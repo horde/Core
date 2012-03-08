@@ -1,6 +1,6 @@
 <?php
 /**
- * A data object that represents raw JSON data.
+ * A data object that represents only JSON notification data.
  *
  * Copyright 2012 Horde LLC (http://www.horde.org/)
  *
@@ -12,32 +12,25 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
-class Horde_Core_Ajax_Response_Raw extends Horde_Core_Ajax_Response
+class Horde_Core_Ajax_Response_Notifications extends Horde_Core_Ajax_Response
 {
     /**
      */
-    public function __construct($data = null)
+    public function __construct()
     {
-        parent::__construct($data);
-    }
-
-    /**
-     * Don't add notification messages to raw data.
-     */
-    public function addNotifications()
-    {
+        parent::__construct(null, true);
     }
 
     /**
      * Prepare JSON data response object.
      *
-     * For raw data, we send back only the response data.
+     * Only return notification data.
      *
      * @return object  Data response object.
      */
     public function jsonData()
     {
-        return $this->data;
+        return $this->notifications;
     }
 
 }
