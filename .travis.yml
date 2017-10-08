@@ -18,10 +18,10 @@ before_script:
   - if [ "$TRAVIS_PHP_VERSION" == "5.6" ] || [ "$TRAVIS_PHP_VERSION" == "7.0" ];
     then
       pear channel-discover pear.horde.org;
-      pear install channel://pear.horde.org/Horde_Role
+      pear install channel://pear.horde.org/Horde_Role;
       echo "include_path = .:$HOME/.phpenv/versions/$(phpenv version-name)/lib/php/pear" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini;
     else
-      pear install channel://pear.horde.org/Horde_Role
+      pear install channel://pear.horde.org/Horde_Role;
     fi
   - pear install channel://pear.horde.org/Horde_Test
   - pear install -a -B package.xml
