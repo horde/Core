@@ -30,7 +30,7 @@
  </developer>
  <date>2017-10-09</date>
  <version>
-  <release>2.31.0</release>
+  <release>2.31.1</release>
   <api>2.31.0</api>
  </version>
  <stability>
@@ -39,7 +39,7 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* [jan] Add Horde_Registry_Application#_backupPrefs() and _restorePrefs().
+* 
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -4524,6 +4524,19 @@
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [jan] Add Horde_Registry_Application#_backupPrefs() and _restorePrefs().
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.1</release>
+    <api>2.31.0</api></version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api></stability>
+   <date>2017-10-09</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* 
    </notes>
   </release>
  </changelog>
