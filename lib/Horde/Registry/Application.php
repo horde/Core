@@ -257,6 +257,8 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
     /**
      * Extends a backup with some application's preferences.
      *
+     * @since Horde_Core 2.31.0
+     *
      * @param \Horde\Backup\User $backup  A backup object to extend with
      *                                    preference information.
      * @param string $app                 An application name.
@@ -277,13 +279,15 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
         }
         $backup->collections[] = new Backup\Collection(
             new ArrayIterator($values),
-            $user,
+            $backup->user,
             'preferences'
         );
     }
 
     /**
      * Restores the preferences for an application.
+     *
+     * @since Horde_Core 2.31.0
      *
      * @param Backup\Collection $data  Backup data for the specified
      *                                 application.
