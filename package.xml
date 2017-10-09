@@ -28,7 +28,7 @@
   <email>mrubinsk@horde.org</email>
   <active>yes</active>
  </developer>
- <date>2017-09-22</date>
+ <date>2017-10-09</date>
  <version>
   <release>2.31.0</release>
   <api>2.31.0</api>
@@ -4520,7 +4520,7 @@
    <stability>
     <release>stable</release>
     <api>stable</api></stability>
-   <date>2017-09-22</date>
+   <date>2017-10-09</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [jan] Add Horde_Registry_Application#_backupPrefs() and _restorePrefs().

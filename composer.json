@@ -26,8 +26,8 @@
             "role": "developer"
         }
     ],
-    "version": "2.30.2",
-    "time": "2017-08-28",
+    "version": "2.31.0",
+    "time": "2017-10-09",
     "repositories": [
         {
             "type": "pear",
@@ -62,7 +62,7 @@
         "pear-pear.horde.org/Horde_Notification": "^2@stable",
         "pear-pear.horde.org/Horde_Pack": "^1@stable",
         "pear-pear.horde.org/Horde_Perms": "^2@stable",
-        "pear-pear.horde.org/Horde_Prefs": "^2.8@stable",
+        "pear-pear.horde.org/Horde_Prefs": "^2.9@stable",
         "pear-pear.horde.org/Horde_Secret": "^2@stable",
         "pear-pear.horde.org/Horde_Serialize": "^2@stable",
         "pear-pear.horde.org/Horde_SessionHandler": "^2@stable",
