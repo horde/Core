@@ -45,10 +45,7 @@ class Horde_Core_Db_Migration
      * Searches all installed applications and libraries for migration
      * directories and builds lists of migrateable modules and directories.
      *
-     * @param string $basedir   Base directory of a Git checkout. If provided
-     *                          either a framework/ sub directory or the base
-     *                          folder for a split checkout is searched for
-     *                          migration scripts too.
+     * @param string $basedir   Base directory of all Git checkouts.
      * @param string $pearconf  Path to a PEAR configuration file.
      */
     public function __construct($basedir = null, $pearconf = null)
@@ -68,15 +65,9 @@ class Horde_Core_Db_Migration
         error_reporting($old_error_reporting & ~E_DEPRECATED);
         $pear = new PEAR_Config($pearconf);
 
-        // Loop through local framework checkout.
+        // Loop through local framework checkouts.
         if ($basedir) {
-            // Support both the split repo and monolithic for now.
-            // @todo - remove when we perform official split.
-            if (!file_exists($basedir . '/.git')) {
-                $path = $basedir . '/*/migration';
-            } else {
-                $path = $basedir . '/framework/*/migration';
-            }
+            $path = $basedir . '/*/migration';
             $packageFile = new PEAR_PackageFile($pear);
             foreach (glob($path) as $dir) {
                 $package = $packageFile->fromPackageFile(
