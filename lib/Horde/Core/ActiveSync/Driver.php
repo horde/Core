@@ -244,7 +244,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     /**
      * Clean up
      *
-     * @see framework/ActiveSync/lib/Horde/ActiveSync/Driver/Horde_ActiveSync_Driver_Base#clearAuthentication()
+     * @see Horde_ActiveSync_Driver_Base#clearAuthentication()
      */
     public function clearAuthentication()
     {
@@ -1638,7 +1638,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     /**
      * Get message stat data
      *
-     * @see framework/ActiveSync/lib/Horde/ActiveSync/Driver/Horde_ActiveSync_Driver_Base#statMessage($folderId, $id)
+     * @see Horde_ActiveSync_Driver_Base#statMessage($folderId, $id)
      */
     public function statMessage($folderid, $id)
     {
