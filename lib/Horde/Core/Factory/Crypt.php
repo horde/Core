@@ -8,7 +8,6 @@
  * @package  Core
  * @author   Michael Slusarz <slusarz@horde.org>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
- * @link     http://pear.horde.org/index.php?package=Core
  */
 
 /**
@@ -23,7 +22,6 @@
  * @package  Core
  * @author   Michael Slusarz <slusarz@horde.org>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
- * @link     http://pear.horde.org/index.php?package=Core
  */
 class Horde_Core_Factory_Crypt extends Horde_Core_Factory_Base
 {
