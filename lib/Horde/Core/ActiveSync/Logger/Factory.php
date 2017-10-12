@@ -9,7 +9,6 @@
  * @license   http://www.horde.org/licenses/gpl GPLv2
  * @copyright 2010-2017 Horde LLC (http://www.horde.org/)
  * @author    Michael J Rubinsky <mrubinsk@horde.org>
- * @link      http://pear.horde.org/index.php?package=Core
  * @package   Core
  */
 
@@ -21,7 +20,6 @@
  * @license   http://www.horde.org/licenses/gpl GPLv2
  * @copyright 2010-2017 Horde LLC (http://www.horde.org/)
  * @author    Michael J Rubinsky <mrubinsk@horde.org>
- * @link      http://pear.horde.org/index.php?package=Core
  * @package   Core
  */
 class Horde_Core_ActiveSync_Logger_Factory implements Horde_ActiveSync_Interface_LoggerFactory

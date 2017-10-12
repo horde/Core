@@ -8,7 +8,6 @@
  * @category  Horde
  * @copyright 2014-2017 Horde LLC
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
- * @link      http://pear.horde.org/index.php?package=Core
  * @package   Core
  */
 
@@ -18,7 +17,6 @@
  * @category  Horde
  * @copyright 2014-2017 Horde LLC
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
- * @link      http://pear.horde.org/index.php?package=Core
  * @package   Core
  */
 class Horde_Core_Factory_History extends Horde_Core_Factory_Injector
