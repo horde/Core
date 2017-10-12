@@ -92,7 +92,7 @@ class Horde_Config
      *
      * @var string
      */
-    protected $_versionUrl = 'http://pear.horde.org/packages.json';
+    protected $_versionUrl = 'https://pear.horde.org/packages.json';
 
     /**
      * Constructor.
@@ -135,7 +135,7 @@ class Horde_Config
             $version = end($package['versions']);
             $versions[str_replace('pear-horde/', '', $package['name'])] = array(
                 'version' => $version['version'],
-                'url' => 'http://pear.horde.org/'
+                'url' => 'https://pear.horde.org/'
             );
         }
 
