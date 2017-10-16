@@ -28,7 +28,7 @@
   <email>mrubinsk@horde.org</email>
   <active>yes</active>
  </developer>
- <date>2017-09-22</date>
+ <date>2017-10-17</date>
  <version>
   <release>2.31.0</release>
   <api>2.31.0</api>
@@ -44,13 +44,6 @@
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
-   <dir name="doc">
-    <dir name="Horde">
-     <dir name="Core">
-      <file name="COPYING" role="doc" />
-     </dir> <!-- /doc/Horde/Core -->
-    </dir> <!-- /doc/Horde -->
-   </dir> <!-- /doc -->
    <dir name="js">
     <dir name="date">
      <file name="ar-SY.js" role="horde" />
@@ -659,10 +652,10 @@
       <file name="LoginTasks.php" role="php" />
       <file name="Nosql.php" role="php" />
       <file name="Perms.php" role="php" />
+      <file name="Secret.php" role="php" />
       <file name="TagBrowser.php" role="php" />
       <file name="Tagger.php" role="php" />
       <file name="Topbar.php" role="php" />
-      <file name="Secret.php" role="php" />
       <file name="Translation.php" role="php">
        <tasks:replace from="@data_dir@" to="data_dir" type="pear-config" />
       </file>
@@ -1013,6 +1006,7 @@
      </dir> <!-- /test/Horde/Core -->
     </dir> <!-- /test/Horde -->
    </dir> <!-- /test -->
+   <file name="LICENSE" role="doc" />
   </dir> <!-- / -->
  </contents>
  <dependencies>
@@ -1541,44 +1535,12 @@
  </usesrole>
  <phprelease>
   <filelist>
-   <install as="COPYING" name="doc/Horde/Core/COPYING" />
    <install as="js/accesskeys.js" name="js/accesskeys.js" />
    <install as="js/addressbooksprefs.js" name="js/addressbooksprefs.js" />
    <install as="js/alarmprefs.js" name="js/alarmprefs.js" />
    <install as="js/autocomplete.js" name="js/autocomplete.js" />
    <install as="js/calendar.js" name="js/calendar.js" />
    <install as="js/colorpicker.js" name="js/colorpicker.js" />
-   <install as="js/dialog.js" name="js/dialog.js" />
-   <install as="js/form_assign.js" name="js/form_assign.js" />
-   <install as="js/form_helpers.js" name="js/form_helpers.js" />
-   <install as="js/growler-jquery.js" name="js/growler-jquery.js" />
-   <install as="js/growler.js" name="js/growler.js" />
-   <install as="js/horde-jquery-init.js" name="js/horde-jquery-init.js" />
-   <install as="js/horde-jquery.js" name="js/horde-jquery.js" />
-   <install as="js/horde.js" name="js/horde.js" />
-   <install as="js/hordeblocks.js" name="js/hordeblocks.js" />
-   <install as="js/hordecore.js" name="js/hordecore.js" />
-   <install as="js/hordetree.js" name="js/hordetree.js" />
-   <install as="js/identityselect.js" name="js/identityselect.js" />
-   <install as="js/image.js" name="js/image.js" />
-   <install as="js/imple.js" name="js/imple.js" />
-   <install as="js/inplaceeditor.js" name="js/inplaceeditor.js" />
-   <install as="js/keynavlist.js" name="js/keynavlist.js" />
-   <install as="js/liquidmetal.js" name="js/liquidmetal.js" />
-   <install as="js/open_html_helper.js" name="js/open_html_helper.js" />
-   <install as="js/popup.js" name="js/popup.js" />
-   <install as="js/prefs.js" name="js/prefs.js" />
-   <install as="js/prettyautocomplete.js" name="js/prettyautocomplete.js" />
-   <install as="js/prototype.js" name="js/prototype.js" />
-   <install as="js/redbox.js" name="js/redbox.js" />
-   <install as="js/smartmobile.js" name="js/smartmobile.js" />
-   <install as="js/sorter.js" name="js/sorter.js" />
-   <install as="js/sourceselect.js" name="js/sourceselect.js" />
-   <install as="js/spellchecker.js" name="js/spellchecker.js" />
-   <install as="js/tables.js" name="js/tables.js" />
-   <install as="js/toggle_quotes.js" name="js/toggle_quotes.js" />
-   <install as="js/tooltips.js" name="js/tooltips.js" />
-   <install as="js/webnotification.js" name="js/webnotification.js" />
    <install as="js/date/ar-SY.js" name="js/date/ar-SY.js" />
    <install as="js/date/bg-BG.js" name="js/date/bg-BG.js" />
    <install as="js/date/bs-BA.js" name="js/date/bs-BA.js" />
@@ -1623,33 +1585,42 @@
    <install as="js/date/uk-UA.js" name="js/date/uk-UA.js" />
    <install as="js/date/zh-CN.js" name="js/date/zh-CN.js" />
    <install as="js/date/zh-TW.js" name="js/date/zh-TW.js" />
+   <install as="js/dialog.js" name="js/dialog.js" />
    <install as="js/excanvas/excanvas.js" name="js/excanvas/excanvas.js" />
    <install as="js/excanvas/excanvas.min.js" name="js/excanvas/excanvas.min.js" />
    <install as="js/flotr2/flotr2.js" name="js/flotr2/flotr2.js" />
-   <install as="js/jquery.mobile/jquery.js" name="js/jquery.mobile/jquery.js" />
-   <install as="js/jquery.mobile/jquery.min.js" name="js/jquery.mobile/jquery.min.js" />
-   <install as="js/jquery.mobile/jquery.mobile.js" name="js/jquery.mobile/jquery.mobile.js" />
-   <install as="js/jquery.mobile/jquery.mobile.min.css" name="js/jquery.mobile/jquery.mobile.min.css" />
-   <install as="js/jquery.mobile/jquery.mobile.min.js" name="js/jquery.mobile/jquery.mobile.min.js" />
+   <install as="js/form_assign.js" name="js/form_assign.js" />
+   <install as="js/form_helpers.js" name="js/form_helpers.js" />
+   <install as="js/growler-jquery.js" name="js/growler-jquery.js" />
+   <install as="js/growler.js" name="js/growler.js" />
+   <install as="js/horde-jquery-init.js" name="js/horde-jquery-init.js" />
+   <install as="js/horde-jquery.js" name="js/horde-jquery.js" />
+   <install as="js/horde.js" name="js/horde.js" />
+   <install as="js/hordeblocks.js" name="js/hordeblocks.js" />
+   <install as="js/hordecore.js" name="js/hordecore.js" />
+   <install as="js/hordetree.js" name="js/hordetree.js" />
+   <install as="js/identityselect.js" name="js/identityselect.js" />
+   <install as="js/image.js" name="js/image.js" />
+   <install as="js/imple.js" name="js/imple.js" />
+   <install as="js/inplaceeditor.js" name="js/inplaceeditor.js" />
    <install as="js/jquery.mobile/images/ajax-loader.gif" name="js/jquery.mobile/images/ajax-loader.gif" />
    <install as="js/jquery.mobile/images/icons-18-black.png" name="js/jquery.mobile/images/icons-18-black.png" />
    <install as="js/jquery.mobile/images/icons-18-white.png" name="js/jquery.mobile/images/icons-18-white.png" />
    <install as="js/jquery.mobile/images/icons-36-black.png" name="js/jquery.mobile/images/icons-36-black.png" />
    <install as="js/jquery.mobile/images/icons-36-white.png" name="js/jquery.mobile/images/icons-36-white.png" />
+   <install as="js/jquery.mobile/jquery.js" name="js/jquery.mobile/jquery.js" />
+   <install as="js/jquery.mobile/jquery.min.js" name="js/jquery.mobile/jquery.min.js" />
+   <install as="js/jquery.mobile/jquery.mobile.js" name="js/jquery.mobile/jquery.mobile.js" />
+   <install as="js/jquery.mobile/jquery.mobile.min.css" name="js/jquery.mobile/jquery.mobile.min.css" />
+   <install as="js/jquery.mobile/jquery.mobile.min.js" name="js/jquery.mobile/jquery.mobile.min.js" />
    <install as="js/jquery.mobile/plugins/autocomplete.js" name="js/jquery.mobile/plugins/autocomplete.js" />
    <install as="js/jquery.mobile/plugins/form.js" name="js/jquery.mobile/plugins/form.js" />
    <install as="js/jquery.mobile/plugins/swipebutton.js" name="js/jquery.mobile/plugins/swipebutton.js" />
+   <install as="js/keynavlist.js" name="js/keynavlist.js" />
+   <install as="js/liquidmetal.js" name="js/liquidmetal.js" />
    <install as="js/map/bing.js" name="js/map/bing.js" />
    <install as="js/map/google.js" name="js/map/google.js" />
    <install as="js/map/horde.js" name="js/map/horde.js" />
-   <install as="js/map/map.js" name="js/map/map.js" />
-   <install as="js/map/mapquest.js" name="js/map/mapquest.js" />
-   <install as="js/map/null.js" name="js/map/null.js" />
-   <install as="js/map/ocm.js" name="js/map/ocm.js" />
-   <install as="js/map/OpenLayers-debug.js" name="js/map/OpenLayers-debug.js" />
-   <install as="js/map/OpenLayers.js" name="js/map/OpenLayers.js" />
-   <install as="js/map/osm.js" name="js/map/osm.js" />
-   <install as="js/map/owm.js" name="js/map/owm.js" />
    <install as="js/map/img/blank.gif" name="js/map/img/blank.gif" />
    <install as="js/map/img/cloud-popup-relative.png" name="js/map/img/cloud-popup-relative.png" />
    <install as="js/map/img/drag-rectangle-off.png" name="js/map/img/drag-rectangle-off.png" />
@@ -1701,13 +1672,19 @@
    <install as="js/map/lang/vi-VI.js" name="js/map/lang/vi-VI.js" />
    <install as="js/map/lang/zh-CN.js" name="js/map/lang/zh-CN.js" />
    <install as="js/map/lang/zh-TW.js" name="js/map/lang/zh-TW.js" />
+   <install as="js/map/map.js" name="js/map/map.js" />
+   <install as="js/map/mapquest.js" name="js/map/mapquest.js" />
+   <install as="js/map/null.js" name="js/map/null.js" />
+   <install as="js/map/ocm.js" name="js/map/ocm.js" />
+   <install as="js/map/OpenLayers-debug.js" name="js/map/OpenLayers-debug.js" />
+   <install as="js/map/OpenLayers.js" name="js/map/OpenLayers.js" />
+   <install as="js/map/osm.js" name="js/map/osm.js" />
+   <install as="js/map/owm.js" name="js/map/owm.js" />
    <install as="js/map/theme/default/framedCloud.css" name="js/map/theme/default/framedCloud.css" />
    <install as="js/map/theme/default/google.css" name="js/map/theme/default/google.css" />
    <install as="js/map/theme/default/google.tidy.css" name="js/map/theme/default/google.tidy.css" />
    <install as="js/map/theme/default/ie6-style.css" name="js/map/theme/default/ie6-style.css" />
    <install as="js/map/theme/default/ie6-style.tidy.css" name="js/map/theme/default/ie6-style.tidy.css" />
-   <install as="js/map/theme/default/style.css" name="js/map/theme/default/style.css" />
-   <install as="js/map/theme/default/style.tidy.css" name="js/map/theme/default/style.tidy.css" />
    <install as="js/map/theme/default/img/add_point_off.png" name="js/map/theme/default/img/add_point_off.png" />
    <install as="js/map/theme/default/img/add_point_on.png" name="js/map/theme/default/img/add_point_on.png" />
    <install as="js/map/theme/default/img/blank.gif" name="js/map/theme/default/img/blank.gif" />
@@ -1742,6 +1719,14 @@
    <install as="js/map/theme/default/img/view_previous_on.png" name="js/map/theme/default/img/view_previous_on.png" />
    <install as="js/map/theme/default/img/zoom-panel-NOALPHA.png" name="js/map/theme/default/img/zoom-panel-NOALPHA.png" />
    <install as="js/map/theme/default/img/zoom-panel.png" name="js/map/theme/default/img/zoom-panel.png" />
+   <install as="js/map/theme/default/style.css" name="js/map/theme/default/style.css" />
+   <install as="js/map/theme/default/style.tidy.css" name="js/map/theme/default/style.tidy.css" />
+   <install as="js/open_html_helper.js" name="js/open_html_helper.js" />
+   <install as="js/popup.js" name="js/popup.js" />
+   <install as="js/prefs.js" name="js/prefs.js" />
+   <install as="js/prettyautocomplete.js" name="js/prettyautocomplete.js" />
+   <install as="js/prototype.js" name="js/prototype.js" />
+   <install as="js/redbox.js" name="js/redbox.js" />
    <install as="js/scriptaculous/builder.js" name="js/scriptaculous/builder.js" />
    <install as="js/scriptaculous/controls.js" name="js/scriptaculous/controls.js" />
    <install as="js/scriptaculous/dragdrop.js" name="js/scriptaculous/dragdrop.js" />
@@ -1750,44 +1735,26 @@
    <install as="js/scriptaculous/slider.js" name="js/scriptaculous/slider.js" />
    <install as="js/scriptaculous/sound.js" name="js/scriptaculous/sound.js" />
    <install as="js/scriptaculous/unittest.js" name="js/scriptaculous/unittest.js" />
+   <install as="js/smartmobile.js" name="js/smartmobile.js" />
+   <install as="js/sorter.js" name="js/sorter.js" />
+   <install as="js/sourceselect.js" name="js/sourceselect.js" />
+   <install as="js/spellchecker.js" name="js/spellchecker.js" />
+   <install as="js/tables.js" name="js/tables.js" />
+   <install as="js/toggle_quotes.js" name="js/toggle_quotes.js" />
+   <install as="js/tooltips.js" name="js/tooltips.js" />
+   <install as="js/webnotification.js" name="js/webnotification.js" />
    <install as="Horde.php" name="lib/Horde.php" />
    <install as="Horde/Config.php" name="lib/Horde/Config.php" />
-   <install as="Horde/Deprecated.php" name="lib/Horde/Deprecated.php" />
-   <install as="Horde/ErrorHandler.php" name="lib/Horde/ErrorHandler.php" />
-   <install as="Horde/Help.php" name="lib/Horde/Help.php" />
-   <install as="Horde/Menu.php" name="lib/Horde/Menu.php" />
-   <install as="Horde/PageOutput.php" name="lib/Horde/PageOutput.php" />
-   <install as="Horde/Registry.php" name="lib/Horde/Registry.php" />
-   <install as="Horde/Session.php" name="lib/Horde/Session.php" />
-   <install as="Horde/Shutdown.php" name="lib/Horde/Shutdown.php" />
-   <install as="Horde/Themes.php" name="lib/Horde/Themes.php" />
    <install as="Horde/Config/Form.php" name="lib/Horde/Config/Form.php" />
-   <install as="Horde/Core/Block.php" name="lib/Horde/Core/Block.php" />
-   <install as="Horde/Core/Browser.php" name="lib/Horde/Core/Browser.php" />
-   <install as="Horde/Core/Bundle.php" name="lib/Horde/Core/Bundle.php" />
-   <install as="Horde/Core/Cli.php" name="lib/Horde/Core/Cli.php" />
-   <install as="Horde/Core/History.php" name="lib/Horde/Core/History.php" />
-   <install as="Horde/Core/Hooks.php" name="lib/Horde/Core/Hooks.php" />
-   <install as="Horde/Core/HordeMap.php" name="lib/Horde/Core/HordeMap.php" />
-   <install as="Horde/Core/LoginTasks.php" name="lib/Horde/Core/LoginTasks.php" />
-   <install as="Horde/Core/Nosql.php" name="lib/Horde/Core/Nosql.php" />
-   <install as="Horde/Core/Perms.php" name="lib/Horde/Core/Perms.php" />
-   <install as="Horde/Core/TagBrowser.php" name="lib/Horde/Core/TagBrowser.php" />
-   <install as="Horde/Core/Tagger.php" name="lib/Horde/Core/Tagger.php" />
-   <install as="Horde/Core/Topbar.php" name="lib/Horde/Core/Topbar.php" />
-   <install as="Horde/Core/Secret.php" name="lib/Horde/Core/Secret.php" />
-   <install as="Horde/Core/Translation.php" name="lib/Horde/Core/Translation.php" />
    <install as="Horde/Core/ActiveSync/Auth.php" name="lib/Horde/Core/ActiveSync/Auth.php" />
    <install as="Horde/Core/ActiveSync/Connector.php" name="lib/Horde/Core/ActiveSync/Connector.php" />
    <install as="Horde/Core/ActiveSync/Driver.php" name="lib/Horde/Core/ActiveSync/Driver.php" />
-   <install as="Horde/Core/ActiveSync/Mail.php" name="lib/Horde/Core/ActiveSync/Mail.php" />
-   <install as="Horde/Core/ActiveSync/Mdn.php" name="lib/Horde/Core/ActiveSync/Mdn.php" />
    <install as="Horde/Core/ActiveSync/Imap/Factory.php" name="lib/Horde/Core/ActiveSync/Imap/Factory.php" />
    <install as="Horde/Core/ActiveSync/Logger/Factory.php" name="lib/Horde/Core/ActiveSync/Logger/Factory.php" />
+   <install as="Horde/Core/ActiveSync/Mail.php" name="lib/Horde/Core/ActiveSync/Mail.php" />
    <install as="Horde/Core/ActiveSync/Mail/Draft.php" name="lib/Horde/Core/ActiveSync/Mail/Draft.php" />
+   <install as="Horde/Core/ActiveSync/Mdn.php" name="lib/Horde/Core/ActiveSync/Mdn.php" />
    <install as="Horde/Core/Ajax/Application.php" name="lib/Horde/Core/Ajax/Application.php" />
-   <install as="Horde/Core/Ajax/Imple.php" name="lib/Horde/Core/Ajax/Imple.php" />
-   <install as="Horde/Core/Ajax/Response.php" name="lib/Horde/Core/Ajax/Response.php" />
    <install as="Horde/Core/Ajax/Application/Handler.php" name="lib/Horde/Core/Ajax/Application/Handler.php" />
    <install as="Horde/Core/Ajax/Application/Handler/Chunk.php" name="lib/Horde/Core/Ajax/Application/Handler/Chunk.php" />
    <install as="Horde/Core/Ajax/Application/Handler/Email.php" name="lib/Horde/Core/Ajax/Application/Handler/Email.php" />
@@ -1795,51 +1762,57 @@
    <install as="Horde/Core/Ajax/Application/Handler/Imple.php" name="lib/Horde/Core/Ajax/Application/Handler/Imple.php" />
    <install as="Horde/Core/Ajax/Application/Handler/Noop.php" name="lib/Horde/Core/Ajax/Application/Handler/Noop.php" />
    <install as="Horde/Core/Ajax/Application/Handler/Prefs.php" name="lib/Horde/Core/Ajax/Application/Handler/Prefs.php" />
+   <install as="Horde/Core/Ajax/Imple.php" name="lib/Horde/Core/Ajax/Imple.php" />
    <install as="Horde/Core/Ajax/Imple/AutoCompleter.php" name="lib/Horde/Core/Ajax/Imple/AutoCompleter.php" />
-   <install as="Horde/Core/Ajax/Imple/ContactAutoCompleter.php" name="lib/Horde/Core/Ajax/Imple/ContactAutoCompleter.php" />
-   <install as="Horde/Core/Ajax/Imple/InPlaceEditor.php" name="lib/Horde/Core/Ajax/Imple/InPlaceEditor.php" />
-   <install as="Horde/Core/Ajax/Imple/SpellChecker.php" name="lib/Horde/Core/Ajax/Imple/SpellChecker.php" />
-   <install as="Horde/Core/Ajax/Imple/UserAutoCompleter.php" name="lib/Horde/Core/Ajax/Imple/UserAutoCompleter.php" />
-   <install as="Horde/Core/Ajax/Imple/WeatherLocationAutoCompleter.php" name="lib/Horde/Core/Ajax/Imple/WeatherLocationAutoCompleter.php" />
    <install as="Horde/Core/Ajax/Imple/AutoCompleter/Ajax.php" name="lib/Horde/Core/Ajax/Imple/AutoCompleter/Ajax.php" />
    <install as="Horde/Core/Ajax/Imple/AutoCompleter/Base.php" name="lib/Horde/Core/Ajax/Imple/AutoCompleter/Base.php" />
    <install as="Horde/Core/Ajax/Imple/AutoCompleter/Local.php" name="lib/Horde/Core/Ajax/Imple/AutoCompleter/Local.php" />
    <install as="Horde/Core/Ajax/Imple/AutoCompleter/Pretty.php" name="lib/Horde/Core/Ajax/Imple/AutoCompleter/Pretty.php" />
+   <install as="Horde/Core/Ajax/Imple/ContactAutoCompleter.php" name="lib/Horde/Core/Ajax/Imple/ContactAutoCompleter.php" />
    <install as="Horde/Core/Ajax/Imple/Geocoder/Geonames.php" name="lib/Horde/Core/Ajax/Imple/Geocoder/Geonames.php" />
+   <install as="Horde/Core/Ajax/Imple/InPlaceEditor.php" name="lib/Horde/Core/Ajax/Imple/InPlaceEditor.php" />
+   <install as="Horde/Core/Ajax/Imple/SpellChecker.php" name="lib/Horde/Core/Ajax/Imple/SpellChecker.php" />
+   <install as="Horde/Core/Ajax/Imple/UserAutoCompleter.php" name="lib/Horde/Core/Ajax/Imple/UserAutoCompleter.php" />
+   <install as="Horde/Core/Ajax/Imple/WeatherLocationAutoCompleter.php" name="lib/Horde/Core/Ajax/Imple/WeatherLocationAutoCompleter.php" />
    <install as="Horde/Core/Ajax/Imple/WeatherLocationAutoCompleter/Base.php" name="lib/Horde/Core/Ajax/Imple/WeatherLocationAutoCompleter/Base.php" />
    <install as="Horde/Core/Ajax/Imple/WeatherLocationAutoCompleter/Metar.php" name="lib/Horde/Core/Ajax/Imple/WeatherLocationAutoCompleter/Metar.php" />
    <install as="Horde/Core/Ajax/Imple/WeatherLocationAutoCompleter/Weather.php" name="lib/Horde/Core/Ajax/Imple/WeatherLocationAutoCompleter/Weather.php" />
+   <install as="Horde/Core/Ajax/Response.php" name="lib/Horde/Core/Ajax/Response.php" />
    <install as="Horde/Core/Ajax/Response/HordeCore.php" name="lib/Horde/Core/Ajax/Response/HordeCore.php" />
-   <install as="Horde/Core/Ajax/Response/Notifications.php" name="lib/Horde/Core/Ajax/Response/Notifications.php" />
-   <install as="Horde/Core/Ajax/Response/Prototypejs.php" name="lib/Horde/Core/Ajax/Response/Prototypejs.php" />
-   <install as="Horde/Core/Ajax/Response/Raw.php" name="lib/Horde/Core/Ajax/Response/Raw.php" />
    <install as="Horde/Core/Ajax/Response/HordeCore/JsonHtml.php" name="lib/Horde/Core/Ajax/Response/HordeCore/JsonHtml.php" />
    <install as="Horde/Core/Ajax/Response/HordeCore/NoAuth.php" name="lib/Horde/Core/Ajax/Response/HordeCore/NoAuth.php" />
    <install as="Horde/Core/Ajax/Response/HordeCore/Reload.php" name="lib/Horde/Core/Ajax/Response/HordeCore/Reload.php" />
    <install as="Horde/Core/Ajax/Response/HordeCore/SessionTimeout.php" name="lib/Horde/Core/Ajax/Response/HordeCore/SessionTimeout.php" />
+   <install as="Horde/Core/Ajax/Response/Notifications.php" name="lib/Horde/Core/Ajax/Response/Notifications.php" />
+   <install as="Horde/Core/Ajax/Response/Prototypejs.php" name="lib/Horde/Core/Ajax/Response/Prototypejs.php" />
+   <install as="Horde/Core/Ajax/Response/Raw.php" name="lib/Horde/Core/Ajax/Response/Raw.php" />
    <install as="Horde/Core/Alarm/Handler/Desktop.php" name="lib/Horde/Core/Alarm/Handler/Desktop.php" />
-   <install as="Horde/Core/Alarm/Handler/Notify.php" name="lib/Horde/Core/Alarm/Handler/Notify.php" />
    <install as="Horde/Core/Alarm/Handler/Desktop/Icon.php" name="lib/Horde/Core/Alarm/Handler/Desktop/Icon.php" />
+   <install as="Horde/Core/Alarm/Handler/Notify.php" name="lib/Horde/Core/Alarm/Handler/Notify.php" />
    <install as="Horde/Core/Auth/Application.php" name="lib/Horde/Core/Auth/Application.php" />
    <install as="Horde/Core/Auth/Composite.php" name="lib/Horde/Core/Auth/Composite.php" />
    <install as="Horde/Core/Auth/Imsp.php" name="lib/Horde/Core/Auth/Imsp.php" />
    <install as="Horde/Core/Auth/Ldap.php" name="lib/Horde/Core/Auth/Ldap.php" />
    <install as="Horde/Core/Auth/Msad.php" name="lib/Horde/Core/Auth/Msad.php" />
    <install as="Horde/Core/Auth/Shibboleth.php" name="lib/Horde/Core/Auth/Shibboleth.php" />
-   <install as="Horde/Core/Auth/UsernameHook.php" name="lib/Horde/Core/Auth/UsernameHook.php" />
-   <install as="Horde/Core/Auth/X509.php" name="lib/Horde/Core/Auth/X509.php" />
    <install as="Horde/Core/Auth/Signup/Base.php" name="lib/Horde/Core/Auth/Signup/Base.php" />
    <install as="Horde/Core/Auth/Signup/Form.php" name="lib/Horde/Core/Auth/Signup/Form.php" />
    <install as="Horde/Core/Auth/Signup/Null.php" name="lib/Horde/Core/Auth/Signup/Null.php" />
    <install as="Horde/Core/Auth/Signup/Sql.php" name="lib/Horde/Core/Auth/Signup/Sql.php" />
    <install as="Horde/Core/Auth/Signup/SqlObject.php" name="lib/Horde/Core/Auth/Signup/SqlObject.php" />
+   <install as="Horde/Core/Auth/UsernameHook.php" name="lib/Horde/Core/Auth/UsernameHook.php" />
+   <install as="Horde/Core/Auth/X509.php" name="lib/Horde/Core/Auth/X509.php" />
+   <install as="Horde/Core/Block.php" name="lib/Horde/Core/Block.php" />
    <install as="Horde/Core/Block/Collection.php" name="lib/Horde/Core/Block/Collection.php" />
    <install as="Horde/Core/Block/Layout.php" name="lib/Horde/Core/Block/Layout.php" />
-   <install as="Horde/Core/Block/Upgrade.php" name="lib/Horde/Core/Block/Upgrade.php" />
    <install as="Horde/Core/Block/Layout/Manager.php" name="lib/Horde/Core/Block/Layout/Manager.php" />
    <install as="Horde/Core/Block/Layout/View.php" name="lib/Horde/Core/Block/Layout/View.php" />
+   <install as="Horde/Core/Block/Upgrade.php" name="lib/Horde/Core/Block/Upgrade.php" />
+   <install as="Horde/Core/Browser.php" name="lib/Horde/Core/Browser.php" />
+   <install as="Horde/Core/Bundle.php" name="lib/Horde/Core/Bundle.php" />
    <install as="Horde/Core/Cache/Session.php" name="lib/Horde/Core/Cache/Session.php" />
    <install as="Horde/Core/Cache/SessionObjects.php" name="lib/Horde/Core/Cache/SessionObjects.php" />
+   <install as="Horde/Core/Cli.php" name="lib/Horde/Core/Cli.php" />
    <install as="Horde/Core/Controller/NotFound.php" name="lib/Horde/Core/Controller/NotFound.php" />
    <install as="Horde/Core/Controller/RequestConfiguration.php" name="lib/Horde/Core/Controller/RequestConfiguration.php" />
    <install as="Horde/Core/Controller/RequestMapper.php" name="lib/Horde/Core/Controller/RequestMapper.php" />
@@ -1876,6 +1849,8 @@
    <install as="Horde/Core/Factory/History.php" name="lib/Horde/Core/Factory/History.php" />
    <install as="Horde/Core/Factory/HttpClient.php" name="lib/Horde/Core/Factory/HttpClient.php" />
    <install as="Horde/Core/Factory/Identity.php" name="lib/Horde/Core/Factory/Identity.php" />
+   <install as="Horde/Core/Factory/Identity/DavUsernameHook.php" name="lib/Horde/Core/Factory/Identity/DavUsernameHook.php" />
+   <install as="Horde/Core/Factory/Identity/UsernameHook.php" name="lib/Horde/Core/Factory/Identity/UsernameHook.php" />
    <install as="Horde/Core/Factory/Image.php" name="lib/Horde/Core/Factory/Image.php" />
    <install as="Horde/Core/Factory/Imple.php" name="lib/Horde/Core/Factory/Imple.php" />
    <install as="Horde/Core/Factory/Imsp.php" name="lib/Horde/Core/Factory/Imsp.php" />
@@ -1905,6 +1880,7 @@
    <install as="Horde/Core/Factory/QueueStorage.php" name="lib/Horde/Core/Factory/QueueStorage.php" />
    <install as="Horde/Core/Factory/Request.php" name="lib/Horde/Core/Factory/Request.php" />
    <install as="Horde/Core/Factory/Secret.php" name="lib/Horde/Core/Factory/Secret.php" />
+   <install as="Horde/Core/Factory/Secret/Cbc.php" name="lib/Horde/Core/Factory/Secret/Cbc.php" />
    <install as="Horde/Core/Factory/SessionHandler.php" name="lib/Horde/Core/Factory/SessionHandler.php" />
    <install as="Horde/Core/Factory/Share.php" name="lib/Horde/Core/Factory/Share.php" />
    <install as="Horde/Core/Factory/ShareBase.php" name="lib/Horde/Core/Factory/ShareBase.php" />
@@ -1922,40 +1898,43 @@
    <install as="Horde/Core/Factory/Vfs.php" name="lib/Horde/Core/Factory/Vfs.php" />
    <install as="Horde/Core/Factory/View.php" name="lib/Horde/Core/Factory/View.php" />
    <install as="Horde/Core/Factory/Weather.php" name="lib/Horde/Core/Factory/Weather.php" />
-   <install as="Horde/Core/Factory/Identity/DavUsernameHook.php" name="lib/Horde/Core/Factory/Identity/DavUsernameHook.php" />
-   <install as="Horde/Core/Factory/Identity/UsernameHook.php" name="lib/Horde/Core/Factory/Identity/UsernameHook.php" />
-   <install as="Horde/Core/Factory/Secret/Cbc.php" name="lib/Horde/Core/Factory/Secret/Cbc.php" />
    <install as="Horde/Core/Group/Ldap.php" name="lib/Horde/Core/Group/Ldap.php" />
    <install as="Horde/Core/HashTable/PersistentSession.php" name="lib/Horde/Core/HashTable/PersistentSession.php" />
    <install as="Horde/Core/HashTable/Vfs.php" name="lib/Horde/Core/HashTable/Vfs.php" />
    <install as="Horde/Core/HashTable/Wrapper.php" name="lib/Horde/Core/HashTable/Wrapper.php" />
+   <install as="Horde/Core/History.php" name="lib/Horde/Core/History.php" />
+   <install as="Horde/Core/Hooks.php" name="lib/Horde/Core/Hooks.php" />
+   <install as="Horde/Core/HordeMap.php" name="lib/Horde/Core/HordeMap.php" />
    <install as="Horde/Core/Imsp/Utils.php" name="lib/Horde/Core/Imsp/Utils.php" />
    <install as="Horde/Core/Itip/Response/Options/Horde.php" name="lib/Horde/Core/Itip/Response/Options/Horde.php" />
    <install as="Horde/Core/Kolab/Storage/HistoryPrefix.php" name="lib/Horde/Core/Kolab/Storage/HistoryPrefix.php" />
    <install as="Horde/Core/Log/Logger.php" name="lib/Horde/Core/Log/Logger.php" />
    <install as="Horde/Core/Log/Object.php" name="lib/Horde/Core/Log/Object.php" />
    <install as="Horde/Core/Log/Wrapper.php" name="lib/Horde/Core/Log/Wrapper.php" />
+   <install as="Horde/Core/LoginTasks.php" name="lib/Horde/Core/LoginTasks.php" />
    <install as="Horde/Core/LoginTasks/Backend/Horde.php" name="lib/Horde/Core/LoginTasks/Backend/Horde.php" />
    <install as="Horde/Core/LoginTasks/SystemTask/Upgrade.php" name="lib/Horde/Core/LoginTasks/SystemTask/Upgrade.php" />
    <install as="Horde/Core/Mime/Headers/Received.php" name="lib/Horde/Core/Mime/Headers/Received.php" />
    <install as="Horde/Core/Mime/Viewer/Syntaxhighlighter.php" name="lib/Horde/Core/Mime/Viewer/Syntaxhighlighter.php" />
    <install as="Horde/Core/Mime/Viewer/Vcard.php" name="lib/Horde/Core/Mime/Viewer/Vcard.php" />
-   <install as="Horde/Core/Notification/Handler.php" name="lib/Horde/Core/Notification/Handler.php" />
+   <install as="Horde/Core/Nosql.php" name="lib/Horde/Core/Nosql.php" />
    <install as="Horde/Core/Notification/Event/Status.php" name="lib/Horde/Core/Notification/Event/Status.php" />
    <install as="Horde/Core/Notification/Event/Webnotification.php" name="lib/Horde/Core/Notification/Event/Webnotification.php" />
+   <install as="Horde/Core/Notification/Handler.php" name="lib/Horde/Core/Notification/Handler.php" />
    <install as="Horde/Core/Notification/Handler/Decorator/Base.php" name="lib/Horde/Core/Notification/Handler/Decorator/Base.php" />
    <install as="Horde/Core/Notification/Handler/Decorator/Hordelog.php" name="lib/Horde/Core/Notification/Handler/Decorator/Hordelog.php" />
    <install as="Horde/Core/Notification/Listener/DynamicStatus.php" name="lib/Horde/Core/Notification/Listener/DynamicStatus.php" />
    <install as="Horde/Core/Notification/Listener/SmartmobileStatus.php" name="lib/Horde/Core/Notification/Listener/SmartmobileStatus.php" />
    <install as="Horde/Core/Notification/Listener/Webnotification.php" name="lib/Horde/Core/Notification/Listener/Webnotification.php" />
    <install as="Horde/Core/Notification/Storage/Session.php" name="lib/Horde/Core/Notification/Storage/Session.php" />
+   <install as="Horde/Core/Perms.php" name="lib/Horde/Core/Perms.php" />
    <install as="Horde/Core/Perms/Ui.php" name="lib/Horde/Core/Perms/Ui.php" />
-   <install as="Horde/Core/Prefs/Identity.php" name="lib/Horde/Core/Prefs/Identity.php" />
-   <install as="Horde/Core/Prefs/Ui.php" name="lib/Horde/Core/Prefs/Ui.php" />
    <install as="Horde/Core/Prefs/Cache/Session.php" name="lib/Horde/Core/Prefs/Cache/Session.php" />
+   <install as="Horde/Core/Prefs/Identity.php" name="lib/Horde/Core/Prefs/Identity.php" />
    <install as="Horde/Core/Prefs/Storage/Configuration.php" name="lib/Horde/Core/Prefs/Storage/Configuration.php" />
    <install as="Horde/Core/Prefs/Storage/Hooks.php" name="lib/Horde/Core/Prefs/Storage/Hooks.php" />
    <install as="Horde/Core/Prefs/Storage/Upgrade.php" name="lib/Horde/Core/Prefs/Storage/Upgrade.php" />
+   <install as="Horde/Core/Prefs/Ui.php" name="lib/Horde/Core/Prefs/Ui.php" />
    <install as="Horde/Core/Prefs/Ui/Special.php" name="lib/Horde/Core/Prefs/Ui/Special.php" />
    <install as="Horde/Core/Prefs/Ui/Widgets.php" name="lib/Horde/Core/Prefs/Ui/Widgets.php" />
    <install as="Horde/Core/Script/Package/Autocomplete.php" name="lib/Horde/Core/Script/Package/Autocomplete.php" />
@@ -1964,16 +1943,21 @@
    <install as="Horde/Core/Script/Package/Keynavlist.php" name="lib/Horde/Core/Script/Package/Keynavlist.php" />
    <install as="Horde/Core/Script/Package/Popup.php" name="lib/Horde/Core/Script/Package/Popup.php" />
    <install as="Horde/Core/Script/Package/Sortable.php" name="lib/Horde/Core/Script/Package/Sortable.php" />
+   <install as="Horde/Core/Secret.php" name="lib/Horde/Core/Secret.php" />
    <install as="Horde/Core/Secret/Cbc.php" name="lib/Horde/Core/Secret/Cbc.php" />
    <install as="Horde/Core/Share/Driver.php" name="lib/Horde/Core/Share/Driver.php" />
    <install as="Horde/Core/Share/FactoryCallback.php" name="lib/Horde/Core/Share/FactoryCallback.php" />
    <install as="Horde/Core/Smartmobile/Url.php" name="lib/Horde/Core/Smartmobile/Url.php" />
    <install as="Horde/Core/Smartmobile/View/Helper.php" name="lib/Horde/Core/Smartmobile/View/Helper.php" />
+   <install as="Horde/Core/TagBrowser.php" name="lib/Horde/Core/TagBrowser.php" />
+   <install as="Horde/Core/Tagger.php" name="lib/Horde/Core/Tagger.php" />
    <install as="Horde/Core/Tagger/Null.php" name="lib/Horde/Core/Tagger/Null.php" />
    <install as="Horde/Core/Text/Filter/Bbcode.php" name="lib/Horde/Core/Text/Filter/Bbcode.php" />
    <install as="Horde/Core/Text/Filter/Emails.php" name="lib/Horde/Core/Text/Filter/Emails.php" />
    <install as="Horde/Core/Text/Filter/Emoticons.php" name="lib/Horde/Core/Text/Filter/Emoticons.php" />
    <install as="Horde/Core/Text/Filter/Highlightquotes.php" name="lib/Horde/Core/Text/Filter/Highlightquotes.php" />
+   <install as="Horde/Core/Topbar.php" name="lib/Horde/Core/Topbar.php" />
+   <install as="Horde/Core/Translation.php" name="lib/Horde/Core/Translation.php" />
    <install as="Horde/Core/Tree/Renderer/Html.php" name="lib/Horde/Core/Tree/Renderer/Html.php" />
    <install as="Horde/Core/Tree/Renderer/Javascript.php" name="lib/Horde/Core/Tree/Renderer/Javascript.php" />
    <install as="Horde/Core/Tree/Renderer/Simplehtml.php" name="lib/Horde/Core/Tree/Renderer/Simplehtml.php" />
@@ -1986,50 +1970,59 @@
    <install as="Horde/Core/Ui/Tabs.php" name="lib/Horde/Core/Ui/Tabs.php" />
    <install as="Horde/Core/Ui/TagCloud.php" name="lib/Horde/Core/Ui/TagCloud.php" />
    <install as="Horde/Core/Ui/VarRenderer.php" name="lib/Horde/Core/Ui/VarRenderer.php" />
-   <install as="Horde/Core/Ui/Widget.php" name="lib/Horde/Core/Ui/Widget.php" />
    <install as="Horde/Core/Ui/VarRenderer/Html.php" name="lib/Horde/Core/Ui/VarRenderer/Html.php" />
    <install as="Horde/Core/Ui/VarRenderer/TablesetHtml.php" name="lib/Horde/Core/Ui/VarRenderer/TablesetHtml.php" />
+   <install as="Horde/Core/Ui/Widget.php" name="lib/Horde/Core/Ui/Widget.php" />
    <install as="Horde/Core/View/Helper/Accesskey.php" name="lib/Horde/Core/View/Helper/Accesskey.php" />
    <install as="Horde/Core/View/Helper/Help.php" name="lib/Horde/Core/View/Helper/Help.php" />
    <install as="Horde/Core/View/Helper/Image.php" name="lib/Horde/Core/View/Helper/Image.php" />
    <install as="Horde/Core/View/Helper/Label.php" name="lib/Horde/Core/View/Helper/Label.php" />
+   <install as="Horde/Deprecated.php" name="lib/Horde/Deprecated.php" />
+   <install as="Horde/ErrorHandler.php" name="lib/Horde/ErrorHandler.php" />
    <install as="Horde/Exception/AuthenticationFailure.php" name="lib/Horde/Exception/AuthenticationFailure.php" />
    <install as="Horde/Exception/HookNotSet.php" name="lib/Horde/Exception/HookNotSet.php" />
    <install as="Horde/Exception/PushApp.php" name="lib/Horde/Exception/PushApp.php" />
+   <install as="Horde/Help.php" name="lib/Horde/Help.php" />
+   <install as="Horde/Menu.php" name="lib/Horde/Menu.php" />
+   <install as="Horde/PageOutput.php" name="lib/Horde/PageOutput.php" />
+   <install as="Horde/Registry.php" name="lib/Horde/Registry.php" />
    <install as="Horde/Registry/Api.php" name="lib/Horde/Registry/Api.php" />
    <install as="Horde/Registry/Application.php" name="lib/Horde/Registry/Application.php" />
    <install as="Horde/Registry/Caller.php" name="lib/Horde/Registry/Caller.php" />
    <install as="Horde/Registry/Hordeconfig.php" name="lib/Horde/Registry/Hordeconfig.php" />
+   <install as="Horde/Registry/Hordeconfig/Merged.php" name="lib/Horde/Registry/Hordeconfig/Merged.php" />
    <install as="Horde/Registry/Loadconfig.php" name="lib/Horde/Registry/Loadconfig.php" />
    <install as="Horde/Registry/Logout.php" name="lib/Horde/Registry/Logout.php" />
+   <install as="Horde/Registry/Logout/Task.php" name="lib/Horde/Registry/Logout/Task.php" />
    <install as="Horde/Registry/Nlsconfig.php" name="lib/Horde/Registry/Nlsconfig.php" />
    <install as="Horde/Registry/Registryconfig.php" name="lib/Horde/Registry/Registryconfig.php" />
-   <install as="Horde/Registry/Hordeconfig/Merged.php" name="lib/Horde/Registry/Hordeconfig/Merged.php" />
-   <install as="Horde/Registry/Logout/Task.php" name="lib/Horde/Registry/Logout/Task.php" />
    <install as="Horde/Script/Cache.php" name="lib/Horde/Script/Cache.php" />
-   <install as="Horde/Script/Compress.php" name="lib/Horde/Script/Compress.php" />
-   <install as="Horde/Script/File.php" name="lib/Horde/Script/File.php" />
-   <install as="Horde/Script/List.php" name="lib/Horde/Script/List.php" />
-   <install as="Horde/Script/Package.php" name="lib/Horde/Script/Package.php" />
    <install as="Horde/Script/Cache/File.php" name="lib/Horde/Script/Cache/File.php" />
    <install as="Horde/Script/Cache/HordeCache.php" name="lib/Horde/Script/Cache/HordeCache.php" />
    <install as="Horde/Script/Cache/Null.php" name="lib/Horde/Script/Cache/Null.php" />
+   <install as="Horde/Script/Compress.php" name="lib/Horde/Script/Compress.php" />
+   <install as="Horde/Script/File.php" name="lib/Horde/Script/File.php" />
    <install as="Horde/Script/File/External.php" name="lib/Horde/Script/File/External.php" />
    <install as="Horde/Script/File/JsDir.php" name="lib/Horde/Script/File/JsDir.php" />
    <install as="Horde/Script/File/JsFramework.php" name="lib/Horde/Script/File/JsFramework.php" />
+   <install as="Horde/Script/List.php" name="lib/Horde/Script/List.php" />
+   <install as="Horde/Script/Package.php" name="lib/Horde/Script/Package.php" />
+   <install as="Horde/Session.php" name="lib/Horde/Session.php" />
    <install as="Horde/Session/Null.php" name="lib/Horde/Session/Null.php" />
+   <install as="Horde/Shutdown.php" name="lib/Horde/Shutdown.php" />
    <install as="Horde/Shutdown/Task.php" name="lib/Horde/Shutdown/Task.php" />
+   <install as="Horde/Themes.php" name="lib/Horde/Themes.php" />
    <install as="Horde/Themes/Cache.php" name="lib/Horde/Themes/Cache.php" />
    <install as="Horde/Themes/Css.php" name="lib/Horde/Themes/Css.php" />
-   <install as="Horde/Themes/Element.php" name="lib/Horde/Themes/Element.php" />
-   <install as="Horde/Themes/Image.php" name="lib/Horde/Themes/Image.php" />
-   <install as="Horde/Themes/Sound.php" name="lib/Horde/Themes/Sound.php" />
    <install as="Horde/Themes/Css/Cache.php" name="lib/Horde/Themes/Css/Cache.php" />
-   <install as="Horde/Themes/Css/Compress.php" name="lib/Horde/Themes/Css/Compress.php" />
    <install as="Horde/Themes/Css/Cache/File.php" name="lib/Horde/Themes/Css/Cache/File.php" />
    <install as="Horde/Themes/Css/Cache/HordeCache.php" name="lib/Horde/Themes/Css/Cache/HordeCache.php" />
    <install as="Horde/Themes/Css/Cache/Null.php" name="lib/Horde/Themes/Css/Cache/Null.php" />
-   <install as="locale/Horde_Core.pot" name="locale/Horde_Core.pot" />
+   <install as="Horde/Themes/Css/Compress.php" name="lib/Horde/Themes/Css/Compress.php" />
+   <install as="Horde/Themes/Element.php" name="lib/Horde/Themes/Element.php" />
+   <install as="Horde/Themes/Image.php" name="lib/Horde/Themes/Image.php" />
+   <install as="Horde/Themes/Sound.php" name="lib/Horde/Themes/Sound.php" />
+   <install as="LICENSE" name="LICENSE" />
    <install as="locale/ar/LC_MESSAGES/Horde_Core.po" name="locale/ar/LC_MESSAGES/Horde_Core.po" />
    <install as="locale/bg/LC_MESSAGES/Horde_Core.po" name="locale/bg/LC_MESSAGES/Horde_Core.po" />
    <install as="locale/bs/LC_MESSAGES/Horde_Core.po" name="locale/bs/LC_MESSAGES/Horde_Core.po" />
@@ -2057,6 +2050,7 @@
    <install as="locale/gl/LC_MESSAGES/Horde_Core.po" name="locale/gl/LC_MESSAGES/Horde_Core.po" />
    <install as="locale/he/LC_MESSAGES/Horde_Core.mo" name="locale/he/LC_MESSAGES/Horde_Core.mo" />
    <install as="locale/he/LC_MESSAGES/Horde_Core.po" name="locale/he/LC_MESSAGES/Horde_Core.po" />
+   <install as="locale/Horde_Core.pot" name="locale/Horde_Core.pot" />
    <install as="locale/hr/LC_MESSAGES/Horde_Core.mo" name="locale/hr/LC_MESSAGES/Horde_Core.mo" />
    <install as="locale/hr/LC_MESSAGES/Horde_Core.po" name="locale/hr/LC_MESSAGES/Horde_Core.po" />
    <install as="locale/hu/LC_MESSAGES/Horde_Core.mo" name="locale/hu/LC_MESSAGES/Horde_Core.mo" />
@@ -2107,16 +2101,16 @@
    <install as="Horde/Core/ActiveSyncTests.php" name="test/Horde/Core/ActiveSyncTests.php" />
    <install as="Horde/Core/AllTests.php" name="test/Horde/Core/AllTests.php" />
    <install as="Horde/Core/bootstrap.php" name="test/Horde/Core/bootstrap.php" />
+   <install as="Horde/Core/Factory/GroupTest.php" name="test/Horde/Core/Factory/GroupTest.php" />
+   <install as="Horde/Core/Factory/KolabServerTest.php" name="test/Horde/Core/Factory/KolabServerTest.php" />
+   <install as="Horde/Core/Factory/KolabSessionTest.php" name="test/Horde/Core/Factory/KolabSessionTest.php" />
    <install as="Horde/Core/NlsconfigTest.php" name="test/Horde/Core/NlsconfigTest.php" />
    <install as="Horde/Core/phpunit.xml" name="test/Horde/Core/phpunit.xml" />
    <install as="Horde/Core/RegistryTest.php" name="test/Horde/Core/RegistryTest.php" />
    <install as="Horde/Core/SmartmobileUrlTest.php" name="test/Horde/Core/SmartmobileUrlTest.php" />
-   <install as="Horde/Core/UrlTest.php" name="test/Horde/Core/UrlTest.php" />
-   <install as="Horde/Core/Factory/GroupTest.php" name="test/Horde/Core/Factory/GroupTest.php" />
-   <install as="Horde/Core/Factory/KolabServerTest.php" name="test/Horde/Core/Factory/KolabServerTest.php" />
-   <install as="Horde/Core/Factory/KolabSessionTest.php" name="test/Horde/Core/Factory/KolabSessionTest.php" />
    <install as="Horde/Core/Stub/Registryconfig.php" name="test/Horde/Core/Stub/Registryconfig.php" />
-   </filelist>
+   <install as="Horde/Core/UrlTest.php" name="test/Horde/Core/UrlTest.php" />
+  </filelist>
  </phprelease>
  <changelog>
   <release>
@@ -4521,7 +4515,7 @@
    <stability>
     <release>stable</release>
     <api>stable</api></stability>
-   <date>2017-09-22</date>
+   <date>2017-10-17</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [mjr] Add ability to disallow access to the ActiveSync GAL
