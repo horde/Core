@@ -5,7 +5,7 @@
  *
  * Copyright 2002-2017 Horde LLC (http://www.horde.org/)
  *
- * See the enclosed file COPYING for license information (LGPL). If you did
+ * See the enclosed file LICENSE for license information (LGPL). If you did
  * not receive this file, see http://opensource.org/licenses/lgpl-2.1.php
  *
  * @author   Marko Djukic <marko@oblo.com>

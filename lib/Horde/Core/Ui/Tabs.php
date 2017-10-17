@@ -5,7 +5,7 @@
  * Copyright 2001-2003 Robert E. Coyle <robertecoyle@hotmail.com>
  * Copyright 2003-2017 Horde LLC (http://www.horde.org/)
  *
- * See the enclosed file COPYING for license information (LGPL). If you
+ * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
  *
  * @author   Jason M. Felice <jason.m.felice@gmail.com>
