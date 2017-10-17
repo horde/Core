@@ -39,6 +39,7 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
+* [mjr] Add ability to disallow access to the ActiveSync GAL
 * [jan] Add Horde_Registry_Application#_backupPrefs() and _restorePrefs().
  </notes>
  <contents>
@@ -4523,6 +4524,7 @@
    <date>2017-09-22</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
+* [mjr] Add ability to disallow access to the ActiveSync GAL
 * [jan] Add Horde_Registry_Application#_backupPrefs() and _restorePrefs().
    </notes>
   </release>
