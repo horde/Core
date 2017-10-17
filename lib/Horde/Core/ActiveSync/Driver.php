@@ -2153,7 +2153,11 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     $results = $this->_connector->files_browse($q['DocumentLibrary:LinkId']);
                 }
             }
-            return array('rows' => $results, 'total' => count($results), 'status' => Horde_ActiveSync_Request_Search::STORE_STATUS_SUCCESS);
+            return array(
+                'rows' => $results,
+                'total' => count($results),
+                'status' => Horde_ActiveSync_Request_Search::STORE_STATUS_SUCCESS
+            );
         }
     }
 
