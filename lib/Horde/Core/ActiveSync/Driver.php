@@ -3426,6 +3426,14 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             'status' => Horde_ActiveSync_Request_Search::STORE_STATUS_SUCCESS,
             'total' => 0
         );
+
+        // If no perms to the GAL, return zero results.
+        $perms = $GLOBALS['injector']->getInstance('Horde_Perms');
+        if ($perms->exists('horde:activesync:no_gal') &&
+            $perms->getPermissions('horde:activesync:no_gal', $this->_user)) {
+                return $return;
+        }
+
         try {
             $results = $this->_connector->contacts_search(
                 $query['query'],
