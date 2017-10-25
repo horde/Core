@@ -14,6 +14,7 @@ matrix:
     - php: nightly
 before_script:
   - phpenv config-rm xdebug.ini || echo "XDebug not enabled"
+  - pear install channel://pear.horde.org/Horde_Role
   - pear install channel://pear.horde.org/Horde_Test
   - pear install -a -B package.xml
 script:
