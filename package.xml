@@ -28,7 +28,7 @@
   <email>mrubinsk@horde.org</email>
   <active>yes</active>
  </developer>
- <date>2017-10-20</date>
+ <date>2017-10-27</date>
  <version>
   <release>2.31.0</release>
   <api>2.31.0</api>
@@ -44,6 +44,13 @@
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
+   <dir name="doc">
+    <dir name="Horde">
+     <dir name="Core">
+      <file name="CHANGES" role="doc" />
+     </dir> <!-- /doc/Horde/Core -->
+    </dir> <!-- /doc/Horde -->
+   </dir> <!-- /doc -->
    <dir name="js">
     <dir name="date">
      <file name="ar-SY.js" role="horde" />
@@ -1534,6 +1541,7 @@
  </usesrole>
  <phprelease>
   <filelist>
+   <install as="CHANGES" name="doc/Horde/Core/CHANGES" />
    <install as="js/accesskeys.js" name="js/accesskeys.js" />
    <install as="js/addressbooksprefs.js" name="js/addressbooksprefs.js" />
    <install as="js/alarmprefs.js" name="js/alarmprefs.js" />
@@ -4512,7 +4520,7 @@
    <stability>
     <release>stable</release>
     <api>stable</api></stability>
-   <date>2017-10-20</date>
+   <date>2017-10-27</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [mjr] Add ability to disallow access to the ActiveSync GAL
