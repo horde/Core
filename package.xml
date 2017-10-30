@@ -28,7 +28,7 @@
   <email>mrubinsk@horde.org</email>
   <active>yes</active>
  </developer>
- <date>2017-10-09</date>
+ <date>2017-10-30</date>
  <version>
   <release>2.31.1</release>
   <api>2.31.0</api>
@@ -46,6 +46,7 @@
    <dir name="doc">
     <dir name="Horde">
      <dir name="Core">
+      <file name="CHANGES" role="doc" />
       <file name="COPYING" role="doc" />
      </dir> <!-- /doc/Horde/Core -->
     </dir> <!-- /doc/Horde -->
@@ -1540,6 +1541,7 @@
  </usesrole>
  <phprelease>
   <filelist>
+   <install as="CHANGES" name="doc/Horde/Core/CHANGES" />
    <install as="COPYING" name="doc/Horde/Core/COPYING" />
    <install as="js/accesskeys.js" name="js/accesskeys.js" />
    <install as="js/addressbooksprefs.js" name="js/addressbooksprefs.js" />
@@ -4534,7 +4536,7 @@
    <stability>
     <release>stable</release>
     <api>stable</api></stability>
-   <date>2017-10-09</date>
+   <date>2017-10-30</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * 
