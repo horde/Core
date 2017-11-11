@@ -21,6 +21,18 @@ authors:
     email: jan@horde.org
     active: true
     role: lead
+  -
+    name: Michael Slusarz
+    user: slusarz
+    email: slusarz@horde.org
+    active: false
+    role: developer
+  -
+    name: Michael J Rubinsky
+    user: mrubinsk
+    email: mrubinsk@horde.org
+    active: true
+    role: developer
 version:
   release: 2.31.0
   api: 2.31.0
