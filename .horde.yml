@@ -90,7 +90,7 @@ dependencies:
       session: '*'
   optional:
     pear:
-      pear.horde.org/Horde_ActiveSync: ^2.38
+      pear.horde.org/Horde_ActiveSync: ^2.39
       pear.horde.org/Horde_Backup: ^1
       pear.horde.org/Horde_Crypt: ^2
       pear.horde.org/Horde_Dav: ^1
