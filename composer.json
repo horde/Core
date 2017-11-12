@@ -79,7 +79,7 @@
         "ext-session": "*"
     },
     "suggest": {
-        "pear-pear.horde.org/Horde_ActiveSync": "^2.38",
+        "pear-pear.horde.org/Horde_ActiveSync": "^2.39",
         "pear-pear.horde.org/Horde_Backup": "^1 <=2.0.0alpha1",
         "pear-pear.horde.org/Horde_Crypt": "^2",
         "pear-pear.horde.org/Horde_Dav": "^1.0.0alpha1",
