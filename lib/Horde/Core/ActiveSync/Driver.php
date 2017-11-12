@@ -804,6 +804,9 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      *
      * @param string $id  The server's folder id.
      * @param string $parent  The folder's parent, if needed. @deprecated
+     *
+     * @throws Horde_ActiveSync_Exception_DeletionNotSupported,
+     *         Horde_ActiveSync_Exception
      */
     public function deleteFolder($id, $parent = Horde_ActiveSync::FOLDER_ROOT)
     {
@@ -826,6 +829,9 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             try {
                 $this->_imap->deleteMailbox($folder_id);
             } catch (Horde_ActiveSync_Exception $e) {
+                if ($this->_isSpecialMailbox($folder_id)) {
+                    throw new Horde_ActiveSync_Exception_DeletionNotSupported($e);
+                }
                 $this->_logger->err($e->getMessage());
                 throw $e;
             }
@@ -2345,6 +2351,8 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         if (!is_null($folder)) {
             return $folder->value;
         }
+
+        return false;
     }
 
     /**
