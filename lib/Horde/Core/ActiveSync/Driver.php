@@ -915,6 +915,12 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      * @return array  An array of hashes that contain the ids of items that have
      *                changed in the specified collection along with a 'type'
      *                flag that indicates the type of change.
+     *
+     * @throws  Horde_Exception_AuthenticationFailure  Thrown when the
+     *          requested collection appears to be no longer available. For H6,
+     *          we should have the application APIs be responsible for
+     *          differentiating between deleted/not-visible.
+     *
      * @todo H6 - Clean up method parameters, update parent class etc...
      *          - Return a new ids object.
      *          - Refactor to use a Repository pattern for each supported
