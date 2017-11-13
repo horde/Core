@@ -3083,7 +3083,6 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             return time();
         }
 
-
         if ($this->_connector->hasFeature('modseq', $this->_classMap[$class])) {
             $modseq = $this->_connector->getHighestModSeq($this->_classMap[$class], $id);
             // Sanity check - if the last syncstamp is higher then the
@@ -3092,7 +3091,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             // entry or (more likely) we are transitioning from using
             // timestamps to using sequences. In this case the difference would
             // be VERY large, so try to detect that.
-            if (!empty($last) && $last > $modseq && (($last - $modseq) > 1000000000)) {
+            if (!empty($last) && (!$modseq || $last > $modseq && (($last - $modseq) > 1000000000))) {
                 return false;
             }
 
