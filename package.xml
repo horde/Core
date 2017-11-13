@@ -3031,7 +3031,6 @@
    <date>2013-03-04</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-* 
    </notes>
   </release>
   <release>
@@ -4526,6 +4525,19 @@
    <notes>
 * [mjr] Add ability to disallow access to the ActiveSync GAL
 * [jan] Add Horde_Registry_Application#_backupPrefs() and _restorePrefs().
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.1</release>
+    <api>2.31.0</api></version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api></stability>
+   <date>2017-10-20</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* [mjr] Detect if the failure was due to trying to delete a special mailbox (Bug #14732).
    </notes>
   </release>
  </changelog>
