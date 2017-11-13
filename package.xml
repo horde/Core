@@ -39,7 +39,7 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* 
+* [mjr] Detect if the failure was due to trying to delete a special mailbox (Bug #14732).
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -3032,7 +3032,6 @@
    <date>2013-03-04</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-* 
    </notes>
   </release>
   <release>
@@ -4539,7 +4538,7 @@
    <date>2017-10-30</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-* 
+* [mjr] Detect if the failure was due to trying to delete a special mailbox (Bug #14732).
    </notes>
   </release>
  </changelog>

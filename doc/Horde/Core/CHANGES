@@ -1,0 +1,1692 @@
+-----------
+v2.31.1-git
+-----------
+
+[mjr] Detect if the failure was due to trying to delete a special mailbox (Bug
+      #14732).
+
+
+
+-------
+v2.31.0
+-------
+
+[mjr] Add ability to disallow access to the ActiveSync GAL
+[jan] Add Horde_Registry_Application#_backupPrefs() and _restorePrefs().
+
+
+-------
+v2.30.2
+-------
+
+[jan] Fix double line breaks in task description tooltips (Bug #14684).
+
+
+-------
+v2.30.1
+-------
+
+[mjr] Fix issue that could break ActiveSync sync if object not found.
+
+
+-------
+v2.30.0
+-------
+
+[jan] SECURITY: Fix XSS vulnerability with pathinfo component in
+      Horde::selfUrl().
+[jan] Deprecate Horde::redirect().
+[jan] Add Horde::signUrl() and Horde::verifySignedUrl().
+
+
+-------
+v2.29.1
+-------
+
+[jan] Fix JavaScript minifying with recent Closure compilers (Bug #14650).
+
+
+-------
+v2.29.0
+-------
+
+[jan] Add Horde_Registry_Application#backup(), restore(), and
+      restoreDependencies().
+[mjr] Fix calculating ActiveSync SOFTDELETE times for calendar collections
+      (Bug #14631).
+
+
+-------
+v2.28.3
+-------
+
+[mjr] Fix regression in loading vhost config files (Bug #14605).
+
+
+-------
+v2.28.2
+-------
+
+[jan] Fix unpacking encrypted session data ("User not authorized for ..." log
+      messages).
+[jan] Throw an exception when accessing a non-existing API through the
+      registry.
+
+
+-------
+v2.28.1
+-------
+
+[jan] Restore BC with incorrect parameter usage of
+      Horde_PageOutput::addInlineScript() (Bug #14597).
+
+
+-------
+v2.28.0
+-------
+
+[jan] Allow to specify JS framework to use for defer-loading inline scripts.
+
+
+-------
+v2.27.8
+-------
+
+[mjr] Fix fatal error when logging a successfully sent email via ActiveSync.
+
+
+-------
+v2.27.7
+-------
+
+[mjr] Fix adding a separator item to a custom menu (Bug #14581).
+[jan] Enable LDAP rootDSE caching.
+[mjr] Use new ActiveSync log handling.
+[jan] Correctly encode IP address literal in first Received: header (Bug
+      #14574).
+[mjr] Remove support for defunct CloudMade, and MyTopo mapping APIs.
+[jan] Fix fatal error screen for PHP 7 error objects.
+[jan] Remember the configuration values of split-read database environments.
+[jan] Only show $conf[sql][ca] if $conf[sql][ssl] is enabled.
+
+
+-------
+v2.27.6
+-------
+
+[jan] Don't show apps with 'admin' status in menu (Bug #14526).
+
+
+-------
+v2.27.5
+-------
+
+[mjr] Add support for a activesync_mailboxlist hook.
+
+
+-------
+v2.27.4
+-------
+
+[mjr] Fix Google Map API warnings (Bug #14525, arjen+horde@de-korte.org).
+[jan] Catch errors from NoSQL preference backend.
+[jan] Make 'hostspec' parameter for MongoDB configuration optional again on
+      PHP 7.
+[jan] Fix session preference driver.
+[jan] Don't pollute DB DSN with unknown parameters when using Cyrsql
+      authentication driver.
+[mjr] Refresh mailbox list when retrieving for ActiveSync.
+
+
+-------
+v2.27.3
+-------
+
+[mjr] Improve handling of certain ActiveSync failures.
+[jan] Fix parsing abbreviated Norwegian month names too (Bug #14503).
+
+
+-------
+v2.27.2
+-------
+
+[mjr] Prevent building invalid HTML when building an email from a SMART_REPLY
+      (Bug #14500).
+
+
+-------
+v2.27.1
+-------
+
+[jan] Allow administrators to log in if preference backend is not available.
+[mjr] Log message headers on error when sending email via ActiveSync.
+[jan] Fix warning if an old locale is longer than 255 characters (Bug #14489).
+[jan] Fix abbreviated Norwegian month names in JavaScript to include trailing
+      dot (Bug #14488).
+[jan] Fix reading session data from the command line with PHP 7.
+
+
+-------
+v2.27.0
+-------
+
+[mjr] Fix BC break in Weather block (Bug #14473).
+[mjr] Fix locking user account after bad logins (Bug #14467).
+[mjr] Add support for EAS 16 draft email sync.
+
+
+-------
+v2.26.1
+-------
+
+[jan] Fix Horde_Form dependency (Bug #14460).
+
+
+-------
+v2.26.0
+-------
+
+[jan] SECURITY: Add CSRF protection tokens to portal layout forms and fix open
+      URL redirection (Reported by ssys GmbH).
+[jan] SECURITY: enable CSRF token for configuration form again (Reported by
+      Dawid Gounski via Beyond Security's SecuriTeam Secure Disclosure
+      program).
+[mjr] Changes to support EAS attachment sync support for Appointment objects.
+[mjr] Refactor ajax weather location autocompleter and add support for metar
+      data.
+[jan] Allow to specify user DN search parameters for LDAP with all bind methods
+      (Request #11697, heinz@htl-steyr.ac.at).
+
+
+-------
+v2.25.0
+-------
+
+[jan] Allow to use the pretty autocompleter without Ajax requests.
+[mjr] Allow adding CSS files with Ajax response.
+[mjr] Use syntaxhighlighter version 4.
+[jan] Fix issue with prototype.js that keeps images in HTML messages from
+      loading.
+
+
+-------
+v2.24.0
+-------
+
+[mjr] Improve EAS logging when sending email messages.
+[jan] Fix specifying custom log template (Viktor Szépe <viktor@szepe.net>).
+[jan] Upgrade prototype.js to version 1.7.3.
+[jan] Pre-select the current locale when building the spellchecker languages
+      (Request #14244).
+[jan] Fix pre-selecting an item in key-navigation-lists.
+[jan] Add classes to support the Horde 6 davusername hook.
+[jan] Fix session_regenerate_id() warnings with PHP 7.
+[jan] Fix running garbage collection on cached CSS and JS files (Bug #14285).
+
+
+-------
+v2.23.0
+-------
+
+[jan] Add Horde_Core_Auth_Application#listNames().
+[jan] Don't call authusername() hook on administrator names when running CLI
+      scripts.
+[jan] Update Greek translation (Limperis Antonis <limperis@cti.gr>).
+[mjr] Fix fatal error with broken EAS clients searching the Outbox.
+
+
+-------
+v2.22.7
+-------
+
+[mjr] Improvements to ActiveSync SETTINGS_ACCOUNTS response data.
+[mjr] Fix issues with ActiveSync clients and user defined message flags.
+[jan] Fix logging in from a different page than the login page (Bug #14231).
+
+
+-------
+v2.22.6
+-------
+
+[mjr] Improvements to GHOSTED/SUPPORTED handling for ActiveSync.
+[mjr] Do not throw a fatal error if a meeting request can not be deleted after
+      responding to it.
+[mjr] Changes for EAS 16.0 support.
+[mjr] Honor the disabled property when rendering boolean form types.
+[jan] Fix returning to last page after problem reporting from AJAX pages (Bug
+      #12112).
+[jan] Fix updating group cache with LDAP backend.
+[jan] Horde_Registry_Nlsconfig#validLang() checks now if a locale is installed
+      (Request #10457).
+[jan] Mark PHP 7 as supported.
+[jan] Add option to always lowercase user names after logging in.
+
+
+-------
+v2.22.5
+-------
+
+[jan] Pass Horde_Cache to Horde_Group if group caching enabled.
+[mjr] Fix handling of empty tags strings in certain use cases (Bug #14203).
+[mjr] Fix fatal error when using count_bad_logins in SQL auth driver.
+
+
+-------
+v2.22.4
+-------
+
+[mjr] SECURITY: Fix XSS in Horde_Core_VarRenderer_Html (reported by Centurion
+      Information Security <www.centurioninfosec.sg>).
+[mjr] Support sending MDN via ActiveSync (Request #23080).
+
+
+-------
+v2.22.3
+-------
+
+[mjr] Fix issue with synchronizing IMAP folder names that contain only numbers.
+
+
+-------
+v2.22.2
+-------
+
+[mjr] Small logging improvements for ActiveSync.
+[mjr] Match various session parameters in the NULL driver.
+
+
+-------
+v2.22.1
+-------
+
+[mjr] Fix ajax updating of Weather block when weather map is shown.
+[mjr] Fix detecting an application's ability to send Horde_Alarm notifications
+      (Bug #14098).
+
+
+-------
+v2.22.0
+-------
+
+[mjr] ActiveSync logging improvements.
+[mjr] Add support for OpenWeatherMap layers in Horde_Map.
+[mjr] Fix edge-case issue with ActiveSync folder list generation when installed
+      application contains no user writable sources.
+
+
+-------
+v2.21.0
+-------
+
+[mjr] Fix dependency on possibly missing Horde_Kolab_Storage_HistoryPrefix
+      interface (Bug #14099).
+[mjr] Add beforeUpdate callback to prettyautocompleter.js.
+
+
+-------
+v2.20.9
+-------
+
+[mjr] Support configuration for version 2 of WorldWeatherOnline's API.
+
+
+-------
+v2.20.8
+-------
+
+[mjr] Map Kolab distribution-list items to the contacts API (Bug #14038).
+
+
+-------
+v2.20.7
+-------
+
+[mjr] Prevent various broken behaviors on ActiveSync clients due to errors
+      copying an email to sent mail folder or updating the maillog (Bug
+      #14058).
+
+
+-------
+v2.20.6
+-------
+
+[jan] SECURITY: Don't allow to login with an empty password.
+[jan] Give administrators access to all groups, even with
+      $conf['share']['any_group'] disabled.
+
+
+-------
+v2.20.5
+-------
+
+[mjr] Fix typo that was causing ActiveSync FILTERTYPE changes to go undetected.
+[mjr] Support for Horde_History in Horde_Kolab_Storage. Requires
+      Horde_Kolab_Storage 2.2.0+.
+[jan] Don't allow empty From: addresses if verifying identities.
+[mjr] Fix fatal error when disconnecting a user Twitter account.
+
+
+-------
+v2.20.4
+-------
+
+[mjr] Work around broken ActiveSync clients that send incorrect line lengths
+      for text/html parts (Bug #13901).
+
+
+-------
+v2.20.3
+-------
+
+[mjr] Fix issue causing message text from email forwarded from ActiveSync
+      clients to be missing (Bug #14000).
+
+
+-------
+v2.20.2
+-------
+
+[mjr] Fix duplicate attachments in certain messages that were forwarded by
+      ActiveSync clients.
+
+
+-------
+v2.20.1
+-------
+
+[mjr] Fix issue that could cause sending the same email to an ActiveSync client
+      multiple times (Bug #13985).
+[mjr] Performance and memory improvements to ActiveSync.
+
+
+-------
+v2.20.0
+-------
+
+[jan] Fix issues with certain locales like Turkish.
+[jan] Upgrade prototype.js to version 1.7.2.
+[jan] Fix editing existing LDAP timeout configuration (Bug #13949).
+[mms] Fix regression in removing CBC cipher mode when encrypting data within a
+      session (Bug #13869).
+
+
+-------
+v2.19.2
+-------
+
+[mjr] Fix combination X509 and http plain authentication with ActiveSync.
+
+
+-------
+v2.19.1
+-------
+
+[jan] Revert to using ECB mode for encryption, to not break existing
+      credentials (Bug #13869).
+[mjr] Fix replying to email from search results in some broken ActiveSync
+      clients (Bug #13878).
+[jan] Fix propagating the LDAP hostspec configuration field (Bug #13872).
+
+
+-------
+v2.19.0
+-------
+
+[jan] Fix notice when deleting identities.
+[jan] Fix NoSQL database name setting getting lost during configuration.
+[jan] Allow to configure multiple LDAP servers and timeout value.
+[mjr] Fixes for using ActiveSync without email sync enabled on Android 5
+      (Niklas Forsdahl <niklas@creamarketing.com>).
+[mms] Calling an application's changeLanguage method on language change now
+      handled by Horde_Registry.
+[jan] Support non-ascii latin characters as access keys.
+[mms] Use more secure CBC block cipher mode when storing encrypted Blowfish
+      data inside the session.
+[mms] If compressing/packaging javascript files, don't use pre-compressed
+      version (if one exists) when generating.
+
+
+-------
+v2.18.3
+-------
+
+[mjr] Improvements in ActiveSync to handling the case when FILTERTYPE changes
+      (Bug #13781).
+
+
+-------
+v2.18.2
+-------
+
+[mjr] Fix missing Date and From headers when saving sent mail from broken HTC
+      clients (Bug #13784).
+[jan] Fix user names via DAV access when using authusername hooks.
+[jan] Fix updating of location in weather portal block.
+
+
+-------
+v2.18.1
+-------
+
+[mjr] Improve/fix support for handling OOF messages in ActiveSync (Bug #13719).
+[mms] Upgrade jQuery to v1.11.2.
+
+
+-------
+v2.18.0
+-------
+
+[jan] Call preference hooks for default values of new identities.
+[mms] Only load application notify handlers on demand.
+
+
+-------
+v2.17.2
+-------
+
+[mjr] Allow disabling maillog synchronization with EAS clients (Bug #13747).
+[jan] Log E_USER_WARNING, E_RECOVERABLE_ERROR, and E_USER_NOTICE messages at
+      the correct level.
+[mjr] Add support for ActiveSync clients that issue BODYPARTPREFERENCE options
+      (Bug #13729).
+
+
+-------
+v2.17.1
+-------
+
+[mjr] Fix broken MIME messages constructed from ActiveSync SMART replies to
+      messages that contained a mulitpart/alternative part (Bug #13720).
+
+
+-------
+v2.17.0
+-------
+
+[mjr] Fix issue that could cause incorrect truncation of ActiveSync emails.
+[mms] Added Horde_Core_Mime_Headers_Received.
+[mms] Added Horde_Core_Itip_Response_Options_Horde.
+[mms] Added Horde_Registry#remoteHost().
+
+
+-------
+v2.16.1
+-------
+
+[mms] Fix file permissions of dynamically generated static CSS/JS files.
+[jan] Use correct user name as a fallback for identity full names with existing
+      authusername hook.
+
+
+-------
+v2.16.0
+-------
+
+[mjr] Add the activesync_provisioning_check hook.
+[mjr] Fix determining multiplex settting for EAS notes (Bug #13637).
+[mjr] Fix adding new tasklists from EAS (Bug #13642).
+[jan] Update Czech translation (Michael Grafnetter
+      <michael.grafnetter@outlook.com>).
+
+
+-------
+v2.15.0
+-------
+
+[mjr] Fix fatal error viewing certain MIME parts due to incorrect method name
+      in the MimeViewer factory.
+[mjr] Add support for moving calendar items on EAS clients.
+
+
+-------
+v2.14.2
+-------
+
+[mjr] Fix generating reply text from EAS clients that only reply in HTML (Bug
+      #13615).
+[mjr] Remove Yahoo related code from HordeMap API.
+[mjr] Add Reply-To header to email sent via ActiveSync if available in identity
+      (Ticket #13592).
+[mjr] Prevent sending contact lists as results in GAL searches.
+
+
+-------
+v2.14.1
+-------
+
+[mjr] Fix handling of EAS categories containing spaces in the name.
+[jan] Catch exceptions if not being able to find an LDAP user DN (Bug #13571).
+[mms] Fix using master SMTP credentials when a CLI script uses the 'user_admin'
+      registry flag.
+
+
+-------
+v2.14.0
+-------
+
+[mjr] Fix dependency on Horde_HashTable (Bug #13549).
+[mjr] Add activesync_email_presend hook.
+[mjr] Fix issue where replying or forwarding broken email messages would break
+      ActiveSync synchronization when saving to Sent mail.
+[mjr] Fix issues with 8-bit characters in Subject header when sending smart
+      replies via ActiveSync (Bug #13456).
+[mjr] Fix GAL searches returning all address book entries.
+[jan] Improve positioning of date picker popup (Karim Geiger
+      <me@karim-geiger.de>).
+[jan] Really fix returning session start time from session handler (Bug
+      #13428).
+
+
+-------
+v2.13.1
+-------
+
+[mms] Ensure persistently stored data is not overwritten by another session.
+[mms] Fix boostrapping DB object when using SQL as the Horde cache driver (Bug
+      #13439).
+[mjr] Support ITEMOPERATIONS_EMPTYFOLDER requests via ActiveSync.
+[mjr] Fetch correct data for EAS ItemSettings requests.
+[jan] Catch exception from application in portal block (Bug #13427).
+[jan] Fix returning session start time from session handler (Bug #13428).
+[mjr] Add support for synchronizing user-defined IMAP flags as EAS Email
+      categories.
+[mjr] Fix BC break when detecting the ActiveSync state driver.
+
+
+-------
+v2.13.0
+-------
+
+[mms] Add Horde_Core_Script_Package_Autocomplete.
+[mms] Fix broken parse_url() behavior for PHP < 5.3.6.
+[mms] Horde_Data now stores temporary data using Horde_Vfs to ensure data
+      persists and that it doesn't overload session storage (Request #11335).
+[mms] Add method to allow any code to register tasks to run on logout.
+[mjr] Ensure EAS client created collections are requested to be added to the
+      application's sync preference (Bug #13359).
+[mjr] Fix fatal error when executing a FOLDERDELETE command on certain
+      collections.
+
+
+-------
+v2.12.6
+-------
+
+[mjr] Fix regression in sending email via ActiveSync when no properly
+      configured identity exists (Bug #13346).
+
+
+-------
+v2.12.5
+-------
+
+[mjr] Fix broken CHANGEFOLDER functionality for ActiveSync NOTES collections
+      (Bug #13334).
+[mms] Better error handling when trying to load config files from the conf.d
+      subdirectory.
+
+
+-------
+v2.12.4
+-------
+
+[mms] Fix clearing authentication-related registry caches when initializing a
+      session in certain instances (Bug #13329).
+[mms] Sanity checking in case smartmobile URL contains anchor that doesn't
+      exist on the page.
+
+
+-------
+v2.12.3
+-------
+
+[mms] Add missing Horde_Pack required dependency.
+
+
+-------
+v2.12.2
+-------
+
+[mms] Add configuration to allow for SMTP authentication if the current Horde
+      access does not have an authenticated user.
+
+
+-------
+v2.12.1
+-------
+
+[jan] Fix botched 2.12.0 release.
+[mjr] Fix closing smartmobile dialog pages (Bug #13316).
+[mjr] Fix issue that could cause multiple tabs to be shown as active when
+      tab_name could be a mix of integers or strings.
+
+
+----------
+v2.12.0RC2
+----------
+
+[mjr] Fix issue sending email via EAS when the imap client throws an error when
+      synchronizing the maillog (Bug #13276).
+[mjr] Improvements to vcard mime handler to allow for ajax updating (Bug
+      #13101).
+[jan] Fix delay when fading the same dialog more than once.
+[jan] Catch exceptions from NoSQL backends when building indices.
+
+
+----------
+v2.12.0RC1
+----------
+
+[mjr] Fix incorrect processing of autocompleted data when using
+      prettyautocompleter (Bug #13256).
+[mjr] Fix updating attendee response status when received via ActiveSync.
+[jan] Add <configldapuser> configuration item.
+[jan] Add base DN to LDAP configuration for searching user DNs.
+[jan] Allow to specify port for PostgreSQL socket connections (Request #13250).
+
+
+------------
+v2.12.0beta3
+------------
+
+[mms] Allow any HordeCore AJAX response object to return JSON-HTML output,
+      instead of pure JSON.
+
+
+------------
+v2.12.0beta2
+------------
+
+[mjr] Fix copying forwarded messages to Sent mail folder when using EAS.
+[mjr] Fix generating From address when sending email via ActiveSync when
+      personal part must be quoted (Bug# 13208).
+
+
+------------
+v2.12.0beta1
+------------
+
+[mjr] Fix tracking bad login count and honoring the lock setting when using
+      Application auth backend.
+[mms] Support LMTP servers when sending mail.
+[mms] Add Horde_Registry#hasLink() (Bug #13175).
+[mjr] Fix returning mailbox list for ActiveSync clients when not using IMAP
+      subscriptions (Bug #13177).
+[jan] Update Hungarian translation (Andras Galos <galosa@netinform.hu>).
+
+
+-------------
+v2.12.0alpha1
+-------------
+
+[mms] Allow CKeditor 3 to work with IE 11.
+[jan] Fix translation of portal block names (Bug #13116).
+[mms] Add Horde_Registry#getAuthInfo() and Horde_Registry#getAuthApps().
+[mms] Add Horde_Core_Cache_Session.
+[mms] Add abstracted web notifications interface to the Horde_Notification
+      system.
+[mms] Upgrade prototype.js to most recent git version
+      (3523295165460a1a371f248454bc311103294f13).
+[mjr] Fix issue that causes enter to submit the form when inside the pretty
+      autocompleter (Bug #12923).
+[mms] Don't store preference UI elements in the session cache storage.
+[mjr] Send the PRIMARYSMTPADDRESS to EAS clients, if appropriate (Request
+      #13062).
+[jan] Fix loading of configuration screen with basedir restrictions or libxml
+      entity loading disabled (Bug #13025).
+[mms] The location of dynamically served static files is now configurable
+      (Request #13070).
+[jan] Update Korean translation (Deokgon Kim <dgkim@dgkim.net>).
+[mms] Support new configuration options for history storage.
+[mms] Fix for prototype.js to correctly recognize IE 11 as IE, not Gecko (Bug
+      #12875).
+[mjr] Added the nonotificationinit parameter to Horde_Registry::appInit().
+[mjr] Fix issue authenticating to certain applications when accessed via RPC.
+[mms] Move CSS minification to the Horde_CssMinify package.
+[mjr] Work around parsing broken incoming ActiveSync SMARTREPLY requests with
+      incorrect character sets (Bug #12969).
+[mms] Add null driver for the content tagger.
+[jan] Add database configuration for Oracle.
+[mms] Add Horde_Registry_Application#getInitialPage().
+[mms] Add Horde_Core_Script_Package_Sortable.
+[mms] Abstract Horde configuration parsing into Horde_Registry_Hordeconfig
+      class.
+[mms] Abstract CSS caching/compressions into Horde_Themes_Css framework.
+[mms] Abstract javascript caching/compression into Horde_Script_Cache
+      framework.
+[mms] Allow jQuery Mobile script to be packaged in same file as other jquery
+      code.
+[mms] Move configuration loading code to Horde_Registry_Loadconfig class.
+[mjr] Fix saving S/MIME signed emails sent via ActiveSync to sent folder (Bug
+      #12936).
+[mms] Store registry cache on the local filesystem.
+[mms] Refactor alarm code to prevent the need from accessing the themes cache
+      on every server access.
+[mms] Prevent avalanche effect from occurring when re-creating cached JS files.
+[mms] Use Horde_JavascriptMinify package to compress javascript.
+[mms] Combine all javascript to compress into a single string.
+[mjr] Improve ActiveSync searches by no longer limiting available searched
+      fields (Request #12917).
+[mms] Support UglifyJS for compressing javascript.
+[mjr] Add support for DocumentLibrary via the files API.
+[mjr] Cache ActiveSync mailbox search results for improved performance during
+      paging.
+[mms] Predis client should only use clustering if necessary.
+[jan] Fix retrieving value lists from Horde_Session.
+[mjr] Use webnotifications.js to normalize various browsers to the standard
+      Notification API.
+[mjr] Fix desktop style notifications in Ajax applications (Bug #12835).
+[mms] Fix jquerymobile icons (Bug #12876).
+[mms] Don't add 2 entries to history when opening a jquery mobile dialog (Bug
+      #12877).
+[jan] Fix padding of drop down lists with scrollbars (Bug #11971).
+
+
+-------
+v2.11.2
+-------
+
+[jan] SECURITY: Fix broken encryption of session data if regenerating session
+      IDs.
+
+
+-------
+v2.11.1
+-------
+
+[jan] Don't try authentication to SMTP server if explicitly disabled (Bug
+      #12830).
+
+
+-------
+v2.11.0
+-------
+
+[mms] Fix hiding preferences if they are contained within a prefs container.
+[mms] Added standardized/normalized mousewheelY javascript event handling to
+      HordeCore.
+[mms] Add nonce generation/checking to Horde_Session.
+[mms] Application hook methods moved from Horde:: to Horde_Core_Hooks::.
+[mms] Add 'fallback' option for the Horde_Registry#appInit() 'authentication'
+      parameter.
+[mms] Fix deauthenticating when a system-level logout event occurs.
+
+
+-------
+v2.10.2
+-------
+
+[mms] Fix prototype.js issue in IE 9 regarding array iteration in a parent
+      window.
+
+
+-------
+v2.10.1
+-------
+
+[mjr] Ensure Bcc is removed from headers when sent via ActiveSync (Bug #12771).
+[mjr] Fix calculating calendars to use for SOFTDELETE commands in certain
+      configurations (Bug #12765).
+[mms] Upgrade jQuery Mobile to v1.3.2/jQuery Core to v1.9.1.
+
+
+-------
+v2.10.0
+-------
+
+[mms] Add Horde_Core_Ui_FlagImage#getFlagImageObByHost.
+[mms] Add base64img property to Horde_Themes_Image.
+[mjr] Do not assume that the filter API is available (Bug #12757).
+[mms] Add ability to load javascript via a HordeCore AJAX response (Request
+      #10971).
+[mms] Add ability to expire CSS cache based on file modification time.
+[mms] Allow disabling VFS via the configuration interface.
+
+
+------
+v2.9.0
+------
+
+[mjr] Send back dummy mail folders when the Mail API is not available (Bug
+      #12738).
+[mms] Upgrade prototype.js to most recent git version
+      (e3d5200cef3236b257ddcfb1eb3eabc5c586bedd).
+[mms] Cache permission results within a PHP access.
+[mms] Don't initialize unnecessary prefs object when creating the topbar.
+[mjr] Support ActiveSync SOFTDELETE.
+[mms] Respect 'nobase64_img' configuration when generating image tags (João
+      Machado <geral@jpaulo.eu>).
+[mjr] Support for X509 certificate authentication in ActiveSync requests.
+[mjr] Fix calculating policy value for SD card encryption and device
+      encryption policies.
+
+
+------
+v2.8.0
+------
+
+[mjr] Always honor activesync_replyposition pref (Bug #12636, Thomas Jarosch
+      <thomas.jarosch@intra2net.com>).
+[rla] Add support for external links in topbar (Request #11977).
+[mms] Fix active session counting from CLI script (Bug #12628).
+
+
+------
+v2.7.0
+------
+
+[mms] Fix regression in authenticating to an application when a session is
+      active.
+[mms] Update session data stored with secret key if session ID changed and we
+      are using non-cookie based sessions.
+[mms] Horde_Session now handles resetting the secret key on login.
+[mms] Add Horde_Session::ENCRYPT flag for session data.
+[mms] The Horde_Mail factory now uses Horde_Smtp as the underlying SMTP driver
+      instead of Net_SMTP.
+[mms] Don't redirect to current page's URL when logging out with a custom
+      message (Bug #12538).
+
+
+------
+v2.6.6
+------
+
+[mjr] Ensure modseq values are always integers which prevents sync loops when
+      no history data is available (Bug #12531).
+[mms] Ensure Registry exists in error handler before attempting to access it
+      (Bug #12540).
+
+
+------
+v2.6.5
+------
+
+[jan] Remove text overlaying menu icon (Bug #12496).
+[mms] Log unexpected authentication errors at a NOTICE level instead of EMERG.
+
+
+------
+v2.6.4
+------
+
+[mms] SessionHandler should not use HashTable wrapper, as it explicitly can't
+      be serialized.
+
+
+------
+v2.6.3
+------
+
+[mjr] Fix fatal error caused by incorrect classname (Bug #12494).
+[mms] Injector a HashTable wrapper object into Cache and SessionHandler
+      objects, so we will reuse global HashTable instance when unserializing.
+
+
+------
+v2.6.2
+------
+
+[mjr] Fix sending s/mime signed email from EAS clients (Bug #12445).
+[mms] Correctly logout when a Horde_Exception_AuthenticationFailure is handled
+      by the default Horde error handler.
+[mms] Don't convert image data URLs already contained within a CSS file when
+      compressing (João Machado <geral@jpaulo.eu>).
+[mms] Prevent endless loop when checkExistingAuth() test fails when
+      initializing an application.
+
+
+------
+v2.6.1
+------
+
+[mjr] Fix issue with replying to emails using EAS 14+ that was causing
+      duplicated original message bodies for some clients.
+[mjr] Performance improvements to Horde_Core_TagBrowser when fetching related
+      tags.
+[mjr] Fix bug in TagBrowser causing shared resources to be ignored (Bug
+      #12405).
+[jan] Fix returning the default from address from a different user without
+      identities.
+[jan] Fix inactive email fields with multiple addresses if disabling linking
+      (Bug #12051).
+[mms] Use built-in ISO 639 mapping in LanguageDetect factory if the underlying
+      library supports it.
+[jan] Fix rendering of email addresses in inactive forms.
+
+
+------
+v2.6.0
+------
+
+[jan] Fixed displaying photos in rendered vCard files.
+[jan] Fix CalDAV/CardDAV access from iOS devices.
+[mjr] Fix obtaining IMSP objects from Horde_Core_Factory_Imsp_Auth.
+[mjr] Fix ActiveSync folder generation when email support is disabled (Bug
+      #12337).
+[mms] Fix language selection at login (Bug #12338).
+[mjr] Add support for history modification sequences in ActiveSync driver.
+[mjr] Fix incorrect offsets when generating free/busy data for ActiveSync
+      clients.
+[mms] Add Horde_HashTable to dependency list (Bug #12314).
+[jan] Don't overwrite host part of parsed email addresses (Bug #12302).
+
+
+------
+v2.5.0
+------
+
+[jan] Don't break existing unchanged sources in the preferences.
+
+
+---------
+v2.5.0RC1
+---------
+
+[mms] Added Horde_Core_Factory_Mail factory to allow for alternative mailer
+      configurations.
+[mms] Fix honoring the sendmail_eol configuration option.
+
+
+-----------
+v2.5.0beta3
+-----------
+
+[mms] Make sure we are not using a SQL Cache driver in the DB object itself.
+[mms] Horde_Memcache usage is deprecated in favor of Horde_HashTable.
+[mms] Add factory for Horde_HashTable drivers.
+
+
+-----------
+v2.5.0beta2
+-----------
+
+[jan] Fix dependencies.
+[mjr] Workaround some limitations with maillog and answered flag syncing in
+      Outlook 2013
+
+
+-----------
+v2.5.0beta1
+-----------
+
+[mms] SECURITY: Fix token validation of AJAX actions.
+[mms] Add the Horde_Registry_Application#nosqlDrivers() method.
+[mms] Add the Horde_Core_Nosql library.
+[jan] Fix setting configuration for timezone lookups.
+[mms] Add a NoSQL factory.
+[mms] Allow MongoDB to be used as a cache backend.
+[mms] Regenerate session IDs during an active session to protect against
+      session fixation attacks.
+[mms] Re-enable support for $conf['session']['timeout'] to allow for
+      non-session based cookie lifetimes.
+[jan] Add menu entry to show the notification log.
+[mms] Dynamic javascript framework now has support for audio notification
+      events.
+[mjr] Add support for EAS 14.0 and 14.1 (see
+      http://wiki.horde.org/ActiveSync/FeatureGrid for complete feature list).
+[mms] Add ability to submit form data to AJAX action in smartmobile view.
+[mms] Upgrade jQuery Mobile to v1.2.1/jQuery Core to v1.8.3.
+[mms] Smartmobile view now honors the current CSS caching configuration.
+[mms] Add Horde_Core_Ajax_Application#callAction().
+[mjr] Close growler notification when alarms are dismissed (Bug #12122).
+[mms] CSS parsing now uses the CSS3 compatible Horde_Css_Parser package instead
+      of Horde_Text_Filter_Csstidy.
+[mms] Fire before/after events in core AJAX javascript code when processing
+      data returned from the server.
+[mjr] Fix sending encrypted emails while locating recipient's public key via
+      the GAL.
+[jan] Use PEAR package information to retrieve packages names in
+      Horde_Core_Db_Migration.
+[jan] Get version list from pear.horde.org when checking for updates.
+[mms] Add support for 'ajaxaction_data' hook (won't be documented in Horde
+      until 5.1+).
+
+
+------
+v2.4.3
+------
+
+[jan] Fix error handler in some PHP versions (Bug #12103).
+
+
+------
+v2.4.2
+------
+
+[mms] Queue log entries issued before framework is initialized and log them
+      once that occurs.
+[mjr] Fix authentication issue when using Horde_Session_Null and expiring
+      sessions (Bug #12078).
+[mjr] Fix logger creation during RPC access (Bug #12094).
+[mms] Add logging wrapper class to reduce serialized size of factory-created
+      objects.
+
+
+------
+v2.4.1
+------
+
+
+------
+v2.4.0
+------
+
+[mms] Always compress cache data, if possible.
+[mms] Abstract data compression out into Horde_Compress_Fast package.
+[mjr] Fix fatal error synchronizing an ActiveSync meeting response (Bug
+      #12084).
+[mms] Added Horde_Shutdown - global Horde shutdown function handler.
+[mjr] Horde_Registry::getServiceLink() can now return full URLs.
+[mms] Allow graphics/sounds to be loaded from view-specific theme directories.
+[mms] Add Horde_Themes::viewDir().
+
+
+------
+v2.3.0
+------
+
+[mms] Use csstidy library to parse CSS files when creating static CSS (Bug
+      #12043).
+[mms] Add Horde_Url#selfUrlParams().
+[mjr] Fix determination of ActiveSync sent-mail folder in certain cases (Bug
+      #11828).
+[mms] Fix order of adding URL parameters in HordeCore.addURLParam (Bug #12058).
+[mms] Ensure that session IDs are always 32 bytes long (Bug #12041).
+[mjr] Fix saving ActiveSync sent mail when the message contains MIME parts
+      (Bug #12040).
+[mms] Fix replacing spellchecker elements within tables (Bug #12028).
+[mms] Fix encoding of JSON parameters to Horde::popupJs() (Bug #12037).
+[mms] Fix destroying session data when the null session driver is used.
+
+
+------
+v2.2.0
+------
+
+[mms] Upgrade jQuery Mobile to v1.2/jQuery Core to v1.8.2.
+[mjr] Fix bug in OpenLayers that caused Prototype's Event object to be
+      overwritten (Bug #12019).
+[jan] Fix notifications while authenticating transparently.
+[mms] Add a configurable delay to the jQuery Mobile autocomplete plugin.
+
+
+------
+v2.1.7
+------
+
+[mjr] Fix handling of moving or deleting messages that have been removed from
+      the server (Bug #12013).
+[jan] Update Slovak translation (Jozef Sudolský <jozef.sudolsky@elbia.sk>).
+[mms] Be sure tasks are passed to any derivative of the HordeCore AJAX
+      response handler.
+
+
+------
+v2.1.6
+------
+
+[jan] Update French translation (Paul De Vlieger
+      <paul.de_vlieger@moniut.univ-bpclermont.fr>).
+[mms] Fix spellchecking on HTML data (Bug #11986).
+[jan] Fix fatal error in signup and password reset forms (Bug #11952).
+
+
+------
+v2.1.5
+------
+
+[jan] Fix sourceselect preferences UI that includes multiple sources.
+
+
+------
+v2.1.4
+------
+
+[mms] Fix multiple AJAX submits to same hidden IFRAME on the same page (Bug
+      #11928).
+[mjr] Fix some MIME related issues when sending email via ActiveSync (Bug
+      #11931).
+[mjr] Fix detecting non-default ActiveSync policies.
+
+
+------
+v2.1.3
+------
+
+[mjr] Improvements to ActiveSync authentication failure handling.
+[mjr] Fix issue with Null session driver that could cause authentication to be
+      lost.
+
+
+------
+v2.1.2
+------
+
+[mms] Fix restoring cached theme data (Bug #11906).
+[jan] Add Basque translation (Ibon Igartua <ibon.igartua@ehu.es>).
+[mjr] Fix dismissing reminders without session cookies enabled (Thomas Jarosch
+      <thomas.jarosch@intra2net.com>, Bug #11875).
+
+
+------
+v2.1.1
+------
+
+[mjr] Improve logging in ActiveSync drivers to better track down issues.
+[jan] Fix returning complete groups with auto-completer.
+
+
+------
+v2.1.0
+------
+
+[mjr] Fix various issues with charset encoding when sending ActiveSync email.
+[jan] Link back to application from preference screen.
+[mjr] Fix GAL searching via ActiveSync (horde@albasoft.com, Bug #11808).
+[mjr] Fix saving sent mail when using ActiveSync (horde@albasoft.com, Bug
+      #11805).
+[jan] Reset NLS information when changing languages.
+[jan] Fix downloading files with special characters in Gollem (Bug #11770).
+[mms] Added Horde_Core_Factory_SpellChecker.
+[mms] Don't log backtrace for E_STRICT errors.
+
+
+------
+v2.0.4
+------
+
+[jan] Fix class name when using the Kolab group backend (Bug #11737).
+
+
+------
+v2.0.3
+------
+
+[mjr] Fix synchronizing device message flag changes over ActiveSync (Bug
+      #11732).
+[mms] Fix returning session start time if session has been closed (read-only)
+      in the current page access (Bug #11685).
+
+
+------
+v2.0.2
+------
+
+[jan] Fix translations (Bug #11606).
+[mjr] Fix detected email changes on certain IMAP servers.
+[mjr] Fix determining special mailboxes and generating folder hierarchy on some
+      ActiveSync clients (Bug #11626).
+[mjr] Limit the length of ActiveSync folder serverids to 64 per ActiveSync
+      specs.
+[mjr] Fix displaying maps in Chrome while using SSL connections (Bug #11618).
+[jan] Update Dutch translation (Arjen de Korte <build+horde@de-korte.org>).
+
+
+------
+v2.0.1
+------
+
+[jan] Re-release of version 2.0.0 due to broken PEAR packager.
+
+
+------
+v2.0.0
+------
+
+First stable release for Horde 5.
+[mms] Confirmation link for new identity requires the full URL as it is
+      intended to be accessed outside of the Horde application (Bug #11593).
+[mms] Need to unescape JSON data returned in a text/html response.
+[jan] Update Polish translation (Krzysztof Kozera <krzysztof113@o2.pl>).
+
+
+---------
+v2.0.0RC1
+---------
+
+[jan] Fix dynamic updating of portal blocks.
+[mms] Allow AJAX handler methods to be marked externally accessible (i.e. no
+      session token checking) (Bug #11538).
+[mjr] Fix copying ActiveSync email to sent folder in certain cases (Bug
+      #11529).
+[jan] Catch exceptions from Horde_Crypt (Bug #11530).
+[jan] Support non-padding operators in JavaScript date formatting (Bug #10435).
+[mms] Add generic CSS class insertion to Help system.
+[mms] Fix handling active error reporting codes in Horde_ErrorHandler.
+
+
+-----------
+v2.0.0beta6
+-----------
+
+[mms] Send spellcheck parameters using AJAX object, not in URL (Bug #11467).
+[mms] Add View helpers to provide access to accesskey methods, Horde::img(),
+      Horde::label(), and Horde_Help::link().
+[mjr] Fix adding Bcc recipients when sending mail from ActiveSync.
+[mjr] Fix issue saving sent mail from ActiveSync (Bug #11410).
+[mms] Added Horde_Core_Smartmobile_Url class.
+[jan] Make Horde::widget() take a single hash parameter.
+[mms] Allow application API interface to dynamically alter properties (Bug
+      #11388).
+
+
+-----------
+v2.0.0beta5
+-----------
+
+[mms] Force IE <= 7 to minimal view (Bug #11327).
+[mms] Add loading triggers to HordeCore JS framework.
+[mjr] Send dummy INBOX, Sent, and Trash folders to client when email sync
+      support is not enabled.
+[mjr] Fix broken ActiveSync behaviour when Email sync is not enabled.
+[mjr] Only subscribed mailboxes are returned by the ActiveSync imap factory.
+[jan] Set HTML 5 "multiple" attribute on email fields if necessary (Bug
+      #11304).
+
+
+-----------
+v2.0.0beta4
+-----------
+
+[mms] Add a no authentication AJAX handler (Bug #11297).
+[mms] Fix HordeCore javascript download action (Bug #11294).
+[mms] Fix upgrade logintasks for pre-release major releases.
+[mjr] Add Horde_Core_Tagger.
+[mjr] Fix autocompletion of tags in ajax views.
+
+
+-----------
+v2.0.0beta3
+-----------
+
+[jan] Fix dependency on Horde_Routes.
+
+
+-----------
+v2.0.0beta2
+-----------
+
+[jan] Fix dependency on Horde_ElasticSearch.
+[jan] Fix default values for LDAP and SQL configuration.
+
+
+-----------
+v2.0.0beta1
+-----------
+
+First beta release for Horde 5.
+[jan] Fix hiding empty top menu entries in multi-level hierarchies.
+[jan] Allow to override configuration details of meta-configuration tags like
+      <configsql> in custom configuration XML files.
+[jan] Allow to configure encryption in global IMAP configuration (Request
+      #11272).
+[mms] Upgrade jQuery Mobile to v1.1.1 RC1.
+[mms] Fix browser-based AJAX autocompletion (Bug #11233).
+
+
+------------
+v2.0.0alpha1
+------------
+
+First alpha release for Horde 5.
+[jan] Update classes for the new user interface.
+[mms] Move output compression code into Horde_PageOutput.
+[mms] Removed Horde::ajaxAvailable().
+[mms] Move Horde::getServiceLink() to Horde_Registry#getServiceLink().
+[jan] Allow to use IMAP storage for shares and groupware data without a
+      complete Kolab server.
+[mms] Moved smartmobile core javascript from the Horde application.
+[mms] Added Horde_PageOutput.
+[mms] Added Horde_Core_Ajax_Imple_ContactAutoCompleter.
+[mjr] Use local member storage when no session is available (Bug #9733).
+[mms] Added AJAX core features.
+[mms] Added view determination to Horde_Registry.
+[mms] Performance improvements when initializing Alarm system.
+[mms] Performance improvements to Alarm checking.
+[mms] Performance improvements when initializing Notification system.
+[mjr] Allow restricting pretty autocompleter to available choices.
+[mms] Add language detection to AJAX spellchecker if no language is selected by
+      the user (Request #7137).
+[mms] Add Horde_Core_Block_Layout_View::getStylesheets().
+
+
+------
+v1.9.3
+------
+
+[mms] SECURITY: Fix XSS in tooltip javascript.
+[jan] Catch exceptions from Horde_Crypt (Bug #11530).
+[mms] Fix Horde_Core_Auth_Application#updateUser().
+[mjr] Port fix for Bug #9733 from FW_5.
+[jan] Fix using PostgreSQL as the session handler backend (Bug #11436).
+[mms] Mark session identifier cookie as HttpOnly.
+
+
+------
+v1.9.2
+------
+
+[mms] Fix cache maxsize preference (Bug #11224).
+[jan] Update Turkish translation (İstanbul Technical University).
+
+
+------
+v1.9.1
+------
+
+[jan] Update Swedish translation.
+[gwr] Fixed session based preferences.
+
+
+------
+v1.9.0
+------
+
+[jan] Add parameters to specify field size of phone and email fields.
+[jan] Log details too, if logging an exception.
+[jan] Fix showing applications with 'admin' status in the sidebar.
+
+
+------
+v1.8.5
+------
+
+[jan] Fix setting default values for HTML signatures.
+[mjr] Throw exception if no weather service configured (Bug #11005).
+[mms] Fix viewable prefs when toggling from Hide->Show Advanced.
+[mms] Better error message when missing required parameters (Bug #10979).
+[mms] Add Horde_Core_Alarm_Handler_Notify class.
+
+
+------
+v1.8.4
+------
+
+[mjr] Fix issue with autocompletion that would cause it to fail in certain
+      circumstances (Bug #10904).
+[mms] Remove trailing semicolon when replacing @import statements.
+[mjr] Fix issue that could cause failure of ActiveSync due to incorrect packing
+      of binary data.
+[jan] Use separate database connection for SQL session handler (Bug #10906).
+[mms] Fix parsing DB config when using splitread database setup.
+
+
+------
+v1.8.3
+------
+
+[mjr] Fix implementation of SENDMAIL ActiveSync command. Fixes sending of
+      meeting requests from device.
+[mjr] Fix issue that caused ActiveSync failure when using device specific
+      logging in certain cases.
+[mms] Fix merging config data (Bug #10381).
+
+
+------
+v1.8.2
+------
+
+[mjr] Allow separate ActiveSync logs per device.
+[jan] Make the lifetime of cached weather information configurable (Arjen de
+      Korte, Request #10848).
+
+
+------
+v1.8.1
+------
+
+[gwr] Fixed hiding menu entries that should not be displayed to admin.
+[gwr] Fixed Kolab anonymous bind.
+[jan] Update Japanese translation (Hiromi Kimura <hiromi@tac.tsukuba.ac.jp>).
+
+
+------
+v1.8.0
+------
+
+[jan] Update Estonian translation.
+[jan] Update Hungarian translation.
+[jan] Fix tests to work with PHPUnit 3.6.
+[mjr] Add Horde_Service_Weather factory.
+[mms] Fix importing CSS data in cache files.
+
+
+------
+v1.7.0
+------
+
+[mms] Detect @import tags in CSS and add to compressed data.
+[mjr] Add ability to remove temporary files at session shutdown.
+
+
+------
+v1.6.1
+------
+
+[jan] Fix resetting authentication credentials (Bug #10228).
+[jan] Correctly render keyval_multienum form field contents.
+[jan] Don't use Xcache in CLI scripts (Bug #10288).
+
+
+------
+v1.6.0
+------
+
+[jan] Fix PostgreSQL DSN when using SQL authentication (Bug #10538).
+[mjr] Add factory for Horde_Service_UrlShortener.
+[mms] Fix minChars behavior in autocomplete javascript code.
+[mms] Allow in-page base64 image encoding to be disabled via Horde
+      configuration.
+[jan] Allow both application and interface names in <configspecial>.
+
+
+------
+v1.5.0
+------
+
+[jan] Fix generating of URLs if both the webroot and the original URL are full
+      URLs.
+[mjr] Support additional GAL fields (Bug #10504).
+[jan] Allow to pass a configuration array to the LDAP factory.
+[mms] Revamp and fix Horde_Registry#removeUserData(); this method should now be
+      the sole access point to delete user data for any/all apps (Bug #10241).
+[mms] Correctly apply value of $conf['session']['timeout'] to PHP environment.
+[mms] Fix cookie timeouts.
+
+
+------
+v1.4.1
+------
+
+[rla] Add locking routines to Horde_Core_Auth_Application.
+[rla] Add support for Horde_Auth's new locking feature.
+
+
+------
+v1.4.0
+------
+
+[rla] Display permissions of hidden apps too
+[gwr] Do not fail when no basedn is set for the Horde_Kolab_Server
+      configuration.
+[mms] When reopening sessions, ensure that we don't alter session information
+      if the authentication status changed (Bug #10403).
+[jan] Use 'ident' option of Horde_Log handlers to prefix log messages (Gonçalo
+      Queirós <goncalo.queiros@portugalmail.net>, Request #9322).
+[jan] Check applications' authValidate() method if present.
+[mms] Add Horde_Session::isActive().
+[mjr] Add remove button to image fields (Request #9870).
+
+
+------
+v1.3.1
+------
+
+[jan] Update Latvian translation.
+[jan] Don't set optional integer fields to 0 when automatically updating
+      configuration.
+[mjr] Fix recurring event exception handling for ActiveSync.
+[mms] Fix removing user data from applications (Bug #10241).
+
+
+------
+v1.3.0
+------
+
+[jan] Update Lithuanian translation.
+[jan] Update Brazilian Portuguese translation.
+[jan] Fix generating database DSN for VFS if the global VFS configuration
+      doesn't use SQL (Bug #10199).
+[jan] Add option to Horde_Themes_Css#getStylesheetUrls() to never use CSS
+      cache.
+[jan] Add Horde_Menu#setMask() (Vilius Sumskas, Request #10078).
+[jan] Allow configuration of split read databases for PostgreSQL (Request
+      #7025).
+[mms] Make sure appinitialized hook gets full application environment.
+
+
+------
+v1.2.1
+------
+
+[mms] Only list sidebar apps in listApps() if parent app is active (Bug
+      #10017).
+[mms] Fix autocomplete javascript when contents of DOM element is dynamically
+      altered.
+[mms] Fix duplicate node IDs in javascript tree rendering code (Bug #10173).
+[rla] Show specific admin privileges a user has permission to (Enhancement
+      #9350).
+
+
+------
+v1.2.0
+------
+
+[jan] Add Horde_Config::configSQL() method.
+[jan] Add Horde_Core_Cli and Horde_Core_Bundle classes.
+[jan] Updated Slovak translation.
+[mms] Allow numbers to be zero in certain preferences (Bug #10120).
+[mms] Fix running Horde login tasks (Bug #9767).
+[mms] Fix authenticating as several users in the same request (Bug #10027).
+[gwr] Added support for the Kolab IMAP based preferences backend.
+[jan] Updated Spanish translation.
+
+
+------
+v1.1.1
+------
+
+[jan] Updated German translation.
+[mms] Optimize session storage.
+
+
+------
+v1.1.0
+------
+
+[jan] Add Horde_Config#configFile() and Horde_Config#writePHPConfiguration().
+[mjr] Fix issue with deleting identities (Bug #9997).
+[jan] Store preferences for guests in the session.
+
+
+------
+v1.0.2
+------
+
+[jan] Don't show IMP compose link if user doesn't have permissions to IMP (Bug
+      #10016).
+[mjr] Fix editing settings of fixed portal blocks (Bug #9910).
+
+
+------
+v1.0.1
+------
+
+[mms] Fix loading correct identities driver for the Horde application (Bug
+      #9936).
+[mms] Don't setup notification handlers in applications that are not yet
+      authenticated (Bug #9733).
+[mms] Allow Horde_Menu to accept string url values (Bug #9917).
+[mjr] Correctly sanitize DSN when using custom cyrus auth driver (Bug #9879).
+[mms] Reinitialize language after loading prefs before authentication (Bug
+      #9822).
+[cjh] Fix cyrsql configuration, rename cyrus host and port parameters to not
+      clash with Horde_Db parameters (Bug #9864).
+[cjh] Fix signups, and update style on signup and reset password pages to match
+      the login page (Bug #9856, partially from Ian Roth
+      <iron_hat@hotmail.com>).
+[cjh] Show an unknown app icon rather than a broken image if an application
+      doesn't have an icon (Bug #9867).
+
+
+------
+v1.0.0
+------
+
+First stable release for Horde 4.
+[mms] Add Horde_Core_Notification_Handler_Decorator_Base.
+[mms] Add listAlarms() to methods provided by Horde_Core_Registry_Application.
+[jan] Delay sidebar creation if the sidebar is generated through JavaScript.
+[jan] Use localized application names when sorting the preference menu tree.
+[mms] Fix adding port to certain urls passed to Horde::url() (Bug #9712).
+
+
+---------
+v1.0.0RC2
+---------
+
+Second release candidate for Horde 4.
+[jan] Fix loading of Horde's vhost conf.php file (Bug #9704).
+[jan] Sort applications in preference menu by name.
+[mms] Fix identities pref UI when default_identity is locked (Bug #9701).
+[mms] Added Horde::debug().
+
+
+---------
+v1.0.0RC1
+---------
+
+First release candidate for Horde 4.
+[jan] Fix converting identities with non-ascii characters to new format.
+[mjr] Fix IMSP Auth driver.
+[jan] Don't show sub-permissions for adding that exist already.
+[jan] Fix listing more than one sub-permission (Bug #9671).
+
+
+-----------
+v1.0.0beta1
+-----------
+
+Catch fatal errors about missing tables during initial configuration.
+Added LoginTasks upgrade framework.
+Added Horde_Core_Perms class.
+Fix clearing expanded state for javascript trees (Bug #9659).
+Only show advanced preferences link if there are some.
+
+
+------------
+v1.0.0alpha1
+------------
+
+First alpha release for Horde 4.
+Add cache support for themes.
+Add Horde_Session.
+Add Horde::addInlineJsVars().
+Remove Horde::nocacheUrl() and Horde::url() (Ticket #9160).
+Absorb horde/Ui package.
+Absorb horde/Ajax package.
+Import application auth driver from horde/Auth.
+Import signup code from horde/Auth.
+Import Horde backend driver from horde/LoginTasks.
+Import perms UI handling class from horde/Perms.
+Import prefs UI handling class from horde/Prefs.
+Convert from PEAR Log to Horde_Log for logging.
+Add Horde_Themes:: class.
+Add Horde::nocacheUrl().
+Remove dependency on Horde_DOM package.
+Added Horde_Registry_Api:: and Horde_Registry_Application:: classes.
+Moved Horde_Exception to Exception package.
+Renamed Menu:: as Horde_Menu::.
+Renamed Help:: as Horde_Help::.
+Removed Text::/Horde_Text::.
+Converted Horde to Horde 4 coding conventions.
