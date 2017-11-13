@@ -1,8 +1,8 @@
 {
     "name": "horde/core",
-    "description": "Horde Core Framework libraries",
+    "description": "Core Horde Framework library",
     "type": "library",
-    "homepage": "https://pear.horde.org",
+    "homepage": "https://www.horde.org/libraries/Horde_Core",
     "license": "LGPL-2.1",
     "authors": [
         {
@@ -27,7 +27,7 @@
         }
     ],
     "version": "2.31.0",
-    "time": "2017-10-20",
+    "time": "2017-11-11",
     "repositories": [
         {
             "type": "pear",
@@ -80,9 +80,9 @@
     },
     "suggest": {
         "pear-pear.horde.org/Horde_ActiveSync": "^2.39",
-        "pear-pear.horde.org/Horde_Backup": "^1 <=2.0.0alpha1",
+        "pear-pear.horde.org/Horde_Backup": "^1",
         "pear-pear.horde.org/Horde_Crypt": "^2",
-        "pear-pear.horde.org/Horde_Dav": "^1.0.0alpha1",
+        "pear-pear.horde.org/Horde_Dav": "^1",
         "pear-pear.horde.org/Horde_Db": "^2",
         "pear-pear.horde.org/Horde_Editor": "^2",
         "pear-pear.horde.org/Horde_ElasticSearch": "^1",
