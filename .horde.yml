@@ -10,28 +10,28 @@ type: library
 homepage: https://www.horde.org/libraries/Horde_Core
 authors:
   -
-    name: Chuck Hagenbuch
-    user: chuck
-    email: chuck@horde.org
-    active: true
-    role: lead
-  -
     name: Jan Schneider
     user: jan
     email: jan@horde.org
     active: true
     role: lead
   -
-    name: Michael Slusarz
-    user: slusarz
-    email: slusarz@horde.org
-    active: false
-    role: developer
-  -
     name: Michael J Rubinsky
     user: mrubinsk
     email: mrubinsk@horde.org
     active: true
+    role: developer
+  -
+    name: Chuck Hagenbuch
+    user: chuck
+    email: chuck@horde.org
+    active: false
+    role: lead
+  -
+    name: Michael Slusarz
+    user: slusarz
+    email: slusarz@horde.org
+    active: false
     role: developer
 version:
   release: 2.31.1
