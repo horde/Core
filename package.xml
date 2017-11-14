@@ -5,16 +5,22 @@
  <summary>Core Horde Framework library</summary>
  <description>These classes provide the core functionality of the Horde Application Framework.</description>
  <lead>
-  <name>Chuck Hagenbuch</name>
-  <user>chuck</user>
-  <email>chuck@horde.org</email>
-  <active>yes</active>
- </lead>
- <lead>
   <name>Jan Schneider</name>
   <user>jan</user>
   <email>jan@horde.org</email>
   <active>yes</active>
+ </lead>
+ <developer>
+  <name>Michael J Rubinsky</name>
+  <user>mrubinsk</user>
+  <email>mrubinsk@horde.org</email>
+  <active>yes</active>
+ </developer>
+ <lead>
+  <name>Chuck Hagenbuch</name>
+  <user>chuck</user>
+  <email>chuck@horde.org</email>
+  <active>no</active>
  </lead>
  <developer>
   <name>Michael Slusarz</name>
@@ -22,13 +28,7 @@
   <email>slusarz@horde.org</email>
   <active>no</active>
  </developer>
- <developer>
-  <name>Michael J Rubinsky</name>
-  <user>mrubinsk</user>
-  <email>mrubinsk@horde.org</email>
-  <active>yes</active>
- </developer>
- <date>2017-11-11</date>
+ <date>2017-11-14</date>
  <version>
   <release>2.31.0</release>
   <api>2.31.0</api>
@@ -4522,7 +4522,7 @@
    <stability>
     <release>stable</release>
     <api>stable</api></stability>
-   <date>2017-11-11</date>
+   <date>2017-11-14</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [mjr] Add ability to disallow access to the ActiveSync GAL

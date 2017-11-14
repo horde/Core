@@ -6,28 +6,28 @@
     "license": "LGPL-2.1",
     "authors": [
         {
-            "name": "Chuck Hagenbuch",
-            "email": "chuck@horde.org",
+            "name": "Jan Schneider",
+            "email": "jan@horde.org",
             "role": "lead"
         },
         {
-            "name": "Jan Schneider",
-            "email": "jan@horde.org",
+            "name": "Michael J Rubinsky",
+            "email": "mrubinsk@horde.org",
+            "role": "developer"
+        },
+        {
+            "name": "Chuck Hagenbuch",
+            "email": "chuck@horde.org",
             "role": "lead"
         },
         {
             "name": "Michael Slusarz",
             "email": "slusarz@horde.org",
             "role": "developer"
-        },
-        {
-            "name": "Michael J Rubinsky",
-            "email": "mrubinsk@horde.org",
-            "role": "developer"
         }
     ],
     "version": "2.31.0",
-    "time": "2017-11-11",
+    "time": "2017-11-14",
     "repositories": [
         {
             "type": "pear",
