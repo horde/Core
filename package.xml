@@ -1006,7 +1006,6 @@
       <file name="AllTests.php" role="test" />
       <file name="bootstrap.php" role="test" />
       <file name="NlsconfigTest.php" role="test" />
-      <file name="phpunit.xml" role="test" />
       <file name="RegistryTest.php" role="test" />
       <file name="SmartmobileUrlTest.php" role="test" />
       <file name="UrlTest.php" role="test" />
@@ -2111,7 +2110,6 @@
    <install as="Horde/Core/AllTests.php" name="test/Horde/Core/AllTests.php" />
    <install as="Horde/Core/bootstrap.php" name="test/Horde/Core/bootstrap.php" />
    <install as="Horde/Core/NlsconfigTest.php" name="test/Horde/Core/NlsconfigTest.php" />
-   <install as="Horde/Core/phpunit.xml" name="test/Horde/Core/phpunit.xml" />
    <install as="Horde/Core/RegistryTest.php" name="test/Horde/Core/RegistryTest.php" />
    <install as="Horde/Core/SmartmobileUrlTest.php" name="test/Horde/Core/SmartmobileUrlTest.php" />
    <install as="Horde/Core/UrlTest.php" name="test/Horde/Core/UrlTest.php" />
