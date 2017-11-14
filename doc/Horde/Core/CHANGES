@@ -1,6 +1,14 @@
 -----------
-v2.31.0-git
+v2.31.1-git
 -----------
+
+[mjr] Detect if the failure was due to trying to delete a special mailbox (Bug
+      #14732).
+
+
+-------
+v2.31.0
+-------
 
 [mjr] Add ability to disallow access to the ActiveSync GAL
 [jan] Add Horde_Registry_Application#_backupPrefs() and _restorePrefs().

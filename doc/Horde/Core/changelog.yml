@@ -4,13 +4,12 @@
   state:
     release: stable
     api: stable
-  date: 2017-10-20
+  date: 2017-11-12
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
-  notes: |+
+  notes: |
     [mjr] Detect if the failure was due to trying to delete a special mailbox (Bug #14732).
-    
 2.31.0:
   api: 2.31.0
   state:
