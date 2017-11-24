@@ -39,6 +39,7 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
+* [mjr] Fix setting and semantic meaning of the &apos;oofstate&apos; property when returning Out of Office data to EAS clients.
 * [mjr] Detect if the failure was due to trying to delete a special mailbox (Bug #14732).
  </notes>
  <contents>
@@ -4538,6 +4539,7 @@
    <date>2017-11-14</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
+* [mjr] Fix setting and semantic meaning of the &apos;oofstate&apos; property when returning Out of Office data to EAS clients.
 * [mjr] Detect if the failure was due to trying to delete a special mailbox (Bug #14732).
    </notes>
   </release>

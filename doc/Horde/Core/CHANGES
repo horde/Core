@@ -2,6 +2,8 @@
 v2.31.1-git
 -----------
 
+[mjr] Fix setting and semantic meaning of the 'oofstate' property when
+      returning Out of Office data to EAS clients.
 [mjr] Detect if the failure was due to trying to delete a special mailbox (Bug
       #14732).
 
