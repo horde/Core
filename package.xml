@@ -28,7 +28,7 @@
   <email>slusarz@horde.org</email>
   <active>no</active>
  </developer>
- <date>2017-11-14</date>
+ <date>2017-11-26</date>
  <version>
   <release>2.31.1</release>
   <api>2.31.0</api>
@@ -4536,7 +4536,7 @@
    <stability>
     <release>stable</release>
     <api>stable</api></stability>
-   <date>2017-11-14</date>
+   <date>2017-11-26</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [mjr] Fix setting and semantic meaning of the &apos;oofstate&apos; property when returning Out of Office data to EAS clients.
