@@ -4,7 +4,7 @@
   state:
     release: stable
     api: stable
-  date: 2017-11-12
+  date: 2017-11-26
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
