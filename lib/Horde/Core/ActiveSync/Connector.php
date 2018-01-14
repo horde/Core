@@ -809,7 +809,6 @@ class Horde_Core_ActiveSync_Connector
                 unset($apis[$key]);
             }
         }
-        $inactive = $this->_registry->listApps(array('inactive'));
         $active_apis = array();
         foreach ($apis as $api) {
             if (!$this->_registry->isInactive($this->_registry->hasInterface($api))) {
