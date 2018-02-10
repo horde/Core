@@ -30,7 +30,7 @@
  </developer>
  <date>2018-02-10</date>
  <version>
-  <release>2.31.2</release>
+  <release>2.31.3</release>
   <api>2.31.0</api>
  </version>
  <stability>
@@ -39,7 +39,7 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* [mjr] Fix reporting status of OOF messages to EAS clients (Bug #14779).
+* 
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -3127,7 +3127,7 @@
    <date>2013-03-04</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-*
+* 
    </notes>
   </release>
   <release>
@@ -4846,6 +4846,21 @@
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [mjr] Fix reporting status of OOF messages to EAS clients (Bug #14779).
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.3</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2018-02-10</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* 
    </notes>
   </release>
  </changelog>
