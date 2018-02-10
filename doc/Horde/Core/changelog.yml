@@ -8,9 +8,8 @@
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
-  notes: |+
+  notes: |
     [mjr] Fix reporting status of OOF messages to EAS clients (Bug #14779).
-    
 2.31.1:
   api: 2.31.0
   state:
