@@ -4835,5 +4835,20 @@
 * [mjr] Detect if the failure was due to trying to delete a special mailbox (Bug #14732).
    </notes>
   </release>
+  <release>
+   <version>
+    <release>2.31.2</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2018-02-10</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* [mjr] Fix reporting status of OOF messages to EAS clients (Bug #14779).
+   </notes>
+  </release>
  </changelog>
 </package>
