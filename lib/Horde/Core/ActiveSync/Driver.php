@@ -2458,7 +2458,9 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 }
                 $res['oof'] = array(
                     'status' => Horde_ActiveSync_Request_Settings::STATUS_SUCCESS,
-                    'oofstate' => Horde_ActiveSync_Request_Settings::OOF_STATE_ENABLED,
+                    'oofstate' => ($vacation['disabled']
+                        ? Horde_ActiveSync_Request_Settings::OOF_STATE_DISABLED
+                        : Horde_ActiveSync_Request_Settings::OOF_STATE_ENABLED),
                     'oofmsgs' => array()
                 );
                 // If we have start/end it's a timebased vacation in EAS-speak.
