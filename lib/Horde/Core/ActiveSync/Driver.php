@@ -1243,7 +1243,6 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             );
         }
 
-
         // For CLASS_EMAIL, all changes are a change in flags, categories or
         // softdelete. @todo: draft edits?
         if ($folder->collectionClass() == Horde_ActiveSync::CLASS_EMAIL) {
