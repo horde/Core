@@ -1221,26 +1221,28 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             }
         }
 
-        $results = array();
+        // Short circuit initial sync.
         if (!$folder->haveInitialSync) {
             $this->_logger->meta('Initial sync, only sending UID.');
             $this->_endBuffer();
             $add = $changes['add'];
             $changes = null;
             return $add;
-        } else {
-            foreach ($changes['add'] as $add) {
-                $type = ($folder->collectionClass() == Horde_ActiveSync::CLASS_EMAIL &&
-                         $folder->serverid() == $this->getSpecialFolderNameByType(self::SPECIAL_DRAFTS))
-                    ? Horde_ActiveSync::CHANGE_TYPE_DRAFT
-                    : Horde_ActiveSync::CHANGE_TYPE_CHANGE;
-                $results[] = array(
-                    'id' => $add,
-                    'type' => $type,
-                    'flags' => Horde_ActiveSync::FLAG_NEWMESSAGE
-                );
-            }
         }
+
+        $results = array();
+        foreach ($changes['add'] as $add) {
+            $type = ($folder->collectionClass() == Horde_ActiveSync::CLASS_EMAIL &&
+                     $folder->serverid() == $this->getSpecialFolderNameByType(self::SPECIAL_DRAFTS))
+                ? Horde_ActiveSync::CHANGE_TYPE_DRAFT
+                : Horde_ActiveSync::CHANGE_TYPE_CHANGE;
+            $results[] = array(
+                'id' => $add,
+                'type' => $type,
+                'flags' => Horde_ActiveSync::FLAG_NEWMESSAGE
+            );
+        }
+
 
         // For CLASS_EMAIL, all changes are a change in flags, categories or
         // softdelete. @todo: draft edits?
