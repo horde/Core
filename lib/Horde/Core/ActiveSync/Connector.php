@@ -1059,6 +1059,7 @@ class Horde_Core_ActiveSync_Connector
     public function mail_ensureMessageFlags(array $flags)
     {
         if ($this->_registry->hasMethod('addFlags', $this->_registry->hasInterface('mail'))) {
+            $this->_logger->meta('Adding flags to the IMAP server.');
             $this->_registry->mail->addFlags($flags);
         }
     }
