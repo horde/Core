@@ -929,6 +929,8 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      *            of the stuff in the registry connector since the Repositories
      *            will handle the basic CRUD operations and change detection on
      *            each collection.
+     *          - Use an object instead of hashes to return in the changes array
+     *            to better define the available properties.
      */
     public function getServerChanges(
         $folder, $from_ts, $to_ts, $cutoffdate, $ping, $ignoreFirstSync = false, $maxitems = 100, $refreshFilter = false)
