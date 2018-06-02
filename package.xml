@@ -39,7 +39,7 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* 
+* |+
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -4828,6 +4828,7 @@
    <date>2017-11-26</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
+* [mjr] Protect against empty imap adapters when no email support is enabled for EAS (Bug #14820).
 * [mjr] Fix checking for active APIs for ActiveSync without throwing exceptions.
 * [mjr] Fix setting and semantic meaning of the &apos;oofstate&apos; property when returning Out of Office data to EAS clients.
 * [mjr] Detect if the failure was due to trying to delete a special mailbox (Bug #14732).
@@ -4860,7 +4861,7 @@
    <date>2018-02-10</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-* 
+* |+
    </notes>
   </release>
  </changelog>
