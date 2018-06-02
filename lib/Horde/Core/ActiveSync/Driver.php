@@ -2200,6 +2200,14 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         $rfc822, $forward = false, $reply = false, $parent = false, $save = true,
         Horde_ActiveSync_Message_SendMail $message = null)
     {
+        // Ignore if we do not support email operations.
+        // @TODO: This assumes the only way to not have an imap object is
+        // if we turn off email support. We should probably make this a flag.
+        if (empty($this->_imap)) {
+            $this->_logger->notice("No IMAP object. Ignoring.");
+            return true;
+        }
+
         ob_start();
         $mailer = new Horde_Core_ActiveSync_Mail($this->_imap, $this->_user, $this->_version);
         $raw_message = !empty($message)
