@@ -2,7 +2,8 @@
 v2.31.3
 -------
 
-|+
+[mjr] Protect against empty imap adapters when no email support is enabled for
+      EAS (Bug #14820).
 
 -------
 v2.31.2
@@ -15,8 +16,6 @@ v2.31.2
 v2.31.1
 -------
 
-[mjr] Protect against empty imap adapters when no email support is enabled for
-      EAS (Bug #14820).
 [mjr] Fix checking for active APIs for ActiveSync without throwing exceptions.
 [mjr] Fix setting and semantic meaning of the 'oofstate' property when
       returning Out of Office data to EAS clients.
