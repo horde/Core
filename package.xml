@@ -30,7 +30,7 @@
  </developer>
  <date>2018-06-10</date>
  <version>
-  <release>2.31.3</release>
+  <release>2.31.4</release>
   <api>2.31.0</api>
  </version>
  <stability>
@@ -39,7 +39,7 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* [mjr] Protect against empty imap adapters when no email support is enabled for EAS (Bug #14820).
+* 
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -3127,7 +3127,7 @@
    <date>2013-03-04</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-*
+* 
    </notes>
   </release>
   <release>
@@ -4861,6 +4861,21 @@
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [mjr] Protect against empty imap adapters when no email support is enabled for EAS (Bug #14820).
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.4</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2018-06-10</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* 
    </notes>
   </release>
  </changelog>
