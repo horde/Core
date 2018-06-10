@@ -5,6 +5,7 @@ v2.31.3
 [mjr] Protect against empty imap adapters when no email support is enabled for
       EAS (Bug #14820).
 
+
 -------
 v2.31.2
 -------
