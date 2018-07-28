@@ -2085,7 +2085,8 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                         array('flagged' => $message->flag->flagstatus)
                     );
                 }
-                if ($message->propertyExists('categories')) {
+                if ($message->propertyExists('categories') &&
+                    $message->categories) {
                     // We *try* to make sure the category is added as a custom
                     // IMAP flag. This might fail in some edge cases, like e.g.
                     // with non-ascii characters.
