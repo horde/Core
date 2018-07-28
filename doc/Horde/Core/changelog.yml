@@ -8,8 +8,9 @@
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
-  notes: |+
-    
+  notes: |
+    [jan] Avoid fatal error if an ActiveSync message has empty categories.
+    |+
 2.31.3:
   api: 2.31.0
   state:
