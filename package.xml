@@ -39,7 +39,8 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* 
+* [jan] Avoid fatal error if an ActiveSync message has empty categories.
+* |+
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -4875,7 +4876,8 @@
    <date>2018-06-10</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-* 
+* [jan] Avoid fatal error if an ActiveSync message has empty categories.
+* |+
    </notes>
   </release>
  </changelog>

@@ -2,7 +2,8 @@
 v2.31.4
 -------
 
-
+[jan] Avoid fatal error if an ActiveSync message has empty categories.
+|+
 
 
 -------
@@ -213,8 +214,7 @@ v2.26.0
 [jan] SECURITY: Add CSRF protection tokens to portal layout forms and fix open
       URL redirection (Reported by ssys GmbH).
 [jan] SECURITY: enable CSRF token for configuration form again (Reported by
-      Dawid Gounski via Beyond Security's SecuriTeam Secure Disclosure
-      program).
+      Dawid Gounski via Beyond Security's SecuriTeam Secure Disclosure program).
 [mjr] Changes to support EAS attachment sync support for Appointment objects.
 [mjr] Refactor ajax weather location autocompleter and add support for metar
       data.
@@ -366,8 +366,7 @@ v2.20.7
 -------
 
 [mjr] Prevent various broken behaviors on ActiveSync clients due to errors
-      copying an email to sent mail folder or updating the maillog (Bug
-      #14058).
+      copying an email to sent mail folder or updating the maillog (Bug #14058).
 
 
 -------
@@ -1637,8 +1636,7 @@ v1.0.1
 [cjh] Fix cyrsql configuration, rename cyrus host and port parameters to not
       clash with Horde_Db parameters (Bug #9864).
 [cjh] Fix signups, and update style on signup and reset password pages to match
-      the login page (Bug #9856, partially from Ian Roth
-      <iron_hat@hotmail.com>).
+      the login page (Bug #9856, partially from Ian Roth <iron_hat@hotmail.com>).
 [cjh] Show an unknown app icon rather than a broken image if an application
       doesn't have an icon (Bug #9867).
 
