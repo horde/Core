@@ -1762,8 +1762,16 @@ Ajax.Request = Class.create(Ajax.Base, {
     };
 
     if (this.method == 'post') {
-      headers['Content-type'] = this.options.contentType +
-        (this.options.encoding ? '; charset=' + this.options.encoding : '');
+      /* For an XHR to properly post a multipart/form-data
+       * it's crucial that the Content-type header is set by
+       * the browser itself for the boundary to be correct.
+       * A script must explicitly set contentType to 'false'
+       * in this case so we don't set the Content-Type header.
+       */
+      if (this.options.contentType!=false) {
+        headers['Content-type'] = this.options.contentType +
+          (this.options.encoding ? '; charset=' + this.options.encoding : '');
+      }
 
       /* Force "Connection: close" for older Mozilla browsers to work
        * around a bug where XMLHttpRequest sends an incorrect
