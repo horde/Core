@@ -30,7 +30,7 @@
  </developer>
  <date>2018-08-09</date>
  <version>
-  <release>2.31.4</release>
+  <release>2.31.5</release>
   <api>2.31.0</api>
  </version>
  <stability>
@@ -39,9 +39,7 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* [mjr] Fix returning EAS GAL search results (Bug #14843).
-* [jan] Avoid fatal error if an ActiveSync message has empty categories.
-* |+
+* 
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -4880,6 +4878,21 @@
 * [mjr] Fix returning EAS GAL search results (Bug #14843).
 * [jan] Avoid fatal error if an ActiveSync message has empty categories.
 * |+
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.5</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2018-08-09</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* 
    </notes>
   </release>
  </changelog>
