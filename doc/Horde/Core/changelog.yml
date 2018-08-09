@@ -9,6 +9,7 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    [mjr] Fix returning EAS GAL search results (Bug #14843).
     [jan] Avoid fatal error if an ActiveSync message has empty categories.
     |+
 2.31.3:
