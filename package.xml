@@ -4852,5 +4852,37 @@
 * [mjr] Fix reporting status of OOF messages to EAS clients (Bug #14779).
    </notes>
   </release>
+  <release>
+   <version>
+    <release>2.31.3</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2018-06-10</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* [mjr] Protect against empty imap adapters when no email support is enabled for EAS (Bug #14820).
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.4</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2018-06-10</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* [mjr] Fix returning EAS GAL search results (Bug #14843).
+* [jan] Avoid fatal error if an ActiveSync message has empty categories.
+* |+
+   </notes>
+  </release>
  </changelog>
 </package>
