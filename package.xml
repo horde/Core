@@ -39,6 +39,7 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
+* [mjr] Work around buggy EAS clients that send badly formed HTML in SMARTREPLY (Bug #14841).
 * [mjr] Protect against empty imap adapters when no email support is enabled for EAS (Bug #14820).
 * [mjr] Fix checking for active APIs for ActiveSync without throwing exceptions.
 * [mjr] Fix setting and semantic meaning of the &apos;oofstate&apos; property when returning Out of Office data to EAS clients.
@@ -4831,6 +4832,7 @@
    <date>2017-11-12</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
+* [mjr] Work around buggy EAS clients that send badly formed HTML in SMARTREPLY (Bug #14841).
 * [mjr] Protect against empty imap adapters when no email support is enabled for EAS (Bug #14820).
 * [mjr] Fix checking for active APIs for ActiveSync without throwing exceptions.
 * [mjr] Fix setting and semantic meaning of the &apos;oofstate&apos; property when returning Out of Office data to EAS clients.
