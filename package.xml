@@ -28,7 +28,7 @@
   <email>slusarz@horde.org</email>
   <active>no</active>
  </developer>
- <date>2018-08-09</date>
+ <date>2018-08-11</date>
  <version>
   <release>2.31.5</release>
   <api>2.31.0</api>
@@ -4889,7 +4889,7 @@
     <release>stable</release>
     <api>stable</api>
    </stability>
-   <date>2018-08-09</date>
+   <date>2018-08-11</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [mjr] Work around buggy EAS clients that send badly formed HTML in SMARTREPLY (Bug #14841).
