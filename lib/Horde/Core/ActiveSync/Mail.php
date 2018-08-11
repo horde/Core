@@ -444,10 +444,12 @@ class Horde_Core_ActiveSync_Mail
         $plain_id, Horde_Mime_Part $mime_message, array $body_data, Horde_Mime_Part $base_part)
     {
         if (!$id = $mime_message->findBody('plain')) {
-            $smart_text = self::html2text(
-                Horde_ActiveSync_Utils::ensureUtf8(
-                    $mime_message->getPart($mime_message->findBody())->getContents(),
-                    $mime_message->getCharset()));
+            $smart_text = Horde_ActiveSync_Utils::ensureUtf8(
+                $mime_message->getPart($mime_message->findBody())->getContents(),
+                $mime_message->getCharset()
+            );
+            $smart_text = $this->_tidyHtml($smart_text);
+            $smart_text = self::html2text($smart_text);
         } else {
             $smart_text = Horde_ActiveSync_Utils::ensureUtf8(
                 $mime_message->getPart($id)->getContents(),
@@ -625,21 +627,35 @@ class Horde_Core_ActiveSync_Mail
                 $msg = $flowed->toFlowed(true);
             }
         } else {
-            // This filter requires the tidy extenstion.
-            if (Horde_Util::extensionExists('tidy')) {
-                return Horde_Text_Filter::filter(
-                    $msg,
-                    'Cleanhtml',
-                    array('body_only' => true)
-                );
-            } else {
-                // If no tidy, use Horde_Dom.
-                $dom = new Horde_Domhtml($msg, 'UTF-8');
-                return $dom->returnBody();
-            }
+            return $this->_tidyHtml($msg);
         }
 
         return $msg;
+    }
+
+    /**
+     * Attempt to sanitize the provided $html string.
+     * Uitilizes the Cleanhtml filter if able, otherwise
+     * uses Horde_Dom
+     *
+     * @param  string $html  An HTML string to sanitize.
+     *
+     * @return string  The sanitized HTML.
+     */
+    protected function _tidyHtml($html)
+    {
+        // This filter requires the tidy extenstion.
+        if (Horde_Util::extensionExists('tidy')) {
+            return Horde_Text_Filter::filter(
+                $html,
+                'Cleanhtml',
+                array('body_only' => true)
+            );
+        } else {
+            // If no tidy, use Horde_Dom.
+            $dom = new Horde_Domhtml($html, 'UTF-8');
+            return $dom->returnBody();
+        }
     }
 
     /**
