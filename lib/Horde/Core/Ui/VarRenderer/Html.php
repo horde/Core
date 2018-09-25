@@ -580,7 +580,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
         $varname = $this->_genID($var->getVarName(), false);
         $color = $var->getValue($vars);
         if ($color) {
-            $style = ' style="background-color:' . $color . ';color:'
+            $style = ' style="background-color:' . htmlspecialchars($color) . ';color:'
                 . (Horde_Image::brightness($color) < 128 ? '#fff' : '#000') . '"';
         } else {
             $style = '';
@@ -1401,7 +1401,7 @@ function obrowserCallback(name, oid)
     protected function _renderVarDisplay_colorpicker($form, &$var, &$vars)
     {
         $color = $var->getValue($vars);
-        return '<span style="background-color:' . $color . ';color:'
+        return '<span style="background-color:' . htmlspecialchars($color) . ';color:'
             . (Horde_Image::brightness($color) < 128 ? '#fff' : '#000')
             . '">' . $color . '</span>';
     }
