@@ -9,9 +9,7 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
-    [mjr] Prevent potential XSS vuln when rendering a colorpicker (Bug #14857).
-    [mjr] Prevent potential XSS vuln when rendering a colorpicker (Bug #14857).
-    |+
+    [mjr] SECURITY: Fix XSS vulnerability when rendering a colorpicker (Bug #14857).
 2.31.5:
   api: 2.31.0
   state:
@@ -23,7 +21,6 @@
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
     [mjr] Work around buggy EAS clients that send badly formed HTML in SMARTREPLY (Bug #14841).
-    |+
 2.31.4:
   api: 2.31.0
   state:
