@@ -3131,7 +3131,7 @@
    <date>2013-03-04</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-* 
+*
    </notes>
   </release>
   <release>
@@ -4883,7 +4883,6 @@
    <notes>
 * [mjr] Fix returning EAS GAL search results (Bug #14843).
 * [jan] Avoid fatal error if an ActiveSync message has empty categories.
-* |+
    </notes>
   </release>
  </changelog>
