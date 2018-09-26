@@ -28,7 +28,7 @@
   <email>slusarz@horde.org</email>
   <active>no</active>
  </developer>
- <date>2018-08-11</date>
+ <date>2018-09-26</date>
  <version>
   <release>2.31.6</release>
   <api>2.31.0</api>
@@ -4904,7 +4904,7 @@
     <release>stable</release>
     <api>stable</api>
    </stability>
-   <date>2018-08-11</date>
+   <date>2018-09-26</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [mjr] SECURITY: Fix XSS vulnerability when rendering a colorpicker (Bug #14857).
