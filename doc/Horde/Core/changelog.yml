@@ -8,8 +8,10 @@
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
-  notes: |+
-    
+  notes: |
+    [mjr] Prevent potential XSS vuln when rendering a colorpicker (Bug #14857).
+    [mjr] Prevent potential XSS vuln when rendering a colorpicker (Bug #14857).
+    |+
 2.31.5:
   api: 2.31.0
   state:
