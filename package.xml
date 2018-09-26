@@ -39,8 +39,6 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* [mjr] Work around buggy EAS clients that send badly formed HTML in SMARTREPLY (Bug #14841).
-* [mjr] Protect against empty imap adapters when no email support is enabled for EAS (Bug #14820).
 * [mjr] Fix checking for active APIs for ActiveSync without throwing exceptions.
 * [mjr] Fix setting and semantic meaning of the &apos;oofstate&apos; property when returning Out of Office data to EAS clients.
 * [mjr] Detect if the failure was due to trying to delete a special mailbox (Bug #14732).
@@ -3131,7 +3129,7 @@
    <date>2013-03-04</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-*
+* 
    </notes>
   </release>
   <release>
@@ -4832,8 +4830,6 @@
    <date>2017-11-12</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-* [mjr] Work around buggy EAS clients that send badly formed HTML in SMARTREPLY (Bug #14841).
-* [mjr] Protect against empty imap adapters when no email support is enabled for EAS (Bug #14820).
 * [mjr] Fix checking for active APIs for ActiveSync without throwing exceptions.
 * [mjr] Fix setting and semantic meaning of the &apos;oofstate&apos; property when returning Out of Office data to EAS clients.
 * [mjr] Detect if the failure was due to trying to delete a special mailbox (Bug #14732).
@@ -4878,11 +4874,41 @@
     <release>stable</release>
     <api>stable</api>
    </stability>
-   <date>2018-06-10</date>
+   <date>2018-08-09</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [mjr] Fix returning EAS GAL search results (Bug #14843).
 * [jan] Avoid fatal error if an ActiveSync message has empty categories.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.5</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2018-08-09</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* [mjr] Work around buggy EAS clients that send badly formed HTML in SMARTREPLY (Bug #14841).
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.6</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2018-08-11</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* [mjr] SECURITY: Fix XSS vulnerability when rendering a colorpicker (Bug #14857).
    </notes>
   </release>
  </changelog>
