@@ -39,7 +39,9 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* 
+* [mjr] Prevent potential XSS vuln when rendering a colorpicker (Bug #14857).
+* [mjr] Prevent potential XSS vuln when rendering a colorpicker (Bug #14857).
+* |+
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -4907,7 +4909,9 @@
    <date>2018-08-11</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-* 
+* [mjr] Prevent potential XSS vuln when rendering a colorpicker (Bug #14857).
+* [mjr] Prevent potential XSS vuln when rendering a colorpicker (Bug #14857).
+* |+
    </notes>
   </release>
  </changelog>

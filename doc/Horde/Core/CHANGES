@@ -2,7 +2,9 @@
 v2.31.6
 -------
 
-
+[mjr] Prevent potential XSS vuln when rendering a colorpicker (Bug #14857).
+[mjr] Prevent potential XSS vuln when rendering a colorpicker (Bug #14857).
+|+
 
 
 -------
