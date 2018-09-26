@@ -2,7 +2,8 @@
 v2.31.6
 -------
 
-[mjr] SECURITY: Fix XSS vulnerability when rendering a colorpicker (Bug #14857).
+[mjr] SECURITY: Fix XSS vulnerability when rendering a colorpicker (Bug
+      #14857).
 
 
 -------
