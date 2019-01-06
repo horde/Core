@@ -2728,11 +2728,18 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 'pictures' => !empty($opts['pictures'])
             );
             $entry = current($this->resolveRecipient('certificate', $search, $options));
-            $opts['starttime']->setTimezone(date_default_timezone_get());
-            $opts['endtime']->setTimezone(date_default_timezone_get());
+
+            // These are empty if we do not have a AVAILABILITY request.
+            if ($availability_request = (!empty($opts['starttime']) && !empty($opts['endtime']))) {
+                $opts['starttime']->setTimezone(date_default_timezone_get());
+                $opts['endtime']->setTimezone(date_default_timezone_get());
+            }
+
             if (!empty($entry)) {
                 $fb = $this->_connector->resolveRecipient($search, $opts);
-                $entry['availability'] = self::buildFbString($fb[$search], $opts['starttime'], $opts['endtime']);
+                if ($availability_request) {
+                    $entry['availability'] = self::buildFbString($fb[$search], $opts['starttime'], $opts['endtime']);
+                }
                 $return[] = $entry;
             }
         }
