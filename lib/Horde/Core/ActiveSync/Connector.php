@@ -459,9 +459,12 @@ class Horde_Core_ActiveSync_Connector
         } else {
             $sources = array($gal);
             $fields = array();
-            $return_fields = array('name', 'alias', 'email', 'firstname', 'lastname',
-                'company', 'homePhone', 'workPhone', 'cellPhone', 'title',
-                'office');
+            $return_fields = array(
+                $gal => array(
+                    'name', 'alias', 'email', 'firstname', 'lastname',
+                    'company', 'homePhone', 'workPhone', 'cellPhone', 'title',
+                    'office')
+            );
         }
         if (!empty($options['pictures'])) {
             $return_fields[$gal][] = 'photo';
