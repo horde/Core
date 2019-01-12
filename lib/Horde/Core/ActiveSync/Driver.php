@@ -2711,16 +2711,15 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                             $picture->status = Horde_ActiveSync_Status::PICTURE_SUCCESS;
                             ++$picture_count;
                         }
-                        $entry[Horde_ActiveSync::GAL_PICTURE] = $picture;
                     }
-                    $result = array(
+                    $entry = array(
                         'displayname' => $result['name'],
                         'emailaddress' => $result['email'],
                         'entries' => !empty($result['smimePublicKey']) ? array($this->_mungeCert($result['smimePublicKey'])) : array(),
                         'type' => $result['source'] == $gal ? Horde_ActiveSync::RESOLVE_RESULT_GAL : Horde_ActiveSync::RESOLVE_RESULT_ADDRESSBOOK,
                         'picture' => !empty($picture) ? $picture : null
                     );
-                    $return[] = $result;
+                    $return[] = $entry;
                 }
             }
         } else {
