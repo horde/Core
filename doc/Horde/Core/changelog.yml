@@ -1,4 +1,15 @@
 ---
+2.31.7:
+  api: 2.31.0
+  state:
+    release: stable
+    api: stable
+  date: 2018-09-26
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    [mjr] Fix handling of EAS ResolveRecipient requests without AVAILABILITY query.
 2.31.6:
   api: 2.31.0
   state:
