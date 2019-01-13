@@ -30,7 +30,7 @@
  </developer>
  <date>2019-01-13</date>
  <version>
-  <release>2.31.7</release>
+  <release>2.31.8</release>
   <api>2.31.0</api>
  </version>
  <stability>
@@ -39,10 +39,7 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* [mjr] Fix returning image binary data with EAS ResolveRecipient requests.
-* [mjr] Fix returning images with EAS search results.
-* [mjr] Fix handling of EAS ResolveRecipient requests without AVAILABILITY query.
-* |+
+* 
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -4927,7 +4924,21 @@
 * [mjr] Fix returning image binary data with EAS ResolveRecipient requests.
 * [mjr] Fix returning images with EAS search results.
 * [mjr] Fix handling of EAS ResolveRecipient requests without AVAILABILITY query.
-* |+
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.8</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2019-01-13</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* 
    </notes>
   </release>
  </changelog>
