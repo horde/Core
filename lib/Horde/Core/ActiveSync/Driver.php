@@ -2703,7 +2703,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                                   strlen($result['photo']) > $opts['maxsize']) {
                             $picture->status = Horde_ActiveSync_Status::PICTURE_TOO_LARGE;
                         } else {
-                            $picture->data = $result['photo'];
+                            $picture->data = $result['photo']['load']['data'];
                             $picture->status = Horde_ActiveSync_Status::PICTURE_SUCCESS;
                             ++$picture_count;
                         }
