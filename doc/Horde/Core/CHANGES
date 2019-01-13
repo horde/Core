@@ -2,6 +2,7 @@
 v2.31.7
 -------
 
+[mjr] Fix returning images with EAS search results.
 [mjr] Fix handling of EAS ResolveRecipient requests without AVAILABILITY query.
 |+
 
