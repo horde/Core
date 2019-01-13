@@ -4,7 +4,7 @@
   state:
     release: stable
     api: stable
-  date: 2018-09-26
+  date: 2019-01-13
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
@@ -12,7 +12,6 @@
     [mjr] Fix returning image binary data with EAS ResolveRecipient requests.
     [mjr] Fix returning images with EAS search results.
     [mjr] Fix handling of EAS ResolveRecipient requests without AVAILABILITY query.
-    |+
 2.31.6:
   api: 2.31.0
   state:

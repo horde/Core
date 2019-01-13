@@ -28,7 +28,7 @@
   <email>slusarz@horde.org</email>
   <active>no</active>
  </developer>
- <date>2018-09-26</date>
+ <date>2019-01-13</date>
  <version>
   <release>2.31.7</release>
   <api>2.31.0</api>
@@ -4921,7 +4921,7 @@
     <release>stable</release>
     <api>stable</api>
    </stability>
-   <date>2018-09-26</date>
+   <date>2019-01-13</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [mjr] Fix returning image binary data with EAS ResolveRecipient requests.
