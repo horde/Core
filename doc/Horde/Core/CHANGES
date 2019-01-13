@@ -2,7 +2,8 @@
 v2.31.7
 -------
 
-
+[mjr] Fix handling of EAS ResolveRecipient requests without AVAILABILITY query.
+|+
 
 
 -------
