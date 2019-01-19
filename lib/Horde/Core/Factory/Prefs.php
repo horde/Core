@@ -218,7 +218,7 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
      * @param string $user       Username.
      * @param boolean $fallback  Return the fallback cache driver?
      *
-     * @return Horde_Cache  Cache object.
+     * @return Horde_Prefs_Cache_HordeCache Cache object.
      */
     protected function _getCache($user, $fallback)
     {
