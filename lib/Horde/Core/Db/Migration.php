@@ -68,17 +68,17 @@ class Horde_Core_Db_Migration
         // Loop through local framework checkouts.
         if ($basedir) {
             $path = $basedir . '/*/migration';
-            $packageFile = new PEAR_PackageFile($pear);
             foreach (glob($path) as $dir) {
-                $package = $packageFile->fromPackageFile(
-                    dirname($dir) . '/package.xml', PEAR_VALIDATE_NORMAL
-                );
-                if ($package instanceof PEAR_Error) {
-                    Horde::log(sprintf('%s: %s', $package->getMessage(), print_r($package->getUserInfo(), true)), Horde_Log::ERR);
+                try {
+                    $package = Horde_Yaml::loadFile($dir . '/../.horde.yml');
+                } catch (Horde_Yaml_Exception $e) {
+                    Horde::log(sprintf('Horde DB Migration failed loading: %s', $e->getMessage()), Horde_Log::ERR);
                     continue;
                 }
-                $this->apps[] = $package->getName();
-                $this->_lower[] = Horde_String::lower($package->getName());
+                // Compat with pear style names. YAML library names do not include Horde_
+                $name = $package['type'] == 'library' ? 'Horde_' . $package['name'] : $package['name'];
+                $this->apps[] = $name;
+                $this->_lower[] = Horde_String::lower($name);
                 $this->dirs[] = realpath($dir);
             }
         }
