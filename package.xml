@@ -31,7 +31,7 @@
  </developer>
  <date>2019-02-09</date>
  <version>
-  <release>2.31.8</release>
+  <release>2.31.9</release>
   <api>2.31.0</api>
  </version>
  <stability>
@@ -40,8 +40,7 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* [mjr] Improve ActiveSync RESOLVERECIPIENT reqeuests.
-* |+
+* 
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -4941,7 +4940,21 @@
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [mjr] Improve ActiveSync RESOLVERECIPIENT reqeuests.
-* |+
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.9</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2019-02-09</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* 
    </notes>
   </release>
  </changelog>
