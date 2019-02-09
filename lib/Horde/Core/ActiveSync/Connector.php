@@ -513,17 +513,19 @@ class Horde_Core_ActiveSync_Connector
         if (!in_array($gal, $sources)) {
             $sources[] = $gal;
         }
+        $returnFields = array();
         foreach ($sources as $source) {
-            $fields[$source] = array('name', 'email', 'alias', 'smimePublicKey');
+            $fields[$source] = array('email');
+            $returnFields[$source] = array('name', 'email', 'alias', 'smimePublicKey');
             if (!empty($opts['pictures'])) {
-                $fields[$source]['photo'];
+                $returnFields[$source]['photo'];
             }
         }
 
         $options = array(
             'matchBegin' => true,
             'sources' => $sources,
-            'fields' => $fields
+            'returnFields' => $fields
         );
         if (isset($opts['maxAmbiguous']) && $opts['maxAmbiguous'] == 0) {
             $options['customStrict'] = array('email', 'name', 'alias');
