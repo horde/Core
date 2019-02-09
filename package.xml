@@ -3,7 +3,8 @@
  <name>Horde_Core</name>
  <channel>pear.horde.org</channel>
  <summary>Core Horde Framework library</summary>
- <description>These classes provide the core functionality of the Horde Application Framework.</description>
+ <description>These classes provide the core functionality of the Horde Application Framework.
+</description>
  <lead>
   <name>Jan Schneider</name>
   <user>jan</user>
@@ -28,7 +29,7 @@
   <email>slusarz@horde.org</email>
   <active>no</active>
  </developer>
- <date>2019-01-13</date>
+ <date>2019-02-09</date>
  <version>
   <release>2.31.8</release>
   <api>2.31.0</api>
@@ -4936,7 +4937,7 @@
     <release>stable</release>
     <api>stable</api>
    </stability>
-   <date>2019-01-13</date>
+   <date>2019-02-09</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [mjr] Improve ActiveSync RESOLVERECIPIENT reqeuests.

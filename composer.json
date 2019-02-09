@@ -26,8 +26,8 @@
             "role": "developer"
         }
     ],
-    "version": "2.31.7",
-    "time": "2019-01-13",
+    "version": "2.31.8",
+    "time": "2019-02-09",
     "repositories": [
         {
             "type": "pear",
