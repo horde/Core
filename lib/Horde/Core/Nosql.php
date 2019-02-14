@@ -20,7 +20,7 @@
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
-class Horde_Core_NoSql
+class Horde_Core_Nosql
 {
     /* getDrivers() mask constants. */
     const HAS_INDICES = 1;
