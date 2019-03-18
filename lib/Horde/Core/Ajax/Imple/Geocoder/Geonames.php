@@ -50,6 +50,14 @@ class Horde_Core_Ajax_Imple_Geocoder_Geonames extends Horde_Core_Ajax_Imple
             throw new Horde_Exception('Incorrect parameters');
         }
 
+        if (empty($vars->key)) {
+            throw new Horde_Exception('Missing required key parameter');
+        }
+
+        $url->add(array(
+            'username' => $vars->key
+        ));
+
         $response = $GLOBALS['injector']->getInstance('Horde_Core_Factory_HttpClient')->create()->get($url);
 
         return new Horde_Core_Ajax_Response_Prototypejs(array(
