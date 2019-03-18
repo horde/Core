@@ -36,12 +36,12 @@ class Horde_Core_Ajax_Imple_Geocoder_Geonames extends Horde_Core_Ajax_Imple
     protected function _handle(Horde_Variables $vars)
     {
         if ($vars->location) {
-            $url = new Horde_Url('http://ws.geonames.org/searchJSON');
+            $url = new Horde_Url('https://secure.geonames.org/searchJSON');
             $url->add(array(
                 'q' => $vars->location
             ));
         } elseif ($vars->lat && $vars->lon) {
-            $url = new Horde_Url('http:/ws.geonames.org/findNearestJSON');
+            $url = new Horde_Url('https://secure.geonames.org/findNearestJSON');
             $url->add(array(
                 'lat' => $vars->lat,
                 'lng' => $vars->lon
