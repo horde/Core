@@ -25,7 +25,14 @@ class Horde_Core_Controller_RequestMapper
 
         $uri = substr($request->getPath(), strlen($registry->get('webroot', 'horde')));
         $uri = trim($uri, '/');
-        if (strpos($uri, '/') === false) {
+        if (empty($uri)) {
+            foreach ($registry->listApps() as $app) {
+                $uri = substr($request->getPath(), strlen($registry->get('webroot', $app)));
+                if (!empty($uri)) {
+                    break;
+                }
+            }
+        } elseif (strpos($uri, '/') === false) {
             $app = $uri;
         } else {
             list($app,) = explode('/', $uri, 2);
