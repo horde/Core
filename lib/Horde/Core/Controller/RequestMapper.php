@@ -15,30 +15,100 @@ class Horde_Core_Controller_RequestMapper
         $this->_mapper = $mapper;
     }
 
+    /**
+     * Check if an app is the relevant source of routes for a request
+     *
+     * The original approach was too specific for the default horde use
+     * setup of an app always living below horde root
+     * We also need to think about the case of different hosts
+     *
+     * @return string  App path if the app fits or empty string if not
+     */
+    protected function _resolveApp($registry, $app, $request, $requestServer,
+        $hordeRoot = '')
+    {
+        $webroot = parse_url($registry->get('webroot', $app));
+        // Filter out absolute urls unless they fit
+        if (!empty($webroot['host'])) {
+            if ($webroot['host'] != $requestServer) {
+                return '';
+            }
+            // treat path as absolute if domain is given
+            $normalized = $this->_normalize($webroot['path']);
+            if ($this->beginsWith($request->getPath(), $normalized)) {
+                return $normalized;
+            }
+        }
+
+        // Relative to horde
+        $normalized = $this->_normalize($hordeRoot . $webroot['path']);
+        if ($this->_beginsWith($request->getPath(), $normalized)) {
+            return $normalized;
+        }
+        return '';
+    }
+
+    protected function _beginsWith($subject, $prefix)
+    {
+        return substr($subject, 0, strlen($prefix)) == $prefix;
+    }
+
+    protected function _normalize($path)
+    {
+        $partsIn = explode('/', $path);
+        $partsOut = [];
+        foreach ($partsIn as $part) {
+            // useless slashes
+            if (empty($part)) {
+                continue;
+            }
+            // useless level
+            if ($part == '.') {
+                continue;
+            }
+            // one level up
+            if ($part == '..') {
+                array_pop($partsOut);
+                continue;
+            }
+            $partsOut[] = $part;
+        }
+        return '/' . implode('/', $partsOut);
+    }
+
     public function getRequestConfiguration(Horde_Injector $injector)
     {
         $request = $injector->getInstance('Horde_Controller_Request');
+        $requestServer = $_SERVER['SERVER_NAME'];
         $registry = $injector->getInstance('Horde_Registry');
         $settingsFinder = $injector->getInstance('Horde_Core_Controller_SettingsFinder');
 
         $config = $injector->createInstance('Horde_Core_Controller_RequestConfiguration');
 
-        $uri = substr($request->getPath(), strlen($registry->get('webroot', 'horde')));
-        $uri = trim($uri, '/');
-        if (empty($uri)) {
-            foreach ($registry->listApps() as $app) {
-                $uri = substr($request->getPath(), strlen($registry->get('webroot', $app)));
-                if (!empty($uri)) {
-                    break;
-                }
+        $apps = $registry->listApps();
+        array_shift($apps);
+        // reserve horde case for last
+        $hordeRoot = parse_url($registry->get('webroot', 'horde'));
+        foreach ($apps as $app) {
+            $prefix = $this->_resolveApp($registry, $app, $request,
+                $requestServer, $hordeRoot['path']);
+            if ($prefix) {
+                $foundApp = $app;
+                break;
             }
-        } elseif (strpos($uri, '/') === false) {
-            $app = $uri;
-        } else {
-            list($app,) = explode('/', $uri, 2);
         }
-        $config->setApplication($app);
-
+        if (empty($foundApp)) {
+            $prefix = $this->_resolveApp($registry, 'horde', $request,
+                $requestServer);
+                if ($prefix) {
+                $foundApp = 'horde';
+            } else {
+                $config->setControllerName('Horde_Core_Controller_NotFound');
+                return $config;
+            }
+        }
+        $config->setApplication($foundApp);
+        $app = $foundApp;
         // Check for route definitions.
         $fileroot = $registry->get('fileroot', $app);
         $routeFile = $fileroot . '/config/routes.php';
@@ -49,11 +119,9 @@ class Horde_Core_Controller_RequestMapper
 
         // Push $app onto the registry
         $registry->pushApp($app);
-
         // Application routes are relative only to the application. Let the
         // mapper know where they start.
-        $this->_mapper->prefix = $registry->get('webroot', $app);
-
+        $this->_mapper->prefix = $prefix;
         // Set the application controller directory
         $this->_mapper->directory = $registry->get('fileroot', $app) . '/app/controllers';
 
