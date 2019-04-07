@@ -54,9 +54,14 @@ class Horde_Core_HordeMap
             'driver' => 'Horde',
             'geocoder' => $conf['maps']['geocoder'],
             'jsuri' => $registry->get('jsuri', 'horde') . '/map/',
-            'providers' => $conf['maps']['providers'],
             'ssl' => $browser->usingSSLConnection(),
         ), $params);
+
+        // If providers were not specified, use global. We don't merge them
+        // above to allow overriding the global completely.
+        if (empty($params['providers'])) {
+            $params['providers'] = $conf['maps']['providers'];
+        }
 
         foreach ($params['providers'] as $layer) {
             switch ($layer) {

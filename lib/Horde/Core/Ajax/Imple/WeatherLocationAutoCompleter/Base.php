@@ -30,6 +30,7 @@ abstract class Horde_Core_Ajax_Imple_WeatherLocationAutoCompleter_Base
                 'window.weatherupdate = window.weatherupdate || {}',
                 'window.weatherupdate["' . $this->_params['instance'] . '"] = {
                     value: false,
+                    coord: false,
                     choices: {},
                     update: function() {
                         var v;
@@ -38,15 +39,19 @@ abstract class Horde_Core_Ajax_Imple_WeatherLocationAutoCompleter_Base
                         } else {
                             v = $F("location' . $this->_params['instance'] . '");
                         }
+                        var c = this.coord;
                         $("' . $indicator . '").toggle();
                         HordeCore.doAction("blockRefresh",
                             { blockid: "' . $block . '", location: v },
-                            { callback: function(r) {
-                                var point = v.split(",");
-                                var p = { lat: point[0], lon: point[1] };
-                                $("weathercontent' . $this->_params['instance'] . '").update(r);
-                                $("' . $indicator . '").toggle();
-                                WeatherBlockMap.maps["' . $this->_params['instance'] . '"].setCenter(p, 7);
+                            {
+                                callback: function(r) {
+                                    if (c) {
+                                        var point = c.split(",");
+                                        var p = { lat: point[0], lon: point[1] };
+                                        WeatherBlockMap.maps["' . $this->_params['instance'] . '"].setCenter(p, 7);
+                                    }
+                                    $("weathercontent' . $this->_params['instance'] . '").update(r);
+                                    $("' . $indicator . '").toggle();
                                 }
                             }
                         );
@@ -79,7 +84,9 @@ abstract class Horde_Core_Ajax_Imple_WeatherLocationAutoCompleter_Base
             'onSelect' => 'function(c) {
                 window.weatherupdate["' . $this->_params['instance'] . '"].choices.each(function(i) {
                     if (i.name == c) {
-                        window.weatherupdate["' . $this->_params['instance'] . '"].value = i.code.replace("/q/", "");
+                        var code = i.code + "";
+                        window.weatherupdate["' . $this->_params['instance'] . '"].value = i.name;
+                        window.weatherupdate["' . $this->_params['instance'] . '"].coord = code.replace("/q/", "");
                         throw $break;
                     } else {
                         window.weatherupdate["' . $this->_params['instance'] . '"].value = false;
