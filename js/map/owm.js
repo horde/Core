@@ -18,11 +18,27 @@ HordeMap.Owm = Class.create(
     getLayers: function(layer)
     {
         return {
+            'streets': new OpenLayers.Layer.OSM(
+                'OpenStreetMap (Mapnik)',
+                [
+                    'http://a.tile.openstreetmap.org/${z}/${x}/${y}.png',
+                    'http://b.tile.openstreetmap.org/${z}/${x}/${y}.png',
+                    'http://c.tile.openstreetmap.org/${z}/${x}/${y}.png'
+                ],
+                { 'minZoomLevel': 1, 'numZoomLevels': 18 }
+            ),
+            'sat': new OpenLayers.Layer.XYZ(
+                'OpenWeatherMap Satellite',
+                    ['https://sat.owm.io/sql/${z}/${x}/${y}/?appid=' + HordeMap.conf['apikeys']['owm'] + '&overzoom=true&from=cloudless'],
+                    {
+                        'isBaseLayer': true,
+                        'sphericalMercator': true,
+                        'opacity': 1
+                    }
+            ),
             'clouds': new OpenLayers.Layer.XYZ(
                 'OpenWeatherMap Cloud Map',
-                    ['http://a.tile.openweathermap.org/map/clouds/${z}/${x}/${y}.png',
-                    'http://b.tile.openweathermap.org/map/clouds/${z}/${x}/${y}.png',
-                    'http://c.tile.openweathermap.org/map/clouds/${z}/${x}/${y}.png'],
+                    ['https://tile.openweathermap.org/map/clouds_new/${z}/${x}/${y}.png?appid=' + HordeMap.conf['apikeys']['owm']],
                     {
                         'isBaseLayer': false,
                         'sphericalMercator': true,
@@ -31,31 +47,7 @@ HordeMap.Owm = Class.create(
             ),
             'precipitation': new OpenLayers.Layer.XYZ(
                 'OpenWeatherMap Precipitation Map',
-                    ['http://a.tile.openweathermap.org/map/precipitation/${z}/${x}/${y}.png',
-                    'http://b.tile.openweathermap.org/map/precipitation/${z}/${x}/${y}.png',
-                    'http://c.tile.openweathermap.org/map/precipitation/${z}/${x}/${y}.png'],
-                    {
-                        'isBaseLayer': false,
-                        'sphericalMercator': true,
-                        'opacity': 0.5
-                    }
-            ),
-            'rain': new OpenLayers.Layer.XYZ(
-                'OpenWeatherMap Rain Map',
-                    ['http://a.tile.openweathermap.org/map/rain/${z}/${x}/${y}.png',
-                    'http://b.tile.openweathermap.org/map/rain/${z}/${x}/${y}.png',
-                    'http://c.tile.openweathermap.org/map/rain/${z}/${x}/${y}.png'],
-                    {
-                        'isBaseLayer': false,
-                        'sphericalMercator': true,
-                        'opacity': 0.5
-                    }
-            ),
-            'snow': new OpenLayers.Layer.XYZ(
-                'OpenWeatherMap Snow Map',
-                    ['http://a.tile.openweathermap.org/map/snow/${z}/${x}/${y}.png',
-                    'http://b.tile.openweathermap.org/map/snow/${z}/${x}/${y}.png',
-                    'http://c.tile.openweathermap.org/map/snow/${z}/${x}/${y}.png'],
+                    ['https://tile.openweathermap.org/map/precipitation_new/${z}/${x}/${y}.png?appid=' + HordeMap.conf['apikeys']['owm']],
                     {
                         'isBaseLayer': false,
                         'sphericalMercator': true,
@@ -64,9 +56,7 @@ HordeMap.Owm = Class.create(
             ),
             'pressure_cntr': new OpenLayers.Layer.XYZ(
                 'OpenWeatherMap Sea-Level Pressure Map',
-                    ['http://a.tile.openweathermap.org/map/pressure_cntr/${z}/${x}/${y}.png',
-                    'http://b.tile.openweathermap.org/map/pressure_cntr/${z}/${x}/${y}.png',
-                    'http://c.tile.openweathermap.org/map/pressure_cntr/${z}/${x}/${y}.png'],
+                    ['https://tile.openweathermap.org/map/pressure_new/${z}/${x}/${y}.png?appid=' + HordeMap.conf['apikeys']['owm']],
                     {
                         'isBaseLayer': false,
                         'sphericalMercator': true,
@@ -75,9 +65,7 @@ HordeMap.Owm = Class.create(
             ),
             'wind': new OpenLayers.Layer.XYZ(
                 'OpenWeatherMap Wind Map',
-                    ['http://a.tile.openweathermap.org/map/wind/${z}/${x}/${y}.png',
-                    'http://b.tile.openweathermap.org/map/wind/${z}/${x}/${y}.png',
-                    'http://c.tile.openweathermap.org/map/wind/${z}/${x}/${y}.png'],
+                    ['https://tile.openweathermap.org/map/wind_new/${z}/${x}/${y}.png?appid=' + HordeMap.conf['apikeys']['owm']],
                     {
                         'isBaseLayer': false,
                         'sphericalMercator': true,
