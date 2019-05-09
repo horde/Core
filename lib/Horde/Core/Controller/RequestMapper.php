@@ -22,30 +22,31 @@ class Horde_Core_Controller_RequestMapper
      * setup of an app always living below horde root
      * We also need to think about the case of different hosts
      *
-     * @return string  App path if the app fits or empty string if not
+     * @return array(string, string) app and  App path if the app fits
      */
     protected function _resolveApp($registry, $app, $request, $requestServer,
         $hordeRoot = '')
     {
         $webroot = parse_url($registry->get('webroot', $app));
-        // Filter out absolute urls unless they fit
-        if (!empty($webroot['host'])) {
-            if ($webroot['host'] != $requestServer) {
-                return '';
-            }
-            // treat path as absolute if domain is given
-            $normalized = $this->_normalize($webroot['path']);
-            if ($this->beginsWith($request->getPath(), $normalized)) {
-                return $normalized;
-            }
+        // Filter out absolute urls with domains unless they fit
+        if (!empty($webroot['host']) && ($webroot['host'] != $requestServer)) {
+            return array('', '');
         }
-
+        // Relative to webroot
+        // This might be the case if the webroot is a horde app
+        // horde is symlinked to /horde
+        // and the other apps are relative to horde
+        // Also path is absolute if domain is given
+        $normalized = $this->_normalize($webroot['path']);
+        if ($this->_beginsWith($request->getPath(), $normalized)) {
+            return array($app, $normalized);
+        }
         // Relative to horde
         $normalized = $this->_normalize($hordeRoot . $webroot['path']);
         if ($this->_beginsWith($request->getPath(), $normalized)) {
-            return $normalized;
+            return array($app, $normalized);
         }
-        return '';
+        return array('', '');
     }
 
     protected function _beginsWith($subject, $prefix)
@@ -89,24 +90,36 @@ class Horde_Core_Controller_RequestMapper
         array_shift($apps);
         // reserve horde case for last
         $hordeRoot = parse_url($registry->get('webroot', 'horde'));
+
         foreach ($apps as $app) {
-            $prefix = $this->_resolveApp($registry, $app, $request,
+            list($foundApp, $prefix) = $this->_resolveApp($registry, $app, $request,
                 $requestServer, $hordeRoot['path']);
-            if ($prefix) {
+            if ($foundApp || $prefix) {
                 $foundApp = $app;
                 break;
             }
         }
-        if (empty($foundApp)) {
-            $prefix = $this->_resolveApp($registry, 'horde', $request,
-                $requestServer);
-                if ($prefix) {
+        // If we found no app
+        // Or found an app which lives in webroot
+        // we need to check if horde may fit
+        if (empty($foundApp) || empty($prefix) || $prefix == '/') {
+            list($foundHorde, $prefixHorde) =
+            $this->_resolveApp($registry, 'horde', $request, $requestServer);
+            if ($foundHorde) {
                 $foundApp = 'horde';
-            } else {
-                $config->setControllerName('Horde_Core_Controller_NotFound');
-                return $config;
+                $prefix = $prefixHorde;
             }
         }
+        // If we still found no app, give up
+        if (empty($foundApp)) {
+            $config->setControllerName('Horde_Core_Controller_NotFound');
+            return $config;
+        }
+        // Route mapper doesn't like / as prefix
+        if ($prefix == '/') {
+            $prefix = '';
+        }
+
         $config->setApplication($foundApp);
         $app = $foundApp;
         // Check for route definitions.
@@ -127,17 +140,18 @@ class Horde_Core_Controller_RequestMapper
 
         // Load application routes.
         $mapper = $this->_mapper;
+        $mapper->environ = array('REQUEST_METHOD' => $request->getMethod());
         include $routeFile;
         if (file_exists($fileroot . '/config/routes.local.php')) {
             include $fileroot . '/config/routes.local.php';
         }
-
         // Match
         // @TODO Cache routes
         $path = $request->getPath();
         if (($pos = strpos($path, '?')) !== false) {
             $path = substr($path, 0, $pos);
         }
+
         $match = $this->_mapper->match($path);
         if (isset($match['controller'])) {
             $config->setControllerName(Horde_String::ucfirst($app) . '_' . Horde_String::ucfirst($match['controller']) . '_Controller');
