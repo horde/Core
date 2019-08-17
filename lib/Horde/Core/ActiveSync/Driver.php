@@ -3127,6 +3127,24 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     }
 
     /**
+     * Set the currently connected device
+     *
+     * @param Horde_ActiveSync_Device $device  The device object.
+     */
+    public function setDevice(Horde_ActiveSync_Device $device)
+    {
+        parent::setDevice($device);
+        // @todo remove is_callable for Horde 6(?)
+        if (!empty($this->_imap) && is_callable(array($this->_imap, 'setOptions'))) {
+            $options = array(
+                Horde_ActiveSync_Imap_Message::ATTACHMENT_OPTIONS_DECODE_TNEF =>
+                !$this->_device->hasQuirk(Horde_ActiveSync_Device::QUIRK_SUPPORTS_TNEF)
+            );
+            $this->_imap->setOptions($options);
+        }
+    }
+
+    /**
      * Helper to build a folder object for non-email folders.
      *
      * @param string $id      The folder's server id.
