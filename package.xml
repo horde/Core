@@ -40,7 +40,8 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* 
+* [mjr] Improvements for handling TNEF attachments over ActiveSync.
+* |+
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -4954,7 +4955,8 @@
    <date>2019-02-09</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-* 
+* [mjr] Improvements for handling TNEF attachments over ActiveSync.
+* |+
    </notes>
   </release>
  </changelog>
