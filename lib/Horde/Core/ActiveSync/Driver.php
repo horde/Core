@@ -3141,7 +3141,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         // @todo remove is_callable for Horde 6(?)
         if (!empty($this->_imap) && is_callable(array($this->_imap, 'setOptions'))) {
             $options = array(
-                Horde_ActiveSync_Imap_Message::ATTACHMENT_OPTIONS_DECODE_TNEF =>
+                Horde_ActiveSync_Imap_Message::OPTIONS_DECODE_TNEF =>
                 !$this->_device->hasQuirk(Horde_ActiveSync_Device::QUIRK_SUPPORTS_TNEF)
             );
             $this->_imap->setOptions($options);
