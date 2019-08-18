@@ -26,7 +26,7 @@
             "role": "developer"
         }
     ],
-    "version": "2.31.9",
+    "version": "2.31.10",
     "time": "2019-08-18",
     "repositories": [
         {
@@ -79,7 +79,7 @@
         "ext-session": "*"
     },
     "suggest": {
-        "pear-pear.horde.org/Horde_ActiveSync": "^2.39",
+        "pear-pear.horde.org/Horde_ActiveSync": "^2.40",
         "pear-pear.horde.org/Horde_Backup": "^1",
         "pear-pear.horde.org/Horde_Crypt": "^2",
         "pear-pear.horde.org/Horde_Dav": "^1",
