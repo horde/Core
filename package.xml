@@ -3,8 +3,7 @@
  <name>Horde_Core</name>
  <channel>pear.horde.org</channel>
  <summary>Core Horde Framework library</summary>
- <description>These classes provide the core functionality of the Horde Application Framework.
-</description>
+ <description>A library that provides the core functionality of the Horde Application Framework.</description>
  <lead>
   <name>Jan Schneider</name>
   <user>jan</user>
@@ -29,7 +28,7 @@
   <email>slusarz@horde.org</email>
   <active>no</active>
  </developer>
- <date>2019-02-09</date>
+ <date>2019-08-18</date>
  <version>
   <release>2.31.9</release>
   <api>2.31.0</api>
@@ -41,7 +40,6 @@
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
 * [mjr] Improvements for handling TNEF attachments over ActiveSync.
-* |+
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -1311,7 +1309,7 @@
    <package>
     <name>Horde_ActiveSync</name>
     <channel>pear.horde.org</channel>
-    <min>2.40.0</min>
+    <min>2.39.0</min>
     <max>3.0.0alpha1</max>
     <exclude>3.0.0alpha1</exclude>
    </package>
@@ -3129,7 +3127,7 @@
    <date>2013-03-04</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-* 
+*
    </notes>
   </release>
   <release>
@@ -4952,11 +4950,10 @@
     <release>stable</release>
     <api>stable</api>
    </stability>
-   <date>2019-02-09</date>
+   <date>2019-08-18</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [mjr] Improvements for handling TNEF attachments over ActiveSync.
-* |+
    </notes>
   </release>
  </changelog>

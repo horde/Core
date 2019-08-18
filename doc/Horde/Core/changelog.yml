@@ -4,13 +4,12 @@
   state:
     release: stable
     api: stable
-  date: 2019-02-09
+  date: 2019-08-18
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
     [mjr] Improvements for handling TNEF attachments over ActiveSync.
-    |+
 2.31.8:
   api: 2.31.0
   state:
