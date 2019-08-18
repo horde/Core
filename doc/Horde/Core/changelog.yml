@@ -10,7 +10,6 @@
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
     [mjr] Fix minimum required ActiveSync version.
-    |+
 2.31.9:
   api: 2.31.0
   state:
