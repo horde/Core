@@ -30,7 +30,7 @@
  </developer>
  <date>2019-08-18</date>
  <version>
-  <release>2.31.10</release>
+  <release>2.31.11</release>
   <api>2.31.0</api>
  </version>
  <stability>
@@ -39,7 +39,7 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* [mjr] Fix minimum required ActiveSync version.
+* 
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -3127,7 +3127,7 @@
    <date>2013-03-04</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-*
+* 
    </notes>
   </release>
   <release>
@@ -4969,6 +4969,21 @@
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [mjr] Fix minimum required ActiveSync version.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.11</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2019-08-18</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* 
    </notes>
   </release>
  </changelog>
