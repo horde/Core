@@ -2,7 +2,8 @@
 v2.31.11
 --------
 
-
+[mjr] Fix UTF-8 encoding of ActiveSync SmartReply requests (Bug #14957)
+|+
 
 
 --------

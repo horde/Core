@@ -39,7 +39,8 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* 
+* [mjr] Fix UTF-8 encoding of ActiveSync SmartReply requests (Bug #14957)
+* |+
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -4983,7 +4984,8 @@
    <date>2019-08-18</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-* 
+* [mjr] Fix UTF-8 encoding of ActiveSync SmartReply requests (Bug #14957)
+* |+
    </notes>
   </release>
  </changelog>
