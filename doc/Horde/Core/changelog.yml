@@ -4,13 +4,12 @@
   state:
     release: stable
     api: stable
-  date: 2019-08-18
+  date: 2019-11-03
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
-    [mjr] Fix UTF-8 encoding of ActiveSync SmartReply requests (Bug #14957)
-    |+
+    [mjr] Fix UTF-8 encoding of ActiveSync SmartReply requests (Bug #14957).
 2.31.10:
   api: 2.31.0
   state:

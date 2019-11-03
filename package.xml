@@ -28,7 +28,7 @@
   <email>slusarz@horde.org</email>
   <active>no</active>
  </developer>
- <date>2019-08-18</date>
+ <date>2019-11-03</date>
  <version>
   <release>2.31.11</release>
   <api>2.31.0</api>
@@ -39,8 +39,7 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* [mjr] Fix UTF-8 encoding of ActiveSync SmartReply requests (Bug #14957)
-* |+
+* [mjr] Fix UTF-8 encoding of ActiveSync SmartReply requests (Bug #14957).
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -3128,7 +3127,7 @@
    <date>2013-03-04</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-* 
+*
    </notes>
   </release>
   <release>
@@ -4981,11 +4980,10 @@
     <release>stable</release>
     <api>stable</api>
    </stability>
-   <date>2019-08-18</date>
+   <date>2019-11-03</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-* [mjr] Fix UTF-8 encoding of ActiveSync SmartReply requests (Bug #14957)
-* |+
+* [mjr] Fix UTF-8 encoding of ActiveSync SmartReply requests (Bug #14957).
    </notes>
   </release>
  </changelog>
