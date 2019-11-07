@@ -24,9 +24,13 @@ class Horde_Core_Controller_RequestMapper
      *
      * @return array(string, string) app and  App path if the app fits
      */
-    protected function _resolveApp($registry, $app, $request, $requestServer,
-        $hordeRoot = '')
-    {
+    protected function _resolveApp(
+        $registry,
+        $app,
+        $request,
+        $requestServer,
+        $hordeRoot = ''
+    ) {
         $webroot = parse_url($registry->get('webroot', $app));
         // Filter out absolute urls with domains unless they fit
         if (!empty($webroot['host']) && ($webroot['host'] != $requestServer)) {
@@ -85,15 +89,18 @@ class Horde_Core_Controller_RequestMapper
         $settingsFinder = $injector->getInstance('Horde_Core_Controller_SettingsFinder');
 
         $config = $injector->createInstance('Horde_Core_Controller_RequestConfiguration');
-
-        $apps = $registry->listApps();
-        array_shift($apps);
+        // $registry->listApps() without params returns empty on unauthenticated access
+        $apps = $registry->listApps(null, false, null);
         // reserve horde case for last
         $hordeRoot = parse_url($registry->get('webroot', 'horde'));
-
         foreach ($apps as $app) {
-            list($foundApp, $prefix) = $this->_resolveApp($registry, $app, $request,
-                $requestServer, $hordeRoot['path']);
+            list($foundApp, $prefix) = $this->_resolveApp(
+                $registry,
+                $app,
+                $request,
+                $requestServer,
+                $hordeRoot['path']
+            );
             if ($foundApp || $prefix) {
                 $foundApp = $app;
                 break;
@@ -110,6 +117,7 @@ class Horde_Core_Controller_RequestMapper
                 $prefix = $prefixHorde;
             }
         }
+
         // If we still found no app, give up
         if (empty($foundApp)) {
             $config->setControllerName('Horde_Core_Controller_NotFound');
@@ -158,6 +166,39 @@ class Horde_Core_Controller_RequestMapper
             $config->setSettingsExporterName($settingsFinder->getSettingsExporterName($config->getControllerName()));
         } else {
             $config->setControllerName('Horde_Core_Controller_NotFound');
+        }
+        // TODO: Move to some ControllerAuthHelper and check perms and admin
+        if (!$registry->isAuthenticated()) {
+            $auth = $injector->getInstance('Horde_Core_Factory_Auth')->create();
+
+            // Default behaviour should be to authenticate as older controllers expect it. This should be overrideable
+            if (!isset($match['HordeAuthType'])) {
+                $match['HordeAuthType'] = 'DEFAULT';
+            }
+            // Keep unauthenticated
+            if ($match['HordeAuthType'] == 'NONE') {
+                return $config;
+            }
+            if ($match['HordeAuthType'] == 'DEFAULT') {
+                // Try to authenticate, otherwise redirect to login page
+                // Check for basic auth
+                if (isset($_SERVER['PHP_AUTH_USER']) and isset($_SERVER['PHP_AUTH_PW'])) {
+                    $res = $auth->authenticate($_SERVER['PHP_AUTH_USER'], ['password' => $_SERVER['PHP_AUTH_PW']]);
+                    if ($res) {
+                        return $config;
+                    }
+                }
+                $registry->getServiceLink('login');
+                Horde::url($registry->getInitialPage('horde'))->redirect();
+            }
+            // In API mode, either allow a request
+            if ($match['HordeAuthType'] == 'BASIC') {
+                if ($auth->authenticate($_SERVER['PHP_AUTH_USER'], ['password' => $_SERVER['PHP_AUTH_PW']])) {
+                    return $config;
+                }
+                $config->setControllerName('Horde_Core_Controller_NotAuthorized');
+                return $config;
+            }
         }
 
         return $config;
