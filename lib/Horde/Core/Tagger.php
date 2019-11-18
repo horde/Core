@@ -69,7 +69,7 @@ abstract class Horde_Core_Tagger
             $types = $injector->getInstance('Content_Types_Manager')
                 ->ensureTypes($this->_types);
             foreach ($this->_types as $k => $v) {
-                $this->_type_ids[$v] = intval($types[$k]);
+                $this->_type_ids[$v] = intval($types ? $types[$k] : 0);
             }
             $cache->set($key, serialize($this->_type_ids));
         }
