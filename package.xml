@@ -28,7 +28,7 @@
   <email>slusarz@horde.org</email>
   <active>no</active>
  </developer>
- <date>2019-11-03</date>
+ <date>2019-12-05</date>
  <version>
   <release>2.31.12</release>
   <api>2.31.0</api>
@@ -40,7 +40,6 @@
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
 * [mjr] Support for EAS Autodiscover v2.
-* |+
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -3128,7 +3127,7 @@
    <date>2013-03-04</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-* 
+*
    </notes>
   </release>
   <release>
@@ -4996,11 +4995,10 @@
     <release>stable</release>
     <api>stable</api>
    </stability>
-   <date>2019-11-03</date>
+   <date>2019-12-05</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [mjr] Support for EAS Autodiscover v2.
-* |+
    </notes>
   </release>
  </changelog>
