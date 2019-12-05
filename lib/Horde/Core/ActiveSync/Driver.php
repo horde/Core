@@ -2566,15 +2566,27 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      * do our best to translate email address to username. If this fails, the
      * device simply falls back to requiring full user configuration.
      *
-     * @param array $params  Optional array of parameters.
+     * @param array $params     Optional array of parameters.
+     * @param integer $version  The Autodisover protocol version. Defaults to 1.
+     *                          @since 2.32.0
      *
      * @return array  Either an array of autodiscover parameters that the
      *                ActiveSync server will use to build the response, or
      *                the raw XML response contained in the raw_xml key.
      */
-    public function autoDiscover($params = array())
+    public function autoDiscover($params = array(), $version = 1)
     {
         $hooks = $GLOBALS['injector']->getInstance('Horde_Core_Hooks');
+        $url = parse_url((string)Horde::url(null, true));
+
+        if ($version == 2) {
+            if (Horde_String::lower($params['protocol']) == 'autodiscoverv1') {
+                $params['url'] = $url['scheme'] . '://' . $url['host'] . '/Autodiscover/Autodiscover.xml';
+            } else if (Horde_String::lower($params['protocol'] == 'activesync')) {
+                $params['url'] = $url['scheme'] . '://' . $url['host'] . '/Microsoft-Server-ActiveSync';
+            }
+            return $params;
+        }
 
         // Attempt to get a username from the email address.
         $ident = $GLOBALS['injector']
@@ -2582,8 +2594,6 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             ->create($GLOBALS['registry']->getAuth());
         $params['display_name'] = $ident->getValue('fullname');
         $params['email'] = $ident->getValue('from_addr');
-        $url = parse_url((string)Horde::url(null, true));
-        $params['url'] = $url['scheme'] . '://' . $url['host'] . '/Microsoft-Server-ActiveSync';
         // As of Exchange 2007, this always returns en:en
         $params['culture'] = 'en:en';
         $params['username'] = $this->getUsernameFromEmail($params['email']);
