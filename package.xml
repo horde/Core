@@ -30,7 +30,7 @@
  </developer>
  <date>2019-12-23</date>
  <version>
-  <release>2.31.13</release>
+  <release>2.31.14</release>
   <api>2.31.0</api>
  </version>
  <stability>
@@ -39,7 +39,7 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* [mjr] Improve PHP 7.3 compatibility.
+* 
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -3127,7 +3127,7 @@
    <date>2013-03-04</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-*
+* 
    </notes>
   </release>
   <release>
@@ -5014,6 +5014,21 @@
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [mjr] Improve PHP 7.3 compatibility.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.14</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2019-12-23</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* 
    </notes>
   </release>
  </changelog>
