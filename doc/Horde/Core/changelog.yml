@@ -10,7 +10,6 @@
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
     [mjr] Improve PHP 7.3 compatibility.
-    |+
 2.31.12:
   api: 2.31.0
   state:
