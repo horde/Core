@@ -3501,7 +3501,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
 
         // Honor range, and don't bother if no results
         $results = array_pop($results);
-        $count = count($results);
+        $count = !empty($results) ? count($results) : 0;
         if (!$count) {
             $this->_endBuffer();
             return $return;
