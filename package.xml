@@ -39,7 +39,8 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* 
+* [mjr] Improve PHP 7.3 compatibility.
+* |+
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -5010,10 +5011,11 @@
     <release>stable</release>
     <api>stable</api>
    </stability>
-   <date>2019-12-05</date>
+   <date>2019-12-23</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-* 
+* [mjr] Improve PHP 7.3 compatibility.
+* |+
    </notes>
   </release>
  </changelog>
