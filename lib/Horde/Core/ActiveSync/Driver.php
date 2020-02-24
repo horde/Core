@@ -2598,6 +2598,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             ->create($GLOBALS['registry']->getAuth());
         $params['display_name'] = $ident->getValue('fullname');
         $params['email'] = $ident->getValue('from_addr');
+        $params['url'] = $url['scheme'] . '://' . $url['host'] . '/Microsoft-Server-ActiveSync';
         // As of Exchange 2007, this always returns en:en
         $params['culture'] = 'en:en';
         $params['username'] = $this->getUsernameFromEmail($params['email']);
