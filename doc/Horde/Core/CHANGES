@@ -2,7 +2,8 @@
 v2.31.14
 --------
 
-
+[mjr] Fix regression in Autodiscover v1 (Bug #14992).
+|+
 
 
 --------
