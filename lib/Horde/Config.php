@@ -66,10 +66,20 @@ class Horde_Config
     protected $_currentConfig = array();
 
     /**
+     * The SHA-1 hash of the conf.xml file which will be copied into the
+     * conf.php file.
+     *
+     * @var string
+     */
+    protected $_configHash = '';
+
+    /**
      * The version tag of the conf.xml file which will be copied into the
      * conf.php file.
      *
      * @var string
+     * @deprecated
+     * @todo Remove for Horde 6
      */
     protected $_versionTag = '';
 
@@ -186,7 +196,11 @@ class Horde_Config
         $dom = new DOMDocument();
         $dom->loadXML(file_get_contents($path . '/conf.xml'));
 
+        /* Create config file hash. */
+        $this->_configHash = hash_file('sha1', $path . '/conf.xml');
+
         /* Check if there is a CVS/Git version tag and store it. */
+        /* TODO: Remove for Horde 6. */
         $node = $dom->firstChild;
         while (!empty($node)) {
             if (($node->nodeType == XML_COMMENT_NODE) &&
@@ -326,7 +340,8 @@ class Horde_Config
         $this->readXMLConfig($custom_conf);
         $this->getPHPConfig();
 
-        $this->_phpConfig = "<?php\n" . $this->_preConfig . $this->_configBegin;
+        $this->_phpConfig = "<?php\n" . $this->_preConfig
+            . $this->_configBegin . '// $Hash: ' . $this->_configHash . "\n";
         if (!empty($this->_versionTag)) {
             $this->_phpConfig .= '// ' . $this->_versionTag;
         }
