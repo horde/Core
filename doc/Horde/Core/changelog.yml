@@ -9,6 +9,7 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    [jan] Use file hashing for detecting outdated configuration files.
     [mjr] Fix regression in Autodiscover v1 (Bug #14992).
 2.31.13:
   api: 2.31.0
