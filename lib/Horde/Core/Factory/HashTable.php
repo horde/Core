@@ -94,9 +94,17 @@ class Horde_Core_Factory_HashTable extends Horde_Core_Factory_Injector
                 $redis_params = reset($redis_params);
             }
 
+            $redis_replication_options = array();
+            if (!empty($params['replication'])) {
+                $redis_replication_options = array(
+                    'replication' => $params['replication'],
+                    'service'  => !empty($params['service']) ? $params['service'] : null,
+                );
+            }
+
             return new Horde_HashTable_Predis(array(
                 'logger' => $logger,
-                'predis' => new Predis\Client($redis_params)
+                'predis' => new Predis\Client($redis_params, $redis_replication_options)
             ));
 
         case 'memory':
