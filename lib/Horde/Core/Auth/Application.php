@@ -666,16 +666,16 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
             return false;
         }
 
+        /* Only set the view mode on initial authentication */
+        if (!$GLOBALS['session']->exists('horde', 'view')) {
+            $this->_setView();
+        }
+
         $registry->setAuth($userId, $credentials, array(
             'app' => $this->_app,
             'change' => $this->getCredential('change'),
             'language' => $language
         ));
-
-        /* Only set the view mode on initial authentication */
-        if (!$GLOBALS['session']->exists('horde', 'view')) {
-            $this->_setView();
-        }
 
         if ($this->_base &&
             isset($GLOBALS['notification']) &&
