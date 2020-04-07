@@ -13,7 +13,7 @@ class Horde_Core_Factory_Dns extends Horde_Core_Factory_Injector
 
         if ($tmpdir = Horde::getTempDir()) {
             $config = array(
-                'cache_file' => $tmpdir . '/horde_dns.cache',
+                'cache_file' => $tmpdir . '/horde_dns.cache' . gethostname(),
                 'cache_size' => 100000,
                 'cache_type' => 'file',
             );
