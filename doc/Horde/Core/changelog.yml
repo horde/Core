@@ -9,6 +9,8 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    [jan] Avoid concurrent access to DNS cache from multiple hosts (cheese@nosuchhost.net, PR#9).
+    [jan] Support Redis Sentinel configuration (Michael Menge <michael.menge@zdv.uni-tuebingen.de>, Request #14998).
     [jan] Use file hashing for detecting outdated configuration files.
     [mjr] Fix regression in Autodiscover v1 (Bug #14992).
 2.31.13:
@@ -156,7 +158,6 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
-    [jan] Support Redis Sentinel configuration (Michael Menge <michael.menge@zdv.uni-tuebingen.de>, Request #14998).
     [mjr] Fix checking for active APIs for ActiveSync without throwing exceptions.
     [mjr] Fix setting and semantic meaning of the 'oofstate' property when returning Out of Office data to EAS clients.
     [mjr] Detect if the failure was due to trying to delete a special mailbox (Bug #14732).
