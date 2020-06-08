@@ -28,7 +28,7 @@
   <email>slusarz@horde.org</email>
   <active>no</active>
  </developer>
- <date>2017-11-14</date>
+ <date>2020-06-08</date>
  <version>
   <release>2.31.1</release>
   <api>2.31.0</api>
@@ -39,9 +39,10 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* [mjr] Fix checking for active APIs for ActiveSync without throwing exceptions.
-* [mjr] Fix setting and semantic meaning of the &apos;oofstate&apos; property when returning Out of Office data to EAS clients.
-* [mjr] Detect if the failure was due to trying to delete a special mailbox (Bug #14732).
+* [jan] Avoid concurrent access to DNS cache from multiple hosts (cheese@nosuchhost.net, PR#9).
+* [jan] Support Redis Sentinel configuration (Michael Menge &lt;michael.menge@zdv.uni-tuebingen.de&gt;, Request #14998).
+* [jan] Use file hashing for detecting outdated configuration files.
+* [mjr] Fix regression in Autodiscover v1 (Bug #14992).
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -4909,6 +4910,131 @@
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [mjr] SECURITY: Fix XSS vulnerability when rendering a colorpicker (Bug #14857).
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.7</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2019-01-13</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* [mjr] Fix returning image binary data with EAS ResolveRecipient requests.
+* [mjr] Fix returning images with EAS search results.
+* [mjr] Fix handling of EAS ResolveRecipient requests without AVAILABILITY query.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.8</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2019-02-09</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* [mjr] Improve ActiveSync RESOLVERECIPIENT reqeuests.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.9</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2019-08-18</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* [mjr] Improvements for handling TNEF attachments over ActiveSync.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.10</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2019-08-18</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* [mjr] Fix minimum required ActiveSync version.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.11</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2019-11-03</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* [mjr] Fix UTF-8 encoding of ActiveSync SmartReply requests (Bug #14957).
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.12</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2019-12-05</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* [mjr] Support for EAS Autodiscover v2.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.13</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2019-12-23</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* [mjr] Improve PHP 7.3 compatibility.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>2.31.14</release>
+    <api>2.31.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2019-12-23</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* [jan] Avoid concurrent access to DNS cache from multiple hosts (cheese@nosuchhost.net, PR#9).
+* [jan] Support Redis Sentinel configuration (Michael Menge &lt;michael.menge@zdv.uni-tuebingen.de&gt;, Request #14998).
+* [jan] Use file hashing for detecting outdated configuration files.
+* [mjr] Fix regression in Autodiscover v1 (Bug #14992).
    </notes>
   </release>
  </changelog>

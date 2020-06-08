@@ -1,3 +1,105 @@
+--------
+v2.31.14
+--------
+
+[jan] Avoid concurrent access to DNS cache from multiple hosts
+      (cheese@nosuchhost.net, PR#9).
+[jan] Support Redis Sentinel configuration (Michael Menge
+      <michael.menge@zdv.uni-tuebingen.de>, Request #14998).
+[jan] Use file hashing for detecting outdated configuration files.
+[mjr] Fix regression in Autodiscover v1 (Bug #14992).
+
+
+--------
+v2.31.13
+--------
+
+[mjr] Improve PHP 7.3 compatibility.
+
+
+--------
+v2.31.12
+--------
+
+[mjr] Support for EAS Autodiscover v2.
+
+
+--------
+v2.31.11
+--------
+
+[mjr] Fix UTF-8 encoding of ActiveSync SmartReply requests (Bug #14957).
+
+
+--------
+v2.31.10
+--------
+
+[mjr] Fix minimum required ActiveSync version.
+
+
+-------
+v2.31.9
+-------
+
+[mjr] Improvements for handling TNEF attachments over ActiveSync.
+
+
+-------
+v2.31.8
+-------
+
+[mjr] Improve ActiveSync RESOLVERECIPIENT reqeuests.
+
+
+-------
+v2.31.7
+-------
+
+[mjr] Fix returning image binary data with EAS ResolveRecipient requests.
+[mjr] Fix returning images with EAS search results.
+[mjr] Fix handling of EAS ResolveRecipient requests without AVAILABILITY query.
+
+
+-------
+v2.31.6
+-------
+
+[mjr] SECURITY: Fix XSS vulnerability when rendering a colorpicker (Bug
+      #14857).
+
+
+-------
+v2.31.5
+-------
+
+[mjr] Work around buggy EAS clients that send badly formed HTML in SMARTREPLY
+      (Bug #14841).
+
+
+-------
+v2.31.4
+-------
+
+[mjr] Fix returning EAS GAL search results (Bug #14843).
+[jan] Avoid fatal error if an ActiveSync message has empty categories.
+
+
+-------
+v2.31.3
+-------
+
+[mjr] Protect against empty imap adapters when no email support is enabled for
+      EAS (Bug #14820).
+
+
+-------
+v2.31.2
+-------
+
+[mjr] Fix reporting status of OOF messages to EAS clients (Bug #14779).
+
+
 -------
 v2.31.1
 -------
