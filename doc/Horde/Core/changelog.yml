@@ -11,7 +11,6 @@
   notes: |
     [jan] Avoid concurrent access to DNS cache from multiple hosts (cheese@nosuchhost.net, PR#9).
     [mjr] Fix regression in Autodiscover v1 (Bug #14992).
-    |+
 2.31.13:
   api: 2.31.0
   state:
