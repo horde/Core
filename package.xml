@@ -28,7 +28,7 @@
   <email>slusarz@horde.org</email>
   <active>no</active>
  </developer>
- <date>2019-12-23</date>
+ <date>2020-06-08</date>
  <version>
   <release>2.31.14</release>
   <api>2.31.0</api>
@@ -39,8 +39,10 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
+* [jan] Avoid concurrent access to DNS cache from multiple hosts (cheese@nosuchhost.net, PR#9).
+* [jan] Support Redis Sentinel configuration (Michael Menge &lt;michael.menge@zdv.uni-tuebingen.de&gt;, Request #14998).
+* [jan] Use file hashing for detecting outdated configuration files.
 * [mjr] Fix regression in Autodiscover v1 (Bug #14992).
-* |+
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -5029,8 +5031,10 @@
    <date>2019-12-23</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
+* [jan] Avoid concurrent access to DNS cache from multiple hosts (cheese@nosuchhost.net, PR#9).
+* [jan] Support Redis Sentinel configuration (Michael Menge &lt;michael.menge@zdv.uni-tuebingen.de&gt;, Request #14998).
+* [jan] Use file hashing for detecting outdated configuration files.
 * [mjr] Fix regression in Autodiscover v1 (Bug #14992).
-* |+
    </notes>
   </release>
  </changelog>

@@ -2,8 +2,12 @@
 v2.31.14
 --------
 
+[jan] Avoid concurrent access to DNS cache from multiple hosts
+      (cheese@nosuchhost.net, PR#9).
+[jan] Support Redis Sentinel configuration (Michael Menge
+      <michael.menge@zdv.uni-tuebingen.de>, Request #14998).
+[jan] Use file hashing for detecting outdated configuration files.
 [mjr] Fix regression in Autodiscover v1 (Bug #14992).
-|+
 
 
 --------
