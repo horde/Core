@@ -9,6 +9,7 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    [jan] Avoid concurrent access to DNS cache from multiple hosts (cheese@nosuchhost.net, PR#9).
     [mjr] Fix regression in Autodiscover v1 (Bug #14992).
     |+
 2.31.13:
@@ -1470,7 +1471,7 @@
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
-  notes:
+  notes: ~
 2.4.0:
   api: 2.4.0
   state:
