@@ -127,3 +127,5 @@ dependencies:
       hash: '*'
       SimpleXML: '*'
       sockets: '*'
+autoload:
+  classmap: ['lib/']
