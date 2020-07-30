@@ -1,7 +1,42 @@
 <?php
 /**
+ * Copyright 2009-2020 Horde LLC (http://www.horde.org/)
+ *
+ * See the enclosed file LICENSE for license information (LGPL). If you
+ * did not receive this file, see http://www.horde.org/licenses/lgpl21.
+ *
+ * @author   Michael J Rubinsky <mrubinsk@horde.org>
  * @category Horde
+ * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
+ */
+
+/**
+ * The Horde_Core_Controller_RequestMapper class provides 
+ * logic to identify which app is supposed to handle the request.
+ *
+ * It loads the relevant routes file.
+ * The routes file may either demand a certain type of authentication
+ * or restrict access to certain HTTP verbs.
+ *
+ * Supported auth types:
+ * - default: The user is supposed to be already logged in and has a session
+ * - basic: The request comes with HTTP BASIC AUTH credentials
+ * - none: Unauthenticated access is permitted
+ *
+ * Finding the right app is supposed to work even if the app does not live
+ * below the horde base URL or even on a separate domain as long as
+ * it is properly configured in the registry.
+ *
+ * Copyright 2009-2020 Horde LLC (http://www.horde.org/)
+ *
+ * See the enclosed file LICENSE for license information (LGPL-2). If you
+ * did not receive this file, see http://www.horde.org/licenses/lgpl.
+ *
+ * @author   Michael J Rubinsky <mrubinsk@horde.org>
+ * @category Horde
+ * @package  Package
+ * @license  http://www.horde.org/licenses/lgpl LGPL-2
  */
 class Horde_Core_Controller_RequestMapper
 {
@@ -21,6 +56,12 @@ class Horde_Core_Controller_RequestMapper
      * The original approach was too specific for the default horde use
      * setup of an app always living below horde root
      * We also need to think about the case of different hosts
+     *
+     * @param Horde_Registry           $registry      The Registry Object
+     * @param string                   $app           Application identifier
+     * @param Horde_Controller_Request $request       The request object
+     * @param string                   $requestServer Hostname requested
+     * @param string                   $hordeRoot     Horde's root web path
      *
      * @return array(string, string) app and  App path if the app fits
      */
@@ -53,11 +94,28 @@ class Horde_Core_Controller_RequestMapper
         return array('', '');
     }
 
+    /**
+     * Check if a path begins with a prefix to identify apps or apis
+     *
+     * @param string $subject The path to test for
+     * @param string $prefix  The prefix we are checking the path for
+     *
+     * @return bool True if subject begins with prefix
+     */
     protected function _beginsWith($subject, $prefix)
     {
         return substr($subject, 0, strlen($prefix)) == $prefix;
     }
 
+    /**
+     * Rebuild a path string to a common form
+     *
+     * Remove any . and .. levels and parts made irrelevant by them
+     *
+     * @param string $path The input path
+     *
+     * @return string The normalized path
+     */
     protected function _normalize($path)
     {
         $partsIn = explode('/', $path);
@@ -81,6 +139,26 @@ class Horde_Core_Controller_RequestMapper
         return '/' . implode('/', $partsOut);
     }
 
+    /**
+     * Identify relevant app and build the request configuration
+     *
+     * Consider the first part of the url behind the Horde base url as the
+     * application identifier.
+     * Consider if the horde base app has the relevant controller
+     *
+     * If nothing fits, return the NotFound controller
+     *
+     * Initialize the found app.
+     * Load the route definition file for the found app.
+     *
+     * Initialize the routes mapper with the app's base path and match
+     *
+     * Finally check authentication if required
+     *
+     * @param Horde_Injector $injector The Dependency Injector
+     *
+     * @return Horde_Controller_RequestConfiguration The found config
+     */
     public function getRequestConfiguration(Horde_Injector $injector)
     {
         $request = $injector->getInstance('Horde_Controller_Request');
@@ -171,7 +249,8 @@ class Horde_Core_Controller_RequestMapper
         if (!$registry->isAuthenticated()) {
             $auth = $injector->getInstance('Horde_Core_Factory_Auth')->create();
 
-            // Default behaviour should be to authenticate as older controllers expect it. This should be overrideable
+            // Default behaviour should be to authenticate if none given.
+            // Older controllers expect this.
             if (!isset($match['HordeAuthType'])) {
                 $match['HordeAuthType'] = 'DEFAULT';
             }
