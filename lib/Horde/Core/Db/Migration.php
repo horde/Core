@@ -66,7 +66,7 @@ class Horde_Core_Db_Migration
         $pear = new PEAR_Config($pearconf);
 
         // Detect and handle the Composer use case
-        if (class_exists('Composer\Autoload\ClassLoader')) {
+        if (class_exists('Composer\Autoload\ClassLoader', false)) {
             /*
               This is a bit brittle. We know where migration
               is relative to the package root and that it should
