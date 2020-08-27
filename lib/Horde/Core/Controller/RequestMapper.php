@@ -51,63 +51,6 @@ class Horde_Core_Controller_RequestMapper
     }
 
     /**
-     * Check if an app is the relevant source of routes for a request
-     *
-     * The original approach was too specific for the default horde use
-     * setup of an app always living below horde root
-     * We also need to think about the case of different hosts
-     *
-     * @param Horde_Registry           $registry      The Registry Object
-     * @param string                   $app           Application identifier
-     * @param Horde_Controller_Request $request       The request object
-     * @param string                   $requestServer Hostname requested
-     * @param string                   $hordeRoot     Horde's root web path
-     *
-     * @return array(string, string) app and  App path if the app fits
-     */
-    protected function _resolveApp(
-        $registry,
-        $app,
-        $request,
-        $requestServer,
-        $hordeRoot = ''
-    ) {
-        $webroot = parse_url($registry->get('webroot', $app));
-        // Filter out absolute urls with domains unless they fit
-        if (!empty($webroot['host']) && ($webroot['host'] != $requestServer)) {
-            return array('', '');
-        }
-        // Relative to webroot
-        // This might be the case if the webroot is a horde app
-        // horde is symlinked to /horde
-        // and the other apps are relative to horde
-        // Also path is absolute if domain is given
-        $normalized = $this->_normalize($webroot['path']);
-        if ($this->_beginsWith($request->getPath(), $normalized)) {
-            return array($app, $normalized);
-        }
-        // Relative to horde
-        $normalized = $this->_normalize($hordeRoot . $webroot['path']);
-        if ($this->_beginsWith($request->getPath(), $normalized)) {
-            return array($app, $normalized);
-        }
-        return array('', '');
-    }
-
-    /**
-     * Check if a path begins with a prefix to identify apps or apis
-     *
-     * @param string $subject The path to test for
-     * @param string $prefix  The prefix we are checking the path for
-     *
-     * @return bool True if subject begins with prefix
-     */
-    protected function _beginsWith($subject, $prefix)
-    {
-        return substr($subject, 0, strlen($prefix)) == $prefix;
-    }
-
-    /**
      * Rebuild a path string to a common form
      *
      * Remove any . and .. levels and parts made irrelevant by them
@@ -140,13 +83,61 @@ class Horde_Core_Controller_RequestMapper
     }
 
     /**
-     * Identify relevant app and build the request configuration
+     * Identify the correct app to handle the request
      *
-     * Consider the first part of the url behind the Horde base url as the
-     * application identifier.
-     * Consider if the horde base app has the relevant controller
+     * This needs to cover a lot of cases
+     * - app lives below horde (pear default)
+     * - app lives besides or independent of horde (composer default)
+     * - app is horde
+     * - app lives in document root (https://webmail.foo.org is imp)
+     * - app lives below horde but document root is another app
+     *    eg https://webmail.foo.org where / is imp, /horde is horde, /horde/turba is turba
      *
-     * If nothing fits, return the NotFound controller
+     * @param string                   $scheme  Request URI scheme (https, http)
+     * @param Horde_Controller_Request $host    Request host part (www.foo.org)
+     * @param string $host    Request host part (www.foo.org)
+     * @param Horde_Registry  $registry         The Horde Registry
+     */
+    protected function _identifyApp($scheme, $request, $host, $registry)
+    {
+        $matches = [];
+        // listApps() would return empty on unauthenticated access
+        foreach ($registry->listApps(null, false, null) as $app)
+        {
+            $default = [
+               'scheme' => $scheme,
+               'host' => $host,
+               'path' => '',
+               'app' => $app
+            ];
+            $applicationUrl = array_merge($default, parse_url($registry->get('webroot', $app)));
+            $applicationUrl['path'] = $this->_normalize($applicationUrl['path']);
+            // sort out cases with wrong host or scheme
+            if ($scheme != $applicationUrl['scheme']) { continue; }
+            if ($host != $applicationUrl['host']) { continue; }
+            // does the path match at all?
+            if (substr($request->getPath(),0, strlen($applicationUrl['path'])) == $applicationUrl['path']) {
+                $matches[] = $applicationUrl;
+            }
+        }
+        // No matches, return early
+        if (count($matches) == 0) {
+            return $matches;
+        }
+        // Longest match path *should* always be the right app
+        usort($matches, function($a, $b) 
+        {
+             return strlen($a['path']) <=> strlen($b['path']);
+        }
+        );
+        return array_pop($matches);
+    }
+
+
+    /**
+     * Build the request configuration
+     *
+     * If no found app fits, return the NotFound controller.
      *
      * Initialize the found app.
      * Load the route definition file for the found app.
@@ -163,41 +154,17 @@ class Horde_Core_Controller_RequestMapper
     {
         $request = $injector->getInstance('Horde_Controller_Request');
         $requestServer = $_SERVER['SERVER_NAME'];
+        $uriScheme = $_SERVER['REQUEST_SCHEME'];
         $registry = $injector->getInstance('Horde_Registry');
         $settingsFinder = $injector->getInstance('Horde_Core_Controller_SettingsFinder');
 
         $config = $injector->createInstance('Horde_Core_Controller_RequestConfiguration');
-        // $registry->listApps() without params returns empty on unauthenticated access
-        $apps = $registry->listApps(null, false, null);
-        // reserve horde case for last
-        $hordeRoot = parse_url($registry->get('webroot', 'horde'));
-        foreach ($apps as $app) {
-            list($foundApp, $prefix) = $this->_resolveApp(
-                $registry,
-                $app,
-                $request,
-                $requestServer,
-                $hordeRoot['path']
-            );
-            if ($foundApp || $prefix) {
-                $foundApp = $app;
-                break;
-            }
-        }
-        // If we found no app
-        // Or found an app which lives in webroot
-        // we need to check if horde may fit
-        if (empty($foundApp) || empty($prefix) || $prefix == '/') {
-            list($foundHorde, $prefixHorde) =
-            $this->_resolveApp($registry, 'horde', $request, $requestServer);
-            if ($foundHorde) {
-                $foundApp = 'horde';
-                $prefix = $prefixHorde;
-            }
-        }
+        $found = $this->_identifyApp($scheme, $request, $requestServer, $GLOBALS['registry']);
+        $prefix = $found['path'];
 
         // If we still found no app, give up
-        if (empty($foundApp)) {
+
+        if (empty($found)) {
             $config->setControllerName('Horde_Core_Controller_NotFound');
             return $config;
         }
@@ -206,12 +173,13 @@ class Horde_Core_Controller_RequestMapper
             $prefix = '';
         }
 
-        $config->setApplication($foundApp);
-        $app = $foundApp;
+        $config->setApplication($found['app']);
+        $app = $found['app'];
         // Check for route definitions.
         $fileroot = $registry->get('fileroot', $app);
         $routeFile = $fileroot . '/config/routes.php';
         if (!file_exists($routeFile)) {
+            $scheme = $_SERVER['REQUEST_SCHEME'];
             $config->setControllerName('Horde_Core_Controller_NotFound');
             return $config;
         }
