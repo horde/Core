@@ -377,9 +377,9 @@ class Horde_Core_ActiveSync_Mail
         $this->_headers->removeHeader('Content-Transfer-Encoding');
 
         if ($this->_forward) {
-            $mail = $this->_doSmartForward();
+            $mail = $this->_buildSmartForward();
         } else {
-            $mail = $this->_doSmartReply();
+            $mail = $this->_buildSmartReply();
         }
 
         try {
@@ -390,7 +390,12 @@ class Horde_Core_ActiveSync_Mail
         }
     }
 
-    protected function _doSmartReply()
+    /**
+     * Build Horde_Mime_Mail object to send email from SmartReply request.
+     *
+     * @return Horde_Mime_Mail
+     */
+    protected function _buildSmartReply()
     {
         $mail = new Horde_Mime_Mail($this->_headers->toArray(array('charset' => 'UTF-8')));
         $base_part = $this->imapMessage->getStructure();
@@ -422,7 +427,12 @@ class Horde_Core_ActiveSync_Mail
         return $mail;
     }
 
-    protected function _doSmartForward()
+    /**
+     * Build Horde_Mime_Mail object to send email from SmartForward request.
+     *
+     * @return Horde_Mime_Mail
+     */
+    protected function _buildSmartForward()
     {
         // Check for EAS 16.0 Forwardees
         if (!empty($this->_forwardees)) {
@@ -457,12 +467,7 @@ class Horde_Core_ActiveSync_Mail
         }
         $mail->addMimePart($rfc822Part);
 
-        try {
-            $mail->send($GLOBALS['injector']->getInstance('Horde_Mail'));
-            $this->_mailer = $mail;
-        } catch (Horde_Mime_Exception $e) {
-            throw new Horde_ActiveSync_Exception($e);
-        }
+        return $mail;
     }
 
     /**
@@ -489,13 +494,13 @@ class Horde_Core_ActiveSync_Mail
         return $smart_text . $this->_replyText($body_data, $base_part->getPart($plain_id));
     }
 
-/**
- * Return plain text part from incoming smart request.
- *
- * @param  Horde_Mime_Part $mime_message  Mime_Part representing the incoming msg
- *
- * @return string  Plain text suitable for setting as the body of mime msg.
- */
+    /**
+     * Return plain text part from incoming smart request.
+     *
+     * @param  Horde_Mime_Part $mime_message  Mime_Part representing the incoming msg
+     *
+     * @return string  Plain text suitable for setting as the body of mime msg.
+     */
     protected function _getSmartPlainText(Horde_Mime_Part $mime_message)
     {
         if (!$id = $mime_message->findBody('plain')) {
@@ -536,6 +541,13 @@ class Horde_Core_ActiveSync_Mail
         return $smart_text . $this->_replyText($body_data, $base_part->getPart($html_id), true);
     }
 
+    /**
+     * Return HTML text part from incoming smart request.
+     *
+     * @param  Horde_Mime_Part $mime_message  Mime_Part representing the incoming msg
+     *
+     * @return string  Plain text suitable for setting as the body of mime msg.
+     */
     protected function _getSmartHtmlText(Horde_Mime_Part $mime_message)
     {
         if (!$id = $mime_message->findBody('html')) {
