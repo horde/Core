@@ -369,7 +369,6 @@ class Horde_Core_ActiveSync_Mail
      */
     protected function _sendSmart()
     {
-        $mime_message = $this->_raw->getMimeObject();
         // Need to remove content-type header from the incoming raw message
         // since in a smart request, we actually construct the full MIME msg
         // ourselves and the content-type in _headers only applies to the reply
@@ -377,17 +376,22 @@ class Horde_Core_ActiveSync_Mail
         $this->_headers->removeHeader('Content-Type');
         $this->_headers->removeHeader('Content-Transfer-Encoding');
 
-        // Check for EAS 16.0 Forwardees
-        if (!empty($this->_forwardees)) {
-            $list = new Horde_Mail_Rfc822_List();
-            foreach ($this->_forwardees as $forwardee) {
-                $to = new Horde_Mail_Rfc822_Address($forwardee->email);
-                $to->personal = $forwardee->name;
-                $list->add($to);
-            }
-            $this->_headers->add('To', $list->writeAddress());
+        if ($this->_forward) {
+            $mail = $this->_doSmartForward();
+        } else {
+            $mail = $this->_doSmartReply();
         }
 
+        try {
+            $mail->send($GLOBALS['injector']->getInstance('Horde_Mail'));
+            $this->_mailer = $mail;
+        } catch (Horde_Mime_Exception $e) {
+            throw new Horde_ActiveSync_Exception($e);
+        }
+    }
+
+    protected function _doSmartReply()
+    {
         $mail = new Horde_Mime_Mail($this->_headers->toArray(array('charset' => 'UTF-8')));
         $base_part = $this->imapMessage->getStructure();
         $plain_id = $base_part->findBody('plain');
@@ -401,23 +405,57 @@ class Horde_Core_ActiveSync_Mail
         } catch (Horde_Exception_NotFound $e) {
             throw new Horde_ActiveSync_Exception($e->getMessage());
         }
+
+        $mime_message = $this->_raw->getMimeObject();
         if (!empty($html_id)) {
             $mail->setHtmlBody($this->_getHtmlPart($html_id, $mime_message, $body_data, $base_part));
         } elseif (!empty($plain_id)) {
             $mail->setBody($this->_getPlainPart($plain_id, $mime_message, $body_data, $base_part));
         }
-        if ($this->_forward) {
-            foreach ($base_part->contentTypeMap() as $mid => $type) {
-                if ($this->imapMessage->isAttachment($mid, $type)) {
-                    $mail->addMimePart($this->imapMessage->getMimePart($mid));
-                }
-            }
-        }
+
         foreach ($mime_message->contentTypeMap() as $mid => $type) {
             if ($mid != 0 && $mid != $mime_message->findBody('plain') && $mid != $mime_message->findBody('html')) {
                 $mail->addMimePart($mime_message->getPart($mid));
             }
         }
+
+        return $mail;
+    }
+
+    protected function _doSmartForward()
+    {
+        // Check for EAS 16.0 Forwardees
+        if (!empty($this->_forwardees)) {
+            $list = new Horde_Mail_Rfc822_List();
+            foreach ($this->_forwardees as $forwardee) {
+                $to = new Horde_Mail_Rfc822_Address($forwardee->email);
+                $to->personal = $forwardee->name;
+                $list->add($to);
+            }
+            $this->_headers->add('To', $list->writeAddress());
+        }
+
+        // Forwarded message
+        $rfc822Stream = $this->imapMessage->getFullMsg(true);
+        $rfc822Part = new Horde_Mime_Part();
+        $rfc822Part->setType("message/rfc822");
+        $rfc822Part->setContents($rfc822Stream);
+        $rfc822Part->setName(Horde_Core_Translation::t("Forwarded Message"));
+
+        // Incoming message to append to forward.
+        $mime_message = $this->_raw->getMimeObject();
+
+        // Outgoing message
+        $mail = new Horde_Mime_Mail($this->_headers->toArray(array('charset' => 'UTF-8')));
+        $mail->setBody($this->_getSmartPlainText($mime_message));
+        $mail->setHtmlBody($this->_getSmartHtmlText($mime_message));
+
+        foreach ($mime_message->contentTypeMap() as $mid => $type) {
+            if ($mid != 0 && $mid != $mime_message->findBody('plain') && $mid != $mime_message->findBody('html')) {
+                $mail->addMimePart($mime_message->getPart($mid));
+            }
+        }
+        $mail->addMimePart($rfc822Part);
 
         try {
             $mail->send($GLOBALS['injector']->getInstance('Horde_Mail'));
@@ -443,6 +481,23 @@ class Horde_Core_ActiveSync_Mail
     protected function _getPlainPart(
         $plain_id, Horde_Mime_Part $mime_message, array $body_data, Horde_Mime_Part $base_part)
     {
+        $smart_text = _getSmartPlainText($mime_message);
+        if ($this->_forward) {
+            return $smart_text . $this->_forwardText($body_data, $base_part->getPart($plain_id));
+        }
+
+        return $smart_text . $this->_replyText($body_data, $base_part->getPart($plain_id));
+    }
+
+/**
+ * Return plain text part from incoming smart request.
+ *
+ * @param  Horde_Mime_Part $mime_message  Mime_Part representing the incoming msg
+ *
+ * @return string  Plain text suitable for setting as the body of mime msg.
+ */
+    protected function _getSmartPlainText(Horde_Mime_Part $mime_message)
+    {
         if (!$id = $mime_message->findBody('plain')) {
             $smart_text = Horde_ActiveSync_Utils::ensureUtf8(
                 $mime_message->getPart($mime_message->findBody())->getContents(),
@@ -456,11 +511,7 @@ class Horde_Core_ActiveSync_Mail
                 $mime_message->getCharset());
         }
 
-        if ($this->_forward) {
-            return $smart_text . $this->_forwardText($body_data, $base_part->getPart($plain_id));
-        }
-
-        return $smart_text . $this->_replyText($body_data, $base_part->getPart($plain_id));
+        return $smart_text;
     }
 
     /**
@@ -476,7 +527,16 @@ class Horde_Core_ActiveSync_Mail
      *
      * @return string  The plaintext part of the email message that is being sent.
      */
-    protected function _getHtmlPart($html_id, $mime_message, $body_data, $base_part)
+    protected function _getHtmlPart($html_id, Horde_Mime_Part $mime_message, $body_data, $base_part)
+    {
+        $smart_text = $this->_getSmartHtmlText($mime_message);
+        if ($this->_forward) {
+            return $smart_text . $this->_forwardText($body_data, $base_part->getPart($html_id), true);
+        }
+        return $smart_text . $this->_replyText($body_data, $base_part->getPart($html_id), true);
+    }
+
+    protected function _getSmartHtmlText(Horde_Mime_Part $mime_message)
     {
         if (!$id = $mime_message->findBody('html')) {
             $smart_text = self::text2html(
@@ -489,10 +549,7 @@ class Horde_Core_ActiveSync_Mail
                 $mime_message->getCharset());
         }
 
-        if ($this->_forward) {
-            return $smart_text . $this->_forwardText($body_data, $base_part->getPart($html_id), true);
-        }
-        return $smart_text . $this->_replyText($body_data, $base_part->getPart($html_id), true);
+        return $smart_text;
     }
 
     /**
