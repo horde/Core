@@ -8,18 +8,19 @@
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
-  notes: |+
-
+  notes: |
+    [mjr] Fix ActiveSync SmartForward handling.
+    |+
 2.31.14:
   api: 2.31.0
   state:
     release: stable
     api: stable
-<<<<<<< HEAD
+0:
   date: 2020-06-08
-=======
+1:
   date: 2020-02-24
->>>>>>> Update date
+2:
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
