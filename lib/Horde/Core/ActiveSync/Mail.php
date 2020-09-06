@@ -486,7 +486,7 @@ class Horde_Core_ActiveSync_Mail
     protected function _getPlainPart(
         $plain_id, Horde_Mime_Part $mime_message, array $body_data, Horde_Mime_Part $base_part)
     {
-        $smart_text = _getSmartPlainText($mime_message);
+        $smart_text = $this->_getSmartPlainText($mime_message);
         if ($this->_forward) {
             return $smart_text . $this->_forwardText($body_data, $base_part->getPart($plain_id));
         }
