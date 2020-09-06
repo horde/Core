@@ -2,7 +2,8 @@
 v2.31.16
 --------
 
-
+[mjr] Fix regression in sending mail via ActiveSync.
+|+
 
 
 --------
