@@ -3,7 +3,7 @@
  <name>Horde_Core</name>
  <channel>pear.horde.org</channel>
  <summary>Core Horde Framework library</summary>
- <description>These classes provide the core functionality of the Horde Application Framework.</description>
+ <description>A library that provides the core functionality of the Horde Application Framework.</description>
  <lead>
   <name>Jan Schneider</name>
   <user>jan</user>
@@ -28,7 +28,7 @@
   <email>slusarz@horde.org</email>
   <active>no</active>
  </developer>
- <date>2020-06-08</date>
+ <date>2020-09-06</date>
  <version>
   <release>2.31.15</release>
   <api>2.31.0</api>
@@ -5207,7 +5207,7 @@
     <release>stable</release>
     <api>stable</api>
    </stability>
-   <date>2020-06-08</date>
+   <date>2020-09-06</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * 
