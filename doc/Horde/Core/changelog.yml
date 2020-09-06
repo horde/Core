@@ -9,6 +9,7 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    [mjr] Fix regression in sending mail via ActiveSync.
     [mjr] Fix ActiveSync SmartForward handling.
 2.31.14:
   api: 2.31.0
@@ -1483,7 +1484,7 @@
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
-  notes:
+  notes: ~
 2.4.0:
   api: 2.4.0
   state:

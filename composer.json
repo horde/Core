@@ -27,7 +27,7 @@
         }
     ],
     "version": "2.31.15",
-    "time": "2020-06-08",
+    "time": "2020-09-06",
     "repositories": [
         {
             "type": "pear",
@@ -79,7 +79,7 @@
         "ext-session": "*"
     },
     "suggest": {
-        "pear-pear.horde.org/Horde_ActiveSync": "^2.39",
+        "pear-pear.horde.org/Horde_ActiveSync": "^2.40",
         "pear-pear.horde.org/Horde_Backup": "^1",
         "pear-pear.horde.org/Horde_Crypt": "^2",
         "pear-pear.horde.org/Horde_Dav": "^1",
