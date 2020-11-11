@@ -159,7 +159,7 @@ class Horde_Core_Controller_RequestMapper
         $settingsFinder = $injector->getInstance('Horde_Core_Controller_SettingsFinder');
 
         $config = $injector->createInstance('Horde_Core_Controller_RequestConfiguration');
-        $found = $this->_identifyApp($scheme, $request, $requestServer, $GLOBALS['registry']);
+        $found = $this->_identifyApp($uriScheme, $request, $requestServer, $GLOBALS['registry']);
         $prefix = $found['path'];
 
         // If we still found no app, give up
@@ -179,7 +179,6 @@ class Horde_Core_Controller_RequestMapper
         $fileroot = $registry->get('fileroot', $app);
         $routeFile = $fileroot . '/config/routes.php';
         if (!file_exists($routeFile)) {
-            $scheme = $_SERVER['REQUEST_SCHEME'];
             $config->setControllerName('Horde_Core_Controller_NotFound');
             return $config;
         }
