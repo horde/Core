@@ -301,8 +301,11 @@ class Horde_Core_ActiveSync_Mail
      */
     protected function _sendRaw()
     {
+        $recipients = '';
         $h_array = $this->_headers->toArray(array('charset' => 'UTF-8'));
-        $recipients = $h_array['To'];
+        if (!empty($h_array['To'])) {
+            $recipients = $h_array['To'];
+        }
         if (!empty($h_array['Cc'])) {
             $recipients .= ',' . $h_array['Cc'];
         }
