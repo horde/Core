@@ -28,14 +28,14 @@
   <email>slusarz@horde.org</email>
   <active>no</active>
  </developer>
- <date>2020-09-06</date>
+ <date>2021-02-24</date>
  <version>
-  <release>2.31.15</release>
-  <api>2.31.0</api>
+  <release>3.0.0alpha1</release>
+  <api>3.0.0alpha1</api>
  </version>
  <stability>
-  <release>stable</release>
-  <api>stable</api>
+  <release>alpha</release>
+  <api>alpha</api>
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
@@ -49,6 +49,8 @@
       <file name="CHANGES" role="doc" />
      </dir> <!-- /doc/Horde/Core -->
     </dir> <!-- /doc/Horde -->
+    <file name="BOOTSTRAP.md" role="doc" />
+    <file name="UPGRADING_H6.md" role="doc" />
    </dir> <!-- /doc -->
    <dir name="js">
     <dir name="date">
@@ -398,6 +400,7 @@
        <file name="SessionObjects.php" role="php" />
       </dir> <!-- /lib/Horde/Core/Cache -->
       <dir name="Controller">
+       <file name="NotAuthorized.php" role="php" />
        <file name="NotFound.php" role="php" />
        <file name="RequestConfiguration.php" role="php" />
        <file name="RequestMapper.php" role="php" />
@@ -1542,7 +1545,9 @@
  </usesrole>
  <phprelease>
   <filelist>
+   <install as="BOOTSTRAP.md" name="doc/BOOTSTRAP.md" />
    <install as="CHANGES" name="doc/Horde/Core/CHANGES" />
+   <install as="UPGRADING_H6.md" name="doc/UPGRADING_H6.md" />
    <install as="js/accesskeys.js" name="js/accesskeys.js" />
    <install as="js/addressbooksprefs.js" name="js/addressbooksprefs.js" />
    <install as="js/alarmprefs.js" name="js/alarmprefs.js" />
@@ -1821,6 +1826,7 @@
    <install as="Horde/Core/Cache/Session.php" name="lib/Horde/Core/Cache/Session.php" />
    <install as="Horde/Core/Cache/SessionObjects.php" name="lib/Horde/Core/Cache/SessionObjects.php" />
    <install as="Horde/Core/Cli.php" name="lib/Horde/Core/Cli.php" />
+   <install as="Horde/Core/Controller/NotAuthorized.php" name="lib/Horde/Core/Controller/NotAuthorized.php" />
    <install as="Horde/Core/Controller/NotFound.php" name="lib/Horde/Core/Controller/NotFound.php" />
    <install as="Horde/Core/Controller/RequestConfiguration.php" name="lib/Horde/Core/Controller/RequestConfiguration.php" />
    <install as="Horde/Core/Controller/RequestMapper.php" name="lib/Horde/Core/Controller/RequestMapper.php" />
@@ -5200,14 +5206,14 @@
   </release>
   <release>
    <version>
-    <release>2.31.15</release>
-    <api>2.31.0</api>
+    <release>3.0.0alpha1</release>
+    <api>3.0.0alpha1</api>
    </version>
    <stability>
-    <release>stable</release>
-    <api>stable</api>
+    <release>alpha</release>
+    <api>alpha</api>
    </stability>
-   <date>2020-09-06</date>
+   <date>2021-02-24</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * 

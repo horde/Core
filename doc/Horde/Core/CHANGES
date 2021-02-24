@@ -1,8 +1,9 @@
---------
-v2.31.15
---------
+------------
+v3.0.0alpha1
+------------
 
-
+[mjr] Fix regression in sending mail via ActiveSync.
+[mjr] Fix ActiveSync SmartForward handling.
 
 
 --------
@@ -35,7 +36,7 @@ v2.31.12
 v2.31.11
 --------
 
-[mjr] Fix UTF-8 encoding of ActiveSync SmartReply requests (Bug #14957).
+[mjr] Fix UTF-8 encoding of ActiveSync SmartReply requests (Bug #14957)
 
 
 --------
