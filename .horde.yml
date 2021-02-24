@@ -34,7 +34,7 @@ authors:
     active: false
     role: developer
 version:
-  release: 3.0.0alpha2
+  release: 3.0.0alpha1
   api: 3.0.0alpha1
 state:
   release: alpha
@@ -85,7 +85,7 @@ dependencies:
       horde/url: ^3
       horde/util: ^3
       horde/view: ^3
-      pear/composer: '*'
+      pear/pear: '*'
     ext:
       session: '*'
   optional:

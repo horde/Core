@@ -26,7 +26,7 @@
             "role": "developer"
         }
     ],
-    "version": "3.0.0alpha2",
+    "version": "3.0.0alpha1",
     "time": "2021-02-24",
     "repositories": [
         {
@@ -76,7 +76,7 @@
         "horde/url": "^3",
         "horde/util": "^3",
         "horde/view": "^3",
-        "pear/composer": "*",
+        "pear/pear": "*",
         "ext-session": "*"
     },
     "suggest": {
