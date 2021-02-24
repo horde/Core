@@ -85,42 +85,11 @@ dependencies:
       horde/url: ^3
       horde/util: ^3
       horde/view: ^3
-      pear/pear: '*'
+      pear/composer: '*'
     ext:
       session: '*'
   optional:
     composer:
-      horde/activeSync: ^3
-      horde/backup: ^2
-      horde/crypt: ^2
-      horde/dav: ^2
-      horde/db: ^3
-      horde/editor: ^3
-      horde/elasticsearch: ^2
-      horde/form: ^3
-      horde/http: ^3
-      horde/icalendar: ^3
-      horde/image: ^3
-      horde/imap_client: ^3
-      horde/javascriptminify_jsmin: ^2
-      horde/kolab_server: ^3
-      horde/kolab_session: ^3
-      horde/kolab_storage: ^3
-      horde/ldap: ^3
-      horde/mail: ^3
-      horde/mongo: ^2
-      horde/nls: ^3
-      horde/oauth: ^3
-      horde/queue: ^2
-      horde/routes: ^3
-      horde/service_twitter: ^3
-      horde/spellchecker: ^3
-      horde/test: ^3
-      horde/tree: ^3
-      horde/vfs: ^3
-      pear/net_dns2: ^1.5
-      pear/text_languagedetect: '*'
-    pear:
       pear.php.net/Text_CAPTCHA: '*'
       pear.php.net/Text_Figlet: '*'
     ext:

@@ -39,7 +39,8 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* 
+* [mjr] Fix regression in sending mail via ActiveSync.
+* [mjr] Fix ActiveSync SmartForward handling.
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -1032,14 +1033,6 @@
    </extension>
   </required>
   <optional>
-   <package>
-    <name>Text_CAPTCHA</name>
-    <channel>pear.php.net</channel>
-   </package>
-   <package>
-    <name>Text_Figlet</name>
-    <channel>pear.php.net</channel>
-   </package>
    <extension>
     <name>dom</name>
    </extension>
@@ -1642,171 +1635,6 @@
   </filelist>
  </phprelease>
  <changelog>
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
   <release>
    <version>
     <release>1.0.0alpha1</release>
@@ -4733,22 +4561,8 @@
    <date>2021-02-24</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-* 
-   </notes>
-  </release>
-  <release>
-   <version>
-    <release>3.0.0alpha1</release>
-    <api>3.0.0alpha1</api>
-   </version>
-   <stability>
-    <release>alpha</release>
-    <api>alpha</api>
-   </stability>
-   <date>2021-02-24</date>
-   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
-   <notes>
-* 
+* [mjr] Fix regression in sending mail via ActiveSync.
+* [mjr] Fix ActiveSync SmartForward handling.
    </notes>
   </release>
  </changelog>
