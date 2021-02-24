@@ -89,8 +89,7 @@
     },
     "autoload": {
         "classmap": [
-            "lib/",
-            "src/"
+            "lib/"
         ]
     }
 }
