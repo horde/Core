@@ -26,7 +26,7 @@
             "role": "developer"
         }
     ],
-    "version": "3.0.0alpha2",
+    "version": "3.0.0alpha1",
     "time": "2021-02-24",
     "repositories": [
         {
@@ -55,7 +55,7 @@
         "horde/date": "^3",
         "horde/exception": "^3",
         "horde/group": "^3",
-        "horde/hashtable": "^3",
+        "horde/hashtable": "^2",
         "horde/history": "^3",
         "horde/injector": "^3",
         "horde/javascriptminify": "^2",
