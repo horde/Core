@@ -44,7 +44,7 @@ class Horde_Core_Factory_DavServer extends Horde_Core_Factory_Injector
         $principals->disableListing = $conf['auth']['list_users'] == 'input';
 
         $calendarBackend = new Horde_Dav_Calendar_Backend($registry, $injector->getInstance('Horde_Dav_Storage'));
-        $caldav = new CalDAV\CalendarRootNode($principalBackend, $calendarBackend);
+        $caldav = new CalDAV\CalendarRoot($principalBackend, $calendarBackend);
         $contactsBackend = new Horde_Dav_Contacts_Backend($registry);
         $carddav = new CardDAV\AddressBookRoot($principalBackend, $contactsBackend);
 
