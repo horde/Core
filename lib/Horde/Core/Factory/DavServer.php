@@ -79,7 +79,13 @@ class Horde_Core_Factory_DavServer extends Horde_Core_Factory_Injector
                 new Horde_Dav_Locks($registry, $injector->getInstance('Horde_Lock'))
             )
         );
-        $server->addPlugin(new DAVACL\Plugin());
+        /**
+         * Since SabreDAV 3.2, we need to explicitly handle access for unauthenticated
+         * Callers. For now, just disable unauthenticated calendar access altogether.
+         */
+        $aclPlugin = new DAVACL\Plugin();
+        $aclPlugin->allowUnauthenticatedAccess = false;
+        $server->addPlugin($aclPlugin);
         $server->addPlugin(new DAV\Browser\Plugin());
 
         return $server;
