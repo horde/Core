@@ -100,3 +100,5 @@ dependencies:
 autoload:
   classmap:
     - lib/
+  psr-4:
+    Horde\Core\: src/
