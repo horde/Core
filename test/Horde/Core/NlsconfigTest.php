@@ -9,6 +9,14 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+namespace Horde\Core;
+use \PHPUnit\Framework\TestCase;
+use \Horde_Test_Case as HordeTestCase;
+use \Horde_Session;
+use \Horde_Support_Stub;
+use \Horde_Test_Stub_Registry;
+use \Horde_Test_Stub_Registry_Loadconfig;
+use \Horde_Registry_Nlsconfig;
 
 /**
  * Tests for Horde_Registry_Nlsconfig.
@@ -18,9 +26,9 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
-class Horde_Core_NlsconfigTest extends Horde_Test_Case
+class NlsconfigTest extends HordeTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         $GLOBALS['session'] = new Horde_Session();
         $GLOBALS['session']->sessionHandler = new Horde_Support_Stub();
@@ -59,6 +67,7 @@ class Horde_Core_NlsconfigTest extends Horde_Test_Case
     public function testGet($key, $expected)
     {
         $nls = new Horde_Registry_Nlsconfig();
+        $this->markTestIncomplete();
     }
 
     public function testValidLang()

@@ -9,6 +9,11 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+namespace Horde\Core;
+use \PHPUnit\Framework\TestCase;
+use \Horde_Core_Stub_Registryconfig;
+use \Horde_Registry_Hordeconfig_Merged;
+use \Horde_Registry_Hordeconfig;
 
 /**
  * Tests for Horde_Registry.
@@ -18,11 +23,11 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
-class Horde_Core_RegistryTest extends PHPUnit_Framework_TestCase
+class RegistryTest extends TestCase
 {
     protected $_tmpdir;
 
-    public function tearDown()
+    public function tearDown(): void
     {
         if (is_dir($this->_tmpdir)) {
             rmdir($this->_tmpdir);

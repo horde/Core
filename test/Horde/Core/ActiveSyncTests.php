@@ -7,7 +7,14 @@
  * @package    Core
  * @subpackage UnitTests
  */
-/**
+namespace Horde\Core;
+use \PHPUnit\Framework\TestCase;
+use \Horde_Test_Case as HordeTestCase;
+use \Horde_Date;
+use \Horde\Core\Mock\MockConnector;
+use \Horde\Core\Mock\MockIMPMailbox;
+
+ /**
  * Unit tests for ActiveSync functionality in Core.
  *
  * @author  Michael J Rubinsky <mrubinsk@horde.org>
@@ -15,7 +22,7 @@
  * @package    Core
  * @subpackage UnitTests
  */
-class Horde_Core_ActiveSyncTests extends Horde_Test_Case
+class ActiveSyncTests extends HordeTestCase
 {
     protected $_auth;
     protected $_state;
@@ -458,46 +465,4 @@ class Horde_Core_ActiveSyncTests extends Horde_Test_Case
         $expected = '440000000000000000000000000000220000000000000000';
         $this->assertEquals($expected, $fb);
     }
-}
-
-/**
- * Mock Connector. Can't mock it since it contain type hints for objects from
- * other libraries (which causes PHPUnit to have a fit).
- *
- */
-class MockConnector extends Horde_Core_ActiveSync_Connector
-{
-    public function __construct()
-    {
-    }
-
-    public function horde_listApis()
-    {
-        return array('mail');
-    }
-
-}
-
-/**
- * Mock the IMP_Mailbox class
- *
- * Needs to return the value property
- */
-class MockIMPMailbox
-{
-    protected $_name;
-
-    public function __construct($mbox)
-    {
-        $this->_name = $mbox;
-    }
-
-    public function __get($property)
-    {
-        switch ($property) {
-        case 'value':
-            return $this->_name;
-        }
-    }
-
 }

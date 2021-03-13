@@ -9,6 +9,8 @@
  * @author   Gunnar Wrobel <wrobel@pardus.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
+namespace Horde\Core\Factory;
+use \PHPUnit\Framework\TestCase;
 
 /**
  * Test the Kolab_Session factory.
@@ -23,9 +25,9 @@
  * @author   Gunnar Wrobel <wrobel@pardus.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
-class Horde_Core_Factory_KolabSessionTest extends PHPUnit_Framework_TestCase
+class KolabSessionTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         $this->markTestIncomplete('Needs some love');
     }
