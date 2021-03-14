@@ -44,5 +44,5 @@ interface Method
      * 
      * @return Credentials A credentials object
      */
-    public function getCredentials(Request $request): Credentials
+    public function getCredentials(Request $request): Credentials;
 }

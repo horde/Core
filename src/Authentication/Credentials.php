@@ -56,7 +56,7 @@ final class Credentials
      * 
      * @return void
      */
-    public function set(string $key, $string $value): void
+    public function set(string $key, string $value): void
     {
         $this->credentials[$key] = $value;
     }
