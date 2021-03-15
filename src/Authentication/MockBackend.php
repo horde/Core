@@ -44,11 +44,11 @@ class MockBackend implements Backend
      */
     public function __construct(
         array $expectedKeys = [],
-        array $credentials = []
+        array $credentialsArr = []
     )
     {
         $this->expectedKeys = $expectedKeys;
-        $this->expected = $credentials;
+        $this->expected = $credentialsArr;
     }
 
     /**
@@ -66,7 +66,7 @@ class MockBackend implements Backend
         foreach ($this->expected as $valid) {
             foreach ($this->expectedKeys as $key) {
                 if ($credentials->get($key) != $valid->get($key)) {
-                    break;
+                    continue 2;
                 }
             }
             return true;

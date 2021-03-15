@@ -40,7 +40,7 @@ class State
     {
         $this->conf = $conf ?? $GLOBALS['conf'];
         // If we still have no array, give up.
-        if (!empty($this->conf)) {
+        if (empty($this->conf)) {
             throw new \Horde_Exception(
                 'Config neither passed nor available from global'
             );    

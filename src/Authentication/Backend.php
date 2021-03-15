@@ -11,7 +11,7 @@
  * @package  Core
  */
 declare(strict_types=1);
-namespace Horde\Core\Controller;
+namespace Horde\Core\Authentication;
 /**
  * An interface for an authentication backend
  * 
