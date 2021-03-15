@@ -90,8 +90,8 @@ dependencies:
       session: '*'
   optional:
     composer:
-      pear.php.net/Text_CAPTCHA: '*'
-      pear.php.net/Text_Figlet: '*'
+      pear/text_captcha: '*'
+      pear/text_figlet: '*'
     ext:
       dom: '*'
       hash: '*'
