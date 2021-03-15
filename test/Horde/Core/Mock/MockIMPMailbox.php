@@ -21,4 +21,4 @@ class MockIMPMailbox
             return $this->_name;
         }
     }
-
+}
