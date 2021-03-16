@@ -26,8 +26,8 @@ class ConfigStateTest extends HordeTestCase
 {
     public function testFailsWhenNoGlobalsOrParam()
     {
-        $this->expectException(\Horde_Exception::class);
         unset($GLOBALS['conf']);
+        $this->expectException(\Horde_Exception::class);
         $state = new State;
         $this->assertEquals([], $state->toArray());
     }
