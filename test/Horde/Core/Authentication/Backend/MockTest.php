@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace Horde\Core\Authentication\Backend;
 use \Horde\Core\Authentication\Credentials;
 use \Horde\Core\Authentication\MockBackend;
