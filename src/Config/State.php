@@ -12,11 +12,10 @@
  */
 declare(strict_types=1);
 namespace Horde\Core\Config;
-use \is_array;
 
 /**
  * Horde Config encapsulated in an object
- * 
+ *
  * This is basically an injectable $GLOBALS['conf']
  *
  * @author   Ralf Lang <lang@horde.org>
@@ -30,20 +29,20 @@ class State
 
     /**
      * Constructor
-     * 
+     *
      * The preferred way is to actually pass the config array
      * However we fall back to $GLOBALS['conf'] for the time being
-     * 
+     *
      * @param array $conf The config tree as provided by registry
      */
-    public function __construct($conf = [])
+    public function __construct(array $conf = null)
     {
         $this->conf = $conf ?? $GLOBALS['conf'];
         // If we still have no array, give up.
         if (empty($this->conf)) {
             throw new \Horde_Exception(
                 'Config neither passed nor available from global'
-            );    
+            );
         }
     }
     /**
@@ -51,10 +50,10 @@ class State
      * and keep objects of this class more or less static/readonly,
      * We should have some OO way of accessing single config keys
      */
- 
+
     /**
      * Return the config array
-     * 
+     *
      * @return array
      */
     public function toArray(): array
