@@ -17,10 +17,10 @@ use Horde\Core\Config\State as ConfigState;
 
 /**
  * Retrieves an existing session
- * 
+ *
  * We honor the relevant configs
  * $conf[session][use_only_cookies]
- * 
+ *
  * @author   Ralf Lang <lang@horde.org>
  * @category Horde
  * @license  http://www.horde.org/licenses/lgpl21 LGPL
@@ -40,7 +40,7 @@ class SessionMethod implements Method
 
      /**
      * Constructor
-     * 
+     *
      * @param ConfigState $conf The Horde Config (optional)
      */
     public function __construct(ConfigState $conf)
@@ -54,9 +54,9 @@ class SessionMethod implements Method
 
     /**
      * Parse Auth header from a request
-     * 
+     *
      * @param Request An authentication request
-     * 
+     *
      * @return Credentials A credentials object
      */
     public function getCredentials(Request $request): Credentials

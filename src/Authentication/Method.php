@@ -16,7 +16,7 @@ use \Horde_Controller_Request as Request;
 
 /**
  * An interface for an authentication method
- * 
+ *
  * A method describes how the authentication information is provided
  * - A session cookie
  * - A basic auth header
@@ -26,7 +26,7 @@ use \Horde_Controller_Request as Request;
  * - A POST form field
  * - A POST/PUT body containing a valid JSON document with a certain key/value
  * - A POST/PUT body containing a valid XML document with a certain key/value
- * 
+ *
  * An AuthMethod does not care about validating this credential.
  * This is up to an AuthSource.
  *
@@ -39,9 +39,9 @@ interface Method
 {
     /**
      * Get authentication credentials from a request
-     * 
+     *
      * @param Request An authentication request
-     * 
+     *
      * @return Credentials A credentials object
      */
     public function getCredentials(Request $request): Credentials;

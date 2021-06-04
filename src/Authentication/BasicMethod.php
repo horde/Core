@@ -16,7 +16,7 @@ use \Horde_Controller_Request as Request;
 
 /**
  * Gets username/password from a HTTP Basic header
- * 
+ *
  * @author   Ralf Lang <lang@horde.org>
  * @category Horde
  * @license  http://www.horde.org/licenses/lgpl21 LGPL
@@ -26,9 +26,9 @@ class BasicMethod implements Method
 {
     /**
      * Parse Auth header from a request
-     * 
+     *
      * @param Request An authentication request
-     * 
+     *
      * @return Credentials A credentials object
      */
     public function getCredentials(Request $request): Credentials

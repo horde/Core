@@ -16,7 +16,7 @@ use \Horde_Exception_NotFound as NotFoundException;
 
 /**
  * A set of credentials
- * 
+ *
  * Most likely, username and password or some token
  *
  * @author   Ralf Lang <lang@horde.org>
@@ -33,11 +33,11 @@ final class Credentials
 
     /**
      * Retrieve a credential
-     * 
+     *
      * @param string $key   The name of the credential
-     * 
+     *
      * @return string The credential content
-     * 
+     *
      * @throws NotFoundException
      */
     public function get(string $key): string
@@ -50,10 +50,10 @@ final class Credentials
 
     /**
      * Set or overwrite a credential
-     * 
+     *
      * @param string $key   The name of the credential
      * @param string $value The content of the credential
-     * 
+     *
      * @return void
      */
     public function set(string $key, string $value): void

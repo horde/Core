@@ -29,15 +29,15 @@ class HordeAuthBackend implements Backend
     protected $expectedKeys = [];
 
     /**
-     * @var 
+     * @var mixed
      */
     protected $expected = [];
 
     /**
      * Constructor
-     * 
+     *
      * Sets up a list of expected keys
-     * 
+     *
      * @param string[] The name of credentials to check for
      * @param Credentials[] An array of Credentials objects to accept
      */
@@ -52,12 +52,12 @@ class HordeAuthBackend implements Backend
 
     /**
      * Checks if a set of credentials is currently valid
-     * 
+     *
      * This method should not create side effects like 
      * establishing a session or setting a session to authenticated
-     * 
+     *
      * @param Credentials $credentials A set of credentials
-     * 
+     *
      * @return bool True if succeeded
      */
     public function checkCredentials(Credentials $credentials): bool

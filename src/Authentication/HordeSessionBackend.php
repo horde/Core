@@ -29,15 +29,15 @@ class HordeSessionBackend implements Backend
     protected $expectedKeys = [];
 
     /**
-     * @var 
+     * @var
      */
     protected $expected = [];
 
     /**
      * Constructor
-     * 
+     *
      * Sets up a list of expected keys
-     * 
+     *
      * @param string[] The name of credentials to check for
      * @param Credentials[] An array of Credentials objects to accept
      */
@@ -52,12 +52,12 @@ class HordeSessionBackend implements Backend
 
     /**
      * Checks if a set of credentials is currently valid
-     * 
-     * This method should not create side effects like 
+     *
+     * This method should not create side effects like
      * establishing a session or setting a session to authenticated
-     * 
+     *
      * @param Credentials $credentials A set of credentials
-     * 
+     *
      * @return bool True if succeeded
      */
     public function checkCredentials(Credentials $credentials): bool
@@ -75,11 +75,11 @@ class HordeSessionBackend implements Backend
 
     /**
      * The mock backend currently does NOT really do authentication
-     * 
+     *
      * For integration tests, we should establish some mock session
-     * 
+     *
      * @param Credentials $credentials A set of credentials
-     * 
+     *
      * @return bool True if succeeded
      */
     public function authenticate(Credentials $credentials): bool
