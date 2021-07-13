@@ -14,7 +14,7 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
-class Horde_Core_Block_Collection implements Serializable
+class Horde_Core_Block_Collection implements Serializable, JsonSerializable
 {
     /**
      * List of apps to load blocks from.
@@ -511,20 +511,35 @@ class Horde_Core_Block_Collection implements Serializable
 
     public function serialize()
     {
-        return json_encode(array(
+        return json_encode($this->__serialize());
+    }
+
+    public function __serialize(): array
+    {
+        return array(
             $this->_apps,
             $this->_blocks,
             $this->_layout
-        ));
+        );
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return json_encode($this->__serialize());        
     }
 
     public function unserialize($data)
+    {
+        $this->__unserialize(json_decode($data, true));
+    }
+
+    public function __unserialize(array $data): void
     {
         list(
             $this->_apps,
             $this->_blocks,
             $this->_layout
-        ) = json_decode($data, true);
+        ) = $data;
     }
 
 }

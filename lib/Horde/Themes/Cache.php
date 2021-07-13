@@ -285,33 +285,41 @@ class Horde_Themes_Cache implements Serializable
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize($this->__serialize());
+    }
+
+    public function __serialize(): array
+    {
+        return array(
             'a' => $this->_app,
             'c' => $this->_complete,
             'd' => $this->_data,
             'id' => $this->getCacheId(),
             't' => $this->_theme
-        ));
+        );
+        
     }
 
+    public function __unserialize(array $data): void
+    {
+
+        // Needed to generate cache ID.
+        if (isset($data['a'])) {
+                $this->_app = $data['a'];
+        }
+
+        if (isset($data['id']) && ($data['id'] != $this->getCacheId())) {
+            throw new Exception('Cache invalidated for ' . $data['a'] . ': ' . $data['id'] . " != ".$this->getCacheId());
+        }
+
+        $this->_complete = $data['c'];
+        $this->_data = $data['d'];
+        $this->_theme = $data['t'];    
+    }
     /**
      */
     public function unserialize($data)
     {
-        $out = @unserialize($data);
-
-        // Needed to generate cache ID.
-        if (isset($out['a'])) {
-            $this->_app = $out['a'];
-        }
-
-        if (isset($out['id']) && ($out['id'] != $this->getCacheId())) {
-            throw new Exception('Cache invalidated for ' . $out['a'] . ': ' . $out['id'] . " != ".$this->getCacheId());
-        }
-
-        $this->_complete = $out['c'];
-        $this->_data = $out['d'];
-        $this->_theme = $out['t'];
+        $this->__unserialize(@unserialize($data));
     }
-
 }

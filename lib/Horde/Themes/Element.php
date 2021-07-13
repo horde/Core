@@ -139,7 +139,10 @@ class Horde_Themes_Element
                 $this->_data = $cache->get((strlen($this->_dirname) ? $this->_dirname . '/' : '') . $this->_name, $mask);
             }
         }
-
+        /* Guard: Cache does not have this element, non-array returned */
+        if (!is_array($this->_data)) {
+            return null;
+        }
         switch ($name) {
         case 'fs':
         case 'uri':

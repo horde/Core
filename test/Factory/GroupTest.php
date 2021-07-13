@@ -10,6 +10,12 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
 
+namespace Horde\Core\Factory;
+
+use PHPUnit\Framework\TestCase;
+use Horde_Injector;
+use Horde_Injector_TopLevel;
+
 /**
  * Test the Group factory.
  *
@@ -23,7 +29,7 @@
  * @author   Gunnar Wrobel <wrobel@pardus.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
-class Horde_Core_Factory_GroupTest extends PHPUnit_Framework_TestCase
+class GroupTest extends TestCase
 {
     public function testMock()
     {

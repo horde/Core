@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2013-2021 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -44,7 +44,7 @@ class Horde_Core_Factory_DavServer extends Horde_Core_Factory_Injector
         $principals->disableListing = $conf['auth']['list_users'] == 'input';
 
         $calendarBackend = new Horde_Dav_Calendar_Backend($registry, $injector->getInstance('Horde_Dav_Storage'));
-        $caldav = new CalDAV\CalendarRootNode($principalBackend, $calendarBackend);
+        $caldav = new CalDAV\CalendarRoot($principalBackend, $calendarBackend);
         $contactsBackend = new Horde_Dav_Contacts_Backend($registry);
         $carddav = new CardDAV\AddressBookRoot($principalBackend, $contactsBackend);
 
@@ -56,10 +56,22 @@ class Horde_Core_Factory_DavServer extends Horde_Core_Factory_Injector
             )
         );
         $server->debugExceptions = false;
-        $server->setBaseUri(
-            $registry->get('webroot', 'horde')
-            . ($GLOBALS['conf']['urls']['pretty'] == 'rewrite' ? '/rpc/' : '/rpc.php/')
-        );
+        $davBaseUri = $registry->get('webroot', 'horde')
+            . ($GLOBALS['conf']['urls']['pretty'] == 'rewrite' ? '/rpc/' : '/rpc.php/');
+
+        // Check if we need to honor an override config
+        // TODO: Refactor to str_starts_with when minimum PHP version becomes 8
+        if (!empty($conf['dav_root'])) {
+            $candidates = explode(';', $conf['dav_root']);
+            // Ensure longer hits overrule shorter hits regardless of input order
+            usort($candidates, function($a, $b) { return strlen($a) <=> strlen($b);});
+            foreach ($candidates as $davBaseTest) {
+                if (!empty($_SERVER['REQUEST_URI']) && (strpos($_SERVER['REQUEST_URI'], $davBaseTest) === 0)) {
+                    $davBaseUri = $davBaseTest;
+                }
+            }
+        }
+        $server->setBaseUri($davBaseUri);
         $server->addPlugin(
             new DAV\Auth\Plugin(
                 new Horde_Core_Dav_Auth(
@@ -79,7 +91,13 @@ class Horde_Core_Factory_DavServer extends Horde_Core_Factory_Injector
                 new Horde_Dav_Locks($registry, $injector->getInstance('Horde_Lock'))
             )
         );
-        $server->addPlugin(new DAVACL\Plugin());
+        /**
+         * Since SabreDAV 3.2, we need to explicitly handle access for unauthenticated
+         * Callers. For now, just disable unauthenticated calendar access altogether.
+         */
+        $aclPlugin = new DAVACL\Plugin();
+        $aclPlugin->allowUnauthenticatedAccess = false;
+        $server->addPlugin($aclPlugin);
         $server->addPlugin(new DAV\Browser\Plugin());
 
         return $server;

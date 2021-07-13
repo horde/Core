@@ -27,7 +27,7 @@ class Horde_Script_Package implements IteratorAggregate
 
     /* IteratorAggregate method. */
 
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new ArrayIterator($this->_files);
     }

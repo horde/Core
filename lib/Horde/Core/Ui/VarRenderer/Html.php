@@ -843,7 +843,7 @@ EOT;
                        $this->_genID($varname . '_n_r'),
                        htmlspecialchars($var->getVarName()),
                        Horde_Core_Translation::t("-- select --"),
-                       $this->selectOptions($new_input, $var_array['n']['r']));
+                       $this->selectOptions($new_input, $var_array['n']['r'] ?? null));
             } elseif ($new_input == true) {
                 $html .= sprintf('<input %s type="text" name="%s[n][r]" value="%s" />',
                        $this->_genID($varname . '_n_r'),
@@ -893,9 +893,19 @@ EOT;
                           $this->_getActionScripts($form, $var));
     }
 
+    /**
+     * Render two input fields to confirm a password
+     * 
+     * Used in admin/user and possibly more places
+     *
+     * @param Horde_Form $form
+     * @param Horde_Variables $var
+     * @param Horde_Variables $vars
+     * @return void
+     */
     protected function _renderVarInput_passwordconfirm($form, &$var, &$vars)
     {
-        $password = $var->getValue($vars);
+        $password = $var->getValue($vars) ?? ['confirm' => '', 'original' => ''];
         return sprintf('<input type="password" name="%s[original]" id="%s_original" value="%s"%s />',
                        htmlspecialchars($var->getVarName()),
                        $this->_genID($var->getVarName(), false),

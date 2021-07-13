@@ -275,7 +275,7 @@ class Horde_PageOutput
      *   - top: (boolean) Add definitions to top of stack?
      *          DEFAULT: false
      *
-     * @return array  Returns the variable list of 'ret_vars' option is true.
+     * @return array|void  Returns the variable list of 'ret_vars' option is true.
      */
     public function addInlineJsVars($data, $opts = array())
     {

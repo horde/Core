@@ -87,6 +87,9 @@ class Horde_Core_Ajax_Application_Handler
      */
     final public function has($action)
     {
+        if (empty($action)) {
+            return false;
+        }
         try {
             $method = new ReflectionMethod($this, $action);
         } catch (ReflectionException $e) {

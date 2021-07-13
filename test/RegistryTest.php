@@ -10,6 +10,14 @@
  * @package  Core
  */
 
+namespace Horde\Core\Test;
+
+use PHPUnit\Framework\TestCase;
+
+use Horde\Core\Test\Stub\Registryconfig as RegistryconfigStub;
+use Horde_Registry_Hordeconfig_Merged;
+use Horde_Registry_Hordeconfig;
+
 /**
  * Tests for Horde_Registry.
  *
@@ -18,11 +26,11 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
-class Horde_Core_RegistryTest extends PHPUnit_Framework_TestCase
+class RegistryTest extends TestCase
 {
     protected $_tmpdir;
 
-    public function tearDown()
+    public function tearDown(): void
     {
         if (is_dir($this->_tmpdir)) {
             rmdir($this->_tmpdir);
@@ -34,7 +42,7 @@ class Horde_Core_RegistryTest extends PHPUnit_Framework_TestCase
     {
         $this->_tmpdir = sys_get_temp_dir() . '/' . uniqid() . '/horde';
         mkdir($this->_tmpdir, 0777, true);
-        $config = new Horde_Core_Stub_Registryconfig();
+        $config = new RegistryconfigStub();
 
         $_SERVER['SCRIPT_URL'] = '/horde/foo/bar';
         $this->assertEquals('/horde', $config->detectWebroot($this->_tmpdir));
@@ -86,87 +94,86 @@ class Horde_Core_RegistryTest extends PHPUnit_Framework_TestCase
 
     public function testBug10381()
     {
-        $a1 = array(
-            'conf' => array(
+        $a1 = [
+            'conf' => [
                 'foo' => 'a',
                 'bar' => 'b',
-                'foobar' => array(
-                    'a', 'b', 'c'
-                ),
-                'foobar2' => array(
+                'foobar' => [
+                    'a', 'b', 'c',
+                ],
+                'foobar2' => [
                     'a' => 1,
-                    'b' => 2
-                )
-            ),
-            'a1_only' => array(
+                    'b' => 2,
+                ],
+            ],
+            'a1_only' => [
                 'a' => 1,
-                'b' => array(
-                    'c' => 2
-                )
-            )
-        );
+                'b' => [
+                    'c' => 2,
+                ],
+            ],
+        ];
 
-        $a2 = array(
-            'conf' => array(
+        $a2 = [
+            'conf' => [
                 'bar' => 'c',
                 'baz' => 'g',
-                'foobar' => array(
-                    'd', 'e'
-                ),
-                'foobar2' => array(
+                'foobar' => [
+                    'd', 'e',
+                ],
+                'foobar2' => [
                     'a' => 3,
-                    'c' => 4
-                )
-            ),
-            'a2_only' => array(
+                    'c' => 4,
+                ],
+            ],
+            'a2_only' => [
                 'a' => 1,
-                'b' => array(
-                    'c' => 2
-                )
-            )
-        );
+                'b' => [
+                    'c' => 2,
+                ],
+            ],
+        ];
 
-        $ob = new Horde_Registry_Hordeconfig_Merged(array(
-            'aconfig' => new Horde_Registry_Hordeconfig(array(
+        $ob = new Horde_Registry_Hordeconfig_Merged([
+            'aconfig' => new Horde_Registry_Hordeconfig([
                 'app' => 'bar',
-                'config' => $a2
-            )),
-            'hconfig' => new Horde_Registry_Hordeconfig(array(
+                'config' => $a2,
+            ]),
+            'hconfig' => new Horde_Registry_Hordeconfig([
                 'app' => 'foo',
-                'config' => $a1
-            ))
-        ));
+                'config' => $a1,
+            ]),
+        ]);
 
         $this->assertEquals(
-            array(
-                'conf' => array(
+            [
+                'conf' => [
                     'foo' => 'a',
                     'bar' => 'c',
                     'baz' => 'g',
-                    'foobar' => array(
-                        'd', 'e'
-                    ),
-                    'foobar2' => array(
+                    'foobar' => [
+                        'd', 'e',
+                    ],
+                    'foobar2' => [
                         'a' => 3,
                         'b' => 2,
-                        'c' => 4
-                    )
-                ),
-                'a1_only' => array(
+                        'c' => 4,
+                    ],
+                ],
+                'a1_only' => [
                     'a' => 1,
-                    'b' => array(
-                    'c' => 2
-                    )
-                ),
-                'a2_only' => array(
+                    'b' => [
+                    'c' => 2,
+                    ],
+                ],
+                'a2_only' => [
                     'a' => 1,
-                    'b' => array(
-                        'c' => 2
-                    )
-                )
-            ),
+                    'b' => [
+                        'c' => 2,
+                    ],
+                ],
+            ],
             $ob->toArray()
         );
     }
-
 }

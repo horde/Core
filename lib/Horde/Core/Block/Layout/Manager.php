@@ -1353,6 +1353,7 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
      *
      * @return integer  The number of blocks.
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         $rows = $this->rows();

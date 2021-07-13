@@ -87,6 +87,7 @@ implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         $this->_load($offset);
@@ -95,6 +96,7 @@ implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         $this->_load($offset);
@@ -103,6 +105,7 @@ implements ArrayAccess, Countable, IteratorAggregate
             : null;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->_load($offset);
@@ -111,6 +114,7 @@ implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         $this->_load($offset);
@@ -121,6 +125,7 @@ implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         /* Return non-zero to ensure a count() calls returns true. */
@@ -131,7 +136,7 @@ implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         $this->toArray();
         return new ArrayIterator($this->_config);

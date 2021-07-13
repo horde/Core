@@ -30,6 +30,7 @@ abstract class Horde_Script_Cache
      */
     protected $_params;
 
+    protected $_compress;
     /**
      * Constructor.
      *

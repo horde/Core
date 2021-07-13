@@ -179,7 +179,7 @@ class Horde_Menu
     public function getSiteLinks()
     {
         $menufile = $GLOBALS['registry']->get('fileroot') . '/config/menu.php';
-
+        $_menu = [];
         if (is_readable($menufile)) {
             include $menufile;
             if (isset($_menu) && is_array($_menu)) {

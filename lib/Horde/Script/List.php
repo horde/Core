@@ -69,6 +69,7 @@ class Horde_Script_List implements Countable, Iterator
 
     /* Countable methods. */
 
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->_files);
@@ -76,21 +77,25 @@ class Horde_Script_List implements Countable, Iterator
 
     /* Iterator methods. */
 
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return current($this->_tmp);
     }
 
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return key($this->_tmp);
     }
 
+    #[\ReturnTypeWillChange]
     public function next()
     {
         next($this->_tmp);
     }
 
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
         $files = array();
@@ -108,6 +113,7 @@ class Horde_Script_List implements Countable, Iterator
         reset($this->_tmp);
     }
 
+    #[\ReturnTypeWillChange]
     public function valid()
     {
         return !is_null(key($this->_tmp));

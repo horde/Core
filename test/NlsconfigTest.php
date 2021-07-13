@@ -10,6 +10,16 @@
  * @package  Core
  */
 
+namespace Horde\Core\Test;
+
+use Horde\Test\TestCase;
+
+use Horde_Session;
+use Horde_Support_Stub;
+use Horde_Test_Stub_Registry;
+use Horde_Test_Stub_Registry_Loadconfig;
+use Horde_Registry_Nlsconfig;
+
 /**
  * Tests for Horde_Registry_Nlsconfig.
  *
@@ -18,39 +28,44 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
-class Horde_Core_NlsconfigTest extends Horde_Test_Case
+class NlsconfigTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         $GLOBALS['session'] = new Horde_Session();
         $GLOBALS['session']->sessionHandler = new Horde_Support_Stub();
         $GLOBALS['registry'] = new Horde_Test_Stub_Registry('john', 'horde');
         $config = new Horde_Test_Stub_Registry_Loadconfig(
-            'horde', 'nls.php', 'horde_nls_config'
+            'horde',
+            'nls.php',
+            'horde_nls_config'
         );
         foreach ($this->providerForTestGet() as $values) {
             $config->config['horde_nls_config'][$values[0]] = $values[1];
         }
         $GLOBALS['registry']->setConfigFile(
-            $config, 'nls.php', 'horde_nls_config', 'horde'
+            $config,
+            'nls.php',
+            'horde_nls_config',
+            'horde'
         );
     }
 
     public function providerForTestGet()
     {
-        return array(
-            'languages' => array(
-                'languages', array('en_US' => '&#x202d;English (American)')
-            ),
-            'aliases' => array(
+        return [
+            'languages' => [
+                'languages', ['en_US' => '&#x202d;English (American)'],
+            ],
+            'aliases' => [
                 'aliases',
-                array('ar' => 'ar_SY', 'bg' => 'bg_BG')
-            ),
-            'charsets' => array(
+                ['ar' => 'ar_SY', 'bg' => 'bg_BG'],
+            ],
+            'charsets' => [
                 'charsets',
-                array('bg_BG' => 'windows-1251', 'bs_BA' => 'ISO-8859-2')
-            ),
-        );
+                ['bg_BG' => 'windows-1251', 'bs_BA' => 'ISO-8859-2'],
+            ],
+        ];
     }
 
     /**
@@ -59,6 +74,7 @@ class Horde_Core_NlsconfigTest extends Horde_Test_Case
     public function testGet($key, $expected)
     {
         $nls = new Horde_Registry_Nlsconfig();
+        $this->markTestIncomplete();
     }
 
     public function testValidLang()

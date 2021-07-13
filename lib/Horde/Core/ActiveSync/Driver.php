@@ -240,6 +240,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 $injector->getInstance('Horde_Log_Logger')->notice(sprintf('Login failed from ActiveSync client for user %s.', $username));
                 return false;
             }
+            return true;
         }
 
         // Get the username from the registry so we capture it after any

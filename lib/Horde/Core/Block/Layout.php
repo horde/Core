@@ -30,6 +30,7 @@ class Horde_Core_Block_Layout
      */
     protected $_viewUrl;
 
+    protected $_layout;
     /**
      * Returns whether the specified block may be removed.
      *
