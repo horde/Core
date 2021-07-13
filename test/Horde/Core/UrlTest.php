@@ -1,4 +1,7 @@
 <?php
+namespace Horde\Core;
+use \PHPUnit\Framework\TestCase;
+use \Horde;
 /**
  * @author     Jan Schneider <jan@horde.org>
  * @license    http://www.horde.org/licenses/lgpl21 LGPL 2.1
@@ -6,7 +9,7 @@
  * @package    Core
  * @subpackage UnitTests
  */
-class Horde_Core_UrlTest extends PHPUnit_Framework_TestCase
+class UrlTest extends TestCase
 {
     public function testUrl()
     {

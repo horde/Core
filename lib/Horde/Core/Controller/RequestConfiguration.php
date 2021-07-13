@@ -1,10 +1,29 @@
 <?php
 /**
- * Object to contain request information as it relates to which controller to
- * create.
+ * Copyright 2009-2020 Horde LLC (http://www.horde.org/)
  *
+ * See the enclosed file LICENSE for license information (LGPL). If you
+ * did not receive this file, see http://www.horde.org/licenses/lgpl21.
+ *
+ * @author   Michael Slusarz <slusarz@horde.org>
  * @category Horde
+ * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
+ */
+
+/**
+ * The Horde_Core_Controller_RequestConfiguration class provides 
+ * information from the request to identify the Controller.
+ * 
+ * Copyright 2009-2020 Horde LLC (http://www.horde.org/)
+ *
+ * See the enclosed file LICENSE for license information (LGPL-2). If you
+ * did not receive this file, see http://www.horde.org/licenses/lgpl.
+ *
+ * @author   Michael Slusarz <slusarz@horde.org>
+ * @category Horde
+ * @package  Package
+ * @license  http://www.horde.org/licenses/lgpl LGPL-2
  */
 class Horde_Core_Controller_RequestConfiguration implements Horde_Controller_RequestConfiguration
 {
@@ -28,6 +47,11 @@ class Horde_Core_Controller_RequestConfiguration implements Horde_Controller_Req
     }
 
     /**
+     * Store the application which should handle the request
+     *
+     * @param string $application The application identifier
+     *
+     * @return void
      */
     public function setApplication($application)
     {
@@ -35,6 +59,9 @@ class Horde_Core_Controller_RequestConfiguration implements Horde_Controller_Req
     }
 
     /**
+     * Return the application which should handle the request
+     *
+     * @return string The application identifier
      */
     public function getApplication()
     {
@@ -42,6 +69,11 @@ class Horde_Core_Controller_RequestConfiguration implements Horde_Controller_Req
     }
 
     /**
+     * Store the application which should handle the request
+     *
+     * @param string $controllerName The controller class name
+     *
+     * @return void
      */
     public function setControllerName($controllerName)
     {
@@ -49,6 +81,9 @@ class Horde_Core_Controller_RequestConfiguration implements Horde_Controller_Req
     }
 
     /**
+     * Return the controller class name
+     *
+     * @return string The controller name
      */
     public function getControllerName()
     {
@@ -56,6 +91,11 @@ class Horde_Core_Controller_RequestConfiguration implements Horde_Controller_Req
     }
 
     /**
+     * Store the settings exporter class name
+     *
+     * @param string $settingsName The exporter class name
+     *
+     * @return void
      */
     public function setSettingsExporterName($settingsName)
     {
@@ -63,6 +103,9 @@ class Horde_Core_Controller_RequestConfiguration implements Horde_Controller_Req
     }
 
     /**
+     * Return the settings exporter class name
+     *
+     * @return string The exporter class name
      */
     public function getSettingsExporterName()
     {
