@@ -34,96 +34,71 @@ authors:
     active: false
     role: developer
 version:
-  release: 2.31.15
-  api: 2.31.0
+  release: 3.0.0alpha6
+  api: 3.0.0alpha1
 state:
-  release: stable
-  api: stable
+  release: alpha
+  api: alpha
 license:
   identifier: LGPL-2.1
   uri: http://www.horde.org/licenses/lgpl21
 dependencies:
   required:
-    php: ^5.3 || ^7
-    pear:
-      pear.horde.org/Horde_Alarm: ^2.2
-      pear.horde.org/Horde_Auth: ^2.2
-      pear.horde.org/Horde_Autoloader: ^2.1
-      pear.horde.org/Horde_Browser: ^2
-      pear.horde.org/Horde_Cache: ^2.5
-      pear.horde.org/Horde_Cli: ^2
-      pear.horde.org/Horde_Compress: ^2
-      pear.horde.org/Horde_Compress_Fast: ^1
-      pear.horde.org/Horde_Controller: ^2
-      pear.horde.org/Horde_CssMinify: ^1
-      pear.horde.org/Horde_Data: ^2
-      pear.horde.org/Horde_Date: ^2
-      pear.horde.org/Horde_Exception: ^2
-      pear.horde.org/Horde_Group: ^2.1
-      pear.horde.org/Horde_HashTable: ^1.2
-      pear.horde.org/Horde_History: ^2
-      pear.horde.org/Horde_Injector: ^2
-      pear.horde.org/Horde_JavascriptMinify: ^1
-      pear.horde.org/Horde_Lock: ^2
-      pear.horde.org/Horde_Log: ^2
-      pear.horde.org/Horde_LoginTasks: ^2
-      pear.horde.org/Horde_Mime: ^2.5
-      pear.horde.org/Horde_Mime_Viewer: ^2.2
-      pear.horde.org/Horde_Notification: ^2
-      pear.horde.org/Horde_Pack: ^1
-      pear.horde.org/Horde_Perms: ^2
-      pear.horde.org/Horde_Prefs: ^2.9
-      pear.horde.org/Horde_Secret: ^2
-      pear.horde.org/Horde_Serialize: ^2
-      pear.horde.org/Horde_SessionHandler: ^2
-      pear.horde.org/Horde_Share: ^2
-      pear.horde.org/Horde_Support: ^2
-      pear.horde.org/Horde_Template: ^2
-      pear.horde.org/Horde_Token: ^2
-      pear.horde.org/Horde_Text_Filter: ^2
-      pear.horde.org/Horde_Translation: ^2.2
-      pear.horde.org/Horde_Url: ^2.1
-      pear.horde.org/Horde_Util: ^2
-      pear.horde.org/Horde_View: ^2
-      pear.php.net/PEAR: '*'
+    php: ^7
+    composer:
+      horde/alarm: ^3
+      horde/auth: ^3
+      horde/autoloader: ^3
+      horde/browser: ^3
+      horde/cache: ^3
+      horde/cli: ^3
+      horde/compress: ^3
+      horde/compress_fast: ^2
+      horde/controller: ^3
+      horde/cssminify: ^2
+      horde/data: ^3
+      horde/date: ^3
+      horde/exception: ^3
+      horde/group: ^3
+      horde/hashtable: ^2
+      horde/history: ^3
+      horde/injector: ^3
+      horde/javascriptminify: ^2
+      horde/lock: ^3
+      horde/log: ^3
+      horde/logintasks: ^3
+      horde/mime: ^3
+      horde/mime_viewer: ^3
+      horde/notification: ^3
+      horde/pack: ^2
+      horde/perms: ^3
+      horde/prefs: ^3
+      horde/secret: ^3
+      horde/serialize: ^3
+      horde/sessionhandler: ^3
+      horde/share: ^3
+      horde/support: ^3
+      horde/template: ^3
+      horde/token: ^3
+      horde/text_filter: ^3
+      horde/translation: ^3
+      horde/url: ^3
+      horde/util: ^3
+      horde/view: ^3
+      pear/pear: '*'
     ext:
       session: '*'
   optional:
-    pear:
-      pear.horde.org/Horde_ActiveSync: ^2.40
-      pear.horde.org/Horde_Backup: ^1
-      pear.horde.org/Horde_Crypt: ^2
-      pear.horde.org/Horde_Dav: ^1
-      pear.horde.org/Horde_Db: ^2
-      pear.horde.org/Horde_Editor: ^2
-      pear.horde.org/Horde_ElasticSearch: ^1
-      pear.horde.org/Horde_Form: ^2.0.15
-      pear.horde.org/Horde_Http: ^2
-      pear.horde.org/Horde_Icalendar: ^2
-      pear.horde.org/Horde_Image: ^2.3
-      pear.horde.org/Horde_Imap_Client: ^2
-      pear.horde.org/Horde_JavascriptMinify_Jsmin: ^1
-      pear.horde.org/Horde_Kolab_Server: ^2
-      pear.horde.org/Horde_Kolab_Session: ^2
-      pear.horde.org/Horde_Kolab_Storage: ^2
-      pear.horde.org/Horde_Ldap: ^2
-      pear.horde.org/Horde_Mail: ^2.3
-      pear.horde.org/Horde_Mongo: ^1
-      pear.horde.org/Horde_Nls: ^2
-      pear.horde.org/Horde_Oauth: ^2
-      pear.horde.org/Horde_Queue: ^1
-      pear.horde.org/Horde_Routes: ^2
-      pear.horde.org/Horde_Service_Twitter: ^2
-      pear.horde.org/Horde_SpellChecker: ^2
-      pear.horde.org/Horde_Test: ^2.6
-      pear.horde.org/Horde_Tree: ^2
-      pear.horde.org/Horde_Vfs: ^2.2
-      pear.php.net/Net_DNS2: ^1.3
-      pear.php.net/Text_CAPTCHA: '*'
-      pear.php.net/Text_Figlet: '*'
-      pear.php.net/Text_LanguageDetect: '*'
+    composer:
+      pear/text_captcha: '*'
+      pear/text_figlet: '*'
     ext:
       dom: '*'
       hash: '*'
       SimpleXML: '*'
       sockets: '*'
+autoload:
+  classmap:
+    - lib/
+  psr-4:
+    Horde\Core\: src/

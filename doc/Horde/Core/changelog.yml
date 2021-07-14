@@ -1,4 +1,19 @@
 ---
+3.0.0alpha6:
+  api: 3.0.0alpha6
+  state:
+    release: stable
+    api: stable
+  date: 2021-07-14
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    [rla] Controller Framework Routes now work correctly for separate subdomain or for uncommon webdir layouts.
+    [rla] Controller Framework now has limited capabilities for unauthenticated or API-authenticated calls.
+    [rla] Adapt schema migrations to work in new H6 installation layout.
+    [rla] Added injectable wrapper around Config to reduce globals access.
+    [rla] With Marco Abbrancati: Upgraded test cases for phpunit 9.x utility.
 2.31.15:
   api: 2.31.0
   state:
