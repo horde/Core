@@ -4,15 +4,19 @@ declare(strict_types=1);
 namespace Horde\Core\Middleware;
 
 use Exception;
+use Horde;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use \Horde_Registry;
 use \Horde_Application;
 use Horde_Controller;
+use Horde_Injector;
 use Horde_Routes_Mapper as Router;
 use \Horde_String;
+use Psr\Http\Message\ResponseFactoryInterface;
 
 /**
  * AppRouter middleware
@@ -34,6 +38,15 @@ use \Horde_String;
 class AppRouter implements MiddlewareInterface
 {
     private Router $router;
+    private Horde_Registry $registry;
+    private Horde_Injector $injector;
+
+    public function __construct(Horde_Registry $registry, Router $router, Horde_Injector $injector)
+    {
+        $this->registry = $registry;       
+        $this->router = $router;
+        $this->injector = $injector;
+    }
 
     /**
      * Route a request for a horde app
@@ -48,11 +61,6 @@ class AppRouter implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $defaultStack = [
-            // TODO: Default stack
-        ];
-
-        $injector = $request->getAttribute('dic');
         $app = $request->getAttribute('app');
         $prefix = $request->getAttribute('routerPrefix');
         if (empty($prefix)) {
@@ -61,14 +69,13 @@ class AppRouter implements MiddlewareInterface
         if (empty($app)) {
             throw new \Exception("Missing Attribute: 'app'");
         }
-        if (empty($injector)) {
-            throw new \Exception("Missing Attribute: 'dic'");
-        }
-        $registry = $injector->get(Horde_Registry::class);
-        $this->router = $injector->get(Router::class);
+        $defaultStack = [
+            AuthHordeSession::class,
+            RedirectToLogin::class
+        ];
         
         // Check for route definitions.
-        $fileroot = $registry->get('fileroot', $app);
+        $fileroot = $this->registry->get('fileroot', $app);
         $routeFile = $fileroot . '/config/routes.php';
         if (!file_exists($routeFile)) {
             throw new \Exception("No Routes file found for App");
@@ -77,13 +84,11 @@ class AppRouter implements MiddlewareInterface
         // TODO: Should this move to another middleware?
 
         // Push $app onto the registry
-        $registry->pushApp($app);
+        $this->registry->pushApp($app);
 
         // Application routes are relative only to the application. Let the
         // mapper know where they start.
         $this->router->prefix = $prefix;
-        // Set the application controller directory
-//        $this->router->directory = $registry->get('fileroot', $app) . '/app/controllers';
 
         // Load application routes.
         // Cannot rename mapper as long as we support the existing routes definitions
@@ -96,13 +101,7 @@ class AppRouter implements MiddlewareInterface
         // Match
         // @TODO Cache routes
         $path = $request->getUri()->getPath();
-        // TODO: Shouldn't this be unnecessary by now? 
-        if (($pos = strpos($path, '?')) !== false) {
-            $path = substr($path, 0, $pos);
-        }
-
         $match = $this->router->match($path);
-
         $request = $request->withAttribute('route', $match);
 
         // Stack is an array of DI keys
@@ -110,20 +109,24 @@ class AppRouter implements MiddlewareInterface
         // unset stack means DEFAULT middleware stack
         $stack = isset($match['stack']) ? $match['stack'] : $defaultStack;
         foreach ($stack as $middleware) {
-            $handler->addMiddleware($middleware);
+            $handler->addMiddleware($this->injector->get($middleware));
         }
 
         // Controller is a single DI key for either a HandlerInterface, MiddlewareInterface or a Horde_Controller
         $controllerName = $match['controller'] ?? '';
         $traditionalName = Horde_String::ucfirst($app) . '_' . Horde_String::ucfirst($controllerName) . '_Controller';
-        if ($injector->has($controllerName) || class_exists($controllerName)) {
-            $controller = $injector->get($controllerName);
-        } elseif ($injector->has($traditionalName) || class_exists($traditionalName)) {
-            $controller = $injector->get($traditionalName);
+        if ($this->injector->has($controllerName) || class_exists($controllerName)) {
+            $controller = $this->injector->get($controllerName);
+        } elseif ($this->injector->has($traditionalName) || class_exists($traditionalName)) {
+            $controller = $this->injector->get($traditionalName);
         }
         // Handle traditional Horde_Controller
         if ($controller instanceof Horde_Controller) {
-            $middleware = $injector->createInstance(H5Controller::class);
+            $middleware = new H5Controller(
+                $controller, 
+                $this->injector->get(ResponseFactoryInterface::class),
+                $this->injector->get(StreamFactoryInterface::class)
+            );
             $handler->addMiddleware($middleware);
         }
         // Controllers can be implemented as a (final?) middleware
@@ -132,53 +135,10 @@ class AppRouter implements MiddlewareInterface
         }
         // Controllers can be implemented as a Payload RequestHandler
         if ($controller instanceof RequestHandlerInterface) {
-            return $controller->handle($request);
+            // Set controller as a payload handler
+            // Simply calling controller would bypass any further middleware
+            $handler->setPayloadHandler($controller);
         }
-
-
-
-/*        if (isset($match['controller'])) {
-            $config->setControllerName();
-            $config->setSettingsExporterName($settingsFinder->getSettingsExporterName($config->getControllerName()));
-        } else {
-            $config->setControllerName('Horde_Core_Controller_NotFound');
-        }
-        // TODO: Move to some ControllerAuthHelper and check perms and admin
-        if (!$registry->isAuthenticated()) {
-            $auth = $injector->getInstance('Horde_Core_Factory_Auth')->create();
-
-            // Default behaviour should be to authenticate if none given.
-            // Older controllers expect this.
-            if (!isset($match['HordeAuthType'])) {
-                $match['HordeAuthType'] = 'DEFAULT';
-            }
-            // Keep unauthenticated
-            if ($match['HordeAuthType'] == 'NONE') {
-                return $config;
-            }
-            if ($match['HordeAuthType'] == 'DEFAULT') {
-                // Try to authenticate, otherwise redirect to login page
-                // Check for basic auth
-                if (isset($_SERVER['PHP_AUTH_USER']) and isset($_SERVER['PHP_AUTH_PW'])) {
-                    $res = $auth->authenticate($_SERVER['PHP_AUTH_USER'], ['password' => $_SERVER['PHP_AUTH_PW']]);
-                    if ($res) {
-                        return $config;
-                    }
-                }
-                $registry->getServiceLink('login');
-                Horde::url($registry->getInitialPage('horde'))->redirect();
-            }
-            // In API mode, either allow a request
-            if ($match['HordeAuthType'] == 'BASIC') {
-                if ($auth->authenticate($_SERVER['PHP_AUTH_USER'], ['password' => $_SERVER['PHP_AUTH_PW']])) {
-                    return $config;
-                }
-                $config->setControllerName('Horde_Core_Controller_NotAuthorized');
-                return $config;
-            }
-        }
-*/
-
         return $handler->handle($request);
     }
 }

@@ -13,6 +13,9 @@ use Horde\Http\Server\Runner;
 use Horde\Http\Server\Middleware\Responder;
 use Horde\Http\StreamFactory;
 use Horde\Core\Middleware\HordeCore as HordeCoreMiddleware;
+use Horde_Injector;
+use Horde_Injector_TopLevel;
+
 /**
  * Bootstrap the Rampage HTTP endpoint
  * 
@@ -31,14 +34,12 @@ class RampageBootstrap
         // The RequestBuilder could easily be autowired by a DI container.
         $requestBuilder = new RequestBuilder($requestFactory, $streamFactory, $uriFactory);
         $request = $requestBuilder->withGlobalVariables()->build();
-        
+        $injector = new Horde_Injector_TopLevel;
         $middlewares = [
             // TODO: Unconditionally setup the output compressor, it should act only upon an attribute
             // TODO: Unconditionally setup the error handler
             // Setup the horde init middleware. It will add more middleware to the stack
             new HordeCoreMiddleware(),
-            new AppFinder(),
-            new AppRouter()
         ];
         
         $handler = new RampageRequestHandler($responseFactory, $streamFactory, $middlewares);

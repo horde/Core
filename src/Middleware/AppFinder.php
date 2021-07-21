@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Horde\Core\Middleware;
 
 use Exception;
+use Horde;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -19,8 +20,6 @@ use \Horde_Registry;
  * Setup attributes to enable the app-specific router middleware
  * 
  * Requires Attributes:
- * - dic        A handle for the DI Container
- * - registry   A handle for the horde registry
  * 
  * Sets Attributes:
  * - app
@@ -30,6 +29,11 @@ use \Horde_Registry;
  */
 class AppFinder implements MiddlewareInterface
 {
+    private Horde_Registry $registry;
+    public function __construct(Horde_Registry $registry)
+    {
+        $this->registry = $registry;
+    }
      /**
      * Rebuild a path string to a common form
      *
@@ -137,7 +141,6 @@ class AppFinder implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $injector = $request->getAttribute('dic');
         $requestServer = $request->getUri()->getHost();
 
         $uriScheme = $request->getUri()->getScheme();

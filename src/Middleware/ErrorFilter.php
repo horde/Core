@@ -32,22 +32,7 @@ class ErrorFilter implements MiddlewareInterface
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $hordeEnv = Horde_Registry::appInit('horde', array('authentication' => 'none'));
-        // Bad! the injector should be part of the early init's response.
-        $injector = $GLOBALS['injector'];
-        $request->withAttribute('dic', $injector);
-        // Detect correct app
-        $registry = $injector->getInstance('Horde_Registry');
-        $request->withAttribute('registry', $registry);
-
-        
-
-        // Setup Router for that app
-        // Detect route in app. If route found, initialize the actual app environment. If not, produce an error.
-        // Push more middleware on the stack
-        // If the detected route's handler is a Horde_Controller, put it into a wrapper middleware.
-        // Initialize the actual application
-
+        // TODO:
         return $handler->handle($request);
     }
 }

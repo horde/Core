@@ -39,6 +39,7 @@ class HordeCore implements MiddlewareInterface
         {
             throw new \Horde_Exception('Autoloading issue');
         } 
+        // This does way too much
         $hordeEnv = Horde_Registry::appInit('horde', ['authentication' => 'none']);
         // Bad! the injector should be part of the early init's response.
         $injector = $GLOBALS['injector'];
@@ -57,19 +58,12 @@ class HordeCore implements MiddlewareInterface
         }
 
 
-        $request = $request->withAttribute('dic', $injector);
         // Detect correct app
         $registry = $injector->getInstance('Horde_Registry');
         $request = $request->withAttribute('registry', $registry);
-
-        
-
-        // Setup Router for that app
-        // Detect route in app. If route found, initialize the actual app environment. If not, produce an error.
-        // Push more middleware on the stack
-        // If the detected route's handler is a Horde_Controller, put it into a wrapper middleware.
-        // Initialize the actual application
-
+        $handler->addMiddleware(new AppFinder($registry));
+        // Find route inside detected app
+        $handler->addMiddleware(new AppRouter($registry, $injector->get('Horde_Routes_Mapper'), $injector));
         return $handler->handle($request);
     }
 }
