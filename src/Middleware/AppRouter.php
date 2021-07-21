@@ -114,12 +114,20 @@ class AppRouter implements MiddlewareInterface
 
         // Controller is a single DI key for either a HandlerInterface, MiddlewareInterface or a Horde_Controller
         $controllerName = $match['controller'] ?? '';
-        $traditionalName = Horde_String::ucfirst($app) . '_' . Horde_String::ucfirst($controllerName) . '_Controller';
-        if ($this->injector->has($controllerName) || class_exists($controllerName)) {
-            $controller = $this->injector->get($controllerName);
-        } elseif ($this->injector->has($traditionalName) || class_exists($traditionalName)) {
-            $controller = $this->injector->get($traditionalName);
+        $traditionalFilename = $fileroot . '/app/controllers/' . $controllerName . '.php';
+        if ($this->injector->hasInstance($controllerName) || class_exists($controllerName)) {
+            $controller = $this->injector->getInstance($controllerName);
         }
+        if (empty($controller)) {
+            if (file_exists($traditionalFilename)) {
+                require_once $traditionalFilename;
+                $traditionalName = Horde_String::ucfirst($app) . '_' . Horde_String::ucfirst($controllerName) . '_Controller';
+                if ($this->injector->hasInstance($traditionalName) || class_exists($traditionalName)) {
+                    $controller = $this->injector->getInstance($traditionalName);
+                }
+            }
+        }
+
         // Handle traditional Horde_Controller
         if ($controller instanceof Horde_Controller) {
             $middleware = new H5Controller(
