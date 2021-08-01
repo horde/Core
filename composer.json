@@ -26,7 +26,7 @@
             "role": "developer"
         }
     ],
-    "time": "2021-07-14",
+    "time": "2021-08-01",
     "repositories": [
         {
             "type": "composer",
@@ -52,6 +52,8 @@
         "horde/group": "^3 || dev-FRAMEWORK_6_0",
         "horde/hashtable": "^2 || dev-FRAMEWORK_6_0",
         "horde/history": "^3 || dev-FRAMEWORK_6_0",
+        "horde/http": "^3 || dev-FRAMEWORK_6_0",
+        "horde/http_server": "^1 || dev-FRAMEWORK_6_0",
         "horde/injector": "^3 || dev-FRAMEWORK_6_0",
         "horde/javascriptminify": "^2 || dev-FRAMEWORK_6_0",
         "horde/lock": "^3 || dev-FRAMEWORK_6_0",
@@ -93,6 +95,11 @@
         ],
         "psr-4": {
             "Horde\\Core\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Horde\\Core\\Test\\": "test/"
         }
     }
 }

@@ -62,6 +62,8 @@ dependencies:
       horde/group: ^3
       horde/hashtable: ^2
       horde/history: ^3
+      horde/http: ^3
+      horde/http_server: ^1
       horde/injector: ^3
       horde/javascriptminify: ^2
       horde/lock: ^3

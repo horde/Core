@@ -83,6 +83,7 @@ class AppRouter implements MiddlewareInterface
 
         // TODO: Should this move to another middleware?
 
+        // Before PushApp, we need to load the Horde Autoloader
         // Push $app onto the registry
         $this->registry->pushApp($app);
 
