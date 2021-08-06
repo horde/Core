@@ -1,0 +1,66 @@
+---
+name: make release
+
+# manual workflow to make a new release for the default branch
+on:
+  workflow_dispatch:
+    branches:
+      - FRAMEWORK_6_0
+
+jobs:
+  run:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: ['ubuntu-20.04']
+        php-versions: ['7.4']
+    steps:
+    - name: Setup git
+      run:  |
+          mkdir -p ~/.ssh/ && ssh-keyscan -t rsa github.com > ~/.ssh/known_hosts
+          git config --global user.name "Github CI Runner"
+          git config --global user.email "ci-job@maintaina.com"
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-versions }}
+        extensions: gettext
+        ini-values: post_max_size=512M, max_execution_time=360
+        tools: composer:v2
+    - name: Setup composer
+      run: |
+          composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
+          composer global config repositories.0 composer https://horde-satis.maintaina.com
+          composer global config minimum-stability dev
+          composer global require horde/components "dev-FRAMEWORK_6_0"
+          alias horde-components="~/.config/composer/web/components/bin/horde-components"
+    - name: write changelog
+      run: |
+          entries_amount=0; max_entries=100
+          for commit in $(git rev-list FRAMEWORK_6_0)
+          do  
+            msg=$(git log --format=%B -n 1 $commit | head -n 1)
+            if [ $entries_amount -gt $max_entries ]; then break; fi
+            if [[ $msg == 'Released'* ]]; then break; fi
+            if [[ $msg == 'Development mode for'* ]]; then break; fi
+            if [[ $msg == 'automatic generation of composer.json'* ]]; then continue; fi
+            if [[ $msg == 'Merge branch'* ]]; then continue; fi
+            author=$(git show -s --format='%an' $commit)
+            firstname=$(echo "$author" | cut -d " " -f 1); comma=${firstname: -1}
+            lastname=$(echo "$author" | rev | cut -d " " -f 1 | rev)
+            if [ $comma == "," ]; then
+              author="$lastname $firstname"
+            fi
+
+            author=$(echo $author | awk '{printf(tolower(substr($1, 1, 1))); print(tolower(substr($NF, 1, 2)))}')
+            horde-components -c doc/components.conf changed "[$author] $msg"
+            let "entries_amount+=1"
+          done
+    - name: make release and push
+      run: |
+          horde-components -c doc/components.conf release for maintaina
+          git commit --amend -m "$(git log -1 --pretty=%B) [ci skip]"
+          git push
+          git push origin --tags
