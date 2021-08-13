@@ -39,24 +39,18 @@ jobs:
     - name: write changelog
       run: |
           entries_amount=0; max_entries=100
+          PATTERN="^\[.*\] .*"
+
           for commit in $(git rev-list FRAMEWORK_6_0)
           do  
             msg=$(git log --format=%B -n 1 $commit | head -n 1)
             if [ $entries_amount -gt $max_entries ]; then break; fi
             if [[ $msg == 'Released'* ]]; then break; fi
             if [[ $msg == 'Development mode for'* ]]; then break; fi
-            if [[ $msg == 'automatic generation of composer.json'* ]]; then continue; fi
-            if [[ $msg == 'Merge branch'* ]]; then continue; fi
-            author=$(git show -s --format='%an' $commit)
-            firstname=$(echo "$author" | cut -d " " -f 1); comma=${firstname: -1}
-            lastname=$(echo "$author" | rev | cut -d " " -f 1 | rev)
-            if [ $comma == "," ]; then
-              author="$lastname $firstname"
+            if [[ $msg =~ $PATTERN ]]; then
+              horde-components -c doc/components.conf changed "$msg"
+              let "entries_amount+=1"
             fi
-
-            author=$(echo $author | awk '{printf(tolower(substr($1, 1, 1))); print(tolower(substr($NF, 1, 2)))}')
-            horde-components -c doc/components.conf changed "[$author] $msg"
-            let "entries_amount+=1"
           done
     - name: make release and push
       run: |
