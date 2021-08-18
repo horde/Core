@@ -35,7 +35,7 @@ class AuthIsGlobalAdmin implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if ($this->registry->isAuthenticated()) {
+        if ($this->registry->isAuthenticated() && $this->registry->isAdmin()) {
             $request = $request->withAttribute('HORDE_GLOBAL_ADMIN', true);
         } else {
             $request = $request->withoutAttribute('HORDE_GLOBAL_ADMIN');
