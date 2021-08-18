@@ -14,7 +14,6 @@ use Horde_Controller;
 use Horde_Routes_Mapper as Router;
 use \Horde_String;
 use \Horde;
-use Horde\Core\UserPassport;
 
 /**
  * AuthHordeSession middleware
