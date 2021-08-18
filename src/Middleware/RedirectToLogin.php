@@ -44,27 +44,3 @@ class RedirectToLogin implements MiddlewareInterface
         return $this->responseFactory->createResponse(302)->withHeader('Location', $redirect);
     }
 }
-
-/*
-            if ($match['HordeAuthType'] == 'DEFAULT') {
-                // Try to authenticate, otherwise redirect to login page
-                // Check for basic auth
-                if (isset($_SERVER['PHP_AUTH_USER']) and isset($_SERVER['PHP_AUTH_PW'])) {
-                    $res = $auth->authenticate($_SERVER['PHP_AUTH_USER'], ['password' => $_SERVER['PHP_AUTH_PW']]);
-                    if ($res) {
-                        return $config;
-                    }
-                }
-                $registry->getServiceLink('login');
-                Horde::url($registry->getInitialPage('horde'))->redirect();
-            }
-            // In API mode, either allow a request
-            if ($match['HordeAuthType'] == 'BASIC') {
-                if ($auth->authenticate($_SERVER['PHP_AUTH_USER'], ['password' => $_SERVER['PHP_AUTH_PW']])) {
-                    return $config;
-                }
-                $config->setControllerName('Horde_Core_Controller_NotAuthorized');
-                return $config;
-            }
-        }
-*/
