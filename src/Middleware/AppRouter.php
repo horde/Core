@@ -105,6 +105,10 @@ class AppRouter implements MiddlewareInterface
         $match = $this->router->match($path);
         $request = $request->withAttribute('route', $match);
 
+        // compatibility: if unset stack and HordeAuthType is 'NONE' set empty stack
+        if (!isset($match['stack']) && $match['HordeAuthType'] === 'NONE') {
+            $match['stack'] = [];
+        }
         // Stack is an array of DI keys
         // Empty array means NO more middleware besides controller
         // unset stack means DEFAULT middleware stack
