@@ -102,6 +102,7 @@ class AppRouter implements MiddlewareInterface
         // Match
         // @TODO Cache routes
         $path = $request->getUri()->getPath();
+        $path = strtok($path, '?');
         $match = $this->router->match($path);
         $request = $request->withAttribute('route', $match);
 
