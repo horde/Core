@@ -21,19 +21,19 @@ use Psr\Http\Message\ResponseFactoryInterface;
 /**
  * AppRouter middleware
  *
- * Purpose: 
- * 
+ * Purpose:
+ *
  * Run the router for the app from the attribute
  * Retrieve the route specific stack
  * If no route found, present a helpful but security-wise acceptable response
- * 
+ *
  * Requires Attributes:
  * - app
  * - prefix
- * 
+ *
  * Sets Attributes:
- * 
- * 
+ *
+ *
  */
 class AppRouter implements MiddlewareInterface
 {
@@ -43,7 +43,7 @@ class AppRouter implements MiddlewareInterface
 
     public function __construct(Horde_Registry $registry, Router $router, Horde_Injector $injector)
     {
-        $this->registry = $registry;       
+        $this->registry = $registry;
         $this->router = $router;
         $this->injector = $injector;
     }
@@ -63,7 +63,7 @@ class AppRouter implements MiddlewareInterface
     {
         $app = $request->getAttribute('app');
         $prefix = $request->getAttribute('routerPrefix');
-        if (empty($prefix)) {
+        if (is_null($prefix)) {
             throw new \Exception("Missing Attribute: 'routerPrefix'");
         }
         if (empty($app)) {
@@ -73,12 +73,12 @@ class AppRouter implements MiddlewareInterface
             AuthHordeSession::class,
             RedirectToLogin::class
         ];
-        
+
         // Check for route definitions.
         $fileroot = $this->registry->get('fileroot', $app);
         $routeFile = $fileroot . '/config/routes.php';
         if (!file_exists($routeFile)) {
-            throw new \Exception("No Routes file found for App");
+            throw new \Exception("No Routes file found for App $app");
         }
 
         // TODO: Should this move to another middleware?
