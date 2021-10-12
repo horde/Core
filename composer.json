@@ -80,7 +80,9 @@
         "pear/pear": "*",
         "ext-session": "*"
     },
-    "require-dev": {},
+    "require-dev": {
+        "horde/test": "dev-FRAMEWORK_6_0"
+    },
     "suggest": {
         "pear/text_captcha": "*",
         "pear/text_figlet": "*",
