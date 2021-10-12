@@ -14,12 +14,15 @@ use \Horde_Registry;
 use \Horde_Session;
 use \Horde_Exception;
 
-
 /**
  * DemandSessionToken middleware
- *
- * Checks if the current session token in the Horde-Session-Token header.
+ * Checks if the current session token is in the Horde-Session-Token header.
  * 
+ * @author    Mahdi Pasche <pasche@b1-systems.de>
+ * @category  Horde
+ * @copyright 2013-2021 Horde LLC
+ * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
+ * @package   Core
  */
 class DemandSessionToken implements MiddlewareInterface
 {
@@ -39,9 +42,8 @@ class DemandSessionToken implements MiddlewareInterface
     }
 
     /**
-     * checks for a valid session token
-     * DemandSessionToken
-     * returns 403 response if token is invalid or not found
+     * Checks for a valid session token
+     * Returns 403 response if token is invalid or not found
      * 
      * @param ServerRequestInterface $request
      * @param RequestHandlerInterface $handler
@@ -50,7 +52,7 @@ class DemandSessionToken implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        // using getHeaderLine forces the request to have a single value for the header to be valid
+        // Using getHeaderLine forces the request to have a single value for the header to be valid
         $token = $request->getHeaderLine('Horde-Session-Token');
         try {
             $this->session->checkToken($token);

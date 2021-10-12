@@ -11,11 +11,17 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
 /**
- * returns 401 response if not authenticated
+ * DemandAuthenticatedUser middleware
+ * Returns 401 response if not authenticated
  * 
  * Reads attribute: 
  * - HORDE_AUTHENTICATED_USER the uid, if authenticated
  * 
+ * @author    Mahdi Pasche <pasche@b1-systems.de>
+ * @category  Horde
+ * @copyright 2013-2021 Horde LLC
+ * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
+ * @package   Core
  */
 class DemandAuthenticatedUser implements MiddlewareInterface
 {
@@ -31,6 +37,6 @@ class DemandAuthenticatedUser implements MiddlewareInterface
         if ($request->getAttribute('HORDE_AUTHENTICATED_USER')) {
             return $handler->handle($request);
         }
-        return $this->responseFactory->createResponse(401);
+        return $this->responseFactory->createResponse(401, 'Authenticated user not found.');
     }
 }
