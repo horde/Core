@@ -30,7 +30,7 @@
  </developer>
  <date>2021-10-12</date>
  <version>
-  <release>3.0.0alpha6</release>
+  <release>3.0.0alpha7</release>
   <api>3.0.0alpha1</api>
  </version>
  <stability>
@@ -39,11 +39,7 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* [rla] Controller Framework Routes now work correctly for separate subdomain or for uncommon webdir layouts.
-* [rla] Controller Framework now has limited capabilities for unauthenticated or API-authenticated calls.
-* [rla] Adapt schema migrations to work in new H6 installation layout.
-* [rla] Added injectable wrapper around Config to reduce globals access.
-* [rla] With Marco Abbrancati: Upgraded test cases for phpunit 9.x utility.
+* 
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -1706,6 +1702,172 @@
   </filelist>
  </phprelease>
  <changelog>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
   <release>
    <version>
     <release>1.0.0alpha1</release>
@@ -4639,13 +4801,13 @@
   <release>
    <version>
     <release>3.0.0alpha6</release>
-    <api>3.0.0alpha1</api>
+    <api>3.0.0alpha6</api>
    </version>
    <stability>
-    <release>alpha</release>
-    <api>alpha</api>
+    <release>stable</release>
+    <api>stable</api>
    </stability>
-   <date>2021-07-14</date>
+   <date>2021-10-12</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
 * [rla] Controller Framework Routes now work correctly for separate subdomain or for uncommon webdir layouts.
@@ -4653,6 +4815,21 @@
 * [rla] Adapt schema migrations to work in new H6 installation layout.
 * [rla] Added injectable wrapper around Config to reduce globals access.
 * [rla] With Marco Abbrancati: Upgraded test cases for phpunit 9.x utility.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>3.0.0alpha7</release>
+    <api>3.0.0alpha6</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2021-10-12</date>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <notes>
+* 
    </notes>
   </release>
  </changelog>
