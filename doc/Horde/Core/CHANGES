@@ -1,8 +1,22 @@
+------------
+v3.0.0alpha6
+------------
+
+[rla] Controller Framework Routes now work correctly for separate subdomain or
+      for uncommon webdir layouts.
+[rla] Controller Framework now has limited capabilities for unauthenticated or
+      API-authenticated calls.
+[rla] Adapt schema migrations to work in new H6 installation layout.
+[rla] Added injectable wrapper around Config to reduce globals access.
+[rla] With Marco Abbrancati: Upgraded test cases for phpunit 9.x utility.
+
+
 --------
 v2.31.15
 --------
 
-
+[mjr] Fix regression in sending mail via ActiveSync.
+[mjr] Fix ActiveSync SmartForward handling.
 
 
 --------
@@ -35,7 +49,7 @@ v2.31.12
 v2.31.11
 --------
 
-[mjr] Fix UTF-8 encoding of ActiveSync SmartReply requests (Bug #14957).
+[mjr] Fix UTF-8 encoding of ActiveSync SmartReply requests (Bug #14957)
 
 
 --------
