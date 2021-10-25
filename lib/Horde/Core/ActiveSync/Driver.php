@@ -217,10 +217,31 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         }
 
         // Now check Basic. Happens for authtype == 'basic' || 'basic_cert'
-        if ($conf['activesync']['auth']['type'] != 'cert' &&
-            !$this->_auth->authenticate($username, array('password' => $password))) {
-            $injector->getInstance('Horde_Log_Logger')->notice(sprintf('Login failed from ActiveSync client for user %s.', $username));
-            return false;
+        if ($conf['activesync']['auth']['type'] != 'cert') {
+            try {
+                $authResult = $this->_auth->authenticate($username, array('password' => $password));
+            } catch (Horde_Auth_Exception $e) {
+                if ($e->getCode() == Horde_Auth::REASON_MESSAGE) {
+                    // This error code would only happen if it's an error
+                    // from the underlaying auth backend, and NOT an invalid
+                    // authentication attempt.
+                    $this->_logger->warn('Authentication server unavailable.');
+
+                    // TODO: Remove BC shim
+                    if (defined('Horde_ActiveSync::AUTH_REASON_UNAVAILABLE')) {
+                       return constant('Horde_ActiveSync::AUTH_REASON_UNAVAILABLE');
+                   }
+
+                   return false;
+                }
+            }
+
+            if (!$authResult) {
+                $injector->getInstance('Horde_Log_Logger')->notice(sprintf('Login failed from ActiveSync client for user %s.', $username));
+                return false;
+            }
+
+            return true;
         }
 
         // Get the username from the registry so we capture it after any
