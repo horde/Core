@@ -9,9 +9,10 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
-namespace Horde\Core;
-use \PHPUnit\Framework\TestCase;
-use \Horde_Core_Stub_Registryconfig;
+namespace Horde\Core\Test;
+use PHPUnit\Framework\TestCase;
+
+use Horde\Core\Test\Stub\Registryconfig as RegistryconfigStub;
 use \Horde_Registry_Hordeconfig_Merged;
 use \Horde_Registry_Hordeconfig;
 
@@ -39,7 +40,7 @@ class RegistryTest extends TestCase
     {
         $this->_tmpdir = sys_get_temp_dir() . '/' . uniqid() . '/horde';
         mkdir($this->_tmpdir, 0777, true);
-        $config = new Horde_Core_Stub_Registryconfig();
+        $config = new RegistryconfigStub();
 
         $_SERVER['SCRIPT_URL'] = '/horde/foo/bar';
         $this->assertEquals('/horde', $config->detectWebroot($this->_tmpdir));

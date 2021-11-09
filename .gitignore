@@ -30,4 +30,6 @@ run-tests.log
 /vendor
 /composer.lock
 /web
-.phpunit.result.cache
+/.phpunit.cache
+.phpunit.results.cache
+.php-cs-fixer.cache
