@@ -26,7 +26,7 @@
             "role": "developer"
         }
     ],
-    "time": "2021-10-12",
+    "time": "2021-11-09",
     "repositories": [
         {
             "type": "composer",
@@ -80,7 +80,9 @@
         "pear/pear": "*",
         "ext-session": "*"
     },
-    "require-dev": {},
+    "require-dev": {
+        "horde/test": "^3 || dev-FRAMEWORK_6_0"
+    },
     "suggest": {
         "pear/text_captcha": "*",
         "pear/text_figlet": "*",

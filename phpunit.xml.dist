@@ -1,11 +1,11 @@
 <phpunit bootstrap="test/Horde/Core/bootstrap.php" colors="true">
-  <filter>
-    <whitelist>
+  <coverage>
+    <include>
       <directory suffix=".php">lib</directory>
-    </whitelist>
-  </filter>
+    </include>
+  </coverage>
   <testsuites>
-    <testsuite>
+    <testsuite name="horde/core">
       <directory>test</directory>
     </testsuite>
   </testsuites>
