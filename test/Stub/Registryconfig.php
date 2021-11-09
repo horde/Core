@@ -11,6 +11,10 @@
  * @package   Core
  */
 
+namespace Horde\Core\Test\Stub;
+
+use \Horde_Registry_Registryconfig;
+
 /**
  * Wrapper around Horde_Registry to get access to _detectWebroot().
  *
@@ -20,7 +24,7 @@
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
-class Horde_Core_Stub_Registryconfig extends Horde_Registry_Registryconfig
+class Registryconfig extends Horde_Registry_Registryconfig
 {
     public function __construct()
     {

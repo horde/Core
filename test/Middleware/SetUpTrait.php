@@ -9,7 +9,7 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
-namespace Horde\Core\Middleware;
+namespace Horde\Core\Test\Middleware;
 
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -19,11 +19,12 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use \Horde\Core\Middleware\DemandSessionToken;
-use \Horde\Http\RequestFactory;
-use \Horde\Http\StreamFactory;
-use \Horde\Http\ResponseFactory;
-use \Horde\Http\Server\RampageRequestHandler;
+use Horde\Core\Middleware\DemandSessionToken;
+use Horde\Http\RequestFactory;
+use Horde\Http\StreamFactory;
+use Horde\Http\ResponseFactory;
+use Horde\Http\Server\RampageRequestHandler;
+
 use \Horde_Session;
 use \Horde_Registry;
 use \Horde_Exception;

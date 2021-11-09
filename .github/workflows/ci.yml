@@ -51,4 +51,4 @@ jobs:
         COMPOSER_ROOT_VERSION=dev-FRAMEWORK_6_0 composer config minimum-stability dev
         COMPOSER_ROOT_VERSION=dev-FRAMEWORK_6_0 composer install
     - name: run phpunit
-      run: phpunit --bootstrap test/Horde/Core/bootstrap.php test/Horde/Core/
+      run: phpunit --bootstrap test/bootstrap.php

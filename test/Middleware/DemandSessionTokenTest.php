@@ -9,14 +9,15 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
-namespace Horde\Core\Middleware;
+namespace Horde\Core\Test\Middleware;
+use Horde\Core\Middleware\DemandSessionToken;
 
-use \Horde_Test_Case as HordeTestCase;
+use Horde\Test\Testcase;
 
 use \Horde_Session;
 use \Horde_Exception;
 
-class DemandSessionTokenTest extends HordeTestCase
+class DemandSessionTokenTest extends Testcase
 {
     use SetUpTrait;
 
