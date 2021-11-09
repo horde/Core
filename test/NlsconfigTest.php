@@ -9,9 +9,10 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
-namespace Horde\Core;
-use \PHPUnit\Framework\TestCase;
-use \Horde_Test_Case as HordeTestCase;
+namespace Horde\Core\Test;
+
+use Horde\Test\TestCase;
+
 use \Horde_Session;
 use \Horde_Support_Stub;
 use \Horde_Test_Stub_Registry;
@@ -26,7 +27,7 @@ use \Horde_Registry_Nlsconfig;
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
-class NlsconfigTest extends HordeTestCase
+class NlsconfigTest extends TestCase
 {
     public function setUp(): void
     {

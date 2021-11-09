@@ -1,6 +1,7 @@
 <?php
-namespace Horde\Core;
-use \PHPUnit\Framework\TestCase;
+namespace Horde\Core\Test;
+
+use PHPUnit\Framework\TestCase;
 use \Horde;
 /**
  * @author     Jan Schneider <jan@horde.org>
