@@ -99,6 +99,9 @@ dependencies:
       hash: '*'
       SimpleXML: '*'
       sockets: '*'
+  dev:
+    composer:
+      horde/test: ^3
 autoload:
   classmap:
     - lib/
