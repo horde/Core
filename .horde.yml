@@ -44,7 +44,7 @@ license:
   uri: http://www.horde.org/licenses/lgpl21
 dependencies:
   required:
-    php: ^7
+    php: ^7.4 || ^8
     composer:
       horde/alarm: ^3
       horde/auth: ^3

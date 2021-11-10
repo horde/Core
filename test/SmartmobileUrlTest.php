@@ -1,7 +1,8 @@
 <?php
-namespace Horde\Core;
-use \PHPUnit\Framework\TestCase;
-use \Horde_Test_Case as HordeTestCase;
+namespace Horde\Core\Test;
+
+use Horde\Test\TestCase;
+
 use \Horde_Core_Smartmobile_Url as SmartmobileUrl;
 use \Horde_Url;
 use InvalidArgumentException;
@@ -13,7 +14,7 @@ use InvalidArgumentException;
  * @package    Core
  * @subpackage UnitTests
  */
-class SmartmobileUrlTest extends HordeTestCase
+class SmartmobileUrlTest extends TestCase
 {
     public function testInvalidParamter()
     {

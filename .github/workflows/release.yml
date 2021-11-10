@@ -22,6 +22,8 @@ jobs:
           git config --global user.email "ci-job@maintaina.com"
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
@@ -42,7 +44,7 @@ jobs:
           PATTERN="^\[.*\] .*"
 
           for commit in $(git rev-list FRAMEWORK_6_0)
-          do  
+          do
             msg=$(git log --format=%B -n 1 $commit | head -n 1)
             if [ $entries_amount -gt $max_entries ]; then break; fi
             if [[ $msg == 'Released'* ]]; then break; fi

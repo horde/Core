@@ -7,12 +7,13 @@
  * @package    Core
  * @subpackage UnitTests
  */
-namespace Horde\Core;
-use \PHPUnit\Framework\TestCase;
-use \Horde_Test_Case as HordeTestCase;
+namespace Horde\Core\Test;
+
+use Horde\Test\TestCase;
+use Horde\Core\Mock\MockConnector;
+use Horde\Core\Mock\MockIMPMailbox;
+
 use \Horde_Date;
-use \Horde\Core\Mock\MockConnector;
-use \Horde\Core\Mock\MockIMPMailbox;
 
  /**
  * Unit tests for ActiveSync functionality in Core.
@@ -22,7 +23,7 @@ use \Horde\Core\Mock\MockIMPMailbox;
  * @package    Core
  * @subpackage UnitTests
  */
-class ActiveSyncTests extends HordeTestCase
+class ActiveSyncTests extends TestCase
 {
     protected $_auth;
     protected $_state;
