@@ -9,6 +9,7 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+
 namespace Horde\Core\Test\Middleware;
 
 use Psr\Http\Server\RequestHandlerInterface;
@@ -25,9 +26,10 @@ use Horde\Http\StreamFactory;
 use Horde\Http\ResponseFactory;
 use Horde\Http\Server\RampageRequestHandler;
 
-use \Horde_Session;
-use \Horde_Registry;
-use \Horde_Exception;
+use Horde_Session;
+use Horde_Registry;
+use Horde_Exception;
+use Horde_Auth_Base;
 
 trait SetUpTrait
 {
@@ -41,7 +43,11 @@ trait SetUpTrait
 
         $this->defaultPayloadResponse = $this->responseFactory->createResponse(200);
         $this->defaultPayloadHandler = $this->createMock(RequestHandlerInterface::class);
-        $this->defaultPayloadHandler->method('handle')->willReturn($this->defaultPayloadResponse);
+        $this->recentlyHandledRequest = null;
+        $this->defaultPayloadHandler->method('handle')->willReturnCallback(function ($request) {
+            $this->recentlyHandledRequest = $request;
+            return $this->defaultPayloadResponse;
+        });
 
         $this->handler = new RampageRequestHandler(
             $this->responseFactory,
@@ -49,5 +55,7 @@ trait SetUpTrait
             [],
             $this->defaultPayloadHandler
         );
+
+        $this->authDriver = $this->createMock(Horde_Auth_Base::class);
     }
 }

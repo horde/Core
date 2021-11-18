@@ -9,11 +9,13 @@
  * @author   Gunnar Wrobel <wrobel@pardus.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
+
 namespace Horde\Core\Factory;
-use \PHPUnit\Framework\TestCase;
-use \Horde_Core_Factory_KolabServer;
-use \Horde_Injector;
-use \Horde_Exception;
+
+use PHPUnit\Framework\TestCase;
+use Horde_Core_Factory_KolabServer;
+use Horde_Injector;
+use Horde_Exception;
 
 /**
  * Test the Kolab_Server factory.
@@ -35,7 +37,12 @@ class KolabServerTest extends TestCase
         $this->markTestIncomplete('Needs some love');
         $GLOBALS['conf']['kolab']['server']['basedn'] = 'test';
         $this->factory   = $this->getMock(
-            'Horde_Core_Factory_KolabServer', array(), array(), '', false, false
+            'Horde_Core_Factory_KolabServer',
+            [],
+            [],
+            '',
+            false,
+            false
         );
         $this->objects   = $this->getMock(
             'Horde_Kolab_Server_Objects_Interface'
@@ -68,7 +75,8 @@ class KolabServerTest extends TestCase
     {
         $factory = $this->_getFactory();
         $this->assertEquals(
-            array('basedn' => 'test'), $factory->getConfiguration()
+            ['basedn' => 'test'],
+            $factory->getConfiguration()
         );
     }
 
@@ -91,7 +99,7 @@ class KolabServerTest extends TestCase
     public function testMethodGetconnectionHasResultMockConnectionWithDataIfConfiguredThatWay()
     {
         $GLOBALS['conf']['kolab']['server']['mock'] = true;
-        $GLOBALS['conf']['kolab']['server']['data'] = array();
+        $GLOBALS['conf']['kolab']['server']['data'] = [];
         $factory = $this->_getFactory();
         $this->assertInstanceOf('Horde_Kolab_Server_Connection_Mock', $factory->getConnection());
     }
@@ -178,9 +186,9 @@ class KolabServerTest extends TestCase
 
     public function testMethodGetstructureHasResultStructureLdapIfConfiguredThatWay()
     {
-        $GLOBALS['conf']['kolab']['server']['structure'] = array(
-            'driver' => 'Horde_Kolab_Server_Structure_Ldap'
-        );
+        $GLOBALS['conf']['kolab']['server']['structure'] = [
+            'driver' => 'Horde_Kolab_Server_Structure_Ldap',
+        ];
         $factory = $this->_getFactory();
         $this->assertNotType(
             'Horde_Kolab_Server_Structure_Kolab',
@@ -220,7 +228,8 @@ class KolabServerTest extends TestCase
         $GLOBALS['conf']['kolab']['server']['count'] = true;
         $factory = $this->_getFactory();
         $this->assertInstanceOf(
-            'Horde_Kolab_Server_Decorator_Count', $factory->getServer()
+            'Horde_Kolab_Server_Decorator_Count',
+            $factory->getServer()
         );
     }
 
@@ -229,16 +238,18 @@ class KolabServerTest extends TestCase
         $GLOBALS['conf']['kolab']['server']['log'] = true;
         $factory = $this->_getFactory();
         $this->assertInstanceOf(
-            'Horde_Kolab_Server_Decorator_Log', $factory->getServer()
+            'Horde_Kolab_Server_Decorator_Log',
+            $factory->getServer()
         );
     }
 
     public function testMethodGetserverHasResultMappedServerIfAMappedWasProvidedInTheConfiguration()
     {
-        $GLOBALS['conf']['kolab']['server']['map'] = array();
+        $GLOBALS['conf']['kolab']['server']['map'] = [];
         $factory = $this->_getFactory();
         $this->assertInstanceOf(
-            'Horde_Kolab_Server_Decorator_Map', $factory->getServer()
+            'Horde_Kolab_Server_Decorator_Map',
+            $factory->getServer()
         );
     }
 
@@ -247,7 +258,8 @@ class KolabServerTest extends TestCase
         $GLOBALS['conf']['kolab']['server']['cleanup'] = true;
         $factory = $this->_getFactory();
         $this->assertInstanceOf(
-            'Horde_Kolab_Server_Decorator_Clean', $factory->getServer()
+            'Horde_Kolab_Server_Decorator_Clean',
+            $factory->getServer()
         );
     }
 
@@ -265,10 +277,10 @@ class KolabServerTest extends TestCase
         $GLOBALS['conf']['kolab']['server']['server'] = 'a';
         $factory = $this->_getFactory();
         $this->assertEquals(
-            array(
+            [
                 'basedn' => 'test',
-                'host' => 'a'
-            ),
+                'host' => 'a',
+            ],
             $factory->getConfiguration()
         );
     }
@@ -278,10 +290,10 @@ class KolabServerTest extends TestCase
         $GLOBALS['conf']['kolab']['server']['phpdn'] = 'a';
         $factory = $this->_getFactory();
         $this->assertEquals(
-            array(
+            [
                 'basedn' => 'test',
-                'binddn' => 'a'
-            ),
+                'binddn' => 'a',
+            ],
             $factory->getConfiguration()
         );
     }
@@ -291,10 +303,10 @@ class KolabServerTest extends TestCase
         $GLOBALS['conf']['kolab']['server']['phppw'] = 'a';
         $factory = $this->_getFactory();
         $this->assertEquals(
-            array(
+            [
                 'basedn' => 'test',
-                'bindpw' => 'a'
-            ),
+                'bindpw' => 'a',
+            ],
             $factory->getConfiguration()
         );
     }
@@ -306,10 +318,10 @@ class KolabServerTest extends TestCase
         $GLOBALS['conf']['kolab']['ldap']['phppw'] = 'a';
         $factory = $this->_getFactory();
         $this->assertEquals(
-            array(
+            [
                 'basedn' => 'test',
-                'bindpw' => 'a'
-            ),
+                'bindpw' => 'a',
+            ],
             $factory->getConfiguration()
         );
     }

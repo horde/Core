@@ -9,8 +9,10 @@
  * @author   Gunnar Wrobel <wrobel@pardus.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
+
 namespace Horde\Core\Factory;
-use \PHPUnit\Framework\TestCase;
+
+use PHPUnit\Framework\TestCase;
 
 /**
  * Test the Kolab_Session factory.

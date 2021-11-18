@@ -1,5 +1,7 @@
 <?php
+
 namespace Horde\Core\Mock;
+
 /**
  * Mock the IMP_Mailbox class
  *

@@ -1,8 +1,10 @@
 <?php
+
 namespace Horde\Core\Test;
 
 use PHPUnit\Framework\TestCase;
-use \Horde;
+use Horde;
+
 /**
  * @author     Jan Schneider <jan@horde.org>
  * @license    http://www.horde.org/licenses/lgpl21 LGPL 2.1
@@ -16,7 +18,7 @@ class UrlTest extends TestCase
     {
         $sname = session_name();
 
-        $expected = array(
+        $expected = [
             '/hordeurl/test.php',
             '/hordeurl/test.php?' . $sname,
             '/hordeurl/test.php',
@@ -257,18 +259,18 @@ class UrlTest extends TestCase
             'http://example.com:443/hordeurl/test.php?foo=1&bar=2&baz=3&' . $sname,
             'http://example.com:443/hordeurl/test.php?foo=1&bar=2&baz=3',
             'http://example.com:443/hordeurl/test.php?foo=1&bar=2&baz=3&' . $sname,
-        );
+        ];
 
-        $uris = array(
+        $uris = [
             'test.php',
             'test.php?foo=1',
             'test.php?foo=1&bar=2',
             'test.php?foo=1&amp;bar=2',
-            'test.php?foo=1&amp;bar=2&amp;baz=3'
-        );
-        $fulls = array(false, true);
-        $ssls = array(0, 1, 3);
-        $ports = array(80, 443);
+            'test.php?foo=1&amp;bar=2&amp;baz=3',
+        ];
+        $fulls = [false, true];
+        $ssls = [0, 1, 3];
+        $ports = [80, 443];
         $expect = 0;
         $GLOBALS['registry'] = new Registry();
         $GLOBALS['conf']['server']['name'] = 'example.com';
@@ -279,12 +281,12 @@ class UrlTest extends TestCase
                     $GLOBALS['conf']['use_ssl'] = $ssl;
                     foreach ($ports as $port) {
                         $GLOBALS['conf']['server']['port'] = $port;
-                        $this->assertEquals($expected[$expect++], (string)Horde::url($uri, $full, array('append_session' => -1)), sprintf('URI: %s, full: %s, SSL: %s, port: %d, session: -1', $uri, var_export($full, true), $ssl, $port));
+                        $this->assertEquals($expected[$expect++], (string)Horde::url($uri, $full, ['append_session' => -1]), sprintf('URI: %s, full: %s, SSL: %s, port: %d, session: -1', $uri, var_export($full, true), $ssl, $port));
                         unset($_COOKIE[session_name()]);
-                        $this->assertEquals($expected[$expect++], (string)Horde::url($uri, $full, array('append_session' => 0)), sprintf('URI: %s, full: %s, SSL: %s, port: %d, session: 0, cookie: false', $uri, var_export($full, true), $ssl, $port));
-                        $_COOKIE[session_name()] = array();
-                        $this->assertEquals($expected[$expect++], (string)Horde::url($uri, $full, array('append_session' => 0)), sprintf('URI: %s, full: %s, SSL: %s, port: %d, session: 0, cookie: true', $uri, var_export($full, true), $ssl, $port));
-                        $this->assertEquals($expected[$expect++], (string)Horde::url($uri, $full, array('append_session' => 1)), sprintf('URI: %s, full: %s, SSL: %s, port: %d, session: 1, cookie: true', $uri, var_export($full, true), $ssl, $port));
+                        $this->assertEquals($expected[$expect++], (string)Horde::url($uri, $full, ['append_session' => 0]), sprintf('URI: %s, full: %s, SSL: %s, port: %d, session: 0, cookie: false', $uri, var_export($full, true), $ssl, $port));
+                        $_COOKIE[session_name()] = [];
+                        $this->assertEquals($expected[$expect++], (string)Horde::url($uri, $full, ['append_session' => 0]), sprintf('URI: %s, full: %s, SSL: %s, port: %d, session: 0, cookie: true', $uri, var_export($full, true), $ssl, $port));
+                        $this->assertEquals($expected[$expect++], (string)Horde::url($uri, $full, ['append_session' => 1]), sprintf('URI: %s, full: %s, SSL: %s, port: %d, session: 1, cookie: true', $uri, var_export($full, true), $ssl, $port));
                     }
                 }
             }
@@ -299,13 +301,16 @@ class UrlTest extends TestCase
 
         $this->assertEquals(
             'http://www.example.com/hordeurl/foo',
-            (string)Horde::url('foo', true, array('append_session' => -1)));
+            (string)Horde::url('foo', true, ['append_session' => -1])
+        );
         $this->assertEquals(
             'http://www.example.com/hordeurl/foo',
-            (string)Horde::url('/hordeurl/foo', true, array('append_session' => -1)));
+            (string)Horde::url('/hordeurl/foo', true, ['append_session' => -1])
+        );
         $this->assertEquals(
             'http://www.example.com/hordeurl/foo/bar',
-            (string)Horde::url('http://www.example.com/hordeurl/foo/bar', true, array('append_session' => -1)));
+            (string)Horde::url('http://www.example.com/hordeurl/foo/bar', true, ['append_session' => -1])
+        );
     }
 
     public function testBug9712()
@@ -318,7 +323,7 @@ class UrlTest extends TestCase
 
         $this->assertEquals(
             'https://example.com:1443/foo',
-            strval(Horde::url('https://example.com:1443/foo', true, array('append_session' => -1)))
+            strval(Horde::url('https://example.com:1443/foo', true, ['append_session' => -1]))
         );
     }
 
@@ -480,6 +485,6 @@ class Browser
 
     public function usingSSLConnection()
     {
-      return false;
+        return false;
     }
 }
