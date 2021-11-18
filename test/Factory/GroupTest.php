@@ -9,10 +9,12 @@
  * @author   Gunnar Wrobel <wrobel@pardus.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
+
 namespace Horde\Core\Factory;
-use \PHPUnit\Framework\TestCase;
-use \Horde_Injector;
-use \Horde_Injector_TopLevel;
+
+use PHPUnit\Framework\TestCase;
+use Horde_Injector;
+use Horde_Injector_TopLevel;
 
 /**
  * Test the Group factory.

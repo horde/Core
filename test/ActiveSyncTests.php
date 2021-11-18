@@ -7,13 +7,14 @@
  * @package    Core
  * @subpackage UnitTests
  */
+
 namespace Horde\Core\Test;
 
 use Horde\Test\TestCase;
 use Horde\Core\Mock\MockConnector;
 use Horde\Core\Mock\MockIMPMailbox;
 
-use \Horde_Date;
+use Horde_Date;
 
  /**
  * Unit tests for ActiveSync functionality in Core.
@@ -38,246 +39,246 @@ class ActiveSyncTests extends TestCase
 
     public function _setupDeepStructure()
     {
-        $this->_mailboxes = array(
-            'INBOX' => array(
+        $this->_mailboxes = [
+            'INBOX' => [
                 'a' => 40,
                 'd' => '.',
                 'label' => 'Inbox',
                 'level' => 0,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'INBOX.Drafts' => array(
+            'INBOX.Drafts' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'Drafts',
                 'level' => 0,
-                'ob' =>$this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' =>$this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'INBOX.Saved Emails' => array(
+            'INBOX.Saved Emails' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'Saved Emails',
                 'level' => 0,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'INBOX.Saved Emails.ACS' => array(
+            'INBOX.Saved Emails.ACS' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'Saved Emails.ACS',
                 'level' => 1,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'INBOX.Saved Emails.Amazon' => array(
+            'INBOX.Saved Emails.Amazon' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'Saved Emails.Amazon',
                 'level' => 1,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'INBOX.Saved Emails.Computer Stuff' => array(
+            'INBOX.Saved Emails.Computer Stuff' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'Saved Emails.Computer Stuff',
                 'level' => 1,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'INBOX.Saved Emails.Computer Stuff.Mailing Lists' => array(
+            'INBOX.Saved Emails.Computer Stuff.Mailing Lists' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'Saved Emails.Computer Stuff.Mailing Lists',
                 'level' => 2,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'INBOX.Saved Emails.Computer Stuff.Mailing Lists.Horde' => array(
+            'INBOX.Saved Emails.Computer Stuff.Mailing Lists.Horde' => [
                 'a' => 40,
                 'd' => '.',
                 'label' => 'Saved Emails.Computer Stuff.Mailing Lists.Horde',
                 'level' => 3,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'INBOX.Saved Emails.Computer Stuff.Mailing Lists.Horde.Archived Horde' => array(
+            'INBOX.Saved Emails.Computer Stuff.Mailing Lists.Horde.Archived Horde' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'Saved Emails.Computer Stuff.Mailing Lists.Horde.Archived Horde',
                 'level' => 4,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'INBOX.Saved Emails.Computer Stuff.Mailing Lists.Horde.BugsHordeOrg' => array(
+            'INBOX.Saved Emails.Computer Stuff.Mailing Lists.Horde.BugsHordeOrg' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'Saved Emails.Computer Stuff.Mailing Lists.Horde.BugsHordeOrg',
                 'level' => 4,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'INBOX.Sent' => array(
+            'INBOX.Sent' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'Sent',
                 'level' => 0,
-                'ob' =>$this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' =>$this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'INBOX.Spam' => array(
+            'INBOX.Spam' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'Spam',
                 'level' => 0,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'INBOX.Trash' => array(
+            'INBOX.Trash' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'Trash',
                 'level' => 0,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'user.benjamin' => array(
+            'user.benjamin' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'user.benjamin',
                 'level' => 1,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'user.benjamin.Drafts' => array(
+            'user.benjamin.Drafts' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'user.benjamin.Drafts',
                 'level' => 2,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'user.benjamin.Saved Emails' => array(
+            'user.benjamin.Saved Emails' => [
                 'a' => 8,
                 'd' => '.',
                 'label' =>'user.benjamin.Saved Emails',
                 'level' => 2,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'user.benjamin.Sent' => array(
+            'user.benjamin.Sent' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'user.benjamin.Sent',
                 'level' => 2,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'user.benjamin.Spam' => array(
+            'user.benjamin.Spam' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'user.benjamin.Spam',
                 'level' => 2,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'user.benjamin.Trash' => array(
+            'user.benjamin.Trash' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'user.benjamin.Trash',
                 'level' => 2,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'user.chiarina' => array(
+            'user.chiarina' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'user.chiarina',
                 'level' => 1,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'user.chiarina.Drafts' => array(
+            'user.chiarina.Drafts' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'user.chiarina.Drafts',
                 'level' => 2,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'user.chiarina.Saved Emails' => array(
+            'user.chiarina.Saved Emails' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'user.chiarina.Saved Emails',
                 'level' => 2,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'user.chiarina.Sent' => array(
+            'user.chiarina.Sent' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'user.chiarina.Sent',
                 'level' => 2,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'user.chiarina.Spam' => array(
+            'user.chiarina.Spam' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'user.chiarina.Spam',
                 'level' => 2,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
-            'user.chiarina.Trash' => array(
+            'user.chiarina.Trash' => [
                 'a' => 8,
                 'd' => '.',
                 'label' => 'user.chiarina.Trash',
                 'level' => 2,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
-        );
-        $this->_special = array(
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
+        ];
+        $this->_special = [
             'composetemplates' => new MockIMPMailbox('Templates'),
             'drafts' => new MockIMPMailbox('INBOX.Drafts'),
             'sent' => new MockIMPMailbox('INBOX.Sent'),
             'spam' => new MockIMPMailbox('INBOX.Spam'),
-            'trash' => new MockIMPMailbox('INBOX.Trash')
-        );
+            'trash' => new MockIMPMailbox('INBOX.Trash'),
+        ];
     }
 
     public function _setUpMailTest()
     {
-        $this->_mailboxes = array(
-            'INBOX' => array(
+        $this->_mailboxes = [
+            'INBOX' => [
                 'a' => 40,
                 'd' => '/',
                 'label' =>'Inbox',
                 'level' => 0,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
-            'sent-mail' => array(
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
+            'sent-mail' => [
                 'a'=> 8,
                 'd' => '/',
                 'label' => 'Sent',
                 'level' => 0,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
-            'Draft' => array(
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
+            'Draft' => [
                 'a' => 8,
                 'd' => '/',
                 'label' => 'Drafts',
                 'level' => 0,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
-            'spam_folder' => array(
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
+            'spam_folder' => [
                 'a' => 8,
                 'd' => '/',
                 'label' => 'Spam',
                 'level' => 0,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
-            'One' => array(
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
+            'One' => [
                 'a' => 12,
                 'd' => '/',
                 'label' => 'One',
                 'level' => 0,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
-            'One/Two' => array(
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
+            'One/Two' => [
                 'a' => 12,
                 'd' => '/',
                 'label' => 'One/Two',
                 'level' => 1,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox')),
-            'One/Two/Three' => array(
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
+            'One/Two/Three' => [
                 'a' => 8,
                 'd' => '/',
                 'label' => 'One/Two/Three',
                 'level' => 2,
-                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'))
-        );
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
+        ];
 
-        $this->_special = array(
+        $this->_special = [
             'composetemplates' => new MockIMPMailbox('Templates'),
             'drafts' => new MockIMPMailbox('Draft'),
             'sent' => new MockIMPMailbox('sent-mail'),
             'spam' => new MockIMPMailbox('Spam'),
             'trash' => new MockIMPMailbox('Trash'),
-            'userhook' => array()
-        );
+            'userhook' => [],
+        ];
     }
 
     public function testGetFolderWithDeepFolderStructureAndPeriodDelimiter()
@@ -286,11 +287,11 @@ class ActiveSyncTests extends TestCase
         $adapter = $this->getMockSkipConstructor('Horde_ActiveSync_Imap_Adapter');
         $adapter->expects($this->once())->method('getMailboxes')->will($this->returnValue($this->_mailboxes));
         $adapter->expects($this->any())->method('getSpecialMailboxes')->will($this->returnValue($this->_special));
-        $driver = new Horde_Core_ActiveSync_Driver(array(
+        $driver = new Horde_Core_ActiveSync_Driver([
             'state' => $this->_state,
             'connector' => new MockConnector(),
             'auth' => $this->_auth,
-            'imap' => $adapter));
+            'imap' => $adapter, ]);
         $folders = $driver->getFolders();
 
         // Test the EAS Type of each special folder
@@ -346,18 +347,18 @@ class ActiveSyncTests extends TestCase
 
     public function testGetFoldersWhenEmailSupportDisabled()
     {
-        $driver = new Horde_Core_ActiveSync_Driver(array(
+        $driver = new Horde_Core_ActiveSync_Driver([
             'state' => $this->_state,
             'connector' => new MockConnector(),
             'auth' => $this->_auth,
-            'imap' => false));
+            'imap' => false, ]);
 
         $folders = $driver->getFolders();
-        $have = array(
+        $have = [
             'Trash' => false,
             'Sent' => false,
-            'INBOX' => false
-        );
+            'INBOX' => false,
+        ];
         foreach ($folders as $f) {
             $have[$f->_serverid] = true;
             switch ($f->_serverid) {
@@ -374,13 +375,11 @@ class ActiveSyncTests extends TestCase
         }
 
         // Make sure we have them all.
-        foreach (array('INBOX', 'Trash', 'Sent') as $test) {
+        foreach (['INBOX', 'Trash', 'Sent'] as $test) {
             if (!$have[$test]) {
                 $this->fail('Missing ' . $test);
             }
         }
-
-
     }
 
     public function testGetFoldersWithForwardSlashDelimiter()
@@ -389,17 +388,17 @@ class ActiveSyncTests extends TestCase
         $adapter = $this->getMockSkipConstructor('Horde_ActiveSync_Imap_Adapter');
         $adapter->expects($this->once())->method('getMailboxes')->will($this->returnValue($this->_mailboxes));
         $adapter->expects($this->any())->method('getSpecialMailboxes')->will($this->returnValue($this->_special));
-        $driver = new Horde_Core_ActiveSync_Driver(array(
+        $driver = new Horde_Core_ActiveSync_Driver([
             'state' => $this->_state,
             'connector' => new MockConnector(),
             'auth' => $this->_auth,
-            'imap' => $adapter));
+            'imap' => $adapter, ]);
         $folders = $driver->getFolders();
-        $have = array(
+        $have = [
             'Draft' => false,
             'INBOX' => false,
             'sent-mail' => false,
-            'spam_folder' => false);
+            'spam_folder' => false, ];
 
         // Test the EAS Type of each special folder
         foreach ($folders as $f) {
@@ -430,7 +429,7 @@ class ActiveSyncTests extends TestCase
         }
 
         // Make sure we have them all.
-        foreach (array('Draft', 'INBOX', 'sent-mail', 'spam_folder', 'One', 'One/Two', 'One/Two/Three') as $test) {
+        foreach (['Draft', 'INBOX', 'sent-mail', 'spam_folder', 'One', 'One/Two', 'One/Two/Three'] as $test) {
             if (!$have[$test]) {
                 $this->fail('Missing ' . $test);
             }
@@ -445,19 +444,19 @@ class ActiveSyncTests extends TestCase
     public function testFbGeneration()
     {
         $connector = new MockConnector();
-        $driver = new Horde_Core_ActiveSync_Driver(array(
+        $driver = new Horde_Core_ActiveSync_Driver([
             'state' => $this->_state,
             'connector' => $connector,
             'auth' => $this->_auth,
-            'imap' => null));
+            'imap' => null, ]);
 
         $fixture = new stdClass();
         $fixture->s = '20130529';
         $fixture->e = '20130628';
-        $fixture->b = array(
+        $fixture->b = [
             '1369850400' => 1369854000,  // 5/29 2:00PM - 3:00PM EDT
-            '1370721600' => 1370728800
-        );
+            '1370721600' => 1370728800,
+        ];
 
         // Times requested by the client in a RESOLVERECIPIENTS request.
         $start = new Horde_Date('2013-05-29T03:00:00.000Z'); // 5/28 11:00PM EDT

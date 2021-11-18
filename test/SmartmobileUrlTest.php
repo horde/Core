@@ -1,10 +1,11 @@
 <?php
+
 namespace Horde\Core\Test;
 
 use Horde\Test\TestCase;
 
-use \Horde_Core_Smartmobile_Url as SmartmobileUrl;
-use \Horde_Url;
+use Horde_Core_Smartmobile_Url as SmartmobileUrl;
+use Horde_Url;
 use InvalidArgumentException;
 
 /**
@@ -25,14 +26,14 @@ class SmartmobileUrlTest extends TestCase
     public function testWithoutAnchor()
     {
         $url = new SmartmobileUrl(new Horde_Url('test'));
-        $url->add(array('foo' => 1, 'bar' => 2));
+        $url->add(['foo' => 1, 'bar' => 2]);
         $this->assertEquals('test?foo=1&amp;bar=2', (string)$url);
     }
 
     public function testWithAnchor()
     {
         $url = new SmartmobileUrl(new Horde_Url('test'));
-        $url->add(array('foo' => 1, 'bar' => 2));
+        $url->add(['foo' => 1, 'bar' => 2]);
         $url->setAnchor('anchor');
         $this->assertEquals('test#anchor?foo=1&amp;bar=2', (string)$url);
     }
@@ -42,7 +43,7 @@ class SmartmobileUrlTest extends TestCase
         $base = new Horde_Url('test');
         $base->add('foo', 0);
         $url = new SmartmobileUrl($base);
-        $url->add(array('foo' => 1, 'bar' => 2));
+        $url->add(['foo' => 1, 'bar' => 2]);
         $url->setAnchor('anchor');
         $this->assertEquals('test?foo=0#anchor?foo=1&amp;bar=2', (string)$url);
     }
@@ -52,7 +53,7 @@ class SmartmobileUrlTest extends TestCase
         $base = new Horde_Url('test');
         $base->add('foo', 0);
         $url = new SmartmobileUrl($base);
-        $url->add(array('foo' => 1, 'bar' => 2));
+        $url->add(['foo' => 1, 'bar' => 2]);
         $this->assertEquals('test?foo=1&amp;bar=2', (string)$url);
     }
 }

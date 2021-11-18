@@ -13,7 +13,7 @@
 
 namespace Horde\Core\Test\Stub;
 
-use \Horde_Registry_Registryconfig;
+use Horde_Registry_Registryconfig;
 
 /**
  * Wrapper around Horde_Registry to get access to _detectWebroot().

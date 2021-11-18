@@ -9,6 +9,7 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+
 namespace Horde\Core\Test;
 
 use Horde\Test\TestCase;
@@ -26,17 +27,17 @@ class ConfigStateTest extends TestCase
 {
     public function testFailsWhenNoGlobalsOrParam()
     {
-        if (isset($GLOBALS['conf'])){
+        if (isset($GLOBALS['conf'])) {
             unset($GLOBALS['conf']);
         }
         $this->expectException(\Horde_Exception::class);
-        $state = new State;
+        $state = new State();
         $this->assertEquals([], $state->toArray());
     }
 
     public function testPassedEqualsDump()
     {
-        if (isset($GLOBALS['conf'])){
+        if (isset($GLOBALS['conf'])) {
             unset($GLOBALS['conf']);
         }
         $param = ['foo' => 'bar'];

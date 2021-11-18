@@ -9,15 +9,17 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+
 namespace Horde\Core\Test\Middleware;
+
 use Horde\Core\Middleware\DemandSessionToken;
 
-use Horde\Test\Testcase;
+use Horde\Test\TestCase;
 
-use \Horde_Session;
-use \Horde_Exception;
+use Horde_Session;
+use Horde_Exception;
 
-class DemandSessionTokenTest extends Testcase
+class DemandSessionTokenTest extends TestCase
 {
     use SetUpTrait;
 
@@ -34,7 +36,7 @@ class DemandSessionTokenTest extends Testcase
     {
         $middleware = $this->getMiddleware();
 
-        $this->session->method('checkToken')->willThrowException(new Horde_Exception("test"));
+        $this->session->method('checkToken')->willThrowException(new Horde_Exception('test'));
         $request = $this->requestFactory->createServerRequest('GET', '/test');
         $response = $middleware->process($request, $this->handler);
 

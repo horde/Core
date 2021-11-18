@@ -9,16 +9,16 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+
 namespace Horde\Core\Test\Middleware;
 
 use Horde\Test\TestCase;
 use Horde\Core\Middleware\DemandAuthenticatedUser;
 
-use \Horde_Session;
-use \Horde_Exception;
+use Horde_Session;
+use Horde_Exception;
 
-
-class DemandAuthenticatedUserTest extends Testcase
+class DemandAuthenticatedUserTest extends TestCase
 {
     use SetUpTrait;
 
