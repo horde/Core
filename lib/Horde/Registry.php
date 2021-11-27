@@ -431,6 +431,7 @@ class Horde_Registry implements Horde_Shutdown_Task
             'Horde_Memcache' => 'Horde_Core_Factory_Memcache',
             'Horde_Nosql_Adapter' => 'Horde_Core_Factory_NosqlBase',
             'Horde_Notification' => 'Horde_Core_Factory_Notification',
+            'Horde_Notification_Handler' => 'Horde_Core_Factory_Notification',
             'Horde_Perms' => 'Horde_Core_Factory_Perms',
             'Horde_Queue_Storage' => 'Horde_Core_Factory_QueueStorage',
             'Horde_Routes_Mapper' => 'Horde_Core_Factory_Mapper',
