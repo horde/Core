@@ -78,8 +78,8 @@ class AppFinder implements MiddlewareInterface
      * - app lives below horde but document root is another app
      *    eg https://webmail.foo.org where / is imp, /horde is horde, /horde/turba is turba
      *
-     * @param RequestInterface $host    Request host part (www.foo.org)
-     * @param Horde_Registry  $registry         The Horde Registry
+     * @param ServerRequestInterface $request    Request object
+     * @param Horde_Registry  $registry    The Horde Registry
      */
     protected function identifyApp(ServerRequestInterface $request, Horde_Registry $registry)
     {
@@ -120,8 +120,8 @@ class AppFinder implements MiddlewareInterface
         usort(
             $matches,
             function ($a, $b) {
-            return strlen($a['path']) <=> strlen($b['path']);
-        }
+                return strlen($a['path']) <=> strlen($b['path']);
+            }
         );
         return array_pop($matches);
     }

@@ -861,7 +861,7 @@ class Horde_Registry implements Horde_Shutdown_Task
      *                        returned. Defaults to non-hidden.
      * @param boolean $assoc  Return hash with app names as keys and config
      *                        parameters as values?
-     * @param integer $perms  The permission level to check for in the list.
+     * @param int|null $perms  The permission level to check for in the list.
      *                        If null, skips permission check.
      *
      * @return array  List of apps registered with Horde. If no

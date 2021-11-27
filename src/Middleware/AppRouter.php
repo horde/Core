@@ -37,7 +37,7 @@ use Horde\Exception\HordeException;
  *
  *
  */
-class AppRouter implements MiddlewareInterface
+class AppRouter implements MiddlewareInterface, RequestHandlerInterface
 {
     private Router $router;
     private Horde_Registry $registry;
@@ -56,7 +56,7 @@ class AppRouter implements MiddlewareInterface
      * Depends on the AppFinder running first
      * This middleware really only works with the Rampage Runner
      *
-     * @param ServerRequestInterfacd $request
+     * @param ServerRequestInterface $request
      * @param RequestHandlerInterface $handler
      *
      * @return ResponseInterface
