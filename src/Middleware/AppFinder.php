@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Horde\Core\Middleware;
@@ -9,23 +10,23 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use \Horde_Registry;
+use Horde_Registry;
 
 /**
  * AppFinder middleware
  *
- * Purpose: 
- * 
+ * Purpose:
+ *
  * Scan through the Registry to find the correct app for the route
  * Setup attributes to enable the app-specific router middleware
- * 
+ *
  * Requires Attributes:
- * 
+ *
  * Sets Attributes:
  * - app
  * - prefix
- * 
- * 
+ *
+ *
  */
 class AppFinder implements MiddlewareInterface
 {
@@ -34,15 +35,15 @@ class AppFinder implements MiddlewareInterface
     {
         $this->registry = $registry;
     }
-     /**
-     * Rebuild a path string to a common form
-     *
-     * Remove any . and .. levels and parts made irrelevant by them
-     *
-     * @param string $path The input path
-     *
-     * @return string The normalized path
-     */
+    /**
+    * Rebuild a path string to a common form
+    *
+    * Remove any . and .. levels and parts made irrelevant by them
+    *
+    * @param string $path The input path
+    *
+    * @return string The normalized path
+    */
     protected function _normalize(string $path): string
     {
         $partsIn = explode('/', $path);
@@ -84,8 +85,7 @@ class AppFinder implements MiddlewareInterface
     {
         $matches = [];
         // listApps() would return empty on unauthenticated access
-        foreach ($registry->listApps(null, false, null) as $app)
-        {
+        foreach ($registry->listApps(null, false, null) as $app) {
             $scheme = $request->getUri()->getScheme();
             $host = $request->getUri()->getHost();
             $path = $request->getUri()->getPath();
@@ -94,17 +94,21 @@ class AppFinder implements MiddlewareInterface
                'scheme' => $scheme,
                'host' => $host,
                'path' => '',
-               'app' => $app
+               'app' => $app,
             ];
 
             $applicationUrl = array_merge($default, parse_url($registry->get('webroot', $app)));
             $applicationUrl['path'] = $this->_normalize($applicationUrl['path']);
             // sort out cases with wrong host or scheme
-            if ($scheme != $applicationUrl['scheme']) { continue; }
-            if ($host != $applicationUrl['host']) { continue; }
+            if ($scheme != $applicationUrl['scheme']) {
+                continue;
+            }
+            if ($host != $applicationUrl['host']) {
+                continue;
+            }
             // does the path match at all?
 
-            if (substr($path, 0, strlen($applicationUrl['path'])) == $applicationUrl['path']) {    
+            if (substr($path, 0, strlen($applicationUrl['path'])) == $applicationUrl['path']) {
                 $matches[] = $applicationUrl;
             }
         }
@@ -113,9 +117,10 @@ class AppFinder implements MiddlewareInterface
             return $matches;
         }
         // Longest match path *should* always be the right app
-        usort($matches, function($a, $b) 
-        {
-             return strlen($a['path']) <=> strlen($b['path']);
+        usort(
+            $matches,
+            function ($a, $b) {
+            return strlen($a['path']) <=> strlen($b['path']);
         }
         );
         return array_pop($matches);
@@ -123,7 +128,7 @@ class AppFinder implements MiddlewareInterface
 
 
     /**
-     * Configure the 
+     * Configure the
      *
      * If no found app fits, return the NotFound response.
      *
@@ -137,7 +142,7 @@ class AppFinder implements MiddlewareInterface
      * @param ServerRequestInterface $request The incoming request
      * @param RequestHandlerInterface $handler The request handler to configure
      *
-     * @return ResponseInterface The response from 
+     * @return ResponseInterface The response from
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

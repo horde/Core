@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Horde\Core\Middleware;
@@ -7,8 +8,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use \Horde_Registry;
-use \Horde_Application;
+use Horde_Registry;
+use Horde_Application;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
@@ -31,14 +32,12 @@ class HordeCore implements MiddlewareInterface
     {
         // run AppInit, implicitly load core
         // Using ::class would defeat the purpose here
-        if (!class_exists('Horde_Application'))
-        {
+        if (!class_exists('Horde_Application')) {
             throw new \Horde_Exception('Autoloading issue');
         }
-        if (!class_exists('Horde_Registry'))
-        {
+        if (!class_exists('Horde_Registry')) {
             throw new \Horde_Exception('Autoloading issue');
-        } 
+        }
         // This does way too much
         $hordeEnv = Horde_Registry::appInit('horde', ['authentication' => 'none']);
         // Bad! the injector should be part of the early init's response.

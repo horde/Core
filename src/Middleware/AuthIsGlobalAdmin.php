@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Horde\Core\Middleware;
@@ -8,12 +9,12 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use \Horde_Registry;
-use \Horde_Application;
+use Horde_Registry;
+use Horde_Application;
 use Horde_Controller;
 use Horde_Routes_Mapper as Router;
-use \Horde_String;
-use \Horde;
+use Horde_String;
+use Horde;
 use Horde\Core\UserPassport;
 
 /**
@@ -23,7 +24,7 @@ use Horde\Core\UserPassport;
  *
  * Sets Attributes:
  * - HORDE_GLOBAL_ADMIN if the user has that privilege
- * 
+ *
  */
 class AuthIsGlobalAdmin implements MiddlewareInterface
 {

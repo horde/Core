@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Horde\Core\Middleware;
@@ -13,10 +14,10 @@ use Psr\Http\Message\ResponseFactoryInterface;
 /**
  * DemandAuthenticatedUser middleware
  * Returns 401 response if not authenticated
- * 
- * Reads attribute: 
+ *
+ * Reads attribute:
  * - HORDE_AUTHENTICATED_USER the uid, if authenticated
- * 
+ *
  * @author    Mahdi Pasche <pasche@b1-systems.de>
  * @category  Horde
  * @copyright 2013-2021 Horde LLC

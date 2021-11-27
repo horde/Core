@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Horde\Core\Middleware;
@@ -10,14 +11,14 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use \Horde_Registry;
-use \Horde_Session;
-use \Horde_Exception;
+use Horde_Registry;
+use Horde_Session;
+use Horde_Exception;
 
 /**
  * DemandSessionToken middleware
  * Checks if the current session token is in the Horde-Session-Token header.
- * 
+ *
  * @author    Mahdi Pasche <pasche@b1-systems.de>
  * @category  Horde
  * @copyright 2013-2021 Horde LLC
@@ -34,8 +35,7 @@ class DemandSessionToken implements MiddlewareInterface
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface $streamFactory,
         Horde_Session $session
-    )
-    {
+    ) {
         $this->responseFactory = $responseFactory;
         $this->streamFactory = $streamFactory;
         $this->session = $session;
@@ -44,10 +44,10 @@ class DemandSessionToken implements MiddlewareInterface
     /**
      * Checks for a valid session token
      * Returns 403 response if token is invalid or not found
-     * 
+     *
      * @param ServerRequestInterface $request
      * @param RequestHandlerInterface $handler
-     * 
+     *
      * @return ResponseInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface

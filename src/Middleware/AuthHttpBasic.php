@@ -57,7 +57,7 @@ class AuthHttpBasic implements MiddlewareInterface
             if (!substr($headerValue, 0, 5) == 'BASIC') {
                 continue;
             }
-            list($user, $password) = explode(':', base64_decode(substr($headerValue, 6)), 2);
+            [$user, $password] = explode(':', base64_decode(substr($headerValue, 6)), 2);
             // Check credentials
             if ($this->driver->authenticate($user, ['password' => $password])) {
                 $request = $request->withAttribute('HORDE_AUTHENTICATED_USER', $user);

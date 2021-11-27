@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Horde\Core\Middleware;
@@ -8,12 +9,12 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use \Horde_Registry;
-use \Horde_Application;
+use Horde_Registry;
+use Horde_Application;
 use Horde_Controller;
 use Horde_Routes_Mapper as Router;
-use \Horde_String;
-use \Horde;
+use Horde_String;
+use Horde;
 use Horde\Core\UserPassport;
 use Psr\Http\Message\ResponseFactoryInterface;
 
@@ -21,10 +22,10 @@ use Psr\Http\Message\ResponseFactoryInterface;
  * RedirectToLogin middleware
  *
  * Purpose: Redirect to login if not authenticated
- * 
- * Reads attribute: 
+ *
+ * Reads attribute:
  * - HORDE_AUTHENTICATED_USER the uid, if authenticated
- * 
+ *
  */
 class RedirectToLogin implements MiddlewareInterface
 {

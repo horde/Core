@@ -11,6 +11,7 @@
  * @package  Core
  */
 declare(strict_types=1);
+
 namespace Horde\Core\Config;
 
 /**

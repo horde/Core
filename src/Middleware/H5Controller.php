@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Horde\Core\Middleware;
@@ -7,11 +8,11 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use \Horde_Registry;
-use \Horde_Application;
+use Horde_Registry;
+use Horde_Application;
 use Horde\Controller\Request\Psr7Wrapper;
-use \Horde_Controller as Controller;
-use \Horde_Controller_Response as H5Response;
+use Horde_Controller as Controller;
+use Horde_Controller_Response as H5Response;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Horde\Controller\Response\Psr7Adapter;
 use Horde\Http\Stream;
@@ -20,17 +21,17 @@ use Psr\Http\Message\StreamFactoryInterface;
 /**
  * H5Controller middleware
  *
- * Purpose: 
- * 
+ * Purpose:
+ *
  * Wraps and runs a traditional Horde_Controller for BC
- * 
+ *
  * Intended to run as bottom of stack
- * 
+ *
  * Requires Attributes:
- * 
+ *
  * Sets Attributes:
- * 
- * 
+ *
+ *
  */
 class H5Controller implements MiddlewareInterface
 {
@@ -39,11 +40,10 @@ class H5Controller implements MiddlewareInterface
     private StreamFactoryInterface $streamFactory;
 
     public function __construct(
-        Controller $controller, 
+        Controller $controller,
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface $streamFactory
-    )
-    {
+    ) {
         $this->controller = $controller;
         $this->responseFactory = $responseFactory;
         $this->streamFactory = $streamFactory;

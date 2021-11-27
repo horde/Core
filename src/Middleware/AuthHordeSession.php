@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Horde\Core\Middleware;
@@ -8,24 +9,24 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use \Horde_Registry;
-use \Horde_Application;
+use Horde_Registry;
+use Horde_Application;
 use Horde_Controller;
 use Horde_Routes_Mapper as Router;
-use \Horde_String;
-use \Horde;
+use Horde_String;
+use Horde;
 
 /**
  * AuthHordeSession middleware
  *
  * Purpose: Identify the session as either user or a guest
- * 
- * 
- * 
+ *
+ *
+ *
  * Sets Attributes:
  * - HORDE_AUTHENTICATED_USER the uid, if authenticated
  * - HORDE_GUEST true if not authenticated
- * 
+ *
  */
 class AuthHordeSession implements MiddlewareInterface
 {
