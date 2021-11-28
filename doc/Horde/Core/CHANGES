@@ -2,7 +2,8 @@
 v3.0.0alpha7
 ------------
 
-
+[rla] Added PSR-3 Logger Factory to the default set.
+|+
 
 
 ------------
