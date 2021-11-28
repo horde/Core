@@ -451,7 +451,8 @@ class Horde_Registry implements Horde_Shutdown_Task
             'Horde_Weather' => 'Horde_Core_Factory_Weather',
             'Net_DNS2_Resolver' => 'Horde_Core_Factory_Dns',
             'Text_LanguageDetect' => 'Horde_Core_Factory_LanguageDetect',
-            Horde\Core\Middleware\AuthHttpBasic::class => Horde\Core\Factory\AuthHttpBasicFactory::class
+            Horde\Core\Middleware\AuthHttpBasic::class => Horde\Core\Factory\AuthHttpBasicFactory::class,
+            Horde\Log\Logger::class => Horde\Core\Factory\LoggerFactory::class
         );
 
         /* Define implementations. */

@@ -12,6 +12,7 @@ use Horde_Core_Factory_Injector;
 use Horde\Log\Logger;
 use Horde\Core\Config\State;
 use Horde\Injector\Injector;
+use Horde\Log\Filter\MaximumLevelFilter;
 use Horde\Log\Formatter\Psr3Formatter;
 use Horde\Log\Formatter\SimpleFormatter;
 use Horde\Log\Formatter\XmlFormatter;
@@ -124,7 +125,7 @@ class LogHandlerFactory extends Horde_Core_Factory_Injector
                 : 'NOTICE';
             break;
         }
-        $handler->addFilter(constant('Horde_Log::' . $priority));
+        $handler->addFilter(new MaximumLevelFilter(constant('Horde_Log::' . $priority)));
         return $handler;
     }
 
