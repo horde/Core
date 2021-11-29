@@ -11,6 +11,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Horde\Http\Server\RampageRequestHandler;
 use Horde_Registry;
 use Horde_Application;
 use Horde_Controller;
@@ -37,7 +38,7 @@ use Horde\Exception\HordeException;
  *
  *
  */
-class AppRouter implements MiddlewareInterface, RequestHandlerInterface
+class AppRouter extends RampageRequestHandler implements MiddlewareInterface, RequestHandlerInterface
 {
     private Router $router;
     private Horde_Registry $registry;
@@ -161,4 +162,5 @@ class AppRouter implements MiddlewareInterface, RequestHandlerInterface
         }
         return $handler->handle($request);
     }
+
 }
