@@ -28,7 +28,7 @@
   <email>slusarz@horde.org</email>
   <active>no</active>
  </developer>
- <date>2021-10-12</date>
+ <date>2021-11-29</date>
  <version>
   <release>3.0.0alpha8</release>
   <api>3.0.0alpha1</api>
@@ -39,7 +39,7 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
  <notes>
-* 
+* |+
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -1007,6 +1007,8 @@
     </dir> <!-- /src/Config -->
     <dir name="Factory">
      <file name="AuthHttpBasicFactory.php" role="php" />
+     <file name="LoggerFactory.php" role="php" />
+     <file name="LogHandlerFactory.php" role="php" />
     </dir> <!-- /src/Factory -->
     <dir name="Middleware">
      <file name="AppFinder.php" role="php" />
@@ -1026,36 +1028,36 @@
     <file name="RampageBootstrap.php" role="php" />
    </dir> <!-- /src -->
    <dir name="test">
-    <dir name="Horde">
-     <dir name="Core">
-      <dir name="Factory">
-       <file name="GroupTest.php" role="test" />
-       <file name="KolabServerTest.php" role="test" />
-       <file name="KolabSessionTest.php" role="test" />
-      </dir> <!-- /test/Horde/Core/Factory -->
-      <dir name="Middleware">
-       <file name="DemandAuthenticatedUserTest.php" role="test" />
-       <file name="DemandSessionTokenTest.php" role="test" />
-       <file name="SetUpTrait.php" role="test" />
-      </dir> <!-- /test/Horde/Core/Middleware -->
-      <dir name="Mock">
-       <file name="MockConnector.php" role="test" />
-       <file name="MockIMPMailbox.php" role="test" />
-      </dir> <!-- /test/Horde/Core/Mock -->
-      <dir name="Stub">
-       <file name="Registryconfig.php" role="test" />
-      </dir> <!-- /test/Horde/Core/Stub -->
-      <file name="ActiveSyncTests.php" role="test" />
-      <file name="AllTests.php" role="test" />
-      <file name="bootstrap.php" role="test" />
-      <file name="ConfigStateTest.php" role="test" />
-      <file name="NlsconfigTest.php" role="test" />
-      <file name="RegistryTest.php" role="test" />
-      <file name="SmartmobileUrlTest.php" role="test" />
-      <file name="UrlTest.php" role="test" />
-     </dir> <!-- /test/Horde/Core -->
-    </dir> <!-- /test/Horde -->
+    <dir name="Factory">
+     <file name="GroupTest.php" role="test" />
+     <file name="KolabServerTest.php" role="test" />
+     <file name="KolabSessionTest.php" role="test" />
+    </dir> <!-- /test/Factory -->
+    <dir name="Middleware">
+     <file name="AuthHordeSessionTest.php" role="test" />
+     <file name="AuthHttpBasicTest.php" role="test" />
+     <file name="DemandAuthenticatedUserTest.php" role="test" />
+     <file name="DemandAuthHeaderTest.php" role="test" />
+     <file name="DemandSessionTokenTest.php" role="test" />
+     <file name="SetUpTrait.php" role="test" />
+    </dir> <!-- /test/Middleware -->
+    <dir name="Mock">
+     <file name="MockConnector.php" role="test" />
+     <file name="MockIMPMailbox.php" role="test" />
+    </dir> <!-- /test/Mock -->
+    <dir name="Stub">
+     <file name="Registryconfig.php" role="test" />
+    </dir> <!-- /test/Stub -->
+    <file name="ActiveSyncTests.php" role="test" />
+    <file name="AllTests.php" role="test" />
+    <file name="bootstrap.php" role="test" />
+    <file name="ConfigStateTest.php" role="test" />
+    <file name="NlsconfigTest.php" role="test" />
+    <file name="RegistryTest.php" role="test" />
+    <file name="SmartmobileUrlTest.php" role="test" />
+    <file name="UrlTest.php" role="test" />
    </dir> <!-- /test -->
+   <file name=".php-cs-fixer.dist.php" role="php" />
    <file name="LICENSE" role="doc" />
   </dir> <!-- / -->
  </contents>
@@ -1100,6 +1102,7 @@
    <install as="workflows/release.yml" name=".github/workflows/release.yml" />
    <install as="workflows/update-composer-json.yml" name=".github/workflows/update-composer-json.yml" />
    <install as="workflows/update-satis.yml" name=".github/workflows/update-satis.yml" />
+   <install as="" name=".php-cs-fixer.dist.php" />
    <install as="components.conf" name="doc/components.conf" />
    <install as="CHANGES" name="doc/Horde/Core/CHANGES" />
    <install as="js/accesskeys.js" name="js/accesskeys.js" />
@@ -1668,6 +1671,8 @@
    <install as="migration/1_horde_core_base_tables.php" name="migration/Horde/Core/1_horde_core_base_tables.php" />
    <install as="Config/State.php" name="src/Config/State.php" />
    <install as="Factory/AuthHttpBasicFactory.php" name="src/Factory/AuthHttpBasicFactory.php" />
+   <install as="Factory/LoggerFactory.php" name="src/Factory/LoggerFactory.php" />
+   <install as="Factory/LogHandlerFactory.php" name="src/Factory/LogHandlerFactory.php" />
    <install as="Middleware/AppFinder.php" name="src/Middleware/AppFinder.php" />
    <install as="Middleware/AppRouter.php" name="src/Middleware/AppRouter.php" />
    <install as="Middleware/AuthHasPermission.php" name="src/Middleware/AuthHasPermission.php" />
@@ -1682,23 +1687,26 @@
    <install as="Middleware/HordeCore.php" name="src/Middleware/HordeCore.php" />
    <install as="Middleware/RedirectToLogin.php" name="src/Middleware/RedirectToLogin.php" />
    <install as="RampageBootstrap.php" name="src/RampageBootstrap.php" />
-   <install as="Horde/Core/ActiveSyncTests.php" name="test/Horde/Core/ActiveSyncTests.php" />
-   <install as="Horde/Core/AllTests.php" name="test/Horde/Core/AllTests.php" />
-   <install as="Horde/Core/bootstrap.php" name="test/Horde/Core/bootstrap.php" />
-   <install as="Horde/Core/ConfigStateTest.php" name="test/Horde/Core/ConfigStateTest.php" />
-   <install as="Horde/Core/Factory/GroupTest.php" name="test/Horde/Core/Factory/GroupTest.php" />
-   <install as="Horde/Core/Factory/KolabServerTest.php" name="test/Horde/Core/Factory/KolabServerTest.php" />
-   <install as="Horde/Core/Factory/KolabSessionTest.php" name="test/Horde/Core/Factory/KolabSessionTest.php" />
-   <install as="Horde/Core/Middleware/DemandAuthenticatedUserTest.php" name="test/Horde/Core/Middleware/DemandAuthenticatedUserTest.php" />
-   <install as="Horde/Core/Middleware/DemandSessionTokenTest.php" name="test/Horde/Core/Middleware/DemandSessionTokenTest.php" />
-   <install as="Horde/Core/Middleware/SetUpTrait.php" name="test/Horde/Core/Middleware/SetUpTrait.php" />
-   <install as="Horde/Core/Mock/MockConnector.php" name="test/Horde/Core/Mock/MockConnector.php" />
-   <install as="Horde/Core/Mock/MockIMPMailbox.php" name="test/Horde/Core/Mock/MockIMPMailbox.php" />
-   <install as="Horde/Core/NlsconfigTest.php" name="test/Horde/Core/NlsconfigTest.php" />
-   <install as="Horde/Core/RegistryTest.php" name="test/Horde/Core/RegistryTest.php" />
-   <install as="Horde/Core/SmartmobileUrlTest.php" name="test/Horde/Core/SmartmobileUrlTest.php" />
-   <install as="Horde/Core/Stub/Registryconfig.php" name="test/Horde/Core/Stub/Registryconfig.php" />
-   <install as="Horde/Core/UrlTest.php" name="test/Horde/Core/UrlTest.php" />
+   <install as="ActiveSyncTests.php" name="test/ActiveSyncTests.php" />
+   <install as="AllTests.php" name="test/AllTests.php" />
+   <install as="bootstrap.php" name="test/bootstrap.php" />
+   <install as="ConfigStateTest.php" name="test/ConfigStateTest.php" />
+   <install as="Factory/GroupTest.php" name="test/Factory/GroupTest.php" />
+   <install as="Factory/KolabServerTest.php" name="test/Factory/KolabServerTest.php" />
+   <install as="Factory/KolabSessionTest.php" name="test/Factory/KolabSessionTest.php" />
+   <install as="Middleware/AuthHordeSessionTest.php" name="test/Middleware/AuthHordeSessionTest.php" />
+   <install as="Middleware/AuthHttpBasicTest.php" name="test/Middleware/AuthHttpBasicTest.php" />
+   <install as="Middleware/DemandAuthenticatedUserTest.php" name="test/Middleware/DemandAuthenticatedUserTest.php" />
+   <install as="Middleware/DemandAuthHeaderTest.php" name="test/Middleware/DemandAuthHeaderTest.php" />
+   <install as="Middleware/DemandSessionTokenTest.php" name="test/Middleware/DemandSessionTokenTest.php" />
+   <install as="Middleware/SetUpTrait.php" name="test/Middleware/SetUpTrait.php" />
+   <install as="Mock/MockConnector.php" name="test/Mock/MockConnector.php" />
+   <install as="Mock/MockIMPMailbox.php" name="test/Mock/MockIMPMailbox.php" />
+   <install as="NlsconfigTest.php" name="test/NlsconfigTest.php" />
+   <install as="RegistryTest.php" name="test/RegistryTest.php" />
+   <install as="SmartmobileUrlTest.php" name="test/SmartmobileUrlTest.php" />
+   <install as="Stub/Registryconfig.php" name="test/Stub/Registryconfig.php" />
+   <install as="UrlTest.php" name="test/UrlTest.php" />
   </filelist>
  </phprelease>
  <changelog>
@@ -4670,7 +4678,7 @@
   <release>
    <version>
     <release>3.0.0alpha8</release>
-    <api>3.0.0alpha6</api>
+    <api>3.0.0alpha1</api>
    </version>
    <stability>
     <release>alpha</release>
@@ -4679,7 +4687,7 @@
    <date>2021-10-12</date>
    <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
    <notes>
-* 
+* |+
    </notes>
   </release>
  </changelog>
