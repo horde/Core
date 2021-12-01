@@ -26,11 +26,11 @@
             "role": "developer"
         }
     ],
-    "time": "2021-11-29",
+    "time": "2021-12-01",
     "repositories": [
         {
             "type": "composer",
-            "url": "https://horde-satis.maintaina.com"
+            "url": "https://horde-satis.maintaina.com/"
         }
     ],
     "require": {

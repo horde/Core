@@ -2,7 +2,8 @@
 v3.0.0alpha9
 ------------
 
-
+[rla] Add support for namespaced Application, Api, Ajax\Application and Blocks.
+|+
 
 
 ------------

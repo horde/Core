@@ -4,12 +4,13 @@
   state:
     release: alpha
     api: alpha
-  date: 2021-11-29
+  date: 2021-12-01
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
-  notes: |+
-    
+  notes: |
+    [rla] Add support for namespaced Application, Api, Ajax\Application and Blocks.
+    |+
 3.0.0alpha8:
   api: 3.0.0alpha6
   state:
