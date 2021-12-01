@@ -38,6 +38,11 @@ class Horde_Core_Factory_Ajax extends Horde_Core_Factory_Base
      */
     public function create($app, $vars, $action = null, $token = null)
     {
+        $class = 'Horde\\' . ucfirst($app) . '\\Ajax\\Application';
+
+        if (class_exists($class)) {
+            return new $class($app, $vars, $action, $token);
+        }
         $class = $app . '_Ajax_Application';
 
         if (class_exists($class)) {

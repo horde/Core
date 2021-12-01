@@ -833,6 +833,16 @@ class Horde_Registry implements Horde_Shutdown_Task
         }
 
         $cname = Horde_String::ucfirst($type);
+        // PSR-4 case: Autoloading should already be handled by composer
+        $classnamePsr4 = 'Horde\\' .  Horde_String::ucfirst($app) . '\\' . $cname;
+        if (class_exists($classnamePsr4)) {
+            $this->_cache['ob'][$app][$type] = ($type == 'application')
+            ? new $classnamePsr4($app)
+            : new $classnamePsr4();
+
+            return $this->_cache['ob'][$app][$type];
+        }
+        // Continue with unnamespaced version
 
         /* Can't autoload here, since the application may not have been
          * initialized yet. */
@@ -1996,6 +2006,9 @@ class Horde_Registry implements Horde_Shutdown_Task
     /**
      * Returns a list of available drivers for a library that are available
      * in an application.
+     * 
+     * @todo support namespaced prefixes with multiple levels
+     *
      *
      * @param string $app     The application name.
      * @param string $prefix  The library prefix.
@@ -2024,7 +2037,21 @@ class Horde_Registry implements Horde_Shutdown_Task
 
                     foreach ($di as $val) {
                         if (!$val->isDir() && !$di->isDot()) {
-                            $class = $app . '_' . $prefix . '_' . basename($val, '.php');
+                            $class = ucfirst($app) . '_' . $prefix . '_' . basename($val, '.php');
+                            if (class_exists($class)) {
+                                $classes[] = $class;
+                            }
+                        }
+                    }
+                } catch (UnexpectedValueException $e) {}
+            }
+            if (is_dir($fileroot . '/src/' . $fileprefix)) {
+                try {
+                    $di = new DirectoryIterator($fileroot . '/src/' . $fileprefix);
+
+                    foreach ($di as $val) {
+                        if (!$val->isDir() && !$di->isDot()) {
+                            $class = 'Horde\\' . ucfirst($app) . '\\' . $prefix . '\\' . basename($val, '.php');
                             if (class_exists($class)) {
                                 $classes[] = $class;
                             }
