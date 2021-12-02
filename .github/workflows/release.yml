@@ -57,6 +57,5 @@ jobs:
     - name: make release and push
       run: |
           horde-components -c doc/components.conf release for maintaina
-          git commit --amend -m "$(git log -1 --pretty=%B) [ci skip]"
           git push
           git push origin --tags
