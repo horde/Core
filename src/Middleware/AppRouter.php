@@ -128,15 +128,16 @@ class AppRouter extends RampageRequestHandler implements MiddlewareInterface, Re
             try {
                 $controller = $this->injector->getInstance($controllerName);
             } catch (Exception $e) {
-                throw new HordeException('Defined controller but could not create: ' . $controllerName, 0, $e);
-            }
-        }
-        if (empty($controller)) {
-            if (file_exists($traditionalFilename)) {
-                require_once $traditionalFilename;
-                $traditionalName = Horde_String::ucfirst($app) . '_' . Horde_String::ucfirst($controllerName) . '_Controller';
-                if ($this->injector->hasInstance($traditionalName) || class_exists($traditionalName)) {
-                    $controller = $this->injector->getInstance($traditionalName);
+                if (empty($controller)) {
+                    if (file_exists($traditionalFilename)) {
+                        require_once $traditionalFilename;
+                        $traditionalName = Horde_String::ucfirst($app) . '_' . Horde_String::ucfirst($controllerName) . '_Controller';
+                        if ($this->injector->hasInstance($traditionalName) || class_exists($traditionalName)) {
+                            $controller = $this->injector->getInstance($traditionalName);
+                        }
+                    } else {
+                        throw new HordeException('Defined controller but could not create: ' . $controllerName, 0, $e);
+                    }
                 }
             }
         }
