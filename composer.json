@@ -3,7 +3,7 @@
     "description": "Core Horde Framework library",
     "type": "horde-library",
     "homepage": "https://www.horde.org/libraries/Horde_Core",
-    "license": "LGPL-2.1",
+    "license": "LGPL-2.1-only",
     "authors": [
         {
             "name": "Jan Schneider",
@@ -34,7 +34,7 @@
         }
     ],
     "require": {
-        "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || *",
+        "horde/horde-installer-plugin": "^2 || dev-FRAMEWORK_6_0",
         "php": "^7.4 || ^8",
         "horde/alarm": "^3 || dev-FRAMEWORK_6_0",
         "horde/auth": "^3 || dev-FRAMEWORK_6_0",
