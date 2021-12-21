@@ -26,7 +26,7 @@
             "role": "developer"
         }
     ],
-    "time": "2021-12-18",
+    "time": "2021-12-21",
     "repositories": [
         {
             "type": "composer",
@@ -34,7 +34,7 @@
         }
     ],
     "require": {
-        "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || *",
+        "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || ^2",
         "php": "^7.4 || ^8",
         "horde/alarm": "^3 || dev-FRAMEWORK_6_0",
         "horde/auth": "^3 || dev-FRAMEWORK_6_0",
