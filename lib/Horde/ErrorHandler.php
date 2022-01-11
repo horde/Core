@@ -148,10 +148,8 @@ HTML;
      * @param string $errstr     See set_error_handler().
      * @param string $errfile    See set_error_handler().
      * @param integer $errline   See set_error_handler().
-     * @param array $errcontext  See set_error_handler().
      */
-    public static function errorHandler($errno, $errstr, $errfile, $errline,
-                                        $errcontext)
+    public static function errorHandler($errno, $errstr, $errfile, $errline)
     {
         $er = error_reporting();
 
