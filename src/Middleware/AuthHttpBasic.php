@@ -54,10 +54,15 @@ class AuthHttpBasic implements MiddlewareInterface
         $headerValues = $request->getHeader('Authorization');
         foreach ($headerValues as $headerValue) {
             // Ignore headers other than BASIC
-            if (!substr($headerValue, 0, 5) == 'BASIC') {
+            if (!(substr($headerValue, 0, 5) == 'BASIC')) {
                 continue;
             }
-            [$user, $password] = explode(':', base64_decode(substr($headerValue, 6)), 2);
+            $userPassword = base64_decode(substr($headerValue, 6));
+            $parts = explode(':', $userPassword, 2);
+            if (count($parts) !== 2) {
+                continue;
+            }
+            [$user, $password] = $parts;
             // Check credentials
             if ($this->driver->authenticate($user, ['password' => $password])) {
                 $request = $request->withAttribute('HORDE_AUTHENTICATED_USER', $user);
