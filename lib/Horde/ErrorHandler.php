@@ -151,7 +151,7 @@ HTML;
      * @param array $errcontext  See set_error_handler().
      */
     public static function errorHandler($errno, $errstr, $errfile, $errline,
-                                        $errcontext)
+                                        $errcontext = null)
     {
         $er = error_reporting();
 
