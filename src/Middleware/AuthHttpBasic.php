@@ -54,7 +54,8 @@ class AuthHttpBasic implements MiddlewareInterface
         $headerValues = $request->getHeader('Authorization');
         foreach ($headerValues as $headerValue) {
             // Ignore headers other than BASIC
-            if (!(substr($headerValue, 0, 5) == 'BASIC')) {
+            $authScheme = strtoupper(substr($headerValue, 0, 5));
+            if ($authScheme !== 'BASIC') {
                 continue;
             }
             $userPassword = base64_decode(substr($headerValue, 6));

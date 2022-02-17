@@ -186,4 +186,24 @@ class AuthHttpBasicTest extends TestCase
         $this->assertNull($noAuthHeader);
         $this->assertSame($username1, $authenticatedUser);
     }
+
+    public function testAuthenticatedAuthSchemeCaseInsensitive()
+    {
+        $username = 'testUser01';
+        $password = 'testPw';
+        $authString = base64_encode(sprintf('%s:%s', $username, $password));
+
+        $this->authDriver->method('authenticate')->willReturn(true);
+        $this->registry->method('getAuth')->willReturn($username);
+
+        $request = $this->requestFactory->createServerRequest('GET', '/test')->withHeader('Authorization', 'BasiC ' . $authString);
+        $middleware = $this->getMiddleware();
+        $middleware->process($request, $this->handler);
+
+        $noAuthHeader = $this->recentlyHandledRequest->getAttribute('NO_AUTH_HEADER');
+        $authenticatedUser = $this->recentlyHandledRequest->getAttribute('HORDE_AUTHENTICATED_USER');
+
+        $this->assertNull($noAuthHeader);
+        $this->assertSame($username, $authenticatedUser);
+    }
 }
