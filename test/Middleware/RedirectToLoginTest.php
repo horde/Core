@@ -13,6 +13,7 @@
 
 namespace Horde\Core\Test\Middleware;
 
+use Horde\Core\Config\State;
 use Horde\Core\Middleware\RedirectToLogin;
 
 use Horde\Test\TestCase;
@@ -25,7 +26,8 @@ class RedirectToLoginTest extends TestCase
     {
         return new RedirectToLogin(
             $this->registry,
-            $this->responseFactory
+            $this->responseFactory,
+            new State(['auth' => []])
         );
     }
 
