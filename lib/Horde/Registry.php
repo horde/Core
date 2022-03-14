@@ -833,14 +833,16 @@ class Horde_Registry implements Horde_Shutdown_Task
         }
 
         $cname = Horde_String::ucfirst($type);
+
+        $psr4App = $app ?: 'horde';
         // PSR-4 case: Autoloading should already be handled by composer
-        $classnamePsr4 = 'Horde\\' .  Horde_String::ucfirst($app) . '\\' . $cname;
+        $classnamePsr4 = 'Horde\\' .  Horde_String::ucfirst($psr4App) . '\\' . $cname;
         if (class_exists($classnamePsr4)) {
-            $this->_cache['ob'][$app][$type] = ($type == 'application')
-            ? new $classnamePsr4($app)
+            $this->_cache['ob'][$psr4App][$type] = ($type == 'application')
+            ? new $classnamePsr4($psr4App)
             : new $classnamePsr4();
 
-            return $this->_cache['ob'][$app][$type];
+            return $this->_cache['ob'][$psr4App][$type];
         }
         // Continue with unnamespaced version
 
