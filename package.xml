@@ -28,7 +28,7 @@
   <email>slusarz@horde.org</email>
   <active>no</active>
  </developer>
- <date>2021-12-13</date>
+ <date>2022-03-14</date>
  <version>
   <release>3.0.0alpha11</release>
   <api>3.0.0alpha1</api>
@@ -37,9 +37,9 @@
   <release>alpha</release>
   <api>alpha</api>
  </stability>
- <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+ <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1-only</license>
  <notes>
-* 
+* |+
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -1040,6 +1040,7 @@
      <file name="DemandAuthenticatedUserTest.php" role="test" />
      <file name="DemandAuthHeaderTest.php" role="test" />
      <file name="DemandSessionTokenTest.php" role="test" />
+     <file name="RedirectToLoginTest.php" role="test" />
      <file name="SetUpTrait.php" role="test" />
     </dir> <!-- /test/Middleware -->
     <dir name="Mock">
@@ -1701,6 +1702,7 @@
    <install as="Middleware/DemandAuthenticatedUserTest.php" name="test/Middleware/DemandAuthenticatedUserTest.php" />
    <install as="Middleware/DemandAuthHeaderTest.php" name="test/Middleware/DemandAuthHeaderTest.php" />
    <install as="Middleware/DemandSessionTokenTest.php" name="test/Middleware/DemandSessionTokenTest.php" />
+   <install as="Middleware/RedirectToLoginTest.php" name="test/Middleware/RedirectToLoginTest.php" />
    <install as="Middleware/SetUpTrait.php" name="test/Middleware/SetUpTrait.php" />
    <install as="Mock/MockConnector.php" name="test/Mock/MockConnector.php" />
    <install as="Mock/MockIMPMailbox.php" name="test/Mock/MockIMPMailbox.php" />
@@ -1712,176 +1714,6 @@
   </filelist>
  </phprelease>
  <changelog>
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
   <release>
    <version>
     <release>1.0.0alpha1</release>
@@ -4896,16 +4728,16 @@
   <release>
    <version>
     <release>3.0.0alpha11</release>
-    <api>3.0.0alpha6</api>
+    <api>3.0.0alpha1</api>
    </version>
    <stability>
     <release>alpha</release>
     <api>alpha</api>
    </stability>
    <date>2021-12-13</date>
-   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1-only</license>
    <notes>
-* 
+* |+
    </notes>
   </release>
  </changelog>
