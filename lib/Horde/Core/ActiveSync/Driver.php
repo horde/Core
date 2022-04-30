@@ -1474,13 +1474,13 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             } catch (Horde_ActiveSync_Exception $e) {
                 $this->_logger->err($e->getMessage());
                 $context = 'Protocol Version: ' . $this->_version . "\r\n"
-                    . 'Truncation: ' . !empty($collection['truncation'])
+                    . 'Truncation: ' . (!empty($collection['truncation'])
                         ? $collection['truncation']
-                        : (!empty($collection['mimetruncation']) ? $collection['mimetruncation'] : 'false') . "\r\n"
+                        : (!empty($collection['mimetruncation']) ? $collection['mimetruncation'] : 'false') ). "\r\n"
                     . 'BodyPrefs: ' . $collection['bodyprefs'] . "\r\n"
-                    . 'BodyPartPrefs: ' . !empty($collection['bodypartprefs'])
+                    . 'BodyPartPrefs: ' . (!empty($collection['bodypartprefs'])
                         ? $collection['bodypartprefs']
-                        : 'false' . "\r\n"
+                        : 'false') . "\r\n"
                     . 'MimeSupport: ' . $collection['mimesupport'];
 
                 $this->_logger->err($context);
