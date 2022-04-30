@@ -1477,9 +1477,9 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     . 'Truncation: ' . (!empty($collection['truncation'])
                         ? $collection['truncation']
                         : (!empty($collection['mimetruncation']) ? $collection['mimetruncation'] : 'false') ). "\r\n"
-                    . 'BodyPrefs: ' . $collection['bodyprefs'] . "\r\n"
+                    . 'BodyPrefs: ' . print_r($collection['bodyprefs'], true) . "\r\n"
                     . 'BodyPartPrefs: ' . (!empty($collection['bodypartprefs'])
-                        ? $collection['bodypartprefs']
+                        ? print_r($collection['bodypartprefs'], true)
                         : 'false') . "\r\n"
                     . 'MimeSupport: ' . $collection['mimesupport'];
 
