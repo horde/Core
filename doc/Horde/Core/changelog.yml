@@ -9,6 +9,7 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    [mjr] Fix detection of autodiscover json endpoint.
     [mjr] Fix regression in sending mail via ActiveSync.
     [mjr] Fix ActiveSync SmartForward handling.
 2.31.14:
