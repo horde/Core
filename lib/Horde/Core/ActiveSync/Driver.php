@@ -2582,7 +2582,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         if ($version == 2) {
             if (Horde_String::lower($params['protocol']) == 'autodiscoverv1') {
                 $params['url'] = $url['scheme'] . '://' . $url['host'] . '/Autodiscover/Autodiscover.xml';
-            } else if (Horde_String::lower($params['protocol'] == 'activesync')) {
+            } else if (Horde_String::lower($params['protocol']) == 'activesync') {
                 $params['url'] = $url['scheme'] . '://' . $url['host'] . '/Microsoft-Server-ActiveSync';
             }
             return $params;
