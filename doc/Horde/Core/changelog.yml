@@ -1,4 +1,26 @@
 ---
+2.31.17:
+  api: 2.31.0
+  state:
+    release: stable
+    api: stable
+  date: 2022-09-18
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    [mjr] Fix detection of autodiscover json endpoint.
+2.31.16:
+  api: 2.31.0
+  state:
+    release: stable
+    api: stable
+  date: 2020-09-06
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    [mjr] Fix regression in sending mail via ActiveSync.
 2.31.15:
   api: 2.31.0
   state:
@@ -9,8 +31,6 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
-    [mjr] Fix detection of autodiscover json endpoint.
-    [mjr] Fix regression in sending mail via ActiveSync.
     [mjr] Fix ActiveSync SmartForward handling.
 2.31.14:
   api: 2.31.0
