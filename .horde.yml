@@ -34,7 +34,7 @@ authors:
     active: false
     role: developer
 version:
-  release: 2.31.18
+  release: 2.31.19
   api: 2.31.0
 state:
   release: stable
