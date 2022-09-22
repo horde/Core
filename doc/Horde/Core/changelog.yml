@@ -8,8 +8,9 @@
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
-  notes: |+
-    
+  notes: |
+    [mjr] Remove local changes that made it to release breaking tag functionality.
+    |+
 2.31.17:
   api: 2.31.0
   state:
