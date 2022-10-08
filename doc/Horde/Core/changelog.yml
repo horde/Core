@@ -4,13 +4,13 @@
   state:
     release: alpha
     api: alpha
-  date: 2022-03-14
+  date: 2022-10-08
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
-   [rla] Improved PHP 8.1 compatibility.
-   [rla] Prevent autoloader clashes when composer autoloader and horde autoloader are present.
+    [rla] Improved PHP 8.1 compatibility.
+    [rla] Prevent autoloader clashes when composer autoloader and horde autoloader are present.
 3.0.0alpha11:
   api: 3.0.0alpha6
   state:

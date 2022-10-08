@@ -26,7 +26,7 @@
             "role": "developer"
         }
     ],
-    "time": "2022-03-14",
+    "time": "2022-10-08",
     "repositories": [
         {
             "type": "composer",
@@ -81,7 +81,11 @@
         "ext-session": "*"
     },
     "require-dev": {
-        "horde/test": "^3 || dev-FRAMEWORK_6_0"
+        "horde/test": "^3 || dev-FRAMEWORK_6_0",
+        "horde/tree": "^3 || dev-FRAMEWORK_6_0",
+        "horde/prefs": "^3 || dev-FRAMEWORK_6_0",
+        "horde/routes": "^3 || dev-FRAMEWORK_6_0",
+        "horde/vfs": "^3 || dev-FRAMEWORK_6_0"
     },
     "suggest": {
         "pear/text_captcha": "*",
@@ -102,6 +106,11 @@
     "autoload-dev": {
         "psr-4": {
             "Horde\\Core\\Test\\": "test/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "horde/horde-installer-plugin": true
         }
     }
 }

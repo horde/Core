@@ -2,7 +2,9 @@
 v3.0.0alpha12
 -------------
 
-
+[rla] Improved PHP 8.1 compatibility.
+[rla] Prevent autoloader clashes when composer autoloader and horde autoloader
+      are present.
 
 
 -------------
