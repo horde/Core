@@ -432,7 +432,7 @@ class Horde
             if ((!isset($c['params']['driverconfig']) ||
                  $c['params']['driverconfig'] != 'horde') &&
                 !is_null($type) && $type == 'sql') {
-                if ($c['params']['protocol'] == 'unix') {
+                if (($c['params']['protocol'] ?? null) == 'unix') {
                     unset($result['hostspec'], $result['port']);
                 } else {
                     unset($result['socket']);

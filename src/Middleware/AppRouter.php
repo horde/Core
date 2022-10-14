@@ -110,7 +110,7 @@ class AppRouter extends RampageRequestHandler implements MiddlewareInterface, Re
         $request = $request->withAttribute('route', $match);
 
         // compatibility: if unset stack and HordeAuthType is 'NONE' set empty stack
-        if (!isset($match['stack']) && $match['HordeAuthType'] === 'NONE') {
+        if (!isset($match['stack']) && ($match['HordeAuthType'] ?? null) === 'NONE') {
             $match['stack'] = [];
         }
         // Stack is an array of DI keys
@@ -163,5 +163,4 @@ class AppRouter extends RampageRequestHandler implements MiddlewareInterface, Re
         }
         return $handler->handle($request);
     }
-
 }
