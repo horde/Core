@@ -86,10 +86,16 @@ class Horde_Core_Db_Migration
                 }
                 $packageIterator = new DirectoryIterator("$vendorDir/$vendor/");
                 foreach ($packageIterator as $package) {
-                    if (!is_dir("$vendorDir/$vendor/$package/migration")) {
+                    $packageDir = "$vendorDir/$vendor/$package";
+                    $migrationDir = "$packageDir/migration";
+                    if (!is_dir("$migrationDir")) {
                         continue;
                     }
-                    // Apps don't go into vendor dir so it's always a lib.
+                    // Find out if it is an app or a lib - This could be more robust
+                    if (file_exists("$packageDir/lib/Application.php") or file_exists("packageDir/src/Application.php")) {
+                        // For now just skip apps and trust the registry to handle them. See above. This should probably be refactored
+                        continue;
+                    }
                     // hope this doesn't break for three part names
                     $lcFullname = Horde_String::lower($vendor. '_' . $package);
                     $parts = [];
