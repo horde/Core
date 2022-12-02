@@ -124,6 +124,7 @@ class AppRouter extends RampageRequestHandler implements MiddlewareInterface, Re
         // Controller is a single DI key for either a HandlerInterface, MiddlewareInterface or a Horde_Controller
         $controllerName = $match['controller'] ?? '';
         $traditionalFilename = $fileroot . '/app/controllers/' . $controllerName . '.php';
+        $controller = null;
         if ($controllerName) {
             try {
                 $controller = $this->injector->getInstance($controllerName);
