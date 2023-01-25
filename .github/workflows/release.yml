@@ -8,6 +8,7 @@ on:
       - FRAMEWORK_6_0
 env:
   components: "/home/runner/.composer/web/components/bin/horde-components -c /home/runner/.composer/web/components/config/maintaina.conf.dist"
+  COMPOSER_ALLOW_SUPERUSER: 1
 
 jobs:
   run:
