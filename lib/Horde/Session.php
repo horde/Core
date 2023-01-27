@@ -360,7 +360,7 @@ class Horde_Session
                 $value = strval($secret->read($secret->getKey(), $value));
             }
 
-            if ($value[0] === self::NOT_SERIALIZED) {
+            if (($value[0] ?? '') === self::NOT_SERIALIZED) {
                 return substr($value, 1);
             }
 
