@@ -84,32 +84,40 @@ class AppFinder implements MiddlewareInterface
     protected function identifyApp(ServerRequestInterface $request, Horde_Registry $registry)
     {
         $matches = [];
+        $scheme = $request->getUri()->getScheme();
+        $host = $request->getUri()->getHost();
+        $path = $request->getUri()->getPath();
         // listApps() would return empty on unauthenticated access
-        foreach ($registry->listApps(null, false, null) as $app) {
-            $scheme = $request->getUri()->getScheme();
-            $host = $request->getUri()->getHost();
-            $path = $request->getUri()->getPath();
-
+        foreach ($registry->listApps(null, true, null) as $app => $config) {
             $default = [
                 'scheme' => $scheme,
                 'host' => $host,
                 'path' => '',
                 'app' => $app,
             ];
+            $webroots = [];
+            $webroots[] = $registry->get('webroot', $app);
 
-            $applicationUrl = array_merge($default, parse_url($registry->get('webroot', $app)));
-            $applicationUrl['path'] = $this->_normalize($applicationUrl['path']);
-            // sort out cases with wrong host or scheme
-            if ($scheme != $applicationUrl['scheme']) {
-                continue;
+            $webrootAliases = $config['webroot_aliases'] ?? null;
+            if (is_array($webrootAliases)) {
+                $webroots = array_merge($webroots, $webrootAliases);
             }
-            if ($host != $applicationUrl['host']) {
-                continue;
-            }
-            // does the path match at all?
 
-            if (substr($path, 0, strlen($applicationUrl['path'])) == $applicationUrl['path']) {
-                $matches[] = $applicationUrl;
+            foreach ($webroots as $webroot) {
+                $applicationUrl = array_merge($default, parse_url($webroot));
+                $appPath = $applicationUrl['path'] = $this->_normalize($applicationUrl['path']);
+                // sort out cases with wrong host or scheme
+                if ($scheme != $applicationUrl['scheme']) {
+                    continue;
+                }
+                if ($host != $applicationUrl['host']) {
+                    continue;
+                }
+
+                // does the path match at all?
+                if ($this->matchesAppPath($appPath, $path)) {
+                    $matches[] = $applicationUrl;
+                }
             }
         }
         // No matches, return early
@@ -124,6 +132,16 @@ class AppFinder implements MiddlewareInterface
             }
         );
         return array_pop($matches);
+    }
+
+    protected function matchesAppPath(string $appPath, string $requestPath): bool
+    {
+        // add a slash to appPath and requestPath, if not already done
+        // this is needed because otherwise a path like 'app_v2' would match the app 'app', which we do not want
+        $appPath = rtrim($appPath, '/') . '/';
+        $requestPath = rtrim($requestPath, '/') . '/';
+
+        return substr($requestPath, 0, strlen($appPath)) === $appPath;
     }
 
 
@@ -146,9 +164,6 @@ class AppFinder implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $requestServer = $request->getUri()->getHost();
-
-        $uriScheme = $request->getUri()->getScheme();
         $registry = $request->getAttribute('registry');
 
         $found = $this->identifyApp($request, $registry);

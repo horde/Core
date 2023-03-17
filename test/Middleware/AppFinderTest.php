@@ -31,6 +31,15 @@ class AppFinderTest extends TestCase
         );
     }
 
+    protected function getAssoc(array $list)
+    {
+        $assoc = [];
+        foreach ($list as $item) {
+            $assoc[$item] = [];
+        }
+        return $assoc;
+    }
+
     /**
      * This tests if the AppFinder finds a valid app in path
      */
@@ -45,7 +54,7 @@ class AppFinderTest extends TestCase
         $request = $request->withAttribute('registry', $registry);
 
 
-        $registry->method('listApps')->willReturn($list);
+        $registry->method('listApps')->willReturn($this->getAssoc($list));
         $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
             return $baseUrl . $app;
         });
@@ -71,7 +80,7 @@ class AppFinderTest extends TestCase
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
         $request = $request->withAttribute('registry', $registry);
 
-        $registry->method('listApps')->willReturn($list);
+        $registry->method('listApps')->willReturn($this->getAssoc($list));
         $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
             return $baseUrl . $app;
         });
@@ -89,14 +98,12 @@ class AppFinderTest extends TestCase
         $baseUrl = 'https://example.ex/';
         $app = 'foobar';
         $list = ['foobar', 'foo'];
-        $rlist = ['foo', 'foobar'];
         $requestUrl = $baseUrl . $app;
         $registry = $this->createMock(Horde_Registry::class);
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
         $request = $request->withAttribute('registry', $registry);
 
-        $registry->method('listApps')->willReturn($rlist);
-        $registry->method('listApps')->willReturn($list);
+        $registry->method('listApps')->willReturn($this->getAssoc($list));
         $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
             return $baseUrl . $app;
         });
@@ -147,7 +154,7 @@ class AppFinderTest extends TestCase
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
         $request = $request->withAttribute('registry', $registry);
 
-        $registry->method('listApps')->willReturn($list);
+        $registry->method('listApps')->willReturn($this->getAssoc($list));
         $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
             return $baseUrl . $app;
         });
@@ -174,7 +181,7 @@ class AppFinderTest extends TestCase
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
         $request = $request->withAttribute('registry', $registry);
 
-        $registry->method('listApps')->willReturn($list);
+        $registry->method('listApps')->willReturn($this->getAssoc($list));
         $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrlWithHttp) {
             return $baseUrlWithHttp . $app;
         });
@@ -199,7 +206,7 @@ class AppFinderTest extends TestCase
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
         $request = $request->withAttribute('registry', $registry);
 
-        $registry->method('listApps')->willReturn($list);
+        $registry->method('listApps')->willReturn($this->getAssoc($list));
         $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrlWithDifferentHost) {
             return $baseUrlWithDifferentHost . $app;
         });
@@ -223,7 +230,104 @@ class AppFinderTest extends TestCase
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
         $request = $request->withAttribute('registry', $registry);
 
-        $registry->method('listApps')->willReturn($list);
+        $registry->method('listApps')->willReturn($this->getAssoc($list));
+        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+            return $baseUrl . $app;
+        });
+
+        $middleware = $this->getMiddleware();
+        $this->expectException(Exception::class);
+        $middleware->process($request, $this->handler);
+    }
+
+    public function testFindAppBehindDifferentApp()
+    {
+        $baseUrl = 'https://example.ex/';
+        $list = ['foobar', 'bla', 'foo', 'barfoo', 'bar'];
+        $app = 'bla';
+        $requestUrl = $baseUrl . 'foo' . '/bla/xyz';
+        $registry = $this->createMock(Horde_Registry::class);
+        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
+        $request = $request->withAttribute('registry', $registry);
+
+        $registry->method('listApps')->willReturn($this->getAssoc($list));
+        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+            if ($app === 'bla') {
+                return $baseUrl . 'foo' . '/bla';
+            } else {
+                return $baseUrl . $app;
+            }
+        });
+
+        $middleware = $this->getMiddleware();
+        $middleware->process($request, $this->handler);
+        $foundApp = $this->recentlyHandledRequest->getAttribute('app');
+
+        $this->assertSame($app, $foundApp);
+    }
+
+    public function testFindAppInDocRoot()
+    {
+        $baseUrl = 'https://example.ex/';
+        $list = ['foobar', 'bla', 'foo', 'barfoo', 'bar'];
+        $app = 'bla';
+        $requestUrl = $baseUrl;
+        $registry = $this->createMock(Horde_Registry::class);
+        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
+        $request = $request->withAttribute('registry', $registry);
+
+        $registry->method('listApps')->willReturn($this->getAssoc($list));
+        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+            if ($app === 'bla') {
+                return $baseUrl;
+            } else {
+                return $baseUrl . $app;
+            }
+        });
+
+        $middleware = $this->getMiddleware();
+        $middleware->process($request, $this->handler);
+        $foundApp = $this->recentlyHandledRequest->getAttribute('app');
+
+        $this->assertSame($app, $foundApp);
+    }
+
+    public function testFindWebrootAlias()
+    {
+        $baseUrl = 'https://example.ex/';
+        $app = 'bar';
+        $requestUrl = $baseUrl . 'barV2';
+        $registry = $this->createMock(Horde_Registry::class);
+        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
+        $request = $request->withAttribute('registry', $registry);
+
+        $registry->method('listApps')->willReturn([
+            'foobar' => [],
+            'bar' => ['webroot_aliases' => [$baseUrl . '/barV2']],
+        ]);
+        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+            return $baseUrl . $app;
+        });
+
+        $middleware = $this->getMiddleware();
+        $middleware->process($request, $this->handler);
+        $foundApp = $this->recentlyHandledRequest->getAttribute('app');
+
+        $this->assertSame($app, $foundApp);
+    }
+
+    public function testDoNotFindWithoutAlias()
+    {
+        $baseUrl = 'https://example.ex/';
+        $requestUrl = $baseUrl . 'barV2';
+        $registry = $this->createMock(Horde_Registry::class);
+        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
+        $request = $request->withAttribute('registry', $registry);
+
+        $registry->method('listApps')->willReturn([
+            'foobar' => [],
+            'bar' => [],
+        ]);
         $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
             return $baseUrl . $app;
         });

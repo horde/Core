@@ -25,7 +25,7 @@ use Horde\Http\RequestFactory;
 use Horde\Http\StreamFactory;
 use Horde\Http\ResponseFactory;
 use Horde\Http\Server\RampageRequestHandler;
-
+use Horde\Http\ServerRequest;
 use Horde_Session;
 use Horde_Registry;
 use Horde_Exception;
@@ -33,6 +33,16 @@ use Horde_Auth_Base;
 
 trait SetUpTrait
 {
+    protected RequestFactory $requestFactory;
+    protected StreamFactory $streamFactory;
+    protected ResponseFactory $responseFactory;
+    protected Horde_Session $session;
+    protected Horde_Registry $registry;
+    protected ResponseInterface $defaultPayloadResponse;
+    protected RequestHandlerInterface $defaultPayloadHandler;
+    protected ?ServerRequest $recentlyHandledRequest;
+    protected RampageRequestHandler $handler;
+
     protected function setUp(): void
     {
         $this->requestFactory = new RequestFactory();
