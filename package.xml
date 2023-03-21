@@ -28,7 +28,7 @@
   <email>slusarz@horde.org</email>
   <active>no</active>
  </developer>
- <date>2022-11-11</date>
+ <date>2023-03-21</date>
  <version>
   <release>3.0.0alpha14</release>
   <api>3.0.0alpha1</api>
@@ -39,7 +39,7 @@
  </stability>
  <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1-only</license>
  <notes>
-* 
+* |+
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -1019,6 +1019,7 @@
      <file name="AuthIsGlobalAdmin.php" role="php" />
      <file name="DemandAuthenticatedUser.php" role="php" />
      <file name="DemandAuthHeader.php" role="php" />
+     <file name="DemandGlobalAdmin.php" role="php" />
      <file name="DemandSessionToken.php" role="php" />
      <file name="ErrorFilter.php" role="php" />
      <file name="H5Controller.php" role="php" />
@@ -1029,12 +1030,8 @@
    </dir> <!-- /src -->
    <dir name="test">
     <dir name="Authentication">
-     <dir name="Backend">
-      <file name="MockTest.php" role="test" />
-     </dir> <!-- /test/Authentication/Backend -->
      <dir name="Method">
       <file name="BasicTest.php" role="test" />
-      <file name="SessionTest.php" role="test" />
      </dir> <!-- /test/Authentication/Method -->
     </dir> <!-- /test/Authentication -->
     <dir name="Factory">
@@ -1693,6 +1690,7 @@
    <install as="Middleware/AuthIsGlobalAdmin.php" name="src/Middleware/AuthIsGlobalAdmin.php" />
    <install as="Middleware/DemandAuthenticatedUser.php" name="src/Middleware/DemandAuthenticatedUser.php" />
    <install as="Middleware/DemandAuthHeader.php" name="src/Middleware/DemandAuthHeader.php" />
+   <install as="Middleware/DemandGlobalAdmin.php" name="src/Middleware/DemandGlobalAdmin.php" />
    <install as="Middleware/DemandSessionToken.php" name="src/Middleware/DemandSessionToken.php" />
    <install as="Middleware/ErrorFilter.php" name="src/Middleware/ErrorFilter.php" />
    <install as="Middleware/H5Controller.php" name="src/Middleware/H5Controller.php" />
@@ -1701,9 +1699,7 @@
    <install as="RampageBootstrap.php" name="src/RampageBootstrap.php" />
    <install as="ActiveSyncTests.php" name="test/ActiveSyncTests.php" />
    <install as="AllTests.php" name="test/AllTests.php" />
-   <install as="Authentication/Backend/MockTest.php" name="test/Authentication/Backend/MockTest.php" />
    <install as="Authentication/Method/BasicTest.php" name="test/Authentication/Method/BasicTest.php" />
-   <install as="Authentication/Method/SessionTest.php" name="test/Authentication/Method/SessionTest.php" />
    <install as="bootstrap.php" name="test/bootstrap.php" />
    <install as="ConfigStateTest.php" name="test/ConfigStateTest.php" />
    <install as="Factory/GroupTest.php" name="test/Factory/GroupTest.php" />
@@ -1728,179 +1724,6 @@
   </filelist>
  </phprelease>
  <changelog>
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
   <release>
    <version>
     <release>1.0.0alpha1</release>
@@ -4961,16 +4784,16 @@
   <release>
    <version>
     <release>3.0.0alpha14</release>
-    <api>3.0.0alpha6</api>
+    <api>3.0.0alpha1</api>
    </version>
    <stability>
     <release>alpha</release>
     <api>alpha</api>
    </stability>
    <date>2022-11-11</date>
-   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1</license>
+   <license uri="http://www.horde.org/licenses/lgpl21">LGPL-2.1-only</license>
    <notes>
-* 
+* |+
    </notes>
   </release>
  </changelog>
