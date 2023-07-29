@@ -20,7 +20,7 @@
  */
 class Horde_Core_NlsconfigTest extends Horde_Test_Case
 {
-    public function setUp()
+    public function setUp(): void
     {
         $GLOBALS['session'] = new Horde_Session();
         $GLOBALS['session']->sessionHandler = new Horde_Support_Stub();
@@ -58,6 +58,8 @@ class Horde_Core_NlsconfigTest extends Horde_Test_Case
      */
     public function testGet($key, $expected)
     {
+        $this->expectNotToPerformAssertions();
+
         $nls = new Horde_Registry_Nlsconfig();
     }
 

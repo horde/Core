@@ -8,11 +8,9 @@
  */
 class Horde_Core_SmartmobileUrlTest extends Horde_Test_Case
 {
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testInvalidParamter()
     {
+        $this->expectException('InvalidArgumentException');
         new Horde_Core_Smartmobile_Url('test');
     }
 

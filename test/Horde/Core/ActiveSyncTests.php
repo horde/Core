@@ -22,7 +22,7 @@ class Horde_Core_ActiveSyncTests extends Horde_Test_Case
     protected $_mailboxes;
     protected $_special;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->_auth = $this->getMockSkipConstructor('Horde_Auth_Auto');
         $this->_state = $this->getMockSkipConstructor('Horde_ActiveSync_State_Sql');

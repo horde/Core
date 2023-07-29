@@ -23,9 +23,9 @@
  * @author   Gunnar Wrobel <wrobel@pardus.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
-class Horde_Core_Factory_KolabServerTest extends PHPUnit_Framework_TestCase
+class Horde_Core_Factory_KolabServerTest extends Horde_Test_Case
 {
-    public function setUp()
+    public function setUp(): void
     {
         $this->markTestIncomplete('Needs some love');
         $GLOBALS['conf']['kolab']['server']['basedn'] = 'test';

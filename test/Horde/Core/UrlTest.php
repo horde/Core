@@ -6,7 +6,7 @@
  * @package    Core
  * @subpackage UnitTests
  */
-class Horde_Core_UrlTest extends PHPUnit_Framework_TestCase
+class Horde_Core_UrlTest extends Horde_Test_Case
 {
     public function testUrl()
     {

@@ -18,11 +18,11 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
-class Horde_Core_RegistryTest extends PHPUnit_Framework_TestCase
+class Horde_Core_RegistryTest extends Horde_Test_Case
 {
     protected $_tmpdir;
 
-    public function tearDown()
+    public function tearDown(): void
     {
         if (is_dir($this->_tmpdir)) {
             rmdir($this->_tmpdir);

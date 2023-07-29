@@ -23,7 +23,7 @@
  * @author   Gunnar Wrobel <wrobel@pardus.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
-class Horde_Core_Factory_GroupTest extends PHPUnit_Framework_TestCase
+class Horde_Core_Factory_GroupTest extends Horde_Test_Case
 {
     public function testMock()
     {
