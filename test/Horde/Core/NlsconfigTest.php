@@ -18,6 +18,7 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+#[\AllowDynamicProperties]
 class Horde_Core_NlsconfigTest extends Horde_Test_Case
 {
     public function setUp(): void
