@@ -24,7 +24,7 @@ class Horde_Core_RegistryTest extends Horde_Test_Case
 
     public function tearDown(): void
     {
-        if (is_dir($this->_tmpdir)) {
+        if (is_dir(is_null($this->_tmpdir) ? "" : $this->_tmpdir)) {
             rmdir($this->_tmpdir);
             rmdir(dirname($this->_tmpdir));
         }
