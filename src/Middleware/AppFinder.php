@@ -6,6 +6,8 @@ namespace Horde\Core\Middleware;
 
 use Exception;
 use Horde;
+use Horde\Http\ResponseFactory;
+use Horde\Http\StreamFactory;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -31,9 +33,17 @@ use Horde_Registry;
 class AppFinder implements MiddlewareInterface
 {
     private Horde_Registry $registry;
-    public function __construct(Horde_Registry $registry)
-    {
+    private ResponseFactory $responseFactory;
+    private StreamFactory $streamFactory;
+
+    public function __construct(
+        Horde_Registry $registry,
+        ResponseFactory $responseFactory,
+        StreamFactory $streamFactory
+    ) {
         $this->registry = $registry;
+        $this->responseFactory = $responseFactory;
+        $this->streamFactory = $streamFactory;
     }
     /**
      * Rebuild a path string to a common form
@@ -171,7 +181,12 @@ class AppFinder implements MiddlewareInterface
         // If we still found no app, give up
         if (empty($found)) {
             $path = $request->getUri()->getPath();
-            throw new \Exception("No App found for path: $path");
+            $msg = sprintf('No App found for path: %s', $path);
+            Horde::log($msg, 'INFO');
+            return $this->responseFactory->createResponse(
+                404,
+                'Not Found'
+            )->withBody($this->streamFactory->createStream($msg));
         }
         $prefix = $found['path'];
 

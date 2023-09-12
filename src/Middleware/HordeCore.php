@@ -60,7 +60,7 @@ class HordeCore implements MiddlewareInterface
         // Detect correct app
         $registry = $injector->getInstance('Horde_Registry');
         $request = $request->withAttribute('registry', $registry);
-        $handler->addMiddleware(new AppFinder($registry));
+        $handler->addMiddleware(new AppFinder($registry, new ResponseFactory(), new StreamFactory()));
         // Find route inside detected app
         $handler->addMiddleware(new AppRouter($registry, $injector->get('Horde_Routes_Mapper'), $injector));
         return $handler->handle($request);

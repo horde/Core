@@ -15,7 +15,8 @@ namespace Horde\Core\Test\Middleware;
 
 use Exception;
 use Horde\Core\Middleware\AppFinder;
-
+use Horde\Http\ResponseFactory;
+use Horde\Http\StreamFactory;
 use Horde\Test\TestCase;
 
 use Horde_Registry;
@@ -27,7 +28,9 @@ class AppFinderTest extends TestCase
     protected function getMiddleware()
     {
         return new AppFinder(
-            $this->registry
+            $this->registry,
+            new ResponseFactory(),
+            new StreamFactory()
         );
     }
 
@@ -86,8 +89,9 @@ class AppFinderTest extends TestCase
         });
 
         $middleware = $this->getMiddleware();
-        $this->expectException(Exception::class);
-        $middleware->process($request, $this->handler);
+        //$this->expectException(Exception::class);
+        $response = $middleware->process($request, $this->handler);
+        $this->assertSame(404, $response->getStatusCode());
     }
 
     /**
@@ -137,8 +141,8 @@ class AppFinderTest extends TestCase
         });
 
         $middleware = $this->getMiddleware();
-        $this->expectException(Exception::class);
-        $middleware->process($request, $this->handler);
+        $response = $middleware->process($request, $this->handler);
+        $this->assertSame(404, $response->getStatusCode());
     }
 
     /**
@@ -188,8 +192,8 @@ class AppFinderTest extends TestCase
 
         $middleware = $this->getMiddleware();
 
-        $this->expectException(Exception::class);
-        $middleware->process($request, $this->handler);
+        $response = $middleware->process($request, $this->handler);
+        $this->assertSame(404, $response->getStatusCode());
     }
 
     /**
@@ -213,8 +217,8 @@ class AppFinderTest extends TestCase
 
         $middleware = $this->getMiddleware();
 
-        $this->expectException(Exception::class);
-        $middleware->process($request, $this->handler);
+        $response = $middleware->process($request, $this->handler);
+        $this->assertSame(404, $response->getStatusCode());
     }
 
 
@@ -236,8 +240,8 @@ class AppFinderTest extends TestCase
         });
 
         $middleware = $this->getMiddleware();
-        $this->expectException(Exception::class);
-        $middleware->process($request, $this->handler);
+        $response = $middleware->process($request, $this->handler);
+        $this->assertSame(404, $response->getStatusCode());
     }
 
     public function testFindAppBehindDifferentApp()
@@ -333,7 +337,7 @@ class AppFinderTest extends TestCase
         });
 
         $middleware = $this->getMiddleware();
-        $this->expectException(Exception::class);
-        $middleware->process($request, $this->handler);
+        $response = $middleware->process($request, $this->handler);
+        $this->assertSame(404, $response->getStatusCode());
     }
 }
