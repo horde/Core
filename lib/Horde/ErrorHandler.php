@@ -87,57 +87,19 @@ class Horde_ErrorHandler
 
         if (!headers_sent()) {
             header('Content-type: text/html; charset=UTF-8');
+            header('HTTP/1.1 500: Internal Server Error');
         }
-        echo <<< HTML
-<html>
-<head><title>Horde :: Fatal Error</title></head>
-<body style="background:#fff; color:#000">
-HTML;
-
-        ob_start();
+        
         try {
             $admin = (isset($registry) && $registry->isAdmin());
-
-            echo '<h1>' . Horde_Core_Translation::t("A fatal error has occurred") . '</h1>';
-
-            if (is_object($error) && method_exists($error, 'getMessage')) {
-                echo '<h3>' . htmlspecialchars($error->getMessage()) . '</h3>';
-            } elseif (is_string($error)) {
-                echo '<h3>' . htmlspecialchars($error) . '</h3>';
-            }
-
-            if ($admin) {
-                if ($error instanceof Throwable ||
-                    $error instanceof Exception) {
-                    $trace = $error;
-                    $file = $error->getFile();
-                    $line = $error->getLine();
-                } else {
-                    $trace = debug_backtrace();
-                    $calling = array_shift($trace);
-                    $file = $calling['file'];
-                    $line = $calling['line'];
-                }
-                printf(Horde_Core_Translation::t("in %s:%d"), $file, $line);
-                echo '<div id="backtrace"><pre>' .
-                    strval(new Horde_Support_Backtrace($trace)) .
-                    '</pre></div>';
-                if (is_object($error)) {
-                    echo '<h3>' . Horde_Core_Translation::t("Details") . '</h3>';
-                    echo '<h4>' . Horde_Core_Translation::t("The full error message is logged in Horde's log file, and is shown below only to administrators. Non-administrative users will not see error details.") . '</h4>';
-                    ob_flush();
-                    flush();
-                    echo '<div id="details"><pre>' . htmlspecialchars(print_r($error, true)) . '</pre></div>';
-                }
-            } else {
-                echo '<h3>' . Horde_Core_Translation::t("Details have been logged for the administrator.") . '</h3>';
-            }
+            $errorHtml = self::getHtmlForError($error, $admin);
         } catch (Exception $e) {
             die($e);
         }
 
+        ob_start();
+        echo $errorHtml;
         ob_end_flush();
-        echo '</body></html>';
         exit(1);
     }
 
@@ -209,4 +171,85 @@ HTML;
         }
     }
 
+    /**
+     * Returns html for an error
+     * 
+     * @param string|Throwable $error  The error as string message or Throwable
+     * @param bool $isAdmin  If true will also output the complete trace
+     *                       If $error is a Throwable its complete content will also be included in the output
+     * @return string  The full html page for that error as a string
+     */
+    public static function getHtmlForError($error, bool $isAdmin = false): string
+    {
+        if ($error instanceof Throwable) {
+            $message = htmlspecialchars($error->getMessage());
+
+        } else {
+            $message = $error;
+        }
+        $fatalErrorHasOccoured = Horde_Core_Translation::t('A fatal error has occurred');
+        if ($isAdmin){
+            $detailsHtml = self::getErrorDetailsAsHtml($error);
+        } else {
+            $detailsHtml = '<h3>' . Horde_Core_Translation::t("Details have been logged for the administrator.") . '</h3>';
+        }
+        return <<<HTMLDELIM
+            <html>
+            <head>
+            <title>Horde :: Fatal Error</title>
+            <meta charset="utf-8">
+            </head>
+            <body style="background:#fff; color:#000">
+            <h1>{$fatalErrorHasOccoured}</h1>
+                <h3>{$message}</h3>
+                {$detailsHtml}
+            </body>
+            </html>
+            HTMLDELIM;
+
+    }
+
+    /**
+     * Get the details of an error as html. This should usually only be output to admin users
+     * 
+     * @param string|Throwable $error  The error as string message or Throwable
+     * @return string  The details of that error as html
+     */
+    protected static function getErrorDetailsAsHtml($error): string
+    {
+        if ($error instanceof Throwable) {
+            $trace = strval(new Horde_Support_Backtrace($error));
+            $fileName = $error->getFile();
+            $lineNo = $error->getLine();
+
+            $translateDetails = Horde_Core_Translation::t('Details');
+            $translateLogInfo = Horde_Core_Translation::t('The full error message is logged in Horde\'s log file, and is shown below only to administrators. Non-administrative users will not see error details.');
+            $fullErrorAsHtml = htmlspecialchars(print_r($error, true));
+            $fullDetailsHtml = <<<HTMLDELIM
+                <h3>$translateDetails</h3>
+                <h4>{$translateLogInfo}</h4>
+                <div id="details">
+                    <pre>$fullErrorAsHtml</pre>
+                </div>
+                HTMLDELIM;
+        } else {
+            $trace = debug_backtrace();
+            $calling = array_shift($trace);
+            $trace = strval(new Horde_Support_Backtrace($trace));
+            $fileName = $calling['file'];
+            $lineNo = $calling['line'];
+            $fullDetailsHtml = '';
+        }
+        $translateIn = sprintf(Horde_Core_Translation::t('in %s:%d'), $fileName, $lineNo);
+
+        return <<<HTMLDELIM
+            {$translateIn}
+            <div id="backtrace">
+            <pre>
+            {$trace}
+            </pre>
+            </div>
+            {$fullDetailsHtml}
+            HTMLDELIM;
+    }
 }
