@@ -10,7 +10,7 @@
  * @license   http://www.horde.org/licenses/lgpl21 LGPL-2.1
  * @package   Core
  */
-
+use Horde\Exception\HordeException;
 /**
  * A loggable event, with the display controlled by Horde configuration.
  *
@@ -113,7 +113,7 @@ class Horde_Core_Log_Object
                 $priority = Horde_Log::ERR;
             }
 
-            if ($event instanceof Horde_Exception) {
+            if ($event instanceof HordeException) {
                 $this->_logged = $event->logged;
                 if ($loglevel = $event->getLogLevel()) {
                     $priority = $loglevel;
@@ -227,7 +227,7 @@ class Horde_Core_Log_Object
     {
         switch ($name) {
         case 'logged':
-            if ($value && $this->_exception) {
+            if ($value && $this->_exception instanceof HordeException) {
                 $this->_exception->logged = true;
             }
             $this->_logged = $value;
