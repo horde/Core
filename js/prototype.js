@@ -1,4 +1,4 @@
-/*  Prototype JavaScript framework, version 1.7.3
+/*  Prototype JavaScript framework, version 1.7.4+horde1
  *  (c) 2005-2010 Sam Stephenson
  *
  *  Prototype is freely distributable under the terms of an MIT-style license.
@@ -8,7 +8,7 @@
 
 var Prototype = {
 
-  Version: '1.7.3',
+  Version: '1.7.4+horde1',
 
   Browser: (function(){
     var ua = navigator.userAgent;
@@ -621,7 +621,8 @@ Object.extend(String.prototype, (function() {
   }
 
   function stripTags() {
-    return this.replace(/<\w+(\s+("[^"]*"|'[^']*'|[^>])+)?(\/)?>|<\/\w+>/gi, '');
+    // CVE-2020-27511 see also https://github.com/prototypejs/prototype/pull/349#issuecomment-1654970930
+    return this.replace(/<\w+(\s+("[^"]*"|'[^']*'|[^>'"])+)?\s*("[^">]*|'[^'>])?(\/)?>|<\/\w+>/gi, '');
   }
 
   function stripScripts() {
