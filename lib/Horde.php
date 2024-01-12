@@ -218,6 +218,10 @@ class Horde
             $now = time();
         }
 
+        if (!is_string($data)) {
+            return false;
+        }
+
         $pos = strrpos($data, '&_h=');
         if ($pos === false) {
             return false;

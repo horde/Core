@@ -8,8 +8,9 @@
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
-  notes: |+
-    
+  notes: |
+    [rla] Fix deprecation warning with strrpos reported on mailing list by Andreas Mauser.
+    |+
 3.0.0alpha16:
   api: 3.0.0alpha6
   state:
