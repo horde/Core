@@ -79,8 +79,10 @@ class Horde_Core_Smartmobile_Url extends Horde_Url
     {
         if ($this->toStringCallback || !strlen($this->anchor)) {
             $baseUrl = $this->_baseUrl->copy();
-            $baseUrl->parameters = array_merge($baseUrl->parameters,
-                                               $this->parameters);
+            $baseUrl->parameters = array_merge(
+                $baseUrl->parameters,
+                $this->parameters
+            );
             if (strlen($this->pathInfo)) {
                 $baseUrl->pathInfo = $this->pathInfo;
             }
@@ -98,8 +100,8 @@ class Horde_Core_Smartmobile_Url extends Horde_Url
             $url .= '#' . ($raw ? $this->anchor : rawurlencode($this->anchor));
         }
 
-        if ($params = $this->_getParameters()) {
-            $url .= '?' . implode($raw ? '&' : '&amp;', $params);
+        if ($params = $this->parameters) {
+            $url .= '?' . http_build_query($params, '', $raw ? '&' : '&amp;');
         }
 
         return strval($url);
