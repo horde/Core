@@ -39,7 +39,10 @@ class Horde_Core_Factory_SessionHandler extends Horde_Core_Factory_Injector
         }
         $params = Horde::getDriverConfig('sessionhandler', $driver);
 
-        $driver = basename(Horde_String::lower($driver));
+        if (strpos($driver, "\\") === false) {
+            $driver = Horde_String::lower($driver);
+        }
+        $driver = basename($driver);
         $noset = false;
 
         switch ($driver) {
