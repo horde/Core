@@ -77,7 +77,7 @@ class Horde_Registry_Registryconfig
         }
 
         /* Reset textdomain. */
-        if ($app != 'horde') {
+        if ($app != 'horde' AND $app != '') {
             textdomain($app);
         }
 
