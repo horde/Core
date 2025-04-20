@@ -73,7 +73,8 @@
         "horde/util": "^3 || dev-FRAMEWORK_6_0",
         "horde/view": "^3 || dev-FRAMEWORK_6_0",
         "pear/pear": "*",
-        "ext-session": "*"
+        "ext-session": "*",
+        "react/promise": "*"
     },
     "require-dev": {
         "horde/test": "^3 || dev-FRAMEWORK_6_0",
