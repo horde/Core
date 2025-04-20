@@ -33,19 +33,19 @@ class Horde_Core_VersionChecker
      */
     public function __construct()
     {
+        if (!defined('HORDE_BASE')) {
+            throw new Horde_Exception('HORDE_BASE is not defined');
+        }
+        
+        // Get the root directory by going up from HORDE_BASE
+        $rootDir = dirname(dirname(HORDE_BASE));
+        $composerFile = $rootDir . '/composer.json';
+        
+        if (!file_exists($composerFile)) {
+            throw new Horde_Exception('Could not find composer.json in ' . $rootDir);
+        }
+
         try {
-            if (!defined('HORDE_BASE')) {
-                throw new Horde_Exception('HORDE_BASE is not defined');
-            }
-            
-            // Get the root directory by going up from HORDE_BASE
-            $rootDir = dirname(dirname(HORDE_BASE));
-            $composerFile = $rootDir . '/composer.json';
-            
-            if (!file_exists($composerFile)) {
-                throw new Horde_Exception('Could not find composer.json in ' . $rootDir);
-            }
-            
             $this->composer = \Composer\Factory::create(new \Composer\IO\NullIO(), $composerFile);
             $this->repositoryManager = $this->composer->getRepositoryManager();
         } catch (\Exception $e) {
