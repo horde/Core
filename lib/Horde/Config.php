@@ -120,36 +120,26 @@ class Horde_Config
      * @return array  Keys are app names, values are arrays with two keys:
      *                'version' and 'url'.
      * @throws Horde_Exception
-     * @throws Horde_Http_Exception, Horde_Exception
      */
     public function checkVersions()
     {
-        $response = $GLOBALS['injector']
-            ->getInstance('Horde_Core_Factory_HttpClient')
-            ->create(array(
-                'request.timeout' => 60,
-                'request.userAgent' => 'Horde ' . $GLOBALS['registry']->getVersion('horde', true)
-            ))
-            ->get($this->_versionUrl);
-        if ($response->code != 200) {
-            throw new Horde_Exception('Unexpected response from server.');
+        try {
+            $versionChecker = new Horde_Core_VersionChecker();
+            $updates = $versionChecker->checkAllHordePackages();
+            
+            $versions = array();
+            foreach ($updates as $packageName => $info) {
+                $appName = str_replace('horde/', '', $packageName);
+                $versions[$appName] = array(
+                    'version' => $info['latest'],
+                    'url' => 'https://github.com/horde/' . $appName
+                );
+            }
+            
+            return $versions;
+        } catch (\Exception $e) {
+            throw new Horde_Exception('Failed to check versions: ' . $e->getMessage());
         }
-        if (!is_array($result = json_decode($response->getBody(), true))) {
-            throw new Horde_Exception('Unexpected response from server.');
-        }
-
-        $versions = array();
-
-        foreach ($result as $package) {
-            uksort($package['versions'], 'version_compare');
-            $version = end($package['versions']);
-            $versions[str_replace('pear-horde/', '', $package['name'])] = array(
-                'version' => $version['version'],
-                'url' => 'https://pear.horde.org/'
-            );
-        }
-
-        return $versions;
     }
 
     /**
