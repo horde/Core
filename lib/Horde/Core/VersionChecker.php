@@ -13,20 +13,13 @@
 class Horde_Core_VersionChecker
 {
     /**
-     * Composer instance
-     *
-     * @var Composer
-     */
-    protected $composer;
-
-    /**
      * Repository manager
      *
      * @var RepositoryManager
      */
     protected $repositoryManager;
 
-        /**
+    /**
      * Constructor
      *
      * @throws Horde_Exception if Composer cannot be initialized
@@ -44,10 +37,13 @@ class Horde_Core_VersionChecker
         if (!file_exists($composerFile)) {
             throw new Horde_Exception('Could not find composer.json in ' . $rootDir);
         }
-
+        
         try {
-            $this->composer = \Composer\Factory::create(new \Composer\IO\NullIO(), $composerFile);
-            $this->repositoryManager = $this->composer->getRepositoryManager();
+            // Create Composer instance with proper working directory
+            $io = new \Composer\IO\NullIO();
+            $config = \Composer\Factory::createConfig($io, $rootDir);
+            $composer = \Composer\Factory::create($io, $composerFile, false, $rootDir, $config);
+            $this->repositoryManager = $composer->getRepositoryManager();
         } catch (\Exception $e) {
             throw new Horde_Exception('Failed to initialize Composer: ' . $e->getMessage());
         }
@@ -59,24 +55,42 @@ class Horde_Core_VersionChecker
      * @param string $packageName Package name (e.g., 'horde/core')
      * @return array Array of available versions
      */
-    public function getAvailableVersions($packageName)
+    public function getAvailableVersions(string $packageName) : array
     {
-        $versions = array();
+        $versions = [];
         
-        foreach ($this->repositoryManager->getRepositories() as $repository) {
-            if ($repository instanceof \Composer\Repository\RepositoryInterface) {
-                $packages = $repository->findPackages($packageName);
-                foreach ($packages as $package) {
-                    $versions[] = $package->getVersion();
+        try {
+            // Get all defined repositories (Packagist, GitHub, etc.)
+            $repositories = $this->repositoryManager->getRepositories();
+        
+            foreach ($repositories as $repo) {
+                if (!method_exists($repo, 'findPackages')) {
+                    Horde::Log('Repository ' . get_class($repo) . ' does not support findPackages', 'DEBUG');
+                    continue;
+                }
+        
+                try {
+                    $packages = $repo->findPackages($packageName);
+        
+                    foreach ($packages as $package) {
+                        $versions[] = $package->getVersion(); // Normalized version
+                    }
+                } catch (\Exception $e) {
+                    // Log but continue with other repositories
+                    Horde::Log('Error checking repository for ' . $packageName . ': ' . $e->getMessage(), 'ERR');
+                    continue;
                 }
             }
+        } catch (\Exception $e) {
+            Horde::Log('Error getting available versions for ' . $packageName . ': ' . $e->getMessage(), 'ERR');
+            return [];
         }
-
-        // Sort versions in descending order
+    
+        // Remove duplicates and sort descending
+        $versions = array_unique($versions);
         usort($versions, 'version_compare');
-        $versions = array_reverse($versions);
 
-        return $versions;
+        return array_reverse($versions);
     }
 
     /**
@@ -85,43 +99,53 @@ class Horde_Core_VersionChecker
      * @param string $packageName Package name (e.g., 'horde/core')
      * @return string|null Installed version or null if not found
      */
-    public function getInstalledVersion($packageName)
+    public function getInstalledVersion(string $packageName) : string|null
     {
-        $localRepository = $this->composer->getRepositoryManager()->getLocalRepository();
-        $packages = $localRepository->findPackages($packageName);
-        
-        if (!empty($packages)) {
-            return $packages[0]->getVersion();
+        // Check if the package is installed
+        if (!\Composer\InstalledVersions::isInstalled($packageName)) {
+            Horde::Log('Package not installed: ' . $packageName, 'ERR');
+            return null;
         }
-        
-        return null;
+
+        $installedVersion = \Composer\InstalledVersions::getVersion($packageName); // normalized
+        $prettyVersion    = \Composer\InstalledVersions::getPrettyVersion($packageName); // human-readable
+
+        return $installedVersion;
     }
 
     /**
-     * Check if a newer version is available
+     * Check if a newer version of a package is available
      *
      * @param string $packageName Package name (e.g., 'horde/core')
      * @return array|null Array with version info or null if no update available
      */
-    public function checkForUpdate($packageName)
+    public function checkForUpdate(string $packageName) : array|null
     {
-        $installedVersion = $this->getInstalledVersion($packageName);
-        if (!$installedVersion) {
-            return null;
-        }
+        try {
+            $installedVersion = $this->getInstalledVersion($packageName);
+            if (!$installedVersion) {
+                Horde::Log('Package ' . $packageName . ' is not installed', 'DEBUG');
+                return null;
+            }
 
-        $availableVersions = $this->getAvailableVersions($packageName);
-        if (empty($availableVersions)) {
-            return null;
-        }
+            $availableVersions = $this->getAvailableVersions($packageName);
+            if (empty($availableVersions)) {
+                Horde::Log('No available versions found for ' . $packageName, 'DEBUG');
+                return null;
+            }
 
-        $latestVersion = $availableVersions[0];
-        if (version_compare($latestVersion, $installedVersion, '>')) {
-            return array(
-                'current' => $installedVersion,
-                'latest' => $latestVersion,
-                'update_available' => true
-            );
+            $latestVersion = $availableVersions[0];
+            if (version_compare($latestVersion, $installedVersion, '>')) {
+                Horde::Log('Update available for ' . $packageName . ': ' . $installedVersion . ' -> ' . $latestVersion, 'INFO');
+                return array(
+                    'current' => $installedVersion,
+                    'latest' => $latestVersion,
+                    'update_available' => true
+                );
+            }
+        } catch (\Exception $e) {
+            Horde::Log('Error checking for updates for ' . $packageName . ': ' . $e->getMessage(), 'ERR');
+            return null;
         }
 
         return null;
@@ -132,20 +156,34 @@ class Horde_Core_VersionChecker
      *
      * @return array Array of packages with available updates
      */
-    public function checkAllHordePackages()
+    public function checkAllHordePackages() : array
     {
         $updates = array();
-        $localRepository = $this->composer->getRepositoryManager()->getLocalRepository();
         
-        foreach ($localRepository->getPackages() as $package) {
-            if (strpos($package->getName(), 'horde/') === 0) {
-                $updateInfo = $this->checkForUpdate($package->getName());
-                if ($updateInfo) {
-                    $updates[$package->getName()] = $updateInfo;
+        try {
+            // Get all installed packages
+            foreach (\Composer\InstalledVersions::getInstalledPackages() as $packageName) {
+                // Only check Horde packages
+                if (strpos($packageName, 'horde/') !== 0) {
+                    continue;
+                }
+
+                try {
+                    $updateInfo = $this->checkForUpdate($packageName);
+                    if ($updateInfo) {
+                        $updates[$packageName] = $updateInfo;
+                    }
+                } catch (\Exception $e) {
+                    Horde::Log('Error checking updates for ' . $packageName . ': ' . $e->getMessage(), 'ERR');
+                    continue;
                 }
             }
+        } catch (\Exception $e) {
+            Horde::Log('Error checking all Horde packages: ' . $e->getMessage(), 'ERR');
+            return [];
         }
 
+        Horde::Log('Found ' . count($updates) . ' packages with available updates', 'INFO');
         return $updates;
     }
-} 
+}
