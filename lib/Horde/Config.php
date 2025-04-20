@@ -98,13 +98,6 @@ class Horde_Config
     protected $_configEnd = "/* CONFIG END. DO NOT CHANGE ANYTHING IN OR BEFORE THIS LINE. */\n";
 
     /**
-     * Horde URL to check version information.
-     *
-     * @var string
-     */
-    protected $_versionUrl = 'https://pear.horde.org/packages.json';
-
-    /**
      * Constructor.
      *
      * @param string $app  The name of the application to be configured.
@@ -123,10 +116,10 @@ class Horde_Config
      */
     public function checkVersions()
     {
+        $versionChecker = new Horde_Core_VersionChecker();
+        $updates = $versionChecker->checkAllHordePackages();
+
         try {
-            $versionChecker = new Horde_Core_VersionChecker();
-            $updates = $versionChecker->checkAllHordePackages();
-            
             $versions = array();
             foreach ($updates as $packageName => $info) {
                 $appName = str_replace('horde/', '', $packageName);
