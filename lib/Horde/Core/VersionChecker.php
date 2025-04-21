@@ -13,11 +13,67 @@
 class Horde_Core_VersionChecker
 {
     /**
+     * Composer instance
+     *
+     * @var \Composer\Composer
+     */
+    protected $composer;
+
+    /**
+     * IO instance
+     *
+     * @var \Composer\IO\NullIO
+     */
+    protected $io;
+
+    /**
+     * Config instance
+     *
+     * @var \Composer\Config
+     */
+    protected $config;
+
+    /**
+     * Process executor instance
+     *
+     * @var \Composer\Util\ProcessExecutor
+     */
+    protected $process;
+
+    /**
+     * HTTP downloader instance
+     *
+     * @var \Composer\Util\HttpDownloader
+     */
+    protected $httpDownloader;
+
+    /**
+     * Event dispatcher instance
+     *
+     * @var \Composer\EventDispatcher\EventDispatcher
+     */
+    protected $eventDispatcher;
+
+    /**
      * Repository manager
      *
      * @var RepositoryManager
      */
     protected $repositoryManager;
+
+    /**
+     * Root directory of horde installation 
+     *
+     * @var string
+     */
+    protected $rootDir;
+
+    /**
+     * Installed packages data
+     *
+     * @var array
+     */
+    protected $installedPackages;
 
     /**
      * Constructor
@@ -31,66 +87,212 @@ class Horde_Core_VersionChecker
         }
         
         // Get the root directory by going up from HORDE_BASE
-        $rootDir = dirname(dirname(HORDE_BASE));
-        $composerFile = $rootDir . '/composer.json';
+        $this->rootDir = dirname(dirname(dirname(dirname(dirname(HORDE_BASE)))));
+        Horde::Log('Root directory: ' . $this->rootDir, 'ERR');
+        $composerFile = $this->rootDir . '/composer.json';
         
         if (!file_exists($composerFile)) {
-            throw new Horde_Exception('Could not find composer.json in ' . $rootDir);
+            throw new Horde_Exception('Could not find composer.json in ' . $this->rootDir);
+        }
+
+        // Load installed.json
+        $installedPath = $this->rootDir . '/vendor/composer/installed.json';
+        if (!file_exists($installedPath)) {
+            throw new Horde_Exception('Could not find installed.json at ' . $installedPath);
+        }
+
+        $installedData = json_decode(file_get_contents($installedPath), true);
+        if ($installedData === null) {
+            throw new Horde_Exception('Could not parse installed.json at ' . $installedPath);
+        }
+
+        $this->installedPackages = $installedData['packages'] ?? $installedData;
+        if (!is_array($this->installedPackages)) {
+            throw new Horde_Exception('Invalid format in installed.json at ' . $installedPath);
         }
         
         try {
             // Create Composer instance with proper working directory
-            $io = new \Composer\IO\NullIO();
-            $config = \Composer\Factory::createConfig($io, $rootDir);
-            $composer = \Composer\Factory::create($io, $composerFile, false, $rootDir, $config);
-            $this->repositoryManager = $composer->getRepositoryManager();
+            $this->io = new \Composer\IO\NullIO();
+            $this->config = \Composer\Factory::createConfig($this->io, $this->rootDir);
+            $this->composer = \Composer\Factory::create($this->io, $composerFile, false, $this->rootDir, $this->config);
+            $this->repositoryManager = $this->composer->getRepositoryManager();
+            
+            // Initialize other Composer components
+            $this->process = new \Composer\Util\ProcessExecutor($this->io);
+            $this->httpDownloader = new \Composer\Util\HttpDownloader($this->io, $this->config);
+            $this->eventDispatcher = new \Composer\EventDispatcher\EventDispatcher($this->composer, $this->io);
         } catch (\Exception $e) {
             throw new Horde_Exception('Failed to initialize Composer: ' . $e->getMessage());
         }
     }
 
     /**
-     * Get available versions for a package
+     * Get the latest commit hash for a given branch
+     * 
+     * This function is used to get the latest commit hash for a given branch
+     * 
+     * Attention: It uses composers internal classes and methods.
+     * These are not part of the public API, but quite stable.
+     *
+     * @param string $gitUrl The URL of the Git repository
+     * @param string $branch The branch name
+     * @return string|null The latest commit hash or null if not found
+     */
+    protected function getLatestCommitHash(string $gitUrl, string $branch): ?string
+    {
+        // Create a VCS repository object pointing to the Git URL
+        $repo = new \Composer\Repository\VcsRepository(
+            [
+                'url' => $gitUrl,
+                'type' => 'git',
+            ],
+            $this->io,
+            $this->config,
+            $this->httpDownloader,
+            $this->eventDispatcher,
+            $this->process
+        );
+
+        if(!$repo instanceof \Composer\Repository\VcsRepository) {
+            Horde::Log('Repository is not a VCS repository: ' . $gitUrl, 'ERR');
+            return null;
+        }
+      
+        // Get the Git driver for the remote repository
+        $driver = $repo->getDriver();
+        if (!$driver instanceof \Composer\Repository\Vcs\GitDriver) {
+            Horde::Log('Repository is not a Git repository: ' . $gitUrl, 'ERR');
+            return null;
+        }
+
+        try {
+            // Get all remote branches and their commit hashes
+            $remoteBranches = $driver->getBranches();
+            //Horde::Log('Remote-Branches for git-url:' . $gitUrl . ' =' . print_r($remoteBranches, true), 'ERR');
+
+            if (empty($remoteBranches)) {
+                Horde::Log('No branches found for remote repository: ' . $gitUrl, 'ERR');
+                return null;
+            }
+
+            // Get the latest commit for our branch
+            if (!isset($remoteBranches[$branch])) {
+                Horde::Log('Branch ' . $branch . ' not found in remote repository', 'ERR');
+                return null;
+            }
+
+            return $remoteBranches[$branch];
+
+        } catch (\Exception $e) {
+            Horde::Log('Error fetching branches for ' . $gitUrl . ': ' . $e->getMessage(), 'ERR');
+            return null;
+        }
+    }
+
+
+    /**
+     * Get available versions for a package from its installation repository
+     *
+     * This function:
+     *  - Finds the installed package and its source repository
+     *  - Queries that repository for all available versions
      *
      * @param string $packageName Package name (e.g., 'horde/core')
-     * @return array Array of available versions
+     * @return array Sorted list of available versions
      */
-    public function getAvailableVersions(string $packageName) : array
+    public function getAvailableVersions(string $packageName): array
     {
-        $versions = [];
-        
-        try {
-            // Get all defined repositories (Packagist, GitHub, etc.)
-            $repositories = $this->repositoryManager->getRepositories();
-        
-            foreach ($repositories as $repo) {
-                if (!method_exists($repo, 'findPackages')) {
-                    Horde::Log('Repository ' . get_class($repo) . ' does not support findPackages', 'DEBUG');
-                    continue;
-                }
-        
-                try {
-                    $packages = $repo->findPackages($packageName);
-        
-                    foreach ($packages as $package) {
-                        $versions[] = $package->getVersion(); // Normalized version
-                    }
-                } catch (\Exception $e) {
-                    // Log but continue with other repositories
-                    Horde::Log('Error checking repository for ' . $packageName . ': ' . $e->getMessage(), 'ERR');
-                    continue;
-                }
-            }
-        } catch (\Exception $e) {
-            Horde::Log('Error getting available versions for ' . $packageName . ': ' . $e->getMessage(), 'ERR');
+        //Horde::Log('Getting available versions for ' . $packageName, 'ERR');
+        if (!\Composer\InstalledVersions::isInstalled($packageName)) {
+            Horde::Log('Package not installed: ' . $packageName, 'ERR');
             return [];
         }
-    
-        // Remove duplicates and sort descending
-        $versions = array_unique($versions);
-        usort($versions, 'version_compare');
 
-        return array_reverse($versions);
+        // Find the package entry from locally installed packages
+        $packageEntry = null;
+        foreach ($this->installedPackages as $pkg) {
+            if ($pkg['name'] === $packageName) {
+                $packageEntry = $pkg;
+                break;
+            }
+        }
+
+        if (!$packageEntry || !isset($packageEntry['source'])) {
+            Horde::Log('Could not find source information for ' . $packageName, 'ERR');
+            return [];
+        }
+
+        $sourceUrl = $packageEntry['source']['url'] ?? null;
+        $sourceType = $packageEntry['source']['type'] ?? null;
+        $sourceReference = $packageEntry['source']['reference'] ?? null;
+
+        if ($sourceType === 'git') {
+            // For Git repositories, identify the local branch from version string
+            $version = $packageEntry['version'] ?? '';
+            $localBranch = null;
+            
+            // Strip away the dev- prefix or -dev suffix
+            if (strpos($version, 'dev-') === 0) {
+                $localBranch = substr($version, 4);
+            } elseif (strpos($version, '-dev') !== false) {
+                $localBranch = substr($version, 0, -4);
+            }
+            
+            //Horde::Log('Package ' . $packageName . ' :: version: ' . $version . ' -> branch: ' . ($localBranch ?? 'unknown'), 'ERR');
+
+            if ($localBranch === null) {
+                Horde::Log('Could not identify branch from version: ' . $version, 'ERR');
+                return [];
+            }
+
+            // Get the latest commit hash for our branch
+            $latestRemoteRef = $this->getLatestCommitHash($sourceUrl, $localBranch);
+            if ($latestRemoteRef === null) {
+                return [];
+            }
+
+            // If we have a different reference, there's an update available
+            if ($latestRemoteRef !== $sourceReference) {
+                Horde::Log('Update available for ' . $packageName . ': ' . $sourceReference . ' -> ' . $latestRemoteRef, 'ERR');
+                return [$latestRemoteRef];
+            }
+            return [];
+
+        } elseif ($sourceType === 'composer') {
+            
+            $repoConfig = [
+                'url'  => $sourceUrl,
+                'type' => 'composer',
+            ];
+
+            $repo = new \Composer\Repository\ComposerRepository(
+                $repoConfig,
+                $this->io,
+                $this->config,
+                $this->httpDownloader,
+                $this->eventDispatcher,
+                $this->process
+            );
+
+            // For Composer repositories, use standard version comparison
+            $versions = [];
+            try {
+                $packages = $repo->findPackages($packageName);
+                foreach ($packages as $package) {
+                    $versions[] = $package->getVersion();
+                }
+            } catch (\Exception $e) {
+                Horde::Log('Error fetching versions for ' . $packageName . ': ' . $e->getMessage(), 'ERR');
+                return [];
+            }
+
+            $versions = array_unique($versions);
+            usort($versions, 'version_compare');
+            return array_reverse($versions);
+        }
+
+        return [];
     }
 
     /**
@@ -134,9 +336,10 @@ class Horde_Core_VersionChecker
                 return null;
             }
 
+            Horde::Log('Available versions for ' . $packageName . ': ' . print_r($availableVersions, true), 'ERR');
             $latestVersion = $availableVersions[0];
             if (version_compare($latestVersion, $installedVersion, '>')) {
-                Horde::Log('Update available for ' . $packageName . ': ' . $installedVersion . ' -> ' . $latestVersion, 'INFO');
+                Horde::Log('Update available for ' . $packageName . ': ' . $installedVersion . ' -> ' . $latestVersion, 'ERR');
                 return array(
                     'current' => $installedVersion,
                     'latest' => $latestVersion,
