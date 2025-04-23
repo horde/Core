@@ -88,7 +88,6 @@ class Horde_Core_VersionChecker
         
         // Get the root directory by going up from HORDE_BASE
         $this->rootDir = dirname(dirname(dirname(dirname(dirname(HORDE_BASE)))));
-        Horde::Log('Root directory: ' . $this->rootDir, 'ERR');
         $composerFile = $this->rootDir . '/composer.json';
         
         if (!file_exists($composerFile)) {
@@ -110,6 +109,8 @@ class Horde_Core_VersionChecker
         if (!is_array($this->installedPackages)) {
             throw new Horde_Exception('Invalid format in installed.json at ' . $installedPath);
         }
+
+       //Horde::Log('\Composer\InstalledVersions::getAllRawData(): ' . print_r(\Composer\InstalledVersions::getAllRawData(), true), 'ERR');
         
         try {
             // Create Composer instance with proper working directory
@@ -117,14 +118,45 @@ class Horde_Core_VersionChecker
             $this->config = \Composer\Factory::createConfig($this->io, $this->rootDir);
             $this->composer = \Composer\Factory::create($this->io, $composerFile, false, $this->rootDir, $this->config);
             $this->repositoryManager = $this->composer->getRepositoryManager();
-            
-            // Initialize other Composer components
             $this->process = new \Composer\Util\ProcessExecutor($this->io);
             $this->httpDownloader = new \Composer\Util\HttpDownloader($this->io, $this->config);
             $this->eventDispatcher = new \Composer\EventDispatcher\EventDispatcher($this->composer, $this->io);
         } catch (\Exception $e) {
             throw new Horde_Exception('Failed to initialize Composer: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Get the installed 'horde/*' packages. other packages are filtered out.
+     *
+     * This method is static to avoid creating a new instance of the VersionChecker class by performance reasons.
+     * 
+     * @return array[] Array with package names (without horde/ prefix) as keys and package info as values
+     */
+    public static function getInstalledPackages(): array
+    {
+        $packages = array();
+        try {
+            // Get all installed packages
+            foreach (\Composer\InstalledVersions::getInstalledPackages() as $packageName) {
+
+                Horde::Log('Installed package: ' . print_r($packageName, true), 'ERR');
+                // Only check Horde packages
+                if (str_starts_with($packageName, 'horde/')) {
+                    $shortName = substr($packageName, 6); // Remove 'horde/' prefix
+                    $packages[$shortName] = array(
+                        'version' => \Composer\InstalledVersions::getVersion($packageName),
+                        'prettyVersion' => \Composer\InstalledVersions::getPrettyVersion($packageName),
+                        'url' => '', // We'll need to get this from composer.lock or installed.json
+                        'commit-reference' => \Composer\InstalledVersions::getReference($packageName) ?? ''
+                    );
+                }
+            }
+        } catch (\Exception $e) {
+            Horde::Log('Error checking all Horde packages: ' . $e->getMessage(), 'ERR');
+            return [];
+        }
+        return $packages;
     }
 
     /**
@@ -190,7 +222,7 @@ class Horde_Core_VersionChecker
         }
     }
 
-
+    
     /**
      * Get latest available version for a package from its installation repository
      *
@@ -312,10 +344,18 @@ class Horde_Core_VersionChecker
     /**
      * Get installed version of a package
      *
+     * Returns an array with the following structure:
+     * [
+     *     'version' => string,        // Normalized version number (e.g., '1.2.3.0' or 'dev-master')
+     *     'prettyVersion' => string,  // Human-readable version (e.g., '1.2.3' or 'dev-master')
+     *     'url' => string,           // Source URL (GitHub for Horde packages, Packagist URL for others)
+     *     'commit-reference' => string // Latest commit hash for dev versions, empty string for releases
+     * ]
+     *
      * @param string $packageName Package name (e.g., 'horde/core')
-     * @return string|null Installed version or null if not found
+     * @return array|null Array with version information or null if package not found
      */
-    public function getInstalledVersion(string $packageName) : string|null
+    public function getInstalledVersion(string $packageName): array|null
     {
         // Check if the package is installed
         if (!\Composer\InstalledVersions::isInstalled($packageName)) {
@@ -323,46 +363,86 @@ class Horde_Core_VersionChecker
             return null;
         }
 
-        $installedVersion = \Composer\InstalledVersions::getVersion($packageName); // normalized
-        $prettyVersion    = \Composer\InstalledVersions::getPrettyVersion($packageName); // human-readable
+        // Find the package entry from installed packages
+        $packageEntry = null;
+        foreach ($this->installedPackages as $pkg) {
+            if ($pkg['name'] === $packageName) {
+                $packageEntry = $pkg;
+                break;
+            }
+        }
 
-        return $installedVersion;
+        if (!$packageEntry) {
+            Horde::Log('Could not find package entry for ' . $packageName, 'ERR');
+            return null;
+        }
+
+        $returnArray = array();
+        $returnArray['version'] = $packageEntry['version_normalized'];
+        $returnArray['prettyVersion'] = $packageEntry['version'];
+
+        // Set URL based on package type
+        if (str_starts_with($packageName, 'horde/')) {
+            $returnArray['url'] = $packageEntry['source']['url'] ?? 'https://github.com/' . $packageName;
+        } else {
+            $returnArray['url'] = 'https://packagist.org/packages/' . $packageName;
+        }
+
+        // Set commit reference if available
+        $returnArray['commit-reference'] = $packageEntry['source']['reference'] ?? '';
+
+        return $returnArray;
     }
 
     /**
      * Check if a newer version of a package is available
      *
+     * Returns an array with update information if an update is available:
+     * [
+     *     'version' => string,        // Latest available version
+     *     'prettyVersion' => string,  // Human-readable latest version
+     *     'url' => string,           // URL to download/update
+     *     'commit-reference' => string // Latest commit hash if applicable
+     * ]
+     *
      * @param string $packageName Package name (e.g., 'horde/core')
-     * @return array|null Array with version info or null if no update available
+     * @return array|null Array with update information or null if no update available
      */
-    public function checkForUpdate(string $packageName) : array|null
+    public function checkForUpdate(string $packageName): array|null
     {
-        try {
-            $installedVersion = $this->getInstalledVersion($packageName);
-            if (!$installedVersion) {
-                Horde::Log('Package ' . $packageName . ' is not installed', 'DEBUG');
-                return null;
-            }
-
-            $availableVersions = $this->getAvailableVersions($packageName);
-            if (empty($availableVersions)) {
-                Horde::Log('No available versions found for ' . $packageName, 'DEBUG');
-                return null;
-            }
-
-            Horde::Log('Available versions for ' . $packageName . ': ' . print_r($availableVersions, true), 'ERR');
-            $latestVersion = $availableVersions[0];
-            if (version_compare($latestVersion, $installedVersion, '>')) {
-                Horde::Log('Update available for ' . $packageName . ': ' . $installedVersion . ' -> ' . $latestVersion, 'ERR');
-                return array(
-                    'current' => $installedVersion,
-                    'latest' => $latestVersion,
-                    'update_available' => true
-                );
-            }
-        } catch (\Exception $e) {
-            Horde::Log('Error checking for updates for ' . $packageName . ': ' . $e->getMessage(), 'ERR');
+        $installedVersion = $this->getInstalledVersion($packageName);
+        if (!$installedVersion) {
+            Horde::Log('Package ' . $packageName . ' is not installed', 'DEBUG');
             return null;
+        }
+        
+        $availableVersion = $this->getAvailableVersion($packageName);
+        if (!$availableVersion) {
+            Horde::Log('No available version found for ' . $packageName, 'DEBUG');
+            return null;
+        }
+
+        Horde::Log('Checking update for ' . $packageName . ': ' . 
+            $installedVersion['version'] . ' -> ' . $availableVersion['version'], 'DEBUG');
+
+        // For dev versions, check commit reference
+        if (str_starts_with($installedVersion['version'], 'dev-') && 
+            !empty($installedVersion['commit-reference']) && 
+            !empty($availableVersion['commit-reference'])) {
+            if ($installedVersion['commit-reference'] !== $availableVersion['commit-reference']) {
+                Horde::Log('Git update available for ' . $packageName . ': ' . 
+                    substr($installedVersion['commit-reference'], 0, 7) . ' -> ' . 
+                    substr($availableVersion['commit-reference'], 0, 7), 'DEBUG');
+                return $availableVersion;
+            }
+            return null;
+        }
+
+        // For regular versions, compare version numbers
+        if (version_compare($availableVersion['version'], $installedVersion['version'], '>')) {
+            Horde::Log('Update available for ' . $packageName . ': ' . 
+                $installedVersion['version'] . ' -> ' . $availableVersion['version'], 'DEBUG');
+            return $availableVersion;
         }
 
         return null;
@@ -400,7 +480,6 @@ class Horde_Core_VersionChecker
             return [];
         }
 
-        Horde::Log('Found ' . count($updates) . ' packages with available updates', 'INFO');
         return $updates;
     }
 }
