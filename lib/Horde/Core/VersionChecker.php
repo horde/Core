@@ -78,36 +78,36 @@ class Horde_Core_VersionChecker
     /**
      * Constructor
      *
-     * @throws Horde_Exception if Composer cannot be initialized
+     * @throws Horde\Exception if Composer cannot be initialized
      */
     public function __construct()
     {
         if (!defined('HORDE_BASE')) {
-            throw new Horde_Exception('HORDE_BASE is not defined');
+            throw new Horde\Exception('HORDE_BASE is not defined');
         }
         
         // Get the root directory by going up from HORDE_BASE
-        $this->rootDir = dirname(dirname(dirname(dirname(dirname(HORDE_BASE)))));
+        $this->rootDir = dirname(HORDE_BASE, 5);
         $composerFile = $this->rootDir . '/composer.json';
         
         if (!file_exists($composerFile)) {
-            throw new Horde_Exception('Could not find composer.json in ' . $this->rootDir);
+            throw new Horde\Exception('Could not find composer.json in ' . $this->rootDir);
         }
 
         // Load installed.json
         $installedPath = $this->rootDir . '/vendor/composer/installed.json';
         if (!file_exists($installedPath)) {
-            throw new Horde_Exception('Could not find installed.json at ' . $installedPath);
+            throw new Horde\Exception('Could not find installed.json at ' . $installedPath);
         }
 
         $installedData = json_decode(file_get_contents($installedPath), true);
         if ($installedData === null) {
-            throw new Horde_Exception('Could not parse installed.json at ' . $installedPath);
+            throw new Horde\Exception('Could not parse installed.json at ' . $installedPath);
         }
 
         $this->installedPackages = $installedData['packages'] ?? $installedData;
         if (!is_array($this->installedPackages)) {
-            throw new Horde_Exception('Invalid format in installed.json at ' . $installedPath);
+            throw new Horde\Exception('Invalid format in installed.json at ' . $installedPath);
         }
 
        //Horde::Log('\Composer\InstalledVersions::getAllRawData(): ' . print_r(\Composer\InstalledVersions::getAllRawData(), true), 'ERR');
@@ -122,7 +122,7 @@ class Horde_Core_VersionChecker
             $this->httpDownloader = new \Composer\Util\HttpDownloader($this->io, $this->config);
             $this->eventDispatcher = new \Composer\EventDispatcher\EventDispatcher($this->composer, $this->io);
         } catch (\Exception $e) {
-            throw new Horde_Exception('Failed to initialize Composer: ' . $e->getMessage());
+            throw new Horde\Exception('Failed to initialize Composer: ' . $e->getMessage());
         }
     }
 
@@ -131,7 +131,7 @@ class Horde_Core_VersionChecker
      *
      * This method is static to avoid creating a new instance of the VersionChecker class by performance reasons.
      * 
-     * @return array[] Array with package names (without horde/ prefix) as keys and package info as values
+     * @return array[] Array with full package names ('horde/package' ) as keys and package info as values
      */
     public static function getInstalledPackages(): array
     {
@@ -143,8 +143,7 @@ class Horde_Core_VersionChecker
                 Horde::Log('Installed package: ' . print_r($packageName, true), 'ERR');
                 // Only check Horde packages
                 if (str_starts_with($packageName, 'horde/')) {
-                    $shortName = substr($packageName, 6); // Remove 'horde/' prefix
-                    $packages[$shortName] = array(
+                    $packages[$packageName] = array(
                         'version' => \Composer\InstalledVersions::getVersion($packageName),
                         'prettyVersion' => \Composer\InstalledVersions::getPrettyVersion($packageName),
                         'url' => '', // We'll need to get this from composer.lock or installed.json
@@ -256,7 +255,7 @@ class Horde_Core_VersionChecker
      * - url: Packagist URL
      * - commit-reference: Empty string
      * 
-     * @param string $packageName Package name 'vendor/package' (e.g., 'horde/core')
+     * @param string $packageName Full package name 'vendor/package' (e.g., 'horde/core')
      * @return array|null Array with version information or null if package not found/error
      */
     public function getAvailableVersion(string $packageName): array|null
@@ -352,7 +351,7 @@ class Horde_Core_VersionChecker
      *     'commit-reference' => string // Latest commit hash for dev versions, empty string for releases
      * ]
      *
-     * @param string $packageName Package name (e.g., 'horde/core')
+     * @param string $packageName Full package name (e.g., 'horde/core')
      * @return array|null Array with version information or null if package not found
      */
     public function getInstalledVersion(string $packageName): array|null
@@ -405,7 +404,7 @@ class Horde_Core_VersionChecker
      *     'commit-reference' => string // Latest commit hash if applicable
      * ]
      *
-     * @param string $packageName Package name (e.g., 'horde/core')
+     * @param string $packageName Full Package name (e.g., 'horde/core')
      * @return array|null Array with update information or null if no update available
      */
     public function checkForUpdate(string $packageName): array|null
@@ -449,7 +448,8 @@ class Horde_Core_VersionChecker
     }
 
     /**
-     * Check for updates for all Horde packages
+     * Check for updates for all Horde packages (long name: horde/*).
+     * Other packages are ignored.
      *
      * @return array Array of packages with available updates
      */
