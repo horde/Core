@@ -1,5 +1,16 @@
 ---
-3.0.0alpha17:
+3.0.0-alpha17:
+  api: 3.0.0-alpha1
+  state:
+    release: true
+    api: true
+  date: 2025-05-05
+  license:
+    identifier: LGPL-2.1-only
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    fix: Improve PSR-12 compliance, apply php-cs-fixer, improve PHP 8.4 compatibility for nullable types
+3.0.0-alpha16:
   api: 3.0.0alpha6
   state:
     release: alpha
@@ -9,21 +20,10 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
-    [rla] Fix deprecation warning with strrpos reported on mailing list by Andreas Mauser.
-    |+
-3.0.0alpha16:
-  api: 3.0.0alpha6
-  state:
-    release: alpha
-    api: alpha
-  date: 2024-01-10
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
+    Original version string was 3.0.0alpha16
     [rla] SECURITY: Mitigate CVE-2020-27511.
     |+
-3.0.0alpha15:
+3.0.0-alpha15:
   api: 3.0.0alpha6
   state:
     release: alpha
@@ -32,8 +32,10 @@
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
-  notes: |+
-3.0.0alpha14:
+  notes: |-
+    Original version string was 3.0.0alpha15
+    |+
+3.0.0-alpha14:
   api: 3.0.0alpha6
   state:
     release: alpha
@@ -42,8 +44,10 @@
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
-  notes: |+
-3.0.0alpha13:
+  notes: |-
+    Original version string was 3.0.0alpha14
+    |+
+3.0.0-alpha13:
   api: 3.0.0alpha6
   state:
     release: alpha
@@ -52,8 +56,10 @@
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
-  notes: |+
-3.0.0alpha12:
+  notes: |-
+    Original version string was 3.0.0alpha13
+    |+
+3.0.0-alpha12:
   api: 3.0.0alpha6
   state:
     release: alpha
@@ -63,9 +69,10 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 3.0.0alpha12
     [rla] Improved PHP 8.1 compatibility.
     [rla] Prevent autoloader clashes when composer autoloader and horde autoloader are present.
-3.0.0alpha11:
+3.0.0-alpha11:
   api: 3.0.0alpha6
   state:
     release: alpha
@@ -74,8 +81,10 @@
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
-  notes: |+
-3.0.0alpha10:
+  notes: |-
+    Original version string was 3.0.0alpha11
+    |+
+3.0.0-alpha10:
   api: 3.0.0alpha6
   state:
     release: alpha
@@ -84,8 +93,10 @@
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
-  notes: |+
-3.0.0alpha9:
+  notes: |-
+    Original version string was 3.0.0alpha10
+    |+
+3.0.0-alpha9:
   api: 3.0.0alpha6
   state:
     release: alpha
@@ -95,9 +106,10 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 3.0.0alpha9
     [rla] Add support for namespaced Application, Api, Ajax\Application and Blocks.
     |+
-3.0.0alpha8:
+3.0.0-alpha8:
   api: 3.0.0alpha6
   state:
     release: alpha
@@ -106,8 +118,10 @@
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
-  notes: |+
-3.0.0alpha7:
+  notes: |-
+    Original version string was 3.0.0alpha8
+    |+
+3.0.0-alpha7:
   api: 3.0.0alpha6
   state:
     release: alpha
@@ -117,9 +131,10 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 3.0.0alpha7
     [rla] Added PSR-3 Logger Factory to the default set.
     |+
-3.0.0alpha6:
+3.0.0-alpha6:
   api: 3.0.0alpha6
   state:
     release: stable
@@ -129,6 +144,7 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 3.0.0alpha6
     [rla] Controller Framework Routes now work correctly for separate subdomain or for uncommon webdir layouts.
     [rla] Controller Framework now has limited capabilities for unauthenticated or API-authenticated calls.
     [rla] Adapt schema migrations to work in new H6 installation layout.
@@ -1162,36 +1178,7 @@
     [jan] Fix botched 2.12.0 release.
     [mjr] Fix closing smartmobile dialog pages (Bug #13316).
     [mjr] Fix issue that could cause multiple tabs to be shown as active when tab_name could be a mix of integers or strings.
-2.12.0RC2:
-  api: 2.12.0
-  state:
-    release: beta
-    api: beta
-  date: 2014-07-01
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    [mjr] Fix issue sending email via EAS when the imap client throws an error when synchronizing the maillog (Bug #13276).
-    [mjr] Improvements to vcard mime handler to allow for ajax updating (Bug #13101).
-    [jan] Fix delay when fading the same dialog more than once.
-    [jan] Catch exceptions from NoSQL backends when building indices.
-2.12.0RC1:
-  api: 2.12.0
-  state:
-    release: beta
-    api: beta
-  date: 2014-06-17
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    [mjr] Fix incorrect processing of autocompleted data when using prettyautocompleter (Bug #13256).
-    [mjr] Fix updating attendee response status when received via ActiveSync.
-    [jan] Add <configldapuser> configuration item.
-    [jan] Add base DN to LDAP configuration for searching user DNs.
-    [jan] Allow to specify port for PostgreSQL socket connections (Request #13250).
-2.12.0beta3:
+2.12.0-beta3:
   api: 2.12.0
   state:
     release: beta
@@ -1201,8 +1188,9 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 2.12.0beta3
     [mms] Allow any HordeCore AJAX response object to return JSON-HTML output, instead of pure JSON.
-2.12.0beta2:
+2.12.0-beta2:
   api: 2.12.0
   state:
     release: beta
@@ -1212,9 +1200,10 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 2.12.0beta2
     [mjr] Fix copying forwarded messages to Sent mail folder when using EAS.
     [mjr] Fix generating From address when sending email via ActiveSync when personal part must be quoted (Bug# 13208).
-2.12.0beta1:
+2.12.0-beta1:
   api: 2.12.0
   state:
     release: beta
@@ -1224,12 +1213,13 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 2.12.0beta1
     [mjr] Fix tracking bad login count and honoring the lock setting when using Application auth backend.
     [mms] Support LMTP servers when sending mail.
     [mms] Add Horde_Registry#hasLink() (Bug #13175).
     [mjr] Fix returning mailbox list for ActiveSync clients when not using IMAP subscriptions (Bug #13177).
     [jan] Update Hungarian translation (Andras Galos <galosa@netinform.hu>).
-2.12.0alpha1:
+2.12.0-alpha1:
   api: 2.12.0
   state:
     release: alpha
@@ -1239,6 +1229,7 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 2.12.0alpha1
     [mms] Allow CKeditor 3 to work with IE 11.
     [jan] Fix translation of portal block names (Bug #13116).
     [mms] Add Horde_Registry#getAuthInfo() and Horde_Registry#getAuthApps().
@@ -1283,6 +1274,37 @@
     [mms] Fix jquerymobile icons (Bug #12876).
     [mms] Don't add 2 entries to history when opening a jquery mobile dialog (Bug #12877).
     [jan] Fix padding of drop down lists with scrollbars (Bug #11971).
+2.12.0-RC2:
+  api: 2.12.0
+  state:
+    release: beta
+    api: beta
+  date: 2014-07-01
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    Original version string was 2.12.0RC2
+    [mjr] Fix issue sending email via EAS when the imap client throws an error when synchronizing the maillog (Bug #13276).
+    [mjr] Improvements to vcard mime handler to allow for ajax updating (Bug #13101).
+    [jan] Fix delay when fading the same dialog more than once.
+    [jan] Catch exceptions from NoSQL backends when building indices.
+2.12.0-RC1:
+  api: 2.12.0
+  state:
+    release: beta
+    api: beta
+  date: 2014-06-17
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    Original version string was 2.12.0RC1
+    [mjr] Fix incorrect processing of autocompleted data when using prettyautocompleter (Bug #13256).
+    [mjr] Fix updating attendee response status when received via ActiveSync.
+    [jan] Add <configldapuser> configuration item.
+    [jan] Add base DN to LDAP configuration for searching user DNs.
+    [jan] Allow to specify port for PostgreSQL socket connections (Request #13250).
 2.11.2:
   api: 2.11.0
   state:
@@ -1505,30 +1527,7 @@
     [mjr] Fix incorrect offsets when generating free/busy data for ActiveSync clients.
     [mms] Add Horde_HashTable to dependency list (Bug #12314).
     [jan] Don't overwrite host part of parsed email addresses (Bug #12302).
-2.5.0:
-  api: 2.5.0
-  state:
-    release: stable
-    api: stable
-  date: 2013-06-04
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    [jan] Don't break existing unchanged sources in the preferences.
-2.5.0RC1:
-  api: 2.5.0
-  state:
-    release: beta
-    api: beta
-  date: 2013-05-28
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    [mms] Added Horde_Core_Factory_Mail factory to allow for alternative mailer configurations.
-    [mms] Fix honoring the sendmail_eol configuration option.
-2.5.0beta3:
+2.5.0-beta3:
   api: 2.5.0
   state:
     release: beta
@@ -1538,10 +1537,11 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 2.5.0beta3
     [mms] Make sure we are not using a SQL Cache driver in the DB object itself.
     [mms] Horde_Memcache usage is deprecated in favor of Horde_HashTable.
     [mms] Add factory for Horde_HashTable drivers.
-2.5.0beta2:
+2.5.0-beta2:
   api: 2.5.0
   state:
     release: beta
@@ -1551,9 +1551,10 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 2.5.0beta2
     [jan] Fix dependencies.
     [mjr] Workaround some limitations with maillog and answered flag syncing in Outlook 2013
-2.5.0beta1:
+2.5.0-beta1:
   api: 2.5.0
   state:
     release: beta
@@ -1563,6 +1564,7 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 2.5.0beta1
     [mms] SECURITY: Fix token validation of AJAX actions.
     [mms] Add the Horde_Registry_Application#nosqlDrivers() method.
     [mms] Add the Horde_Core_Nosql library.
@@ -1585,6 +1587,30 @@
     [jan] Use PEAR package information to retrieve packages names in Horde_Core_Db_Migration.
     [jan] Get version list from pear.horde.org when checking for updates.
     [mms] Add support for 'ajaxaction_data' hook (won't be documented in Horde until 5.1+).
+2.5.0-RC1:
+  api: 2.5.0
+  state:
+    release: beta
+    api: beta
+  date: 2013-05-28
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    Original version string was 2.5.0RC1
+    [mms] Added Horde_Core_Factory_Mail factory to allow for alternative mailer configurations.
+    [mms] Fix honoring the sendmail_eol configuration option.
+2.5.0:
+  api: 2.5.0
+  state:
+    release: stable
+    api: stable
+  date: 2013-06-04
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    [jan] Don't break existing unchanged sources in the preferences.
 2.4.3:
   api: 2.4.0
   state:
@@ -1825,38 +1851,7 @@
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
     [jan] Re-release of version 2.0.0 due to broken PEAR packager.
-2.0.0:
-  api: 2.0.0
-  state:
-    release: stable
-    api: stable
-  date: 2012-10-30
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    First stable release for Horde 5.
-    [mms] Confirmation link for new identity requires the full URL as it is intended to be accessed outside of the Horde application (Bug #11593).
-    [mms] Need to unescape JSON data returned in a text/html response.
-    [jan] Update Polish translation (Krzysztof Kozera <krzysztof113@o2.pl>).
-2.0.0RC1:
-  api: 2.0.0beta1
-  state:
-    release: beta
-    api: beta
-  date: 2012-10-26
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    [jan] Fix dynamic updating of portal blocks.
-    [mms] Allow AJAX handler methods to be marked externally accessible (i.e. no session token checking) (Bug #11538).
-    [mjr] Fix copying ActiveSync email to sent folder in certain cases (Bug #11529).
-    [jan] Catch exceptions from Horde_Crypt (Bug #11530).
-    [jan] Support non-padding operators in JavaScript date formatting (Bug #10435).
-    [mms] Add generic CSS class insertion to Help system.
-    [mms] Fix handling active error reporting codes in Horde_ErrorHandler.
-2.0.0beta6:
+2.0.0-beta6:
   api: 2.0.0beta1
   state:
     release: beta
@@ -1866,6 +1861,7 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 2.0.0beta6
     [mms] Send spellcheck parameters using AJAX object, not in URL (Bug #11467).
     [mms] Add View helpers to provide access to accesskey methods, Horde::img(), Horde::label(), and Horde_Help::link().
     [mjr] Fix adding Bcc recipients when sending mail from ActiveSync.
@@ -1873,7 +1869,7 @@
     [mms] Added Horde_Core_Smartmobile_Url class.
     [jan] Make Horde::widget() take a single hash parameter.
     [mms] Allow application API interface to dynamically alter properties (Bug #11388).
-2.0.0beta5:
+2.0.0-beta5:
   api: 2.0.0beta1
   state:
     release: beta
@@ -1883,13 +1879,14 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 2.0.0beta5
     [mms] Force IE <= 7 to minimal view (Bug #11327).
     [mms] Add loading triggers to HordeCore JS framework.
     [mjr] Send dummy INBOX, Sent, and Trash folders to client when email sync support is not enabled.
     [mjr] Fix broken ActiveSync behaviour when Email sync is not enabled.
     [mjr] Only subscribed mailboxes are returned by the ActiveSync imap factory.
     [jan] Set HTML 5 "multiple" attribute on email fields if necessary (Bug #11304).
-2.0.0beta4:
+2.0.0-beta4:
   api: 2.0.0beta1
   state:
     release: beta
@@ -1899,12 +1896,13 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 2.0.0beta4
     [mms] Add a no authentication AJAX handler (Bug #11297).
     [mms] Fix HordeCore javascript download action (Bug #11294).
     [mms] Fix upgrade logintasks for pre-release major releases.
     [mjr] Add Horde_Core_Tagger.
     [mjr] Fix autocompletion of tags in ajax views.
-2.0.0beta3:
+2.0.0-beta3:
   api: 2.0.0beta1
   state:
     release: beta
@@ -1914,8 +1912,9 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 2.0.0beta3
     [jan] Fix dependency on Horde_Routes.
-2.0.0beta2:
+2.0.0-beta2:
   api: 2.0.0beta1
   state:
     release: beta
@@ -1925,9 +1924,10 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 2.0.0beta2
     [jan] Fix dependency on Horde_ElasticSearch.
     [jan] Fix default values for LDAP and SQL configuration.
-2.0.0beta1:
+2.0.0-beta1:
   api: 2.0.0beta1
   state:
     release: beta
@@ -1937,13 +1937,14 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 2.0.0beta1
     First beta release for Horde 5.
     [jan] Fix hiding empty top menu entries in multi-level hierarchies.
     [jan] Allow to override configuration details of meta-configuration tags like <configsql> in custom configuration XML files.
     [jan] Allow to configure encryption in global IMAP configuration (Request #11272).
     [mms] Upgrade jQuery Mobile to v1.1.1 RC1.
     [mms] Fix browser-based AJAX autocompletion (Bug #11233).
-2.0.0alpha1:
+2.0.0-alpha1:
   api: 2.0.0alpha1
   state:
     release: alpha
@@ -1953,6 +1954,7 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 2.0.0alpha1
     First alpha release for Horde 5.
     [jan] Update classes for the new user interface.
     [mms] Move output compression code into Horde_PageOutput.
@@ -1971,6 +1973,38 @@
     [mjr] Allow restricting pretty autocompleter to available choices.
     [mms] Add language detection to AJAX spellchecker if no language is selected by the user (Request #7137).
     [mms] Add Horde_Core_Block_Layout_View::getStylesheets().
+2.0.0-RC1:
+  api: 2.0.0beta1
+  state:
+    release: beta
+    api: beta
+  date: 2012-10-26
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    Original version string was 2.0.0RC1
+    [jan] Fix dynamic updating of portal blocks.
+    [mms] Allow AJAX handler methods to be marked externally accessible (i.e. no session token checking) (Bug #11538).
+    [mjr] Fix copying ActiveSync email to sent folder in certain cases (Bug #11529).
+    [jan] Catch exceptions from Horde_Crypt (Bug #11530).
+    [jan] Support non-padding operators in JavaScript date formatting (Bug #10435).
+    [mms] Add generic CSS class insertion to Help system.
+    [mms] Fix handling active error reporting codes in Horde_ErrorHandler.
+2.0.0:
+  api: 2.0.0
+  state:
+    release: stable
+    api: stable
+  date: 2012-10-30
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    First stable release for Horde 5.
+    [mms] Confirmation link for new identity requires the full URL as it is intended to be accessed outside of the Horde application (Bug #11593).
+    [mms] Need to unescape JSON data returned in a text/html response.
+    [jan] Update Polish translation (Krzysztof Kozera <krzysztof113@o2.pl>).
 1.9.3:
   api: 1.9.0
   state:
@@ -2310,53 +2344,7 @@
     [cjh] Fix cyrsql configuration, rename cyrus host and port parameters to not clash with Horde_Db parameters (Bug #9864).
     [cjh] Fix signups, and update style on signup and reset password pages to match the login page (Bug #9856, partially from Ian Roth <iron_hat@hotmail.com>).
     [cjh] Show an unknown app icon rather than a broken image if an application doesn't have an icon (Bug #9867).
-1.0.0:
-  api: 1.0.0
-  state:
-    release: stable
-    api: stable
-  date: 2011-04-06
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    First stable release for Horde 4.
-    [mms] Add Horde_Core_Notification_Handler_Decorator_Base.
-    [mms] Add listAlarms() to methods provided by Horde_Core_Registry_Application.
-    [jan] Delay sidebar creation if the sidebar is generated through JavaScript.
-    [jan] Use localized application names when sorting the preference menu tree.
-    [mms] Fix adding port to certain urls passed to Horde::url() (Bug #9712).
-1.0.0RC2:
-  api: 1.0.0
-  state:
-    release: beta
-    api: beta
-  date: 2011-03-29
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    Second release candidate for Horde 4.
-    [jan] Fix loading of Horde's vhost conf.php file (Bug #9704).
-    [jan] Sort applications in preference menu by name.
-    [mms] Fix identities pref UI when default_identity is locked (Bug #9701).
-    [mms] Added Horde::debug().
-1.0.0RC1:
-  api: 1.0.0
-  state:
-    release: beta
-    api: beta
-  date: 2011-03-22
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    First release candidate for Horde 4.
-    [jan] Fix converting identities with non-ascii characters to new format.
-    [mjr] Fix IMSP Auth driver.
-    [jan] Don't show sub-permissions for adding that exist already.
-    [jan] Fix listing more than one sub-permission (Bug #9671).
-1.0.0beta1:
+1.0.0-beta1:
   api: 1.0.0
   state:
     release: beta
@@ -2366,12 +2354,13 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 1.0.0beta1
     Catch fatal errors about missing tables during initial configuration.
     Added LoginTasks upgrade framework.
     Added Horde_Core_Perms class.
     Fix clearing expanded state for javascript trees (Bug #9659).
     Only show advanced preferences link if there are some.
-1.0.0alpha1:
+1.0.0-alpha1:
   api: 1.0.0
   state:
     release: alpha
@@ -2381,6 +2370,7 @@
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    Original version string was 1.0.0alpha1
     First alpha release for Horde 4.
     Add cache support for themes.
     Add Horde_Session.
@@ -2403,3 +2393,51 @@
     Renamed Help:: as Horde_Help::.
     Removed Text::/Horde_Text::.
     Converted Horde to Horde 4 coding conventions.
+1.0.0-RC2:
+  api: 1.0.0
+  state:
+    release: beta
+    api: beta
+  date: 2011-03-29
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    Original version string was 1.0.0RC2
+    Second release candidate for Horde 4.
+    [jan] Fix loading of Horde's vhost conf.php file (Bug #9704).
+    [jan] Sort applications in preference menu by name.
+    [mms] Fix identities pref UI when default_identity is locked (Bug #9701).
+    [mms] Added Horde::debug().
+1.0.0-RC1:
+  api: 1.0.0
+  state:
+    release: beta
+    api: beta
+  date: 2011-03-22
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    Original version string was 1.0.0RC1
+    First release candidate for Horde 4.
+    [jan] Fix converting identities with non-ascii characters to new format.
+    [mjr] Fix IMSP Auth driver.
+    [jan] Don't show sub-permissions for adding that exist already.
+    [jan] Fix listing more than one sub-permission (Bug #9671).
+1.0.0:
+  api: 1.0.0
+  state:
+    release: stable
+    api: stable
+  date: 2011-04-06
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    First stable release for Horde 4.
+    [mms] Add Horde_Core_Notification_Handler_Decorator_Base.
+    [mms] Add listAlarms() to methods provided by Horde_Core_Registry_Application.
+    [jan] Delay sidebar creation if the sidebar is generated through JavaScript.
+    [jan] Use localized application names when sorting the preference menu tree.
+    [mms] Fix adding port to certain urls passed to Horde::url() (Bug #9712).
