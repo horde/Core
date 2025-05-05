@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based factory for creating PEAR DB objects.
  *
@@ -30,7 +31,7 @@ class Horde_Core_Factory_DbPear extends Horde_Core_Factory_Base
      *
      * @var array
      */
-    private $_instances = array();
+    private $_instances = [];
 
     /**
      * Return the DB instance.
@@ -65,13 +66,13 @@ class Horde_Core_Factory_DbPear extends Horde_Core_Factory_Base
             $config = array_merge($config, $config['read']);
         }
 
-        Horde::assertDriverConfig($config, 'sql', array('charset', 'phptype'));
+        Horde::assertDriverConfig($config, 'sql', ['charset', 'phptype']);
 
         /* Connect to the SQL server using the supplied parameters. */
-        $db = DB::connect($config, array(
+        $db = DB::connect($config, [
             'persistent' => !empty($config['persistent']),
-            'ssl' => !empty($config['ssl'])
-        ));
+            'ssl' => !empty($config['ssl']),
+        ]);
 
         if ($db instanceof PEAR_Error) {
             if ($pushed) {

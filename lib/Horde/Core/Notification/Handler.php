@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -21,10 +22,9 @@
  * @package   Core
  * @since     2.18.0
  */
-class Horde_Core_Notification_Handler
-extends Horde_Notification_Handler
+class Horde_Core_Notification_Handler extends Horde_Notification_Handler
 {
-    const SESS_KEY = 'core_notification_handler';
+    public const SESS_KEY = 'core_notification_handler';
 
     /**
      * List of applications that contain notification handlers. Array with
@@ -35,7 +35,7 @@ extends Horde_Notification_Handler
 
     /**
      */
-    public function notify(array $options = array())
+    public function notify(array $options = [])
     {
         if ($this->_apps) {
             foreach ($this->_apps as $key => $val) {
@@ -63,12 +63,12 @@ extends Horde_Notification_Handler
             return;
         }
 
-        $this->_apps = array();
+        $this->_apps = [];
 
         try {
             $apps = $registry->listApps(null, false, Horde_Perms::READ);
         } catch (Horde_Exception $e) {
-            $apps = array();
+            $apps = [];
         }
 
         foreach ($apps as $app) {
@@ -100,12 +100,13 @@ extends Horde_Notification_Handler
             $registry->callAppMethod(
                 $app,
                 'setupNotification',
-                array(
-                    'args' => array($this),
-                    'noperms' => true
-                )
+                [
+                    'args' => [$this],
+                    'noperms' => true,
+                ]
             );
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+        }
     }
 
 }

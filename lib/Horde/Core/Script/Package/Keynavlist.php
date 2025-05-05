@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This class identifies the javascript necessary to output the keyboard
  * navigation list widget javascript code to the browser.

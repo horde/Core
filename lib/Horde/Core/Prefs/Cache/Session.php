@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
  *
@@ -24,7 +25,7 @@
  */
 class Horde_Core_Prefs_Cache_Session extends Horde_Prefs_Cache_Base
 {
-    const SESS_KEY = 'prefs_cache/';
+    public const SESS_KEY = 'prefs_cache/';
 
     /**
      */

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Core_Auth_Composite class provides Horde-specific functions
  * on top of the base composite driver.
@@ -29,11 +30,11 @@ class Horde_Core_Auth_Composite extends Horde_Auth_Composite
             return $this->_params['auth_driver']->getLoginParams();
         }
 
-        return array(
-            'js_code' => array(),
-            'js_files' => array(),
-            'params' => array()
-        );
+        return [
+            'js_code' => [],
+            'js_files' => [],
+            'params' => [],
+        ];
     }
 
 }

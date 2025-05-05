@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The abstract Horde factory class.
  *
@@ -60,23 +61,23 @@ class Horde_Core_Factory_Base
          * in the driver name, guess that this is a full classname so try that
          * option first. */
         $search = (strpbrk($driver, '\\_') === false)
-            ? array('driver', 'class')
-            : array('class', 'driver');
+            ? ['driver', 'class']
+            : ['class', 'driver'];
 
         foreach ($search as $val) {
             switch ($val) {
-            case 'class':
-                if (class_exists($driver)) {
-                    return $driver;
-                }
-                break;
+                case 'class':
+                    if (class_exists($driver)) {
+                        return $driver;
+                    }
+                    break;
 
-            case 'driver':
-                $class = $base . '_' . Horde_String::ucfirst($driver);
-                if (class_exists($class)) {
-                    return $class;
-                }
-                break;
+                case 'driver':
+                    $class = $base . '_' . Horde_String::ucfirst($driver);
+                    if (class_exists($class)) {
+                        return $class;
+                    }
+                    break;
             }
         }
 

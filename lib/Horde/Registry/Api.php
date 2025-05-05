@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Default class for application defined API calls.
  *
@@ -24,28 +25,28 @@ class Horde_Registry_Api
      *
      * @var array
      */
-    protected $_disabled = array();
+    protected $_disabled = [];
 
     /**
      * Links.
      *
      * @var array
      */
-    protected $_links = array();
+    protected $_links = [];
 
     /**
      * Cached list of methods.
      *
      * @var array
      */
-    protected $_methods = array();
+    protected $_methods = [];
 
     /**
      * The listing of API calls that do not require permissions checking.
      *
      * @var array
      */
-    protected $_noPerms = array();
+    protected $_noPerms = [];
 
     /**
      * List of disabled API methods.

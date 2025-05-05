@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2011-2017 Horde LLC (http://www.horde.org/)
  *
@@ -34,7 +35,7 @@ class Horde_Core_Block_Upgrade
         if (is_array($layout)) {
             $upgrade = false;
         } else {
-            $layout = array();
+            $layout = [];
             $upgrade = true;
         }
 

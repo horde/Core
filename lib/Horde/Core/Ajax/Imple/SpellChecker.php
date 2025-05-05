@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Imple to attach the spellchecker to an HTML element.
  *
@@ -20,7 +21,7 @@ class Horde_Core_Ajax_Imple_SpellChecker extends Horde_Core_Ajax_Imple
      *   - states: (array) TODO
      *   - targetId: (string) TODO
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
         global $language, $registry;
 
@@ -32,13 +33,13 @@ class Horde_Core_Ajax_Imple_SpellChecker extends Horde_Core_Ajax_Imple
             $key_list = array_keys($registry->nlsconfig->spelling);
             asort($key_list, SORT_LOCALE_STRING);
 
-            $params['locales'] = array();
+            $params['locales'] = [];
             foreach ($key_list as $lcode) {
-                $params['locales'][] = array(
+                $params['locales'][] = [
                     'l' => $registry->nlsconfig->languages[$lcode],
                     's' => $lcode == $language,
-                    'v' => $lcode
-                );
+                    'v' => $lcode,
+                ];
             }
         }
 
@@ -55,26 +56,26 @@ class Horde_Core_Ajax_Imple_SpellChecker extends Horde_Core_Ajax_Imple
             $page_output->addScriptFile('spellchecker.js', 'horde');
             $page_output->addScriptPackage('Horde_Core_Script_Package_Keynavlist');
 
-            $page_output->addInlineJsVars(array(
-                'HordeImple.SpellChecker' => new stdClass
-            ));
+            $page_output->addInlineJsVars([
+                'HordeImple.SpellChecker' => new stdClass(),
+            ]);
         }
 
         $dom_id = $this->getDomId();
 
-        $opts = array(
+        $opts = [
             'locales' => $this->_params['locales'],
             'statusButton' => $dom_id,
             'target' => $this->_params['targetId'],
-            'url' => strval($this->getImpleUrl()->setRaw(true)->add(array('input' => $this->_params['targetId'])))
-        );
+            'url' => strval($this->getImpleUrl()->setRaw(true)->add(['input' => $this->_params['targetId']])),
+        ];
         if (isset($this->_params['states'])) {
             $opts['bs'] = $this->_params['states'];
         }
 
-        $page_output->addInlineScript(array(
-            'HordeImple.SpellChecker.' . $dom_id . '=new SpellChecker(' . Horde_Serialize::serialize($opts, Horde_Serialize::JSON) . ')'
-        ), true);
+        $page_output->addInlineScript([
+            'HordeImple.SpellChecker.' . $dom_id . '=new SpellChecker(' . Horde_Serialize::serialize($opts, Horde_Serialize::JSON) . ')',
+        ], true);
 
         return false;
     }
@@ -87,7 +88,7 @@ class Horde_Core_Ajax_Imple_SpellChecker extends Horde_Core_Ajax_Imple
     {
         global $injector;
 
-        $args = array('html' => !empty($vars->html));
+        $args = ['html' => !empty($vars->html)];
         if (isset($vars->locale)) {
             $args['locale'] = $vars->locale;
         }
@@ -99,10 +100,10 @@ class Horde_Core_Ajax_Imple_SpellChecker extends Horde_Core_Ajax_Imple
             );
         } catch (Horde_Exception $e) {
             Horde::log($e, 'ERR');
-            return array(
-                'bad' => array(),
-                'suggestions' => array()
-            );
+            return [
+                'bad' => [],
+                'suggestions' => [],
+            ];
         }
     }
 

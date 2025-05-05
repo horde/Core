@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Preferences storage implementation that loads the default values from
  * the configuration files.
@@ -20,7 +21,7 @@ class Horde_Core_Prefs_Storage_Configuration extends Horde_Prefs_Storage_Base
      *
      * @var array
      */
-    public $hooks = array();
+    public $hooks = [];
 
     /**
      */
@@ -37,7 +38,7 @@ class Horde_Core_Prefs_Storage_Configuration extends Horde_Prefs_Storage_Base
         }
 
         /* List of UI-only config options. */
-        $ui = array('link', 'prefslink', 'rawhtml', 'container', 'special');
+        $ui = ['link', 'prefslink', 'rawhtml', 'container', 'special'];
 
         if (isset($pconf->config['_prefs'])) {
             foreach ($pconf->config['_prefs'] as $name => $pref) {

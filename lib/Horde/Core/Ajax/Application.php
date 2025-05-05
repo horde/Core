@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Defines the AJAX interface for an application.
  *
@@ -50,7 +51,7 @@ abstract class Horde_Core_Ajax_Application
      *
      * @var array
      */
-    protected $_handlers = array();
+    protected $_handlers = [];
 
     /**
      * The request variables.
@@ -69,9 +70,12 @@ abstract class Horde_Core_Ajax_Application
      *
      * @throws Horde_Exception
      */
-    public function __construct($app, Horde_Variables $vars, $action = null,
-                                $token = null)
-    {
+    public function __construct(
+        $app,
+        Horde_Variables $vars,
+        $action = null,
+        $token = null
+    ) {
         global $registry, $session;
 
         $this->_app = $app;
@@ -122,11 +126,11 @@ abstract class Horde_Core_Ajax_Application
     public function __get($name)
     {
         switch ($name) {
-        case 'app':
-            return $this->_app;
+            case 'app':
+                return $this->_app;
 
-        case 'vars':
-            return $this->_vars;
+            case 'vars':
+                return $this->_vars;
         }
     }
 
@@ -172,14 +176,14 @@ abstract class Horde_Core_Ajax_Application
 
         /* Look for action in helpers. */
         if ($ob = $this->_getHandler()) {
-            $this->data = call_user_func(array($ob, $this->_action));
+            $this->data = call_user_func([$ob, $this->_action]);
         } else {
             /* Look for action in application hook. */
             try {
                 $this->data = $hooks->callHook(
                     'ajaxaction_handle',
                     $this->_app,
-                    array($this, $this->_action)
+                    [$this, $this->_action]
                 );
             } catch (Horde_Exception $e) {
                 /* DEPRECATED hook. @deprecated */
@@ -187,7 +191,7 @@ abstract class Horde_Core_Ajax_Application
                     $this->data = $hooks->callHook(
                         'ajaxaction',
                         $this->_app,
-                        array($this->_action, $this->_vars)
+                        [$this->_action, $this->_vars]
                     );
                 } catch (Horde_Exception $e) {
                     throw new Horde_Exception('Handler for action "' . $this->_action . '" does not exist.');
@@ -199,9 +203,10 @@ abstract class Horde_Core_Ajax_Application
             $this->data = $hooks->callHook(
                 'ajaxaction_data',
                 $this->_app,
-                array($this->_action, $this->data)
+                [$this->_action, $this->data]
             );
-        } catch (Horde_Exception_HookNotSet $e) {}
+        } catch (Horde_Exception_HookNotSet $e) {
+        }
     }
 
     /**
@@ -214,7 +219,7 @@ abstract class Horde_Core_Ajax_Application
     public function addTask($name, $data, $app = null)
     {
         if (empty($this->tasks)) {
-            $this->tasks = new stdClass;
+            $this->tasks = new stdClass();
         }
 
         $name = (is_null($app) ? $this->_app : $app) . ':' . $name;
@@ -254,7 +259,7 @@ abstract class Horde_Core_Ajax_Application
     {
         foreach ($this->_handlers as $ob) {
             if ($ob->has($action)) {
-                return call_user_func(array($ob, $action));
+                return call_user_func([$ob, $action]);
             }
         }
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -25,14 +26,14 @@
 class Horde_Core_Cache_Session extends Horde_Cache_Storage_Base
 {
     /* Suffix to add to storage_key to produce stored key. */
-    const STORED_KEY = '_s';
+    public const STORED_KEY = '_s';
 
     /**
      * The list of keys stored in the cache backend.
      *
      * @var array
      */
-    protected $_stored = array();
+    protected $_stored = [];
 
     /**
      * @param array $params  Configuration parameters:
@@ -44,18 +45,18 @@ class Horde_Core_Cache_Session extends Horde_Cache_Storage_Base
      *   - storage_key: (string) The storage key to save the session data
      *                  under.
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
         if (!isset($params['cache'])) {
             throw new InvalidArgumentException('Missing cache parameter.');
         }
 
         parent::__construct(array_merge(
-            array(
+            [
                 'app' => 'horde',
                 'maxsize' => 5000,
-                'storage_key' => 'sess_cache'
-            ),
+                'storage_key' => 'sess_cache',
+            ],
             $params
         ));
     }
@@ -148,7 +149,7 @@ class Horde_Core_Cache_Session extends Horde_Cache_Storage_Base
         foreach (array_keys($this->_stored) as $key) {
             $this->_params['cache']->expire($key);
         }
-        $this->_stored = array();
+        $this->_stored = [];
         $this->_saveStored();
     }
 
@@ -162,11 +163,11 @@ class Horde_Core_Cache_Session extends Horde_Cache_Storage_Base
             return $this->_params['storage_key'] . '/' . $key;
         }
 
-        return implode('|', array(
+        return implode('|', [
             $this->_params['app'],
             $session->getToken(),
-            $key
-        ));
+            $key,
+        ]);
     }
 
     /**

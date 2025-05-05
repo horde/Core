@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Horde/Log PSR-3 Logger Factory
  *
@@ -65,65 +66,65 @@ class LogHandlerFactory extends Horde_Core_Factory_Injector
         $formatters = [new Psr3Formatter()];
 
         switch ($conf['log']['type']) {
-        case 'file':
-        case 'stream':
-            // TODO: Default context?
+            case 'file':
+            case 'stream':
+                // TODO: Default context?
 
-            $append = ($conf['log']['type'] == 'file')
-                ? ($conf['log']['params']['append'] ? 'a+' : 'w+')
-                : null;
-            $format = $conf['log']['params']['format']
-                ?? 'default';
+                $append = ($conf['log']['type'] == 'file')
+                    ? ($conf['log']['params']['append'] ? 'a+' : 'w+')
+                    : null;
+                $format = $conf['log']['params']['format']
+                    ?? 'default';
 
-            switch ($format) {
-            case 'custom':
-                $formatters[] = new SimpleFormatter(['format' => $conf['log']['params']['template']]);
+                switch ($format) {
+                    case 'custom':
+                        $formatters[] = new SimpleFormatter(['format' => $conf['log']['params']['template']]);
+                        break;
+
+                    case 'default':
+                    default:
+                        // Use Horde_Log defaults.
+                        break;
+
+                    case 'xml':
+                        $formatters[] = new XmlFormatter();
+                        break;
+                }
+
+                $options = new Options();
+                $options->ident = (string) $conf['log']['ident'] ?? '';
+                // Let's not try and catch. Let it fail, the caller should care
+                $handler = new StreamHandler($conf['log']['name'], $append, $options, $formatters);
                 break;
 
-            case 'default':
+            case 'syslog':
+                $options = new SyslogOptions();
+                if (!empty($conf['log']['name'] && is_numeric($conf['log']['name']))) {
+                    $options->facility = (int) $conf['log']['name'];
+                }
+                if (!empty($conf['log']['ident'])) {
+                    $options->ident = (string) $conf['log']['ident'];
+                }
+                $handler = new SyslogHandler($options, $formatters, []);
+                break;
+
+            case 'null':
             default:
-                // Use Horde_Log defaults.
-                break;
-
-            case 'xml':
-                $formatters[] = new XmlFormatter();
-                break;
-            }
-
-            $options = new Options();
-            $options->ident = (string) $conf['log']['ident'] ?? '';
-            // Let's not try and catch. Let it fail, the caller should care
-            $handler = new StreamHandler($conf['log']['name'], $append, $options, $formatters);
-            break;
-
-        case 'syslog':
-            $options = new SyslogOptions();
-            if (!empty($conf['log']['name'] && is_numeric($conf['log']['name']))) {
-                $options->facility = (int) $conf['log']['name'];
-            }
-            if (!empty($conf['log']['ident'])) {
-                $options->ident = (string) $conf['log']['ident'];
-            }
-            $handler = new SyslogHandler($options, $formatters, []);
-            break;
-
-        case 'null':
-        default:
-            // Use default null handler.
-            return new NullHandler();
+                // Use default null handler.
+                return new NullHandler();
         }
 
         switch ($conf['log']['priority']) {
-        case 'WARNING':
-            // Bug #12109
-            $priority = 'WARN';
-            break;
+            case 'WARNING':
+                // Bug #12109
+                $priority = 'WARN';
+                break;
 
-        default:
-            $priority = defined('Horde_Log::' . $conf['log']['priority'])
-                ? $conf['log']['priority']
-                : 'NOTICE';
-            break;
+            default:
+                $priority = defined('Horde_Log::' . $conf['log']['priority'])
+                    ? $conf['log']['priority']
+                    : 'NOTICE';
+                break;
         }
         $handler->addFilter(new MaximumLevelFilter(constant('Horde_Log::' . $priority)));
         return $handler;
@@ -134,7 +135,7 @@ class LogHandlerFactory extends Horde_Core_Factory_Injector
         return new NullHandler();
     }
 
-    public function createStreamHandler($streamOrUrl, string $mode = 'a+', array $formatters = null, array $filters = []): StreamHandler
+    public function createStreamHandler($streamOrUrl, string $mode = 'a+', ?array $formatters = null, array $filters = []): StreamHandler
     {
         $options = new Options();
         $handler = new StreamHandler($streamOrUrl, $mode, $options, $formatters);

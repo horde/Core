@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector based Horde_Timezone factory.
  *
@@ -23,10 +24,10 @@ class Horde_Core_Factory_Timezone extends Horde_Core_Factory_Injector
             throw new Horde_Exception('Timezone database location is not configured');
         }
 
-        return new Horde_Timezone(array(
+        return new Horde_Timezone([
             'cache' => $injector->getInstance('Horde_Cache'),
             'location' => $GLOBALS['conf']['timezone']['location'],
-            'temp' => Horde::getTempDir()
-        ));
+            'temp' => Horde::getTempDir(),
+        ]);
     }
 }

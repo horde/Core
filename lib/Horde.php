@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 1999-2017 Horde LLC (http://www.horde.org/)
  *
@@ -23,10 +24,10 @@
  */
 class Horde
 {
-    const SSL_NEVER        = 0;
-    const SSL_ALWAYS       = 1;
-    const SSL_AUTO         = 2;
-    const SSL_ONLY_LOGIN   = 3;
+    public const SSL_NEVER        = 0;
+    public const SSL_ALWAYS       = 1;
+    public const SSL_AUTO         = 2;
+    public const SSL_ONLY_LOGIN   = 3;
     /**
      * The current buffer level.
      *
@@ -46,7 +47,7 @@ class Horde
      *
      * @var array
      */
-    protected static $_labels = array();
+    protected static $_labels = [];
 
     /**
      * Are accesskeys supported on this system.
@@ -60,16 +61,18 @@ class Horde
      *
      * @var array
      */
-    protected static $_used = array();
+    protected static $_used = [];
 
     /**
      * Shortcut to logging method.
      *
      * @see Horde_Core_Log_Logger
      */
-    public static function log($event, $priority = null,
-                               array $options = array())
-    {
+    public static function log(
+        $event,
+        $priority = null,
+        array $options = []
+    ) {
         $options['trace'] = isset($options['trace'])
             ? ($options['trace'] + 1)
             : 1;
@@ -91,9 +94,11 @@ class Horde
      * @deprecated Use log() instead
      * @see log()
      */
-    public static function logMessage($event, $priority = null,
-                                      array $options = array())
-    {
+    public static function logMessage(
+        $event,
+        $priority = null,
+        array $options = []
+    ) {
         $options['trace'] = isset($options['trace'])
             ? ($options['trace'] + 1)
             : 1;
@@ -110,9 +115,11 @@ class Horde
      *                            directory.
      * @param boolean $backtrace  Include backtrace information?
      */
-    public static function debug($event = null, $fname = null,
-                                 $backtrace = true)
-    {
+    public static function debug(
+        $event = null,
+        $fname = null,
+        $backtrace = true
+    ) {
         if (is_null($fname)) {
             $fname = self::getTempDir() . '/horde_debug.txt';
         }
@@ -172,7 +179,7 @@ class Horde
         }
 
         if ($url instanceof Horde_Url) {
-            $url->setRaw(true)->add(array('_t' => $now, '_h' => ''));
+            $url->setRaw(true)->add(['_t' => $now, '_h' => '']);
             $url->add(
                 '_h',
                 Horde_Url::uriB64Encode(
@@ -275,7 +282,7 @@ class Horde
         }
 
         if ($queryString instanceof Horde_Url) {
-            $queryString->setRaw(true)->add(array('_t' => $now, '_h' => ''));
+            $queryString->setRaw(true)->add(['_t' => $now, '_h' => '']);
             $parse_url = parse_url($queryString);
             $queryString->add('_h', Horde_Url::uriB64Encode(hash_hmac('sha1', $parse_url['query'] . '=', $GLOBALS['conf']['secret_key'], true)));
             return $queryString;
@@ -331,7 +338,7 @@ class Horde
      *
      * @return string  The escaped string.
      */
-    public static function escapeJson($data, array $options = array())
+    public static function escapeJson($data, array $options = [])
     {
         $json = Horde_Serialize::serialize($data, Horde_Serialize::JSON);
         if (empty($options['nodelimit'])) {
@@ -389,7 +396,7 @@ class Horde
     public static function requireSecureConnection()
     {
         if (!self::isConnectionSecure()) {
-            throw new Horde_Exception(Horde_Core_Translation::t("The encryption features require a secure web connection."));
+            throw new Horde_Exception(Horde_Core_Translation::t('The encryption features require a secure web connection.'));
         }
     }
 
@@ -448,7 +455,7 @@ class Horde
 
         return (!is_null($type) && isset($conf[$type]))
             ? $conf[$type]
-            : array();
+            : [];
     }
 
     /**
@@ -469,11 +476,14 @@ class Horde
      *
      * @throws Horde_Exception
      */
-    public static function assertDriverConfig($params, $driver, $fields,
-                                              $name = null,
-                                              $file = 'conf.php',
-                                              $variable = '$conf')
-    {
+    public static function assertDriverConfig(
+        $params,
+        $driver,
+        $fields,
+        $name = null,
+        $file = 'conf.php',
+        $variable = '$conf'
+    ) {
         global $registry;
 
         // Don't generate a fatal error if we fail during or before
@@ -485,19 +495,25 @@ class Horde
 
         if (!is_array($params) || !count($params)) {
             throw new Horde_Exception(
-                sprintf(Horde_Core_Translation::t("No configuration information specified for %s."), $name) . "\n\n" .
-                sprintf(Horde_Core_Translation::t("The file %s should contain some %s settings."),
+                sprintf(Horde_Core_Translation::t('No configuration information specified for %s.'), $name) . "\n\n" .
+                sprintf(
+                    Horde_Core_Translation::t('The file %s should contain some %s settings.'),
                     $fileroot . '/config/' . $file,
-                    sprintf("%s['%s']['params']", $variable, $driver)));
+                    sprintf("%s['%s']['params']", $variable, $driver)
+                )
+            );
         }
 
         foreach ($fields as $field) {
             if (!isset($params[$field])) {
                 throw new Horde_Exception(
-                    sprintf(Horde_Core_Translation::t("Required \"%s\" not specified in %s configuration."), $field, $name) . "\n\n" .
-                    sprintf(Horde_Core_Translation::t("The file %s should contain a %s setting."),
+                    sprintf(Horde_Core_Translation::t('Required "%s" not specified in %s configuration.'), $field, $name) . "\n\n" .
+                    sprintf(
+                        Horde_Core_Translation::t('The file %s should contain a %s setting.'),
                         $fileroot . '/config/' . $file,
-                        sprintf("%s['%s']['params']['%s']", $variable, $driver, $field)));
+                        sprintf("%s['%s']['params']['%s']", $variable, $driver, $field)
+                    )
+                );
             }
         }
     }
@@ -523,18 +539,17 @@ class Horde
      *
      * @return Horde_Url  The URL with the session id appended (if needed).
      */
-    public static function url($uri, $full = false, $opts = array())
+    public static function url($uri, $full = false, $opts = [])
     {
         if (is_array($opts)) {
-            $append_session = isset($opts['append_session'])
-                ? $opts['append_session']
-                : 0;
+            $append_session = $opts['append_session']
+                ?? 0;
             if (!empty($opts['force_ssl'])) {
                 $full = true;
             }
         } else {
             $append_session = $opts;
-            $opts = array();
+            $opts = [];
         }
 
         $puri = parse_url($uri);
@@ -564,28 +579,27 @@ class Horde
             !preg_match($schemeRegexp, $webroot)) {
             /* Store connection parameters in local variables. */
             $server_name = $GLOBALS['conf']['server']['name'];
-            $server_port = isset($GLOBALS['conf']['server']['port'])
-                ? $GLOBALS['conf']['server']['port']
-                : '';
+            $server_port = $GLOBALS['conf']['server']['port']
+                ?? '';
 
             $protocol = 'http';
             switch ($GLOBALS['conf']['use_ssl']) {
-            case self::SSL_ALWAYS:
-                $protocol = 'https';
-                break;
-
-            case self::SSL_AUTO:
-                if ($GLOBALS['browser']->usingSSLConnection()) {
+                case self::SSL_ALWAYS:
                     $protocol = 'https';
-                }
-                break;
+                    break;
 
-            case self::SSL_ONLY_LOGIN:
-                if (!empty($opts['force_ssl'])) {
-                    $protocol = 'https';
-                    $server_port = '';
-                }
-                break;
+                case self::SSL_AUTO:
+                    if ($GLOBALS['browser']->usingSSLConnection()) {
+                        $protocol = 'https';
+                    }
+                    break;
+
+                case self::SSL_ONLY_LOGIN:
+                    if (!empty($opts['force_ssl'])) {
+                        $protocol = 'https';
+                        $server_port = '';
+                    }
+                    break;
             }
 
             /* If using a non-standard port, add to the URL. */
@@ -621,7 +635,7 @@ class Horde
                 $url = $webroot . '/' . $puri['path'];
             }
         } else {
-            $url .= '/' . ($webroot ? $webroot . '/' : '') . (isset($puri['path']) ? $puri['path'] : '');
+            $url .= '/' . ($webroot ? $webroot . '/' : '') . ($puri['path'] ?? '');
         }
 
         if (isset($puri['query'])) {
@@ -687,11 +701,17 @@ class Horde
      *
      * @return string  The full <a href> tag.
      */
-    public static function link($url = '', $title = '', $class = '',
-                                $target = '', $onclick = '', $title2 = '',
-                                $accesskey = '', $attributes = array(),
-                                $escape = true)
-    {
+    public static function link(
+        $url = '',
+        $title = '',
+        $class = '',
+        $target = '',
+        $onclick = '',
+        $title2 = '',
+        $accesskey = '',
+        $attributes = [],
+        $escape = true
+    ) {
         if (!($url instanceof Horde_Url)) {
             $url = new Horde_Url($url);
         }
@@ -714,8 +734,10 @@ class Horde
         if (!empty($title)) {
             if ($escape) {
                 $title = str_replace(
-                    array("\r", "\n"), '',
-                    htmlspecialchars(nl2br(htmlspecialchars($title))));
+                    ["\r", "\n"],
+                    '',
+                    htmlspecialchars(nl2br(htmlspecialchars($title)))
+                );
                 /* Remove double encoded entities. */
                 $title = preg_replace('/&amp;([a-z]+|(#\d+));/i', '&\\1;', $title);
             }
@@ -743,10 +765,15 @@ class Horde
      * @return string  The full <a href> tag.
      */
     public static function linkTooltip(
-        $url, $status = '', $class = '', $target = '', $onclick = '',
-        $title = '', $accesskey = '', $attributes = array()
-    )
-    {
+        $url,
+        $status = '',
+        $class = '',
+        $target = '',
+        $onclick = '',
+        $title = '',
+        $accesskey = '',
+        $attributes = []
+    ) {
         if (strlen($title)) {
             $attributes['nicetitle'] = Horde_Serialize::serialize(
                 preg_split(
@@ -790,11 +817,11 @@ class Horde
     public static function widget($params)
     {
         $params = array_merge(
-            array(
+            [
                 'class' => '',
                 'target' => '',
                 'onclick' => '',
-                'nocheck' => false),
+                'nocheck' => false],
             $params
         );
 
@@ -826,17 +853,19 @@ class Horde
      *
      * @return Horde_Url  The requested URL.
      */
-    public static function selfUrl($script_params = false, $nocache = true,
-                                   $full = false, $force_ssl = false)
-    {
+    public static function selfUrl(
+        $script_params = false,
+        $nocache = true,
+        $full = false,
+        $force_ssl = false
+    ) {
         if (!strncmp(PHP_SAPI, 'cgi', 3)) {
             // When using CGI PHP, SCRIPT_NAME may contain the path to
             // the PHP binary instead of the script being run; use
             // PHP_SELF instead.
             $url = $_SERVER['PHP_SELF'];
         } else {
-            $url = isset($_SERVER['SCRIPT_NAME']) ?
-                $_SERVER['SCRIPT_NAME'] :
+            $url = $_SERVER['SCRIPT_NAME'] ??
                 $_SERVER['PHP_SELF'];
         }
         if (isset($_SERVER['REQUEST_URI'])) {
@@ -857,7 +886,7 @@ class Horde
             }
         }
 
-        $url = self::url($url, $full, array('force_ssl' => $force_ssl));
+        $url = self::url($url, $full, ['force_ssl' => $force_ssl]);
 
         return ($nocache && $GLOBALS['browser']->hasQuirk('cache_same_url'))
             ? $url->unique()
@@ -884,11 +913,10 @@ class Horde
      *
      * @return Horde_Url  The self URL.
      */
-    public static function selfUrlParams(array $opts = array())
+    public static function selfUrlParams(array $opts = [])
     {
-        $vars = isset($opts['vars'])
-            ? $opts['vars']
-            : $GLOBALS['injector']->createInstance('Horde_Variables');
+        $vars = $opts['vars']
+            ?? $GLOBALS['injector']->createInstance('Horde_Variables');
 
         $url = self::selfUrl(
             false,
@@ -950,10 +978,13 @@ class Horde
      * @return string   Returns the full path-name to the temporary file or
      *                  false if a temporary file could not be created.
      */
-    public static function getTempFile($prefix = 'Horde', $delete = true,
-                                       $dir = '', $secure = false,
-                                       $session_remove = false)
-    {
+    public static function getTempFile(
+        $prefix = 'Horde',
+        $delete = true,
+        $dir = '',
+        $secure = false,
+        $session_remove = false
+    ) {
         if (empty($dir) || !is_dir($dir)) {
             $dir = self::getTempDir();
         }
@@ -977,15 +1008,15 @@ class Horde
     public static function webServerID()
     {
         switch (PHP_SAPI) {
-        case 'apache':
-            return 'apache1';
+            case 'apache':
+                return 'apache1';
 
-        case 'apache2filter':
-        case 'apache2handler':
-            return 'apache2';
+            case 'apache2filter':
+            case 'apache2handler':
+                return 'apache2';
 
-        default:
-            return PHP_SAPI;
+            default:
+                return PHP_SAPI;
         }
     }
 
@@ -1001,9 +1032,10 @@ class Horde
      *                 string if no key can be found.
      */
     public static function getAccessKey(
-        $label, $nocheck = false, $shutdown = false
-    )
-    {
+        $label,
+        $nocheck = false,
+        $shutdown = false
+    ) {
         /* Shutdown call for translators? */
         if ($shutdown) {
             if (!count(self::$_labels)) {
@@ -1014,7 +1046,7 @@ class Horde
             sort($labels);
             $used = array_keys(self::$_used);
             sort($used);
-            $remaining = str_replace($used, array(), 'abcdefghijklmnopqrstuvwxyz');
+            $remaining = str_replace($used, [], 'abcdefghijklmnopqrstuvwxyz');
             self::log('Access key information for ' . $script);
             self::log('Used labels: ' . implode(',', $labels));
             self::log('Used keys: ' . implode('', $used));
@@ -1109,13 +1141,15 @@ class Horde
      * @return string  The title, and if appropriate, the accesskey attributes
      *                 for the element.
      */
-    public static function getAccessKeyAndTitle($label, $nocheck = false,
-                                                $return_array = false)
-    {
+    public static function getAccessKeyAndTitle(
+        $label,
+        $nocheck = false,
+        $return_array = false
+    ) {
         $ak = self::getAccessKey($label, $nocheck);
-        $attributes = array('title' => self::stripAccessKey($label));
+        $attributes = ['title' => self::stripAccessKey($label)];
         if (!empty($ak)) {
-            $attributes['title'] .= sprintf(Horde_Core_Translation::t(" (Accesskey %s)"), strtoupper($ak));
+            $attributes['title'] .= sprintf(Horde_Core_Translation::t(' (Accesskey %s)'), strtoupper($ak));
             $attributes['accesskey'] = $ak;
         }
 
@@ -1148,10 +1182,12 @@ class Horde
         }
         $label = self::highlightAccessKey($label, $ak);
 
-        return sprintf('<label for="%s"%s>%s</label>',
-                       $for,
-                       !empty($ak) ? ' accesskey="' . $ak . '"' : '',
-                       $label);
+        return sprintf(
+            '<label for="%s"%s>%s</label>',
+            $for,
+            !empty($ak) ? ' accesskey="' . $ak . '"' : '',
+            $label
+        );
     }
 
     /**
@@ -1186,7 +1222,7 @@ class Horde
      *
      * @return Horde_Url  The URL to the cache page.
      */
-    public static function getCacheUrl($type, $params = array())
+    public static function getCacheUrl($type, $params = [])
     {
         $url = $GLOBALS['registry']
             ->getserviceLink('cache', 'horde')
@@ -1195,7 +1231,7 @@ class Horde
             $url .= '/' . $key . '=' . rawurlencode(strval($val));
         }
 
-        return self::url($url, true, array('append_session' => -1));
+        return self::url($url, true, ['append_session' => -1]);
     }
 
     /**
@@ -1219,11 +1255,11 @@ class Horde
      *
      * @return string  The javascript needed to call the popup code.
      */
-    public static function popupJs($url, $options = array())
+    public static function popupJs($url, $options = [])
     {
         $GLOBALS['page_output']->addScriptPackage('Horde_Core_Script_Package_Popup');
 
-        $params = new stdClass;
+        $params = new stdClass();
 
         if (!$url instanceof Horde_Url) {
             $url = new Horde_Url($url);
@@ -1232,7 +1268,7 @@ class Horde
 
         if (!empty($url->parameters)) {
             if (!isset($options['params'])) {
-                $options['params'] = array();
+                $options['params'] = [];
             }
             foreach (array_merge($url->parameters, $options['params']) as $key => $val) {
                 $options['params'][$key] = addcslashes($val, '"');
@@ -1242,13 +1278,13 @@ class Horde
         if (!empty($options['menu'])) {
             $params->menu = 1;
         }
-        foreach (array('height', 'onload', 'params', 'width') as $key) {
+        foreach (['height', 'onload', 'params', 'width'] as $key) {
             if (!empty($options[$key])) {
                 $params->$key = $options[$key];
             }
         }
 
-        return 'void(HordePopup.popup(' . self::escapeJson($params, array('nodelimit' => true, 'urlencode' => !empty($options['urlencode']))) . '));';
+        return 'void(HordePopup.popup(' . self::escapeJson($params, ['nodelimit' => true, 'urlencode' => !empty($options['urlencode'])]) . '));';
     }
 
     /**
@@ -1307,13 +1343,13 @@ class Horde
         }
 
         $menu = new Horde_Menu();
-        $registry->callAppMethod($app, 'menu', array(
-            'args' => array($menu)
-        ));
+        $registry->callAppMethod($app, 'menu', [
+            'args' => [$menu],
+        ]);
         $sidebar = $menu->render();
-        $registry->callAppMethod($app, 'sidebar', array(
-            'args' => array($sidebar)
-        ));
+        $registry->callAppMethod($app, 'sidebar', [
+            'args' => [$sidebar],
+        ]);
 
         return $sidebar;
     }
@@ -1331,8 +1367,9 @@ class Horde
     {
         try {
             $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
-                ->callHook('perms_denied', 'horde', array($app, $perm));
-        } catch (Horde_Exception_HookNotSet $e) {}
+                ->callHook('perms_denied', 'horde', [$app, $perm]);
+        } catch (Horde_Exception_HookNotSet $e) {
+        }
 
         if (!is_null($error)) {
             $GLOBALS['notification']->push($error, 'horde.warning');
@@ -1345,7 +1382,7 @@ class Horde
     public static function __callStatic($name, $arguments)
     {
         return call_user_func_array(
-            array('Horde_Deprecated', $name),
+            ['Horde_Deprecated', $name],
             $arguments
         );
     }

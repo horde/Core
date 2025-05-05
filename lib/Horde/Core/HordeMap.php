@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2009-2017 Horde LLC (http://www.horde.org/)
  *
@@ -34,7 +35,7 @@ class Horde_Core_HordeMap
      *
      * @param array $params
      */
-    public static function init(array $params = array())
+    public static function init(array $params = [])
     {
         global $browser, $conf, $language, $page_output, $registry;
 
@@ -44,18 +45,18 @@ class Horde_Core_HordeMap
             $language = 'en-US';
         }
 
-        $params = array_merge(array(
-            'conf' => array(
+        $params = array_merge([
+            'conf' => [
                 'language' => $language,
                 'markerImage' => strval(Horde_Themes::img('map/marker.png')),
                 'markerBackground' => strval(Horde_Themes::img('map/marker-shadow.png')),
                 'useMarkerLayer' => true,
-            ),
+            ],
             'driver' => 'Horde',
             'geocoder' => $conf['maps']['geocoder'],
             'jsuri' => $registry->get('jsuri', 'horde') . '/map/',
             'ssl' => $browser->usingSSLConnection(),
-        ), $params);
+        ], $params);
 
         // If providers were not specified, use global. We don't merge them
         // above to allow overriding the global completely.
@@ -65,24 +66,24 @@ class Horde_Core_HordeMap
 
         foreach ($params['providers'] as $layer) {
             switch ($layer) {
-            case 'Google':
-                $params['conf']['apikeys']['google'] = $conf['api']['googlemaps'];
-                break;
+                case 'Google':
+                    $params['conf']['apikeys']['google'] = $conf['api']['googlemaps'];
+                    break;
             }
         }
 
         if (!empty($params['geocoder'])) {
             switch ($params['geocoder']) {
-            case 'Google':
-                $params['conf']['apikeys']['google'] = $conf['api']['googlemaps'];
-                break;
+                case 'Google':
+                    $params['conf']['apikeys']['google'] = $conf['api']['googlemaps'];
+                    break;
             }
         }
 
         $page_output->addScriptFile('map/map.js', 'horde');
-        $page_output->addInlineScript(array(
-            'HordeMap.initialize(' . Horde_Serialize::serialize($params, HORDE_SERIALIZE::JSON) . ');'
-        ));
+        $page_output->addInlineScript([
+            'HordeMap.initialize(' . Horde_Serialize::serialize($params, HORDE_SERIALIZE::JSON) . ');',
+        ]);
     }
 
 }

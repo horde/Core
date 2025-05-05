@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Mime_Viewer_Syntaxhighlighter class renders source code appropriate
  * for highlighting with http://alexgorbatchev.com/SyntaxHighlighter/.
@@ -16,7 +17,7 @@
 class Horde_Core_Mime_Viewer_Syntaxhighlighter extends Horde_Mime_Viewer_Syntaxhighlighter
 {
     protected static $_shLoaded = false;
-    protected static $_shBrushes = array();
+    protected static $_shBrushes = [];
 
     /**
      * Return the rendered inline version of the Horde_Mime_Part object.

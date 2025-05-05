@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -37,7 +38,7 @@ class Horde_Core_ActiveSync_Auth extends Horde_Auth_Base
      *
      * @throws InvalidArgumentException
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
         if (!isset($params['base_driver'])) {
             throw new InvalidArgumentException('Missing base_driver parameter.');

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This class extends the base LoginTasks class in order to ensure Horde
  * tasks are always run first.
@@ -34,7 +35,7 @@ class Horde_Core_LoginTasks extends Horde_LoginTasks
 
     /**
      */
-    public function runTasks(array $opts = array())
+    public function runTasks(array $opts = [])
     {
         if (!isset($opts['url'])) {
             $opts['url'] = Horde::selfUrl(true, true, true);

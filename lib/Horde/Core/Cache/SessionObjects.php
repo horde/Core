@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -25,15 +26,15 @@ class Horde_Core_Cache_SessionObjects extends Horde_Core_Cache_Session
 {
     /**
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
-        parent::__construct(array(
+        parent::__construct([
             'app' => 'horde',
             'cache' => new Horde_Cache_Storage_Null(),
             /* Sanity checking. */
             'maxsize' => 1048576,
-            'storage_key' => 'sess_obcache'
-        ));
+            'storage_key' => 'sess_obcache',
+        ]);
     }
 
     /**

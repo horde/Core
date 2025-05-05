@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Hordelog Decorator logs error events via Horde::log().
  *
@@ -11,8 +12,7 @@
  * @category Horde
  * @package  Core
  */
-class Horde_Core_Notification_Handler_Decorator_Hordelog
-extends Horde_Notification_Handler_Decorator_Base
+class Horde_Core_Notification_Handler_Decorator_Hordelog extends Horde_Notification_Handler_Decorator_Base
 {
     /**
      */

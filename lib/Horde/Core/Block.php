@@ -1,4 +1,5 @@
 <?php
+
 /**
  * An abstract class representing a single block in the portal/block display.
  *
@@ -60,7 +61,7 @@ abstract class Horde_Core_Block
      *
      * @var array
      */
-    protected $_params = array();
+    protected $_params = [];
 
     /**
      * Constructor.
@@ -69,7 +70,7 @@ abstract class Horde_Core_Block
      * @param array|boolean $params  Any parameters the block needs. If false,
      *                               the default parameter will be used.
      */
-    public function __construct($app, $params = array())
+    public function __construct($app, $params = [])
     {
         $this->_app = $app;
 
@@ -114,7 +115,7 @@ abstract class Horde_Core_Block
      */
     public function getParams()
     {
-        return $this->_call('_params', array());
+        return $this->_call('_params', []);
     }
 
     /**
@@ -124,7 +125,7 @@ abstract class Horde_Core_Block
      */
     protected function _params()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -246,8 +247,8 @@ abstract class Horde_Core_Block
     protected function _ajaxUpdateUrl()
     {
         $ajax_url = $GLOBALS['registry']->getServiceLink('ajax')
-            ->add(array('app' => $this->getApp(),
-                        'blockid' => get_class($this)));
+            ->add(['app' => $this->getApp(),
+                        'blockid' => get_class($this)]);
         $ajax_url->pathInfo = 'blockUpdate';
 
         return $ajax_url;
@@ -265,10 +266,10 @@ abstract class Horde_Core_Block
     protected function _call($name, $default, $args = null)
     {
         try {
-            $pushed = $GLOBALS['registry']->pushApp($this->getApp(), array(
+            $pushed = $GLOBALS['registry']->pushApp($this->getApp(), [
                 'check_perms' => true,
-                'logintasks' => false
-            ));
+                'logintasks' => false,
+            ]);
         } catch (Horde_Exception $e) {
             return $default;
         }
@@ -276,7 +277,7 @@ abstract class Horde_Core_Block
         try {
             $ret = is_null($args)
                 ? $this->$name()
-                : call_user_func(array($this, $name), $args);
+                : call_user_func([$this, $name], $args);
         } catch (Horde_Exception $e) {
             $ret = $default;
         }

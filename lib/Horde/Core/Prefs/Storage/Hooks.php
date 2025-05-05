@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Preferences storage implementation that adds support for Horde hooks to
  * manipulate preference values.
@@ -32,15 +33,16 @@ class Horde_Core_Prefs_Storage_Hooks extends Horde_Prefs_Storage_Base
                     $GLOBALS['injector']->getInstance('Horde_Core_Hooks')->callHook(
                         'prefs_init',
                         $scope_ob->scope,
-                        array(
+                        [
                             $name,
                             $scope_ob->get($name),
                             strlen($this->_params['user']) ? $this->_params['user'] : null,
-                            $scope_ob
-                        )
+                            $scope_ob,
+                        ]
                     )
                 );
-            } catch (Horde_Exception_HookNotSet $e) {}
+            } catch (Horde_Exception_HookNotSet $e) {
+            }
         }
 
         return $scope_ob;
@@ -59,8 +61,9 @@ class Horde_Core_Prefs_Storage_Hooks extends Horde_Prefs_Storage_Base
     {
         try {
             $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
-                ->callHook('prefs_change', $scope, array($pref));
-        } catch (Horde_Exception_HookNotSet $e) {}
+                ->callHook('prefs_change', $scope, [$pref]);
+        } catch (Horde_Exception_HookNotSet $e) {
+        }
     }
 
     /**

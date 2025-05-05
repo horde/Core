@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Menu:: class provides standardized methods for creating menus in
  * Horde applications.
@@ -20,7 +21,7 @@ class Horde_Menu
      *
      * @var array
      */
-    protected $_menu = array();
+    protected $_menu = [];
 
     /**
      * Add an item to the menu array.
@@ -37,18 +38,24 @@ class Horde_Menu
      * @param string $onclick    Onclick javascript, if desired.
      * @param string $class      CSS class for the menu item.
      */
-    public function add($url, $text, $icon = '', $icon_path = null,
-                        $target = '', $onclick = null, $class = null)
-    {
-        $this->_menu[] = array(
+    public function add(
+        $url,
+        $text,
+        $icon = '',
+        $icon_path = null,
+        $target = '',
+        $onclick = null,
+        $class = null
+    ) {
+        $this->_menu[] = [
             'url' => ($url instanceof Horde_Url) ? $url : new Horde_Url($url),
             'text' => $text,
             'icon' => $icon,
             'icon_path' => $icon_path,
             'target' => $target,
             'onclick' => $onclick,
-            'class' => $class
-        );
+            'class' => $class,
+        ];
     }
 
     /**
@@ -82,7 +89,7 @@ class Horde_Menu
             $item['url'] = new Horde_Url($item['url']);
         }
 
-        $this->_menu[] = array_merge(array(
+        $this->_menu[] = array_merge([
             'class' => null,
             'icon' => '',
             'icon_path' => null,
@@ -90,7 +97,7 @@ class Horde_Menu
             'target' => '',
             'text' => '',
             'container' => '',
-        ), $item);
+        ], $item);
     }
 
     /**
@@ -127,13 +134,13 @@ class Horde_Menu
                 continue;
             }
 
-            $row = array(
+            $row = [
                 'cssClass' => $m['icon'],
                 'url' => $m['url'],
                 'label' => $m['text'],
                 'target' => $m['target'],
                 'onclick' => $m['onclick'],
-            );
+            ];
 
             /* Item class and selected indication. */
             if (!isset($m['class'])) {
@@ -187,7 +194,7 @@ class Horde_Menu
             }
         }
 
-        return array();
+        return [];
     }
 
     /**

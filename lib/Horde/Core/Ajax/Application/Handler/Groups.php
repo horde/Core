@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Defines AJAX calls used to interact with Horde Groups.
  *
@@ -23,7 +24,7 @@ class Horde_Core_Ajax_Application_Handler_Groups extends Horde_Core_Ajax_Applica
      */
     public function listGroups()
     {
-        $result = new stdClass;
+        $result = new stdClass();
 
         try {
             $groups = $GLOBALS['injector']

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A data object that represents only JSON notification data.
  *

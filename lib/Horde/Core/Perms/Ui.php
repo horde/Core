@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Core_Perms_Ui class provides UI methods for the Horde permissions
  * system.
@@ -55,9 +56,10 @@ class Horde_Core_Perms_Ui
      * @param Horde_Perms_Base $perms  The object to display UI stuff for.
      * @param Horde_Core_Perms_Base $corePerms
      */
-    public function __construct(Horde_Perms_Base $perms,
-                                Horde_Core_Perms $corePerms)
-    {
+    public function __construct(
+        Horde_Perms_Base $perms,
+        Horde_Core_Perms $corePerms
+    ) {
         $this->_perms = $perms;
         $this->_corePerms = $corePerms;
     }
@@ -73,48 +75,48 @@ class Horde_Core_Perms_Ui
         /* Get the perms tree. */
         $nodes = $this->_perms->getTree();
 
-        $perms_node = array('icon' => Horde_Themes::img('perms.png'));
+        $perms_node = ['icon' => Horde_Themes::img('perms.png')];
         $add = Horde::url('admin/perms/addchild.php');
-        $add_img = Horde_Themes_Image::tag('plus.png', array('alt' => Horde_Core_Translation::t("Add Permission")));
+        $add_img = Horde_Themes_Image::tag('plus.png', ['alt' => Horde_Core_Translation::t('Add Permission')]);
         $edit = Horde::url('admin/perms/edit.php');
         $delete = Horde::url('admin/perms/delete.php');
-        $edit_img = Horde_Themes_Image::tag('edit.png', array('alt' => Horde_Core_Translation::t("Edit Permission")));
-        $delete_img = Horde_Themes_Image::tag('delete.png', array('alt' => Horde_Core_Translation::t("Delete Permission")));
-        $blank_img = Horde_Themes_Image::tag('blank.gif', array('attr' => array('width' => 16, 'height' => 16)));
+        $edit_img = Horde_Themes_Image::tag('edit.png', ['alt' => Horde_Core_Translation::t('Edit Permission')]);
+        $delete_img = Horde_Themes_Image::tag('delete.png', ['alt' => Horde_Core_Translation::t('Delete Permission')]);
+        $blank_img = Horde_Themes_Image::tag('blank.gif', ['attr' => ['width' => 16, 'height' => 16]]);
 
         /* Set up the tree. */
-        $tree = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Tree')->create('perms_ui', 'Javascript', array(
+        $tree = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Tree')->create('perms_ui', 'Javascript', [
             'alternate' => true,
-            'hideHeaders' => true
-        ));
-        $tree->setHeader(array(
-            array(
-                'class' => 'horde-tree-spacer'
-            )
-        ));
+            'hideHeaders' => true,
+        ]);
+        $tree->setHeader([
+            [
+                'class' => 'horde-tree-spacer',
+            ],
+        ]);
 
         foreach ($nodes as $perm_id => $node) {
             $node_class = ($current == $perm_id)
-                ? array('class' => 'selected')
-                : array();
+                ? ['class' => 'selected']
+                : [];
             if ($perm_id == Horde_Perms::ROOT) {
-                $add_link = $add->add('perm_id', $perm_id)->link(array('class' => 'permsAdd', 'title' => Horde_Core_Translation::t("Add New Permission"))) . $add_img . '</a>';
-                $base_node_params = array('icon' => Horde_Themes::img('administration.png'));
+                $add_link = $add->add('perm_id', $perm_id)->link(['class' => 'permsAdd', 'title' => Horde_Core_Translation::t('Add New Permission')]) . $add_img . '</a>';
+                $base_node_params = ['icon' => Horde_Themes::img('administration.png')];
 
-                $tree->addNode(array(
+                $tree->addNode([
                     'id' => $perm_id,
-                    'label' => Horde_Core_Translation::t("All Permissions"),
+                    'label' => Horde_Core_Translation::t('All Permissions'),
                     'expanded' => true,
                     'params' => $base_node_params + $node_class,
-                    'right' => array($add_link)
-                ));
+                    'right' => [$add_link],
+                ]);
             } else {
                 $parent_id = $this->_perms->getParent($node);
 
-                $perms_extra = array();
+                $perms_extra = [];
                 $parents = explode(':', $node);
 
-                if (!in_array($parents[0], $GLOBALS['registry']->listApps(array('notoolbar', 'active', 'hidden')))) {
+                if (!in_array($parents[0], $GLOBALS['registry']->listApps(['notoolbar', 'active', 'hidden']))) {
                     // This backend has permissions for an application that is
                     // not installed.  Perhaps the application has been removed
                     // or the backend is shared with other Horde installations.
@@ -131,29 +133,29 @@ class Horde_Core_Perms_Ui
 
                 if (isset($app_perms['tree']) &&
                     is_array(Horde_Array::getElement($app_perms['tree'], $parents))) {
-                    $add_link = $add->add('perm_id', $perm_id)->link(array('class' => 'permsAdd', 'title' => Horde_Core_Translation::t("Add Child Permission"))) . $add_img . '</a>';
+                    $add_link = $add->add('perm_id', $perm_id)->link(['class' => 'permsAdd', 'title' => Horde_Core_Translation::t('Add Child Permission')]) . $add_img . '</a>';
                     $perms_extra[] = $add_link;
                 } else {
                     $perms_extra[] = $blank_img;
                 }
 
-                $edit_link = $edit->add('perm_id', $perm_id)->link(array('class' => 'permsEdit', 'title' => Horde_Core_Translation::t("Edit Permission"))) . $edit_img . '</a>';
+                $edit_link = $edit->add('perm_id', $perm_id)->link(['class' => 'permsEdit', 'title' => Horde_Core_Translation::t('Edit Permission')]) . $edit_img . '</a>';
                 $perms_extra[] = $edit_link;
-                $delete_link = $delete->add('perm_id', $perm_id)->link(array('class' => 'permsDelete', 'title' => Horde_Core_Translation::t("Delete Permission"))) . $delete_img . '</a>';
+                $delete_link = $delete->add('perm_id', $perm_id)->link(['class' => 'permsDelete', 'title' => Horde_Core_Translation::t('Delete Permission')]) . $delete_img . '</a>';
                 $perms_extra[] = $delete_link;
                 $name = $this->_corePerms->getTitle($node);
 
                 $expanded = isset($nodes[$current]) &&
                     strpos($nodes[$current], $node) === 0 &&
                     $nodes[$current] != $node;
-                $tree->addNode(array(
+                $tree->addNode([
                     'id' => $perm_id,
                     'parent' => $parent_id,
                     'label' => $name,
                     'expanded' => $expanded,
                     'params' => $perms_node + $node_class,
-                    'right' => $perms_extra
-                ));
+                    'right' => $perms_extra,
+                ]);
             }
         }
 
@@ -197,8 +199,8 @@ class Horde_Core_Perms_Ui
         /* Initialise form if required. */
         $this->_formInit();
 
-        $this->_form->setTitle(sprintf(Horde_Core_Translation::t("Add a child permission to \"%s\""), $this->_corePerms->getTitle($permission->getName())));
-        $this->_form->setButtons(Horde_Core_Translation::t("Add"));
+        $this->_form->setTitle(sprintf(Horde_Core_Translation::t('Add a child permission to "%s"'), $this->_corePerms->getTitle($permission->getName())));
+        $this->_form->setButtons(Horde_Core_Translation::t('Add'));
         $this->_vars->set('perm_id', $this->_perms->getPermissionId($permission));
         $this->_form->addHidden('', 'perm_id', 'text', false);
 
@@ -206,12 +208,12 @@ class Horde_Core_Perms_Ui
         $child_perms = $this->_corePerms->getAvailable($permission->getName());
         if ($child_perms === false) {
             /* False, so no childs are to be added below this level. */
-            $this->_form->addVariable(Horde_Core_Translation::t("Permission"), 'child', 'invalid', true, false, null, array(Horde_Core_Translation::t("No children can be added to this permission.")));
+            $this->_form->addVariable(Horde_Core_Translation::t('Permission'), 'child', 'invalid', true, false, null, [Horde_Core_Translation::t('No children can be added to this permission.')]);
         } elseif (is_array($child_perms)) {
             if (!empty($force_choice)) {
                 /* Choice array available, but choice being forced. */
                 $this->_vars->set('child', $force_choice);
-                $this->_form->addVariable(Horde_Core_Translation::t("Permissions"), 'child', 'enum', true, true, null, array($child_perms));
+                $this->_form->addVariable(Horde_Core_Translation::t('Permissions'), 'child', 'enum', true, true, null, [$child_perms]);
             } else {
                 /* Choice array available, so set up enum field. */
                 $prefix = $permission->getName() . ':';
@@ -221,7 +223,7 @@ class Horde_Core_Perms_Ui
                         unset($child_perms[substr($name, $length)]);
                     }
                 }
-                $this->_form->addVariable(Horde_Core_Translation::t("Permissions"), 'child', 'enum', true, false, null, array($child_perms));
+                $this->_form->addVariable(Horde_Core_Translation::t('Permissions'), 'child', 'enum', true, false, null, [$child_perms]);
             }
         }
     }
@@ -254,7 +256,7 @@ class Horde_Core_Perms_Ui
         /* Initialise form if required. */
         $this->_formInit();
 
-        $this->_form->setButtons(Horde_Core_Translation::t("Update"), true);
+        $this->_form->setButtons(Horde_Core_Translation::t('Update'), true);
         $this->_vars->set('perm_id', $this->_perms->getPermissionId($permission));
         $this->_form->addHidden('', 'perm_id', 'text', false);
 
@@ -264,7 +266,7 @@ class Horde_Core_Perms_Ui
 
         /* Default permissions. */
         $perm_val = $permission->getDefaultPermissions();
-        $this->_form->setSection('default', Horde_Core_Translation::t("All Authenticated Users"), Horde_Themes_Image::tag('perms.png'), false);
+        $this->_form->setSection('default', Horde_Core_Translation::t('All Authenticated Users'), Horde_Themes_Image::tag('perms.png'), false);
 
         /* We MUST use 'deflt' for the variable name because 'default' is a
          * reserved word in JavaScript. */
@@ -273,8 +275,8 @@ class Horde_Core_Perms_Ui
             $cols = Horde_Perms::getPermsArray();
 
             /* Define a single matrix row for default perms. */
-            $matrix = array(Horde_Perms::integerToArray($perm_val));
-            $this->_form->addVariable('', 'deflt', 'matrix', false, false, null, array($cols, array(0 => ''), $matrix));
+            $matrix = [Horde_Perms::integerToArray($perm_val)];
+            $this->_form->addVariable('', 'deflt', 'matrix', false, false, null, [$cols, [0 => ''], $matrix]);
         } else {
             $var = $this->_form->addVariable('', 'deflt', $this->_type, false, false, null, $params);
             $var->setDefault($perm_val);
@@ -282,12 +284,12 @@ class Horde_Core_Perms_Ui
 
         /* Guest permissions. */
         $perm_val = $permission->getGuestPermissions();
-        $this->_form->setSection('guest', Horde_Core_Translation::t("Guest Permissions"), '', false);
+        $this->_form->setSection('guest', Horde_Core_Translation::t('Guest Permissions'), '', false);
 
         if ($this->_type == 'matrix') {
             /* Define a single matrix row for guest perms. */
-            $matrix = array(Horde_Perms::integerToArray($perm_val));
-            $this->_form->addVariable('', 'guest', 'matrix', false, false, null, array($cols, array(0 => ''), $matrix));
+            $matrix = [Horde_Perms::integerToArray($perm_val)];
+            $this->_form->addVariable('', 'guest', 'matrix', false, false, null, [$cols, [0 => ''], $matrix]);
         } else {
             $var = $this->_form->addVariable('', 'guest', $this->_type, false, false, null, $params);
             $var->setDefault($perm_val);
@@ -295,12 +297,12 @@ class Horde_Core_Perms_Ui
 
         /* Object creator permissions. */
         $perm_val = $permission->getCreatorPermissions();
-        $this->_form->setSection('creator', Horde_Core_Translation::t("Creator Permissions"), Horde_Themes_Image::tag('user.png'), false);
+        $this->_form->setSection('creator', Horde_Core_Translation::t('Creator Permissions'), Horde_Themes_Image::tag('user.png'), false);
 
         if ($this->_type == 'matrix') {
             /* Define a single matrix row for creator perms. */
-            $matrix = array(Horde_Perms::integerToArray($perm_val));
-            $this->_form->addVariable('', 'creator', 'matrix', false, false, null, array($cols, array(0 => ''), $matrix));
+            $matrix = [Horde_Perms::integerToArray($perm_val)];
+            $this->_form->addVariable('', 'creator', 'matrix', false, false, null, [$cols, [0 => ''], $matrix]);
         } else {
             $var = $this->_form->addVariable('', 'creator', $this->_type, false, false, null, $params);
             $var->setDefault($perm_val);
@@ -308,14 +310,14 @@ class Horde_Core_Perms_Ui
 
         /* Users permissions. */
         $perm_val = $permission->getUserPermissions();
-        $this->_form->setSection('users', Horde_Core_Translation::t("Individual Users"), Horde_Themes_Image::tag('user.png'), false);
+        $this->_form->setSection('users', Horde_Core_Translation::t('Individual Users'), Horde_Themes_Image::tag('user.png'), false);
         $auth = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Auth')->create();
-        $user_list = array();
+        $user_list = [];
         if ($auth->hasCapability('list')) {
             /* The auth driver has list capabilities so set up an array which
              * the matrix field type will recognise to set up an enum box for
              * adding new users to the permissions matrix. */
-            $new_users = array();
+            $new_users = [];
 
             try {
                 $user_list = $auth->listNames();
@@ -337,19 +339,19 @@ class Horde_Core_Perms_Ui
             /* Set up the matrix array, breaking up each permission integer
              * into an array.  The keys of this array will be the row
              * headers. */
-            $rows = array();
-            $matrix = array();
+            $rows = [];
+            $matrix = [];
             foreach ($perm_val as $u_id => $u_perms) {
-                $rows[$u_id] = isset($user_list[$u_id]) ? $user_list[$u_id] : $u_id;
+                $rows[$u_id] = $user_list[$u_id] ?? $u_id;
                 $matrix[$u_id] = Horde_Perms::integerToArray($u_perms);
             }
-            $this->_form->addVariable('', 'u', 'matrix', false, false, null, array($cols, $rows, $matrix, $new_users));
+            $this->_form->addVariable('', 'u', 'matrix', false, false, null, [$cols, $rows, $matrix, $new_users]);
         } else {
             if ($new_users) {
                 if (is_array($new_users)) {
                     $u_n = Horde_Util::getFormData('u_n');
                     $u_n = empty($u_n['u']) ? null : $u_n['u'];
-                    $user_html = '<select name="u_n[u]"><option value="">' . Horde_Core_Translation::t("-- select --") . '</option>';
+                    $user_html = '<select name="u_n[u]"><option value="">' . Horde_Core_Translation::t('-- select --') . '</option>';
                     foreach ($new_users as $new_user => $name) {
                         $user_html .= '<option value="' . $new_user . '"';
                         $user_html .= $u_n == $new_user ? ' selected="selected"' : '';
@@ -369,21 +371,21 @@ class Horde_Core_Perms_Ui
 
         /* Groups permissions. */
         $perm_val = $permission->getGroupPermissions();
-        $this->_form->setSection('groups', Horde_Core_Translation::t("Groups"), Horde_Themes_Image::tag('group.png'), false);
+        $this->_form->setSection('groups', Horde_Core_Translation::t('Groups'), Horde_Themes_Image::tag('group.png'), false);
         try {
             $group_list = $GLOBALS['injector']
                 ->getInstance('Horde_Group')
                 ->listAll();
         } catch (Horde_Group_Exception $e) {
             $GLOBALS['notification']->push($e);
-            $group_list = array();
+            $group_list = [];
         }
 
         if (!empty($group_list)) {
             /* There is an available list of groups so set up an array which
              * the matrix field type will recognise to set up an enum box for
              * adding new groups to the permissions matrix. */
-            $new_groups = array();
+            $new_groups = [];
             foreach ($group_list as $groupId => $group) {
                 if (!isset($perm_val[$groupId])) {
                     $new_groups[$groupId] = $group;
@@ -397,19 +399,19 @@ class Horde_Core_Perms_Ui
         if ($this->_type == 'matrix') {
             /* Set up the matrix array, break up each permission integer into
              * an array. The keys of this array will be the row headers. */
-            $rows = array();
-            $matrix = array();
+            $rows = [];
+            $matrix = [];
             foreach ($perm_val as $g_id => $g_perms) {
-                $rows[$g_id] = isset($group_list[$g_id]) ? $group_list[$g_id] : $g_id;
+                $rows[$g_id] = $group_list[$g_id] ?? $g_id;
                 $matrix[$g_id] = Horde_Perms::integerToArray($g_perms);
             }
-            $this->_form->addVariable('', 'g', 'matrix', false, false, null, array($cols, $rows, $matrix, $new_groups));
+            $this->_form->addVariable('', 'g', 'matrix', false, false, null, [$cols, $rows, $matrix, $new_groups]);
         } else {
             if ($new_groups) {
                 if (is_array($new_groups)) {
                     $g_n = Horde_Util::getFormData('g_n');
                     $g_n = empty($g_n['g']) ? null : $g_n['g'];
-                    $group_html = '<select name="g_n[g]"><option value="">' . Horde_Core_Translation::t("-- select --") . '</option>';
+                    $group_html = '<select name="g_n[g]"><option value="">' . Horde_Core_Translation::t('-- select --') . '</option>';
                     foreach ($new_groups as $groupId => $group) {
                         $group_html .= '<option value="' . $groupId . '"';
                         $group_html .= $g_n == $groupId ? ' selected="selected"' : '';
@@ -422,13 +424,13 @@ class Horde_Core_Perms_Ui
                 $this->_form->addVariable($group_html, 'g_n[v]', $this->_type, false, false, null, $params);
             }
             foreach ($perm_val as $g_id => $g_perms) {
-                $var = $this->_form->addVariable(isset($group_list[$g_id]) ? $group_list[$g_id] : $g_id, 'g_v[' . $g_id . ']', $this->_type, false, false, null, $params);
+                $var = $this->_form->addVariable($group_list[$g_id] ?? $g_id, 'g_v[' . $g_id . ']', $this->_type, false, false, null, $params);
                 $var->setDefault($g_perms);
             }
         }
 
         /* Set form title. */
-        $this->_form->setTitle(sprintf(Horde_Core_Translation::t("Edit permissions for \"%s\""), $this->_corePerms->getTitle($permission->getName())));
+        $this->_form->setTitle(sprintf(Horde_Core_Translation::t('Edit permissions for "%s"'), $this->_corePerms->getTitle($permission->getName())));
     }
 
     /**
@@ -447,18 +449,15 @@ class Horde_Core_Perms_Ui
 
         if ($this->_type == 'matrix') {
             /* Collapse the array for default/guest/creator. */
-            $info['deflt'] = isset($info['deflt'][0])
-                ? $info['deflt'][0]
-                : null;
-            $info['guest'] = isset($info['guest'][0])
-                ? $info['guest'][0]
-                : null;
-            $info['creator'] = isset($info['creator'][0])
-                ? $info['creator'][0]
-                : null;
+            $info['deflt'] = $info['deflt'][0]
+                ?? null;
+            $info['guest'] = $info['guest'][0]
+                ?? null;
+            $info['creator'] = $info['creator'][0]
+                ?? null;
         } else {
             $u_n = $this->_vars->get('u_n');
-            $info['u'] = array();
+            $info['u'] = [];
             if (!empty($u_n['u'])) {
                 $info['u'][$u_n['u']] = $info['u_n']['v'];
             }
@@ -468,7 +467,7 @@ class Horde_Core_Perms_Ui
                 unset($info['u_v']);
             }
             $g_n = $this->_vars->get('g_n');
-            $info['g'] = array();
+            $info['g'] = [];
             if (!empty($g_n['g'])) {
                 $info['g'][$g_n['g']] = $info['g_n']['v'];
             }
@@ -494,10 +493,10 @@ class Horde_Core_Perms_Ui
         /* Initialise form if required. */
         $this->_formInit();
 
-        $this->_form->setTitle(sprintf(Horde_Core_Translation::t("Delete permissions for \"%s\""), $this->_corePerms->getTitle($permission->getName())));
-        $this->_form->setButtons(array(array('class' => 'horde-delete', 'value' => Horde_Core_Translation::t("Delete")), array('class' => 'horde-cancel', 'value' => Horde_Core_Translation::t("Do not delete"))));
+        $this->_form->setTitle(sprintf(Horde_Core_Translation::t('Delete permissions for "%s"'), $this->_corePerms->getTitle($permission->getName())));
+        $this->_form->setButtons([['class' => 'horde-delete', 'value' => Horde_Core_Translation::t('Delete')], ['class' => 'horde-cancel', 'value' => Horde_Core_Translation::t('Do not delete')]]);
         $this->_form->addHidden('', 'perm_id', 'text', false);
-        $this->_form->addVariable(sprintf(Horde_Core_Translation::t("Delete permissions for \"%s\" and any sub-permissions?"), $this->_corePerms->getTitle($permission->getName())), 'prompt', 'description', false);
+        $this->_form->addVariable(sprintf(Horde_Core_Translation::t('Delete permissions for "%s" and any sub-permissions?'), $this->_corePerms->getTitle($permission->getName())), 'prompt', 'description', false);
     }
 
     /**
@@ -513,7 +512,7 @@ class Horde_Core_Perms_Ui
     {
         $form_submit = $this->_vars->get('submitbutton');
 
-        if ($form_submit == Horde_Core_Translation::t("Delete")) {
+        if ($form_submit == Horde_Core_Translation::t('Delete')) {
             if ($this->_form->validate($this->_vars)) {
                 $this->_form->getInfo($this->_vars, $info);
                 return true;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2009-2020 Horde LLC (http://www.horde.org/)
  *
@@ -12,7 +13,7 @@
  */
 
 /**
- * The Horde_Core_Controller_SettingsFinder class provides 
+ * The Horde_Core_Controller_SettingsFinder class provides
  * logic to find the most appropriate SettingsExporter for a controller
  *
  * Copyright 2009-2020 Horde LLC (http://www.horde.org/)

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Horde_Core_ActiveSync_Mail::
  *
@@ -28,7 +29,7 @@
  */
 class Horde_Core_ActiveSync_Mail
 {
-    const HTML_BLOCKQUOTE = '<blockquote type="cite" style="border-left:2px solid blue;margin-left:2px;padding-left:12px;">';
+    public const HTML_BLOCKQUOTE = '<blockquote type="cite" style="border-left:2px solid blue;margin-left:2px;padding-left:12px;">';
 
     /**
      * The headers used when sending the email.
@@ -131,7 +132,7 @@ class Horde_Core_ActiveSync_Mail
      * @var array
      * @since  2.31.0
      */
-    protected $_forwardees = array();
+    protected $_forwardees = [];
 
     /**
      * Const'r
@@ -141,8 +142,10 @@ class Horde_Core_ActiveSync_Mail
      * @param integer $eas_version                 EAS version in use.
      */
     public function __construct(
-        Horde_ActiveSync_Imap_Adapter $imap, $user, $eas_version)
-    {
+        Horde_ActiveSync_Imap_Adapter $imap,
+        $user,
+        $eas_version
+    ) {
         $this->_imap = $imap;
         $this->_user = $user;
         $this->_version = $eas_version;
@@ -151,19 +154,19 @@ class Horde_Core_ActiveSync_Mail
     public function &__get($property)
     {
         switch ($property) {
-        case 'imapMessage':
-            if (!isset($this->_imapMessage)) {
-                $this->_getImapMessage();
-            }
-            return $this->_imapMessage;
-        case 'replacemime':
-        case 'id':
-        case 'reply':
-        case 'forward':
-        case 'headers':
-        case 'parentFolder':
-            $property = '_' . $property;
-            return $this->$property;
+            case 'imapMessage':
+                if (!isset($this->_imapMessage)) {
+                    $this->_getImapMessage();
+                }
+                return $this->_imapMessage;
+            case 'replacemime':
+            case 'id':
+            case 'reply':
+            case 'forward':
+            case 'headers':
+            case 'parentFolder':
+                $property = '_' . $property;
+                return $this->$property;
         }
     }
 
@@ -210,7 +213,7 @@ class Horde_Core_ActiveSync_Mail
      *                 message.
      * @throws Horde_ActiveSync_Exception
      */
-    public function setForward($parent, $id, $params = array())
+    public function setForward($parent, $id, $params = [])
     {
         if (!empty($this->_reply)) {
             throw new Horde_ActiveSync_Exception('Cannot set both Forward and Reply.');
@@ -262,14 +265,14 @@ class Horde_Core_ActiveSync_Mail
     protected function _callPreSendHook()
     {
         $hooks = $GLOBALS['injector']->getInstance('Horde_Core_Hooks');
-        $params = array(
+        $params = [
             'raw' => $this->_raw,
             'imap_msg' => $this->imapMessage,
             'parent' => $this->_parentFolder,
             'reply' => $this->_reply,
-            'forward' => $this->_forward);
+            'forward' => $this->_forward];
         try {
-            if (!$result = $hooks->callHook('activesync_email_presend', 'horde', array($params))) {
+            if (!$result = $hooks->callHook('activesync_email_presend', 'horde', [$params])) {
                 throw new Horde_ActiveSync_Exception('There was an issue running the activesync_email_presend hook.');
             }
             if ($result instanceof Horde_ActiveSync_Mime) {
@@ -289,8 +292,8 @@ class Horde_Core_ActiveSync_Mail
         if (!empty($this->_mailer)) {
             return $this->_mailer->getRaw();
         }
-        $stream = new Horde_Stream_Temp(array('max_memory' => 262144));
-        $stream->add($this->_headers->toString(array('charset' => 'UTF-8')) . $this->_raw->getMessage(), true);
+        $stream = new Horde_Stream_Temp(['max_memory' => 262144]);
+        $stream->add($this->_headers->toString(['charset' => 'UTF-8']) . $this->_raw->getMessage(), true);
         return $stream;
     }
 
@@ -302,7 +305,7 @@ class Horde_Core_ActiveSync_Mail
     protected function _sendRaw()
     {
         $recipients = '';
-        $h_array = $this->_headers->toArray(array('charset' => 'UTF-8'));
+        $h_array = $this->_headers->toArray(['charset' => 'UTF-8']);
         if (!empty($h_array['To'])) {
             $recipients = $h_array['To'];
         }
@@ -400,15 +403,16 @@ class Horde_Core_ActiveSync_Mail
      */
     protected function _buildSmartReply()
     {
-        $mail = new Horde_Mime_Mail($this->_headers->toArray(array('charset' => 'UTF-8')));
+        $mail = new Horde_Mime_Mail($this->_headers->toArray(['charset' => 'UTF-8']));
         $base_part = $this->imapMessage->getStructure();
         $plain_id = $base_part->findBody('plain');
         $html_id = $base_part->findBody('html');
 
         try {
-            $body_data = $this->imapMessage->getMessageBodyData(array(
+            $body_data = $this->imapMessage->getMessageBodyData(
+                [
                 'protocolversion' => $this->_version,
-                'bodyprefs' => array(Horde_ActiveSync::BODYPREF_TYPE_MIME => true))
+                'bodyprefs' => [Horde_ActiveSync::BODYPREF_TYPE_MIME => true]]
             );
         } catch (Horde_Exception_NotFound $e) {
             throw new Horde_ActiveSync_Exception($e->getMessage());
@@ -451,15 +455,15 @@ class Horde_Core_ActiveSync_Mail
         // Forwarded message
         $rfc822Stream = $this->imapMessage->getFullMsg(true);
         $rfc822Part = new Horde_Mime_Part();
-        $rfc822Part->setType("message/rfc822");
+        $rfc822Part->setType('message/rfc822');
         $rfc822Part->setContents($rfc822Stream);
-        $rfc822Part->setName(Horde_Core_Translation::t("Forwarded Message"));
+        $rfc822Part->setName(Horde_Core_Translation::t('Forwarded Message'));
 
         // Incoming message to append to forward.
         $mime_message = $this->_raw->getMimeObject();
 
         // Outgoing message
-        $mail = new Horde_Mime_Mail($this->_headers->toArray(array('charset' => 'UTF-8')));
+        $mail = new Horde_Mime_Mail($this->_headers->toArray(['charset' => 'UTF-8']));
         $mail->setBody($this->_getSmartPlainText($mime_message));
         $mail->setHtmlBody($this->_getSmartHtmlText($mime_message));
 
@@ -487,8 +491,11 @@ class Horde_Core_ActiveSync_Mail
      * @return string  The plaintext part of the email message that is being sent.
      */
     protected function _getPlainPart(
-        $plain_id, Horde_Mime_Part $mime_message, array $body_data, Horde_Mime_Part $base_part)
-    {
+        $plain_id,
+        Horde_Mime_Part $mime_message,
+        array $body_data,
+        Horde_Mime_Part $base_part
+    ) {
         $smart_text = $this->_getSmartPlainText($mime_message);
         if ($this->_forward) {
             return $smart_text . $this->_forwardText($body_data, $base_part->getPart($plain_id));
@@ -516,7 +523,8 @@ class Horde_Core_ActiveSync_Mail
         } else {
             $smart_text = Horde_ActiveSync_Utils::ensureUtf8(
                 $mime_message->getPart($id)->getContents(),
-                $mime_message->getCharset());
+                $mime_message->getCharset()
+            );
         }
 
         return $smart_text;
@@ -557,11 +565,14 @@ class Horde_Core_ActiveSync_Mail
             $smart_text = self::text2html(
                 Horde_ActiveSync_Utils::ensureUtf8(
                     $mime_message->getPart($mime_message->findBody('plain'))->getContents(),
-                    $mime_message->getCharset()));
+                    $mime_message->getCharset()
+                )
+            );
         } else {
             $smart_text = Horde_ActiveSync_Utils::ensureUtf8(
                 $mime_message->getPart($id)->getContents(),
-                $mime_message->getCharset());
+                $mime_message->getCharset()
+            );
         }
 
         return $smart_text;
@@ -577,7 +588,7 @@ class Horde_Core_ActiveSync_Mail
         if (empty($this->_id) || empty($this->_parentFolder)) {
             return;
         }
-        $this->_imapMessage = array_pop($this->_imap->getImapMessage($this->_parentFolder, $this->_id, array('headers' => true)));
+        $this->_imapMessage = array_pop($this->_imap->getImapMessage($this->_parentFolder, $this->_id, ['headers' => true]));
         if (empty($this->_imapMessage)) {
             throw new Horde_Exception_NotFound('The forwarded/replied message was not found.');
         }
@@ -661,7 +672,7 @@ class Horde_Core_ActiveSync_Mail
             return self::HTML_BLOCKQUOTE . $msg . '</blockquote><br /><br />';
         }
         return empty($msg)
-            ? '[' . Horde_Core_Translation::t("No message body text") . ']'
+            ? '[' . Horde_Core_Translation::t('No message body text') . ']'
             : $msg;
     }
 
@@ -718,7 +729,7 @@ class Horde_Core_ActiveSync_Mail
             return Horde_Text_Filter::filter(
                 $html,
                 'Cleanhtml',
-                array('body_only' => true)
+                ['body_only' => true]
             );
         } else {
             // If no tidy, use Horde_Dom.
@@ -739,15 +750,15 @@ class Horde_Core_ActiveSync_Mail
         return Horde_Text_Filter::filter(
             $msg,
             'Text2html',
-            array(
+            [
                 'flowed' => self::HTML_BLOCKQUOTE,
-                'parselevel' => Horde_Text_Filter_Text2html::MICRO)
+                'parselevel' => Horde_Text_Filter_Text2html::MICRO]
         );
     }
 
     public static function html2text($msg)
     {
-        return Horde_Text_Filter::filter($msg, 'Html2text', array('nestingLimit' => 1000));
+        return Horde_Text_Filter::filter($msg, 'Html2text', ['nestingLimit' => 1000]);
     }
 
 }

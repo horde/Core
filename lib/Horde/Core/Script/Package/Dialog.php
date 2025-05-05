@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This class identifies the javascript necessary to output the dialog
  * javascript code to the browser.
@@ -21,10 +22,10 @@ class Horde_Core_Script_Package_Dialog extends Horde_Script_Package
     public function __construct()
     {
         $ob = new Horde_Script_File_JsDir('dialog.js', 'horde');
-        $ob->jsvars = array(
-            'HordeDialog.cancel_text' => Horde_Core_Translation::t("Cancel"),
-            'HordeDialog.ok_text' => Horde_Core_Translation::t("OK")
-        );
+        $ob->jsvars = [
+            'HordeDialog.cancel_text' => Horde_Core_Translation::t('Cancel'),
+            'HordeDialog.ok_text' => Horde_Core_Translation::t('OK'),
+        ];
         $this->_files[] = $ob;
 
         $this->_files[] = new Horde_Script_File_JsDir('redbox.js', 'horde');

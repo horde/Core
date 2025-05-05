@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This class defines the abstract driver implementation for
  * Horde_Core_Auth_Signup.
@@ -35,7 +36,7 @@ abstract class Horde_Core_Auth_Signup_Base
         $this->_preSignup($info);
 
         // Attempt to add the user to the system.
-        $auth->addUser($info['user_name'], array('password' => $info['password']));
+        $auth->addUser($info['user_name'], ['password' => $info['password']]);
 
         // Attempt to add/update any extra data handed in.
         if (!empty($info['extra'])) {
@@ -43,13 +44,14 @@ abstract class Horde_Core_Auth_Signup_Base
                 $injector->getInstance('Horde_Core_Hooks')->callHook(
                     'signup_addextra',
                     'horde',
-                    array(
+                    [
                         $info['user_name'],
                         $info['extra'],
-                        $info['password']
-                    )
+                        $info['password'],
+                    ]
                 );
-            } catch (Horde_Exception_HookNotSet $e) {}
+            } catch (Horde_Exception_HookNotSet $e) {
+            }
         }
     }
 
@@ -77,10 +79,10 @@ abstract class Horde_Core_Auth_Signup_Base
         if (!empty($info['extra'])) {
             $signup->setData($info['extra']);
         }
-        $signup->setData(array_merge($signup->getData(), array(
+        $signup->setData(array_merge($signup->getData(), [
             'dateReceived' => time(),
             'password' => $info['password'],
-        )));
+        ]));
 
         $this->_queueSignup($signup);
 
@@ -88,29 +90,30 @@ abstract class Horde_Core_Auth_Signup_Base
             $injector->getInstance('Horde_Core_Hooks')->callHook(
                 'signup_queued',
                 'horde',
-                array(
+                [
                     $info['user_name'],
-                    $info
-                )
+                    $info,
+                ]
             );
-        } catch (Horde_Exception_HookNotSet $e) {}
+        } catch (Horde_Exception_HookNotSet $e) {
+        }
 
         if (!empty($conf['signup']['email'])) {
-            $link = Horde::url($registry->get('webroot', 'horde') . '/admin/signup_confirm.php', true, -1)->setRaw(true)->add(array(
+            $link = Horde::url($registry->get('webroot', 'horde') . '/admin/signup_confirm.php', true, -1)->setRaw(true)->add([
                 'u' => $signup->getName(),
-                'h' => hash_hmac('sha1', $signup->getName(), $conf['secret_key'])
-            ));
-            $message = sprintf(Horde_Core_Translation::t("A new account for the user \"%s\" has been requested through the signup form."), $signup->getName())
+                'h' => hash_hmac('sha1', $signup->getName(), $conf['secret_key']),
+            ]);
+            $message = sprintf(Horde_Core_Translation::t('A new account for the user "%s" has been requested through the signup form.'), $signup->getName())
                 . "\n\n"
-                . Horde_Core_Translation::t("Approve the account:")
+                . Horde_Core_Translation::t('Approve the account:')
                 . "\n" . $link->copy()->add('a', 'approve') . "\n"
-                . Horde_Core_Translation::t("Deny the account:")
+                . Horde_Core_Translation::t('Deny the account:')
                 . "\n" . $link->copy()->add('a', 'deny');
-            $mail = new Horde_Mime_Mail(array(
+            $mail = new Horde_Mime_Mail([
                 'body' => $message,
-                'Subject' => sprintf(Horde_Core_Translation::t("Account signup request for \"%s\""), $signup->getName()),
+                'Subject' => sprintf(Horde_Core_Translation::t('Account signup request for "%s"'), $signup->getName()),
                 'To' => $conf['signup']['email'],
-                'From' => $conf['signup']['email']));
+                'From' => $conf['signup']['email']]);
             $mail->send($injector->getInstance('Horde_Mail'));
         }
     }
@@ -132,15 +135,16 @@ abstract class Horde_Core_Auth_Signup_Base
             $info = $injector->getInstance('Horde_Core_Hooks')->callHook(
                 'signup_preprocess',
                 'horde',
-                array($info)
+                [$info]
             );
-        } catch (Horde_Exception_HookNotSet $e) {}
+        } catch (Horde_Exception_HookNotSet $e) {
+        }
 
         // Check to see if the username already exists in the auth backend or
         // the signup queue.
         if ($auth->exists($info['user_name']) ||
             $this->exists($info['user_name'])) {
-            throw new Horde_Exception(sprintf(Horde_Core_Translation::t("Username \"%s\" already exists."), $info['user_name']));
+            throw new Horde_Exception(sprintf(Horde_Core_Translation::t('Username "%s" already exists.'), $info['user_name']));
         }
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based Horde_Kolab_Session:: factory.
  *
@@ -51,12 +52,14 @@ class Horde_Core_Factory_KolabSession extends Horde_Core_Factory_Base
         $auth
     ) {
         $validator = new Horde_Kolab_Session_Valid_Base(
-            $session, $auth
+            $session,
+            $auth
         );
 
         if (isset($GLOBALS['conf']['kolab']['session']['debug'])) {
             $validator = new Horde_Kolab_Session_Valid_Decorator_Logged(
-                $validator, $this->_injector->getInstance('Horde_Log_Logger')
+                $validator,
+                $this->_injector->getInstance('Horde_Log_Logger')
             );
         }
 
@@ -71,7 +74,7 @@ class Horde_Core_Factory_KolabSession extends Horde_Core_Factory_Base
     public function createSession()
     {
         if (!empty($GLOBALS['conf']['kolab']['enabled']) &&
-	    !isset($GLOBALS['conf']['kolab']['users'])) {
+        !isset($GLOBALS['conf']['kolab']['users'])) {
             $session = new Horde_Kolab_Session_Base(
                 $this->_injector->getInstance('Horde_Kolab_Server_Composite'),
                 $GLOBALS['conf']['kolab']
@@ -87,7 +90,8 @@ class Horde_Core_Factory_KolabSession extends Horde_Core_Factory_Base
 
         if (isset($GLOBALS['conf']['kolab']['session']['debug'])) {
             $session = new Horde_Kolab_Session_Decorator_Logged(
-                $session, $this->_injector->getInstance('Horde_Log_Logger')
+                $session,
+                $this->_injector->getInstance('Horde_Log_Logger')
             );
         }
 

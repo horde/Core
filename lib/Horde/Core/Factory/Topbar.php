@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector based Horde_Core_Topbar factory.
  *

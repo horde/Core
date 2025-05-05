@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @category Horde
  * @package  Core
@@ -13,30 +14,30 @@ class Horde_Core_Factory_Weather extends Horde_Core_Factory_Injector
         global $conf, $injector;
 
         if (empty($conf['weather']['provider'])) {
-            throw new Horde_Exception(Horde_Core_Translation::t("Weather support not configured."));
+            throw new Horde_Exception(Horde_Core_Translation::t('Weather support not configured.'));
         }
 
         // Parameters for all driver types
-        $params = array(
+        $params = [
             'cache' => $injector->getInstance('Horde_Cache'),
             'cache_lifetime' => $conf['weather']['params']['lifetime'],
-            'http_client' => $injector->createInstance('Horde_Core_Factory_HttpClient')->create()
-        );
+            'http_client' => $injector->createInstance('Horde_Core_Factory_HttpClient')->create(),
+        ];
 
         $driver = $conf['weather']['provider'];
 
         switch ($driver) {
-        case 'WeatherUnderground':
-        case 'Wwo':
-        case 'Owm':
-            $params['apikey'] = $conf['weather']['params']['key'];
-            if (!empty($conf['weather']['params']['apiversion'])) {
-                $params['apiVersion'] = $conf['weather']['params']['apiversion'];
-            }
-            break;
-        case 'Metar':
-            $params['db'] = $injector->getInstance('Horde_Db_Adapter');
-            break;
+            case 'WeatherUnderground':
+            case 'Wwo':
+            case 'Owm':
+                $params['apikey'] = $conf['weather']['params']['key'];
+                if (!empty($conf['weather']['params']['apiversion'])) {
+                    $params['apiVersion'] = $conf['weather']['params']['apiversion'];
+                }
+                break;
+            case 'Metar':
+                $params['db'] = $injector->getInstance('Horde_Db_Adapter');
+                break;
         }
         $class = $this->_getDriverName($driver, 'Horde_Service_Weather');
 

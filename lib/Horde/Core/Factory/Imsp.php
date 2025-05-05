@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based Horde_Imsp:: factory.
  *
@@ -30,7 +31,7 @@ class Horde_Core_Factory_Imsp extends Horde_Core_Factory_Base
      *
      * @var array
      */
-    protected $_instances = array();
+    protected $_instances = [];
 
     /**
      *
@@ -56,9 +57,9 @@ class Horde_Core_Factory_Imsp extends Horde_Core_Factory_Base
      *
      * @return Horde_Imsp  The Horde_Imsp object
      */
-    public function create($driver = null, array $params = array())
+    public function create($driver = null, array $params = [])
     {
-        $signature = serialize(array($driver, $params));
+        $signature = serialize([$driver, $params]);
         if (!isset($this->_instances[$signature])) {
             $this->_instances[$signature] = self::_factory($driver, $params);
         }
@@ -75,7 +76,7 @@ class Horde_Core_Factory_Imsp extends Horde_Core_Factory_Base
      * @return mixed The Horde_Imsp object or Horde_Imsp_Client object.
      * @throws Horde_Exception
      */
-    protected function _factory($driver = null, array $params = array())
+    protected function _factory($driver = null, array $params = [])
     {
         $driver = basename($driver);
 

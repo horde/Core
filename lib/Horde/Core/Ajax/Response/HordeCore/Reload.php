@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A data object that indicates to the HordeCore javascript framework that
  * the action was successful, but the page needs to be reloaded.
@@ -15,7 +16,6 @@
  */
 class Horde_Core_Ajax_Response_HordeCore_Reload extends Horde_Core_Ajax_Response_HordeCore
 {
-
     /**
      * Constructor.
      *
@@ -34,7 +34,7 @@ class Horde_Core_Ajax_Response_HordeCore_Reload extends Horde_Core_Ajax_Response
      */
     protected function _jsonData()
     {
-        $ob = new stdClass;
+        $ob = new stdClass();
         $ob->reload = is_null($this->data)
             ? true
             : $this->data;

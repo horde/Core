@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Horde specific wrapper for Horde_Share drivers. Adds Horde hook calls etc...
  *
@@ -26,11 +27,11 @@ class Horde_Core_Share_Driver
      *
      * @var array
      */
-    protected $_storageMap = array(
+    protected $_storageMap = [
         'Horde_Share_Sql' => 'Horde_Db_Adapter',
         'Horde_Share_Sqlng' => 'Horde_Db_Adapter',
         'Horde_Share_Sql_Hierarchical' => 'Horde_Db_Adapter',
-        'Horde_Share_Kolab' => 'Horde_Kolab_Storage');
+        'Horde_Share_Kolab' => 'Horde_Kolab_Storage'];
 
     /**
      */
@@ -40,14 +41,15 @@ class Horde_Core_Share_Driver
 
         $this->_share = $share;
         $this->_share->setStorage($injector->getInstance($this->_storageMap[get_class($this->_share)]));
-        $this->_share->addCallback('add', array($this, 'shareAddCallback'));
-        $this->_share->addCallback('modify', array($this, 'shareModifyCallback'));
-        $this->_share->addCallback('remove', array($this, 'shareRemoveCallback'));
-        $this->_share->addCallback('list', array($this, 'shareListCallback'));
+        $this->_share->addCallback('add', [$this, 'shareAddCallback']);
+        $this->_share->addCallback('modify', [$this, 'shareModifyCallback']);
+        $this->_share->addCallback('remove', [$this, 'shareRemoveCallback']);
+        $this->_share->addCallback('list', [$this, 'shareListCallback']);
 
         try {
-            $injector->getInstance('Horde_Core_Hooks')->callHook('share_init', 'horde', array($this, $this->_share->getApp()));
-        } catch (Horde_Exception_HookNotSet $e) {}
+            $injector->getInstance('Horde_Core_Hooks')->callHook('share_init', 'horde', [$this, $this->_share->getApp()]);
+        } catch (Horde_Exception_HookNotSet $e) {
+        }
     }
 
     /**
@@ -60,7 +62,7 @@ class Horde_Core_Share_Driver
      */
     public function __call($method, $args)
     {
-        return call_user_func_array(array($this->_share, $method), $args);
+        return call_user_func_array([$this->_share, $method], $args);
     }
 
     /**
@@ -98,11 +100,13 @@ class Horde_Core_Share_Driver
             }
 
             // Try to place the item lock at app:shareid scope.
-            return $locks->setLock($GLOBALS['registry']->getAuth(),
-                                   $itemscope,
-                                   $uid,
-                                   $timeout,
-                                   $locktype);
+            return $locks->setLock(
+                $GLOBALS['registry']->getAuth(),
+                $itemscope,
+                $uid,
+                $timeout,
+                $locktype
+            );
         } else {
             // Share lock requested. Check for locked items.
             try {
@@ -116,11 +120,13 @@ class Horde_Core_Share_Driver
             }
 
             // Try to place the share lock
-            return $locks->setLock($GLOBALS['registry']->getAuth(),
-                                   $this->_share->getShareOb()->getApp(),
-                                   $shareid,
-                                   $timeout,
-                                   $locktype);
+            return $locks->setLock(
+                $GLOBALS['registry']->getAuth(),
+                $this->_share->getShareOb()->getApp(),
+                $shareid,
+                $timeout,
+                $locktype
+            );
         }
     }
 
@@ -178,11 +184,11 @@ class Horde_Core_Share_Driver
         }
 
         if (empty($result)) {
-            return array();
+            return [];
         }
 
-        return array('type' => $locktargettype,
-                     'lock' => reset($result));
+        return ['type' => $locktargettype,
+                     'lock' => reset($result)];
     }
 
     /**
@@ -194,13 +200,14 @@ class Horde_Core_Share_Driver
      *
      * @return array  An array of share objects
      */
-    public function shareListCallback($userid, $shares, $params = array())
+    public function shareListCallback($userid, $shares, $params = [])
     {
         try {
             $params = new Horde_Support_Array($params);
             return $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
-                ->callHook('share_list', 'horde', array($userid, $params['perm'], $params['attributes'], $shares));
-        } catch (Horde_Exception_HookNotSet $e) {}
+                ->callHook('share_list', 'horde', [$userid, $params['perm'], $params['attributes'], $shares]);
+        } catch (Horde_Exception_HookNotSet $e) {
+        }
 
         return $shares;
     }
@@ -214,8 +221,9 @@ class Horde_Core_Share_Driver
     {
         try {
             $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
-                ->callHook('share_add', 'horde', array($share));
-        } catch (Horde_Exception_HookNotSet $e) {}
+                ->callHook('share_add', 'horde', [$share]);
+        } catch (Horde_Exception_HookNotSet $e) {
+        }
     }
 
     /**
@@ -227,16 +235,18 @@ class Horde_Core_Share_Driver
     {
         try {
             $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
-                ->callHook('share_remove', 'horde', array($share));
-        } catch (Horde_Exception_HookNotSet $e) {}
+                ->callHook('share_remove', 'horde', [$share]);
+        } catch (Horde_Exception_HookNotSet $e) {
+        }
     }
 
     public function shareModifyCallback(Horde_Share_Object $share)
     {
         try {
             $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
-                ->callHook('share_modify', 'horde', array($share));
-        } catch (Horde_Exception_HookNotSet $e) {}
+                ->callHook('share_modify', 'horde', [$share]);
+        } catch (Horde_Exception_HookNotSet $e) {
+        }
     }
 
 }

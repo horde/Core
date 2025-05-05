@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @category Horde
  * @package  Core
@@ -14,7 +15,7 @@ class Horde_Core_Factory_Image extends Horde_Core_Factory_Base
      * @return Horde_Image
      * @throws Horde_Exception
      */
-    public function create(array $params = array())
+    public function create(array $params = [])
     {
         global $conf;
 
@@ -25,16 +26,16 @@ class Horde_Core_Factory_Image extends Horde_Core_Factory_Base
 
         $class = $this->_getDriverName($driver, 'Horde_Image');
 
-        $context = array(
+        $context = [
             'tmpdir' => Horde::getTempdir(),
-            'logger' => $this->_injector->getInstance('Horde_Log_Logger')
-        );
+            'logger' => $this->_injector->getInstance('Horde_Log_Logger'),
+        ];
 
         switch ($driver) {
-        case 'Im':
-            $context['convert'] = $conf['image']['convert'];
-            $context['identify'] = $conf['image']['identify'];
-            break;
+            case 'Im':
+                $context['convert'] = $conf['image']['convert'];
+                $context['identify'] = $conf['image']['identify'];
+                break;
         }
 
         return new $class($params, $context);

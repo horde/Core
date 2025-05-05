@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base class for configuring a javascript autocompleter.
  *
@@ -19,14 +20,14 @@ abstract class Horde_Core_Ajax_Imple_AutoCompleter_Base
      *
      * @var array
      */
-    public $params = array();
+    public $params = [];
 
     /**
      * Constructor.
      *
      * @param array $params  Configuration options.
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
         $this->params = $params;
     }
@@ -38,6 +39,6 @@ abstract class Horde_Core_Ajax_Imple_AutoCompleter_Base
      * @param Horde_Core_Ajax_Imple_AutoCompleter $ac  The underlying imple
      *                                                 object.
      */
-    abstract function generate(Horde_Core_Ajax_Imple_AutoCompleter $ac);
+    abstract public function generate(Horde_Core_Ajax_Imple_AutoCompleter $ac);
 
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Core_Ui_JsCalendar:: class generates the necessary javascript
  * code to allow the javascript calendar widget to be displayed on the page.
@@ -42,20 +43,20 @@ class Horde_Core_Ui_JsCalendar
      *                    DEFAULT: false
      * </pre>
      */
-    public static function init(array $params = array())
+    public static function init(array $params = [])
     {
         if (self::$_initRun) {
             return;
         }
         self::$_initRun = true;
 
-        $params = array_merge(array(
+        $params = array_merge([
             'click_month' => false,
             'click_week' => false,
             'click_year' => false,
             'full_weekdays' => false,
-            'short_weekdays' => false
-        ), $params);
+            'short_weekdays' => false,
+        ], $params);
 
         $weekdays = self::weekdays();
         if ($params['short_weekdays']) {
@@ -64,14 +65,14 @@ class Horde_Core_Ui_JsCalendar
             }
         }
 
-        $js = array(
+        $js = [
             '-Horde_Calendar.click_month' => intval($params['click_month']),
             '-Horde_Calendar.click_week' => intval($params['click_week']),
             '-Horde_Calendar.click_year' => intval($params['click_year']),
             '-Horde_Calendar.firstDayOfWeek' => intval($GLOBALS['prefs']->getValue('first_week_day')),
             'Horde_Calendar.months' => self::months(),
-            'Horde_Calendar.weekdays' => $weekdays
-        );
+            'Horde_Calendar.weekdays' => $weekdays,
+        ];
         if ($params['full_weekdays']) {
             $js['Horde_Calendar.fullweekdays'] = self::fullWeekdays();
         }
@@ -88,15 +89,15 @@ class Horde_Core_Ui_JsCalendar
      */
     public static function weekdays()
     {
-        return array(
-            Horde_Core_Translation::t("Su"),
-            Horde_Core_Translation::t("Mo"),
-            Horde_Core_Translation::t("Tu"),
-            Horde_Core_Translation::t("We"),
-            Horde_Core_Translation::t("Th"),
-            Horde_Core_Translation::t("Fr"),
-            Horde_Core_Translation::t("Sa")
-        );
+        return [
+            Horde_Core_Translation::t('Su'),
+            Horde_Core_Translation::t('Mo'),
+            Horde_Core_Translation::t('Tu'),
+            Horde_Core_Translation::t('We'),
+            Horde_Core_Translation::t('Th'),
+            Horde_Core_Translation::t('Fr'),
+            Horde_Core_Translation::t('Sa'),
+        ];
     }
 
     /**
@@ -106,15 +107,15 @@ class Horde_Core_Ui_JsCalendar
      */
     public static function fullWeekdays()
     {
-        return array(
-            Horde_Core_Translation::t("Sunday"),
-            Horde_Core_Translation::t("Monday"),
-            Horde_Core_Translation::t("Tuesday"),
-            Horde_Core_Translation::t("Wednesday"),
-            Horde_Core_Translation::t("Thursday"),
-            Horde_Core_Translation::t("Friday"),
-            Horde_Core_Translation::t("Saturday"),
-        );
+        return [
+            Horde_Core_Translation::t('Sunday'),
+            Horde_Core_Translation::t('Monday'),
+            Horde_Core_Translation::t('Tuesday'),
+            Horde_Core_Translation::t('Wednesday'),
+            Horde_Core_Translation::t('Thursday'),
+            Horde_Core_Translation::t('Friday'),
+            Horde_Core_Translation::t('Saturday'),
+        ];
     }
 
     /**
@@ -124,20 +125,20 @@ class Horde_Core_Ui_JsCalendar
      */
     public static function months()
     {
-        return array(
-            Horde_Core_Translation::t("January"),
-            Horde_Core_Translation::t("February"),
-            Horde_Core_Translation::t("March"),
-            Horde_Core_Translation::t("April"),
-            Horde_Core_Translation::t("May"),
-            Horde_Core_Translation::t("June"),
-            Horde_Core_Translation::t("July"),
-            Horde_Core_Translation::t("August"),
-            Horde_Core_Translation::t("September"),
-            Horde_Core_Translation::t("October"),
-            Horde_Core_Translation::t("November"),
-            Horde_Core_Translation::t("December")
-        );
+        return [
+            Horde_Core_Translation::t('January'),
+            Horde_Core_Translation::t('February'),
+            Horde_Core_Translation::t('March'),
+            Horde_Core_Translation::t('April'),
+            Horde_Core_Translation::t('May'),
+            Horde_Core_Translation::t('June'),
+            Horde_Core_Translation::t('July'),
+            Horde_Core_Translation::t('August'),
+            Horde_Core_Translation::t('September'),
+            Horde_Core_Translation::t('October'),
+            Horde_Core_Translation::t('November'),
+            Horde_Core_Translation::t('December'),
+        ];
     }
 
 }

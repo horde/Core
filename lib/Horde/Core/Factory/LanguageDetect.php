@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based Text_LanguageDetect:: factory.
  *
@@ -38,7 +39,7 @@ class Horde_Core_Factory_LanguageDetect extends Horde_Core_Factory_Base
      *
      * @var array
      */
-    protected $_langmap = array(
+    protected $_langmap = [
         'albanian' => 'sq',
         'arabic' => 'ar',
         // azeri
@@ -90,8 +91,8 @@ class Horde_Core_Factory_LanguageDetect extends Horde_Core_Factory_Base
         'urdu' => 'ur',
         'uzbek' => 'uz',
         'vietnamese' => 'vi',
-        'welsh' => 'cy'
-    );
+        'welsh' => 'cy',
+    ];
 
     /**
      * Return a Text_LanguageDetect instance.

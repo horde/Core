@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -50,16 +51,16 @@ class Horde_Themes_Css_Cache_File extends Horde_Themes_Css_Cache
             $compress = new Horde_Themes_Css_Compress();
             $temp = Horde_Util::getTempFile('staticcss', true, $js_fs);
             if (!file_put_contents($temp, $compress->compress($css), LOCK_EX) ||
-                !chmod($temp, 0777 & ~umask()) ||
+                !chmod($temp, 0o777 & ~umask()) ||
                 !rename($temp, $path)) {
                 Horde::log('Could not write cached CSS file to disk.', 'EMERG');
-                return array();
+                return [];
             }
         }
 
-        return array(
-             Horde::url($registry->get('staticuri', 'horde') . '/' . $filename, true, array('append_session' => -1))
-         );
+        return [
+             Horde::url($registry->get('staticuri', 'horde') . '/' . $filename, true, ['append_session' => -1]),
+         ];
     }
 
     /**

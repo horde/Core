@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base interface for handling 'special' preference types.
  *

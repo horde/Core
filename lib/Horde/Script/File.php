@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
  *
@@ -38,9 +39,9 @@
 class Horde_Script_File
 {
     /** Priority constants. */
-    const PRIORITY_HIGH = 1;
-    const PRIORITY_NORMAL = 2;
-    const PRIORITY_LOW = 3;
+    public const PRIORITY_HIGH = 1;
+    public const PRIORITY_NORMAL = 2;
+    public const PRIORITY_LOW = 3;
 
     /**
      * The cache group this file should be output in.
@@ -54,7 +55,7 @@ class Horde_Script_File
      *
      * @var array
      */
-    public $jsvars = array();
+    public $jsvars = [];
 
     /**
      * Application.
@@ -98,42 +99,42 @@ class Horde_Script_File
     public function __get($name)
     {
         switch ($name) {
-        case 'app':
-            return $this->_app;
+            case 'app':
+                return $this->_app;
 
-        case 'file':
-            return $this->_file;
+            case 'file':
+                return $this->_file;
 
-        case 'full_path':
-            return $this->path . $this->_file;
+            case 'full_path':
+                return $this->path . $this->_file;
 
-        case 'hash':
-            return hash(
-                'md5',
-                $this->_app . "\0" . $this->_file
-            );
+            case 'hash':
+                return hash(
+                    'md5',
+                    $this->_app . "\0" . $this->_file
+                );
 
-        case 'modified':
-            return filemtime($this->full_path);
+            case 'modified':
+                return filemtime($this->full_path);
 
-        case 'path':
-            return '/';
+            case 'path':
+                return '/';
 
-        case 'priority':
-            return $this->_priority;
+            case 'priority':
+                return $this->_priority;
 
-        case 'tag':
-        case 'tag_full':
-            return '<script type="text/javascript" src="' .
-                (($name == 'tag') ? $this->url : $this->url_full) .
-                '"></script>';
+            case 'tag':
+            case 'tag_full':
+                return '<script type="text/javascript" src="' .
+                    (($name == 'tag') ? $this->url : $this->url_full) .
+                    '"></script>';
 
-        case 'uncompressed':
-            return $this;
+            case 'uncompressed':
+                return $this;
 
-        case 'url':
-        case 'url_full':
-            return $this->_url($this->_file, ($name == 'url_full'));
+            case 'url':
+            case 'url_full':
+                return $this->_url($this->_file, ($name == 'url_full'));
         }
     }
 
@@ -142,11 +143,11 @@ class Horde_Script_File
     public function __set($name, $value)
     {
         switch ($name) {
-        case 'priority':
-            if (in_array($value, array(self::PRIORITY_HIGH, self::PRIORITY_NORMAL, self::PRIORITY_LOW))) {
-                $this->_priority = $value;
-            }
-            break;
+            case 'priority':
+                if (in_array($value, [self::PRIORITY_HIGH, self::PRIORITY_NORMAL, self::PRIORITY_LOW])) {
+                    $this->_priority = $value;
+                }
+                break;
         }
     }
 
@@ -172,10 +173,13 @@ class Horde_Script_File
         /* Add cache-busting version param. */
         return empty($GLOBALS['conf']['cachejsparams']['url_version_param'])
             ? $url
-            : $url->add('v', hash(
-                  'md5',
-                  $GLOBALS['registry']->getVersion($this->app))
-              );
+            : $url->add(
+                'v',
+                hash(
+                    'md5',
+                    $GLOBALS['registry']->getVersion($this->app)
+                )
+            );
     }
 
 }

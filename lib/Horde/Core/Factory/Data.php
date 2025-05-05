@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based Horde_Data:: factory.
  *
@@ -34,14 +35,14 @@ class Horde_Core_Factory_Data extends Horde_Core_Factory_Base
      * @return Horde_Data_Driver  The instance.
      * @throws Horde_Data_Exception
      */
-    public function create($driver, array $params = array())
+    public function create($driver, array $params = [])
     {
         $class = $this->_getDriverName($driver, 'Horde_Data');
         $params['browser'] = $this->_injector->getInstance('Horde_Browser');
         $params['vars'] = $this->_injector->getInstance('Horde_Variables');
         $params['http'] = $this->_injector
             ->getInstance('Horde_Core_Factory_HttpClient')
-            ->create(array('request.verifyPeer' => false));
+            ->create(['request.verifyPeer' => false]);
 
         return new $class($this->_injector->getInstance('Horde_Core_Data_Storage'), $params);
     }

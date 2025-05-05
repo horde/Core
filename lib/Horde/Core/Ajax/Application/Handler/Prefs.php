@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Defines AJAX calls used to interact with Horde preferences.
  *

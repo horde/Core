@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A response object that directly outputs the data.
  *
@@ -32,9 +33,11 @@ class Horde_Core_Ajax_Response_Raw extends Horde_Core_Ajax_Response
      * @param string $type     Content-type of the data.
      * @param string $charset  Charset of the data (if of type text/*).
      */
-    public function __construct($data = null, $type = 'text/plain',
-                                $charset = 'UTF-8')
-    {
+    public function __construct(
+        $data = null,
+        $type = 'text/plain',
+        $charset = 'UTF-8'
+    ) {
         parent::__construct($data);
 
         $this->charset = $charset;

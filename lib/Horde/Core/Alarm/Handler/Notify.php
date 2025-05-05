@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
  *
@@ -39,13 +40,15 @@ class Horde_Core_Alarm_Handler_Notify extends Horde_Alarm_Handler
             $app = $alarm['params']['notify']['show']['__app'];
             unset($params['__app']);
             $alarm['params']['notify']['url'] = $registry->linkByPackage(
-                $app, 'show', $params
+                $app,
+                'show',
+                $params
             );
         }
         $notification->push(
             $alarm['title'],
             'horde.alarm',
-            array('alarm' => $alarm)
+            ['alarm' => $alarm]
         );
         if (!empty($alarm['params']['notify']['sound']) &&
             !isset($this->_soundPlayed[$alarm['params']['notify']['sound']])) {
@@ -53,7 +56,7 @@ class Horde_Core_Alarm_Handler_Notify extends Horde_Alarm_Handler
             $notification->push(
                 $alarm['params']['notify']['sound'],
                 'audio',
-                array('id' => $alarm['id'])
+                ['id' => $alarm['id']]
             );
             $this->_soundPlayed[$alarm['params']['notify']['sound']] = true;
         }
@@ -66,7 +69,7 @@ class Horde_Core_Alarm_Handler_Notify extends Horde_Alarm_Handler
      */
     public function getDescription()
     {
-        return Horde_Core_Translation::t("Inline");
+        return Horde_Core_Translation::t('Inline');
     }
 
     /**
@@ -83,12 +86,12 @@ class Horde_Core_Alarm_Handler_Notify extends Horde_Alarm_Handler
      */
     public function getParameters()
     {
-        return array(
-            'sound' => array(
+        return [
+            'sound' => [
                 'type' => 'sound',
-                'desc' => Horde_Core_Translation::t("Play a sound?"),
-                'required' => false
-            )
-        );
+                'desc' => Horde_Core_Translation::t('Play a sound?'),
+                'required' => false,
+            ],
+        ];
     }
 }

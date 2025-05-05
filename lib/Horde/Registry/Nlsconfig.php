@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
  *
@@ -35,13 +36,13 @@ class Horde_Registry_Nlsconfig
         global $language, $registry, $session;
 
         /* These entries can be cached in the session. */
-        $cached = array(
+        $cached = [
             'curr_charset',
             'curr_default',
             'curr_emails',
             'curr_multibyte',
-            'curr_rtl'
-        );
+            'curr_rtl',
+        ];
 
         if (in_array($name, $cached) &&
             $session->exists('horde', 'nls/' . $name)) {
@@ -53,63 +54,59 @@ class Horde_Registry_Nlsconfig
         }
 
         switch ($name) {
-        case 'aliases':
-        case 'charsets':
-        case 'encodings':
-        case 'emails':
-        case 'languages':
-        case 'multibyte':
-        case 'rtl':
-        case 'spelling':
-            $ret = isset($this->_config[$name])
-                ? $this->_config[$name]
-                : array();
-            break;
+            case 'aliases':
+            case 'charsets':
+            case 'encodings':
+            case 'emails':
+            case 'languages':
+            case 'multibyte':
+            case 'rtl':
+            case 'spelling':
+                $ret = $this->_config[$name]
+                    ?? [];
+                break;
 
-        case 'charsets_sort':
-            $ret = $this->charsets;
-            natcasesort($ret);
-            break;
+            case 'charsets_sort':
+                $ret = $this->charsets;
+                natcasesort($ret);
+                break;
 
-        case 'curr_charset':
-            /* Return charset for the current language. */
-            $ret = isset($this->_config['charsets'][$language])
-                ? $this->_config['charsets'][$language]
-                : null;
-            break;
+            case 'curr_charset':
+                /* Return charset for the current language. */
+                $ret = $this->_config['charsets'][$language]
+                    ?? null;
+                break;
 
-        case 'curr_default':
-            /* The default langauge, as specified by the config file. */
-            $ret = isset($this->_config['defaults']['language'])
-                ? $this->_config['defaults']['language']
-                : null;
-            break;
+            case 'curr_default':
+                /* The default langauge, as specified by the config file. */
+                $ret = $this->_config['defaults']['language']
+                    ?? null;
+                break;
 
-        case 'curr_emails':
-            /* Return e-mail charset for the current language. */
-            $ret = isset($this->_config['emails'][$language])
-                ? $this->_config['emails'][$language]
-                : null;
-            break;
+            case 'curr_emails':
+                /* Return e-mail charset for the current language. */
+                $ret = $this->_config['emails'][$language]
+                    ?? null;
+                break;
 
-        case 'curr_multibyte':
-            /* Is the current language charset multibyte? */
-            $ret = isset($this->_config['multibyte'][$registry->getLanguageCharset()]);
-            break;
+            case 'curr_multibyte':
+                /* Is the current language charset multibyte? */
+                $ret = isset($this->_config['multibyte'][$registry->getLanguageCharset()]);
+                break;
 
-        case 'curr_rtl':
-            /* Is the current language RTL? */
-            $ret = isset($this->_config['rtl'][$language]);
-            break;
+            case 'curr_rtl':
+                /* Is the current language RTL? */
+                $ret = isset($this->_config['rtl'][$language]);
+                break;
 
-        case 'encodings_sort':
-            $ret = $this->encodings;
-            asort($ret);
-            break;
+            case 'encodings_sort':
+                $ret = $this->encodings;
+                asort($ret);
+                break;
 
-        default:
-            $ret = null;
-            break;
+            default:
+                $ret = null;
+                break;
         }
 
         if (in_array($name, $cached)) {
@@ -140,7 +137,7 @@ class Horde_Registry_Nlsconfig
                 } else {
                     // Locale length is limited to 255 characters.
                     foreach (explode(';', $locale) as $lc) {
-                        list($category, $catLocale) = explode('=', $lc);
+                        [$category, $catLocale] = explode('=', $lc);
                         if (defined($category)) {
                             setlocale(constant($category), $catLocale);
                         }

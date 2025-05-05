@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Core_Auth_Ldap class provides Horde-specific code that
  * extends the base LDAP driver.
@@ -25,7 +26,7 @@ class Horde_Core_Auth_Ldap extends Horde_Auth_Ldap
      */
     public function addUser($userId, $credentials)
     {
-        list($userId, $credentials) = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Auth')->create()->runHook($userId, $credentials, 'preauthenticate', 'admin');
+        [$userId, $credentials] = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Auth')->create()->runHook($userId, $credentials, 'preauthenticate', 'admin');
 
         parent::addUser($userId, $credentials);
     }
@@ -41,15 +42,19 @@ class Horde_Core_Auth_Ldap extends Horde_Auth_Ldap
      *
      * @throws Horde_Auth_Exception
      */
-    public function updateUser($oldID, $newID, $credentials, $olddn = null,
-                               $newdn = null)
-    {
+    public function updateUser(
+        $oldID,
+        $newID,
+        $credentials,
+        $olddn = null,
+        $newdn = null
+    ) {
         $auth = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Auth')->create();
 
-        list($oldID, $old_credentials) = $auth->runHook($oldID, $credentials, 'preauthenticate', 'admin');
-        list($newID, $new_credentials) = $auth->runHook($newID, $credentials, 'preauthenticate', 'admin');
-        $olddn = isset($old_credentials['dn']) ? $old_credentials['dn'] : null;
-        $newdn = isset($new_credentials['dn']) ? $new_credentials['dn'] : null;
+        [$oldID, $old_credentials] = $auth->runHook($oldID, $credentials, 'preauthenticate', 'admin');
+        [$newID, $new_credentials] = $auth->runHook($newID, $credentials, 'preauthenticate', 'admin');
+        $olddn = $old_credentials['dn'] ?? null;
+        $newdn = $new_credentials['dn'] ?? null;
 
         parent::updateUser($oldID, $newID, $new_credentials, $olddn, $newdn);
     }
@@ -64,7 +69,7 @@ class Horde_Core_Auth_Ldap extends Horde_Auth_Ldap
      */
     public function removeUser($userId, $dn = null)
     {
-        list($userId, $credentials) = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Auth')->create()->runHook($userId, array(), 'preauthenticate', 'admin');
+        [$userId, $credentials] = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Auth')->create()->runHook($userId, [], 'preauthenticate', 'admin');
 
         parent::removeUser($userId, isset($credentials['ldap']) ? $credentials['ldap']['dn'] : null);
     }

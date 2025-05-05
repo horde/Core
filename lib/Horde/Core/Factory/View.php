@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based factory for creating Horde_View objects.
  *
@@ -31,7 +32,7 @@ class Horde_Core_Factory_View extends Horde_Core_Factory_Injector
     public function create(Horde_Injector $injector)
     {
         $registry = $injector->getInstance('Horde_Registry');
-        $view = new Horde_View(array('templatePath' => $registry->get('templates', $registry->getApp())));
+        $view = new Horde_View(['templatePath' => $registry->get('templates', $registry->getApp())]);
         $view->addHelper('Tag');
         $view->addHelper('Text');
         return $view;

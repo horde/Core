@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -23,8 +24,8 @@
 class Horde_Core_Nosql
 {
     /* getDrivers() mask constants. */
-    const HAS_INDICES = 1;
-    const NEEDS_INDICES = 2;
+    public const HAS_INDICES = 1;
+    public const NEEDS_INDICES = 2;
 
     /**
      * Retrieve the list of active NoSQL drivers for an application.
@@ -41,37 +42,37 @@ class Horde_Core_Nosql
         try {
             $drivers = $registry->callAppMethod($app, 'nosqlDrivers');
         } catch (Horde_Exception $e) {
-            return array();
+            return [];
         }
 
         /* Handle framework-level drivers here. */
         if ($app == 'horde') {
-            $backends = array(
-                'Horde_ActiveSync_State_Mongo' => function() use ($injector) {
+            $backends = [
+                'Horde_ActiveSync_State_Mongo' => function () use ($injector) {
                     return $injector->getInstance('Horde_ActiveSyncState');
                 },
-                'Horde_Cache_Storage_Mongo' => function() use ($injector) {
+                'Horde_Cache_Storage_Mongo' => function () use ($injector) {
                     return $injector->getInstance('Horde_Core_Factory_Cache')->storage;
                 },
-                'Horde_History_Mongo' => function() use ($injector) {
+                'Horde_History_Mongo' => function () use ($injector) {
                     return $injector->getInstance('Horde_History');
                 },
-                'Horde_Lock_Mongo' => function() use ($injector) {
+                'Horde_Lock_Mongo' => function () use ($injector) {
                     return $injector->getInstance('Horde_Lock');
                 },
-                'Horde_Prefs_Storage_Mongo' => function() use ($injector) {
+                'Horde_Prefs_Storage_Mongo' => function () use ($injector) {
                     return $injector->getInstance('Horde_Core_Factory_Prefs')->storage;
                 },
-                'Horde_SessionHandler_Storage_Mongo' => function() use ($injector) {
+                'Horde_SessionHandler_Storage_Mongo' => function () use ($injector) {
                     return $injector->getInstance('Horde_Core_Factory_SessionHandler')->storage;
                 },
-                'Horde_Token_Mongo' => function() use ($injector) {
+                'Horde_Token_Mongo' => function () use ($injector) {
                     return $injector->getInstance('Horde_Token');
                 },
-                'Horde_Vfs_Mongo' => function() use ($injector) {
+                'Horde_Vfs_Mongo' => function () use ($injector) {
                     return $injector->getInstance('Horde_Core_Factory_Vfs')->create();
                 },
-            );
+            ];
 
             foreach ($backends as $key => $func) {
                 try {

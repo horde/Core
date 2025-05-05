@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
  *
@@ -32,7 +33,7 @@ class Horde_Core_Factory_SpellChecker extends Horde_Core_Factory_Base
      * @return Horde_SpellChecker  The spellchecker instance.
      * @throws Horde_Exception
      */
-    public function create(array $args = array(), $input = null)
+    public function create(array $args = [], $input = null)
     {
         global $conf, $language, $registry;
 
@@ -41,7 +42,7 @@ class Horde_Core_Factory_SpellChecker extends Horde_Core_Factory_Base
         }
 
         $args = array_merge(
-            array('localDict' => array()),
+            ['localDict' => []],
             Horde::getDriverConfig('spell', null),
             $args
         );
@@ -50,7 +51,8 @@ class Horde_Core_Factory_SpellChecker extends Horde_Core_Factory_Base
             if (!is_null($input)) {
                 try {
                     $args['locale'] = $this->_injector->getInstance('Horde_Core_Factory_LanguageDetect')->getLanguageCode($input);
-                } catch (Horde_Exception $e) {}
+                } catch (Horde_Exception $e) {
+                }
             }
 
             if (empty($args['locale']) && isset($language)) {
@@ -64,7 +66,8 @@ class Horde_Core_Factory_SpellChecker extends Horde_Core_Factory_Base
                 $args['localDict'],
                 $registry->loadConfigFile('spelling.php', 'ignore_list', 'horde')->config['ignore_list']
             );
-        } catch (Horde_Exception $e) {}
+        } catch (Horde_Exception $e) {
+        }
 
         $classname  = 'Horde_SpellChecker_' . Horde_String::ucfirst(basename($conf['spell']['driver']));
         if (!class_exists($classname)) {

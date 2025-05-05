@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
  *
@@ -31,7 +32,7 @@ class Horde_Session_Null extends Horde_Session implements Horde_Shutdown_Task
     public function __construct()
     {
         // Store session data internally.
-        $this->_data = array();
+        $this->_data = [];
     }
 
     /**
@@ -44,9 +45,11 @@ class Horde_Session_Null extends Horde_Session implements Horde_Shutdown_Task
 
     /**
      */
-    public function setup($start = true, $cache_limiter = null,
-                          $session_id = null)
-    {
+    public function setup(
+        $start = true,
+        $cache_limiter = null,
+        $session_id = null
+    ) {
         global $conf;
 
         // Set this here, since we actually do start a php session. Even though
@@ -120,7 +123,7 @@ class Horde_Session_Null extends Horde_Session implements Horde_Shutdown_Task
     public function destroy()
     {
         session_unset();
-        $this->_data = array();
+        $this->_data = [];
         $this->_cleansession = true;
     }
 

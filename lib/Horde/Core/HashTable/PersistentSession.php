@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -26,33 +27,31 @@
  * @package   Core
  * @since     2.13.0
  */
-class Horde_Core_HashTable_PersistentSession
-extends Horde_Core_HashTable_Vfs
-implements Horde_Registry_Logout_Task
+class Horde_Core_HashTable_PersistentSession extends Horde_Core_HashTable_Vfs implements Horde_Registry_Logout_Task
 {
     /** Session data storage key. */
-    const SESS_KEY = 'psession_keys';
+    public const SESS_KEY = 'psession_keys';
 
     /** The virtual path to use for VFS data (temporary storage). */
-    const VFS_PATH = '.horde/core/psession_data';
+    public const VFS_PATH = '.horde/core/psession_data';
 
     /**
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
         global $session;
 
-        parent::__construct(array(
+        parent::__construct([
             'prefix' => $session->getToken(),
-            'vfspath' => self::VFS_PATH
-        ));
+            'vfspath' => self::VFS_PATH,
+        ]);
 
         $this->gc(86400);
     }
 
     /**
      */
-    public function set($key, $val, array $opts = array())
+    public function set($key, $val, array $opts = [])
     {
         global $session;
 

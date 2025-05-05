@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Defines AJAX calls used to manipulate e-mail addresses.
  *
@@ -37,14 +38,14 @@ class Horde_Core_Ajax_Application_Handler_Email extends Horde_Core_Ajax_Applicat
     {
         $ob = new Horde_Mail_Rfc822_Address($this->vars->email);
         if (is_null($ob->mailbox)) {
-            throw new Horde_Exception(Horde_Core_Translation::t("No valid email address found"));
+            throw new Horde_Exception(Horde_Core_Translation::t('No valid email address found'));
         }
 
         if (is_null($ob->host) && !is_null($this->defaultDomain)) {
             $ob->host = $this->defaultDomain;
         }
 
-        $ret = new stdClass;
+        $ret = new stdClass();
         $ret->email = $ob->bare_address;
 
         return $ret;

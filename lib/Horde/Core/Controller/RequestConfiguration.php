@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2009-2020 Horde LLC (http://www.horde.org/)
  *
@@ -12,9 +13,9 @@
  */
 
 /**
- * The Horde_Core_Controller_RequestConfiguration class provides 
+ * The Horde_Core_Controller_RequestConfiguration class provides
  * information from the request to identify the Controller.
- * 
+ *
  * Copyright 2009-2020 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL-2). If you
@@ -29,7 +30,7 @@ class Horde_Core_Controller_RequestConfiguration implements Horde_Controller_Req
 {
     /**
      */
-    protected $_classNames = array();
+    protected $_classNames = [];
 
     /**
      */
@@ -40,10 +41,10 @@ class Horde_Core_Controller_RequestConfiguration implements Horde_Controller_Req
      */
     public function __construct()
     {
-        $this->_classNames = array(
+        $this->_classNames = [
             'controller' => 'Horde_Core_Controller_NotFound',
             'settings'   => 'Horde_Controller_SettingsExporter_Default',
-        );
+        ];
     }
 
     /**

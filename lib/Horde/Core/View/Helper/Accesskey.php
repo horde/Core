@@ -1,4 +1,5 @@
 <?php
+
 /**
  * View helper class to allow access to Horde accesskey methods.
  *
@@ -19,9 +20,11 @@ class Horde_Core_View_Helper_Accesskey extends Horde_View_Helper_Base
      *
      * @see Horde::getAccessKeyAndTitle()
      */
-    public function hordeAccessKeyAndTitle($label, $nocheck = false,
-                                           $return_array = false)
-    {
+    public function hordeAccessKeyAndTitle(
+        $label,
+        $nocheck = false,
+        $return_array = false
+    ) {
         return Horde::getAccessKeyAndTitle($label, $nocheck, $return_array);
     }
 

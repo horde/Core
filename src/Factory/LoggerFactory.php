@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Horde/Log PSR-3 Logger Factory
  *

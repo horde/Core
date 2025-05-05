@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
  *
@@ -25,10 +26,10 @@
 class Horde_Core_Prefs_Identity extends Horde_Prefs_Identity
 {
     /** Identity entry containing the expiration time. */
-    const EXPIRE = 'confirm_expire';
+    public const EXPIRE = 'confirm_expire';
 
     /** Expiration (in seconds) of a confirmation request. */
-    const EXPIRE_SECS = 86400;
+    public const EXPIRE_SECS = 86400;
 
     /**
      * Sends a message to an email address supposed to be added to the
@@ -71,7 +72,7 @@ class Horde_Core_Prefs_Identity extends Horde_Prefs_Identity
         $msg_headers->addHeaderOb(Horde_Mime_Headers_Date::create());
         $msg_headers->addHeader('To', $new_addr);
         $msg_headers->addHeader('From', $old_addr);
-        $msg_headers->addHeader('Subject', Horde_Core_Translation::t("Confirm new email address"));
+        $msg_headers->addHeader('Subject', Horde_Core_Translation::t('Confirm new email address'));
 
         $body = new Horde_Mime_Part();
         $body->setType('text/plain');
@@ -86,7 +87,7 @@ class Horde_Core_Prefs_Identity extends Horde_Prefs_Identity
 
         $notification->push(
             sprintf(
-                Horde_Core_Translation::t("A message has been sent to \"%s\" to verify that this is really your address. The new email address is activated as soon as you confirm this message."),
+                Horde_Core_Translation::t('A message has been sent to "%s" to verify that this is really your address. The new email address is activated as soon as you confirm this message.'),
                 $new_addr
             ),
             'horde.message'
@@ -106,7 +107,7 @@ class Horde_Core_Prefs_Identity extends Horde_Prefs_Identity
         $confirm = $this->_confirmEmail();
         if (empty($confirm) || !isset($confirm[$hash])) {
             $notification->push(
-                Horde_Core_Translation::t("Email address to confirm not found."),
+                Horde_Core_Translation::t('Email address to confirm not found.'),
                 'horde.message'
             );
             return;
@@ -122,7 +123,7 @@ class Horde_Core_Prefs_Identity extends Horde_Prefs_Identity
 
         if ($id === false) {
             /* Adding a new identity. */
-            $verified = array();
+            $verified = [];
             foreach ($identity as $key => $value) {
                 if (!$this->_prefs->isLocked($key)) {
                     $verified[$key] = $value;
@@ -142,7 +143,7 @@ class Horde_Core_Prefs_Identity extends Horde_Prefs_Identity
 
         $notification->push(
             sprintf(
-                Horde_Core_Translation::t("The email address %s has been added to your identities. You can close this window now."),
+                Horde_Core_Translation::t('The email address %s has been added to your identities. You can close this window now.'),
                 $verified[$this->_prefnames['from_addr']]
             ),
             'horde.success'
@@ -219,7 +220,7 @@ class Horde_Core_Prefs_Identity extends Horde_Prefs_Identity
         if (is_null($confirm)) {
             return ($pref = @unserialize($this->_prefs->getValue('confirm_email')))
                 ? $pref
-                : array();
+                : [];
         }
 
         $this->_prefs->setValue('confirm_email', serialize($confirm));

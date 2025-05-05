@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -50,9 +51,9 @@ class Horde_Themes_Css_Cache_HordeCache extends Horde_Themes_Css_Cache
             $cache->set($sig, $compress->compress($css));
         }
 
-        return array(
-            Horde::getCacheUrl('css', array('cid' => $sig))
-        );
+        return [
+            Horde::getCacheUrl('css', ['cid' => $sig]),
+        ];
     }
 
 }

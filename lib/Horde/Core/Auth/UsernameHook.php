@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2015-2017 Horde LLC (http://www.horde.org/)
  *
@@ -37,7 +38,7 @@ class Horde_Core_Auth_UsernameHook extends Horde_Auth_Base
      *
      * @throws InvalidArgumentException
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
         if (!isset($params['base'])) {
             throw new InvalidArgumentException('Missing base parameter.');

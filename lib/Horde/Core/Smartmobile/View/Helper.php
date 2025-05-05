@@ -1,4 +1,5 @@
 <?php
+
 /**
  * View helper class for smartmobile pages.
  *
@@ -27,7 +28,7 @@ class Horde_Core_Smartmobile_View_Helper extends Horde_View_Helper_Base
      *
      * @return string  Generated HTML code.
      */
-    public function smartmobileHeader(array $params = array())
+    public function smartmobileHeader(array $params = [])
     {
         global $registry;
 
@@ -43,7 +44,7 @@ class Horde_Core_Smartmobile_View_Helper extends Horde_View_Helper_Base
                     $params['backlink'][1] . '</a>';
             } else {
                 $out .= '<a class="smartmobile-back ui-btn-left" href="#" ' .
-                    'data-icon="arrow-l" data-rel="back">' . Horde_Core_Translation::t("Back") . '</a>';
+                    'data-icon="arrow-l" data-rel="back">' . Horde_Core_Translation::t('Back') . '</a>';
             }
         }
 
@@ -51,7 +52,7 @@ class Horde_Core_Smartmobile_View_Helper extends Horde_View_Helper_Base
             ($portal = $registry->getServiceLink('portal', 'horde')->setRaw(false))) {
             $out .= '<a class="smartmobile-portal ui-btn-left" ' .
                 'data-ajax="false" href="' . $portal . '">' .
-                Horde_Core_Translation::t("Applications") . '</a>';
+                Horde_Core_Translation::t('Applications') . '</a>';
         }
 
         if (isset($params['title']) && strlen($params['title'])) {
@@ -64,7 +65,7 @@ class Horde_Core_Smartmobile_View_Helper extends Horde_View_Helper_Base
             $out .= '<a class="smartmobile-logout ui-btn-right" href="' .
                 $logout .
                 '" data-ajax="false" data-theme="e" data-icon="delete">' .
-                Horde_Core_Translation::t("Log out") . '</a>';
+                Horde_Core_Translation::t('Log out') . '</a>';
         }
 
         return $out . '</div>';

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -36,7 +37,7 @@ abstract class Horde_Script_Cache
      *
      * @param array $params  Configuration parameters.
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
         $this->_params = $params;
         if (!rand(0, 999)) {
@@ -58,13 +59,13 @@ abstract class Horde_Script_Cache
      */
     public function process(Horde_Script_List $hsl, $full = false)
     {
-        $out = new stdClass;
-        $out->all = array();
-        $out->jsvars = array();
-        $out->script = array();
+        $out = new stdClass();
+        $out->all = [];
+        $out->jsvars = [];
+        $out->script = [];
 
         $last_cache = null;
-        $tmp = array();
+        $tmp = [];
 
         foreach ($hsl as $val) {
             $out->all[] = $url = strval($full ? $val->url_full : $val->url);
@@ -73,16 +74,16 @@ abstract class Horde_Script_Cache
                 $out->script = array_merge(
                     $out->script,
                     $this->_process($tmp, $full),
-                    array($url)
+                    [$url]
                 );
-                $tmp = array();
+                $tmp = [];
             } else {
                 if (!is_null($last_cache) && ($last_cache != $val->cache)) {
                     $out->script = array_merge(
                         $out->script,
                         $this->_process($tmp, $full)
                     );
-                    $tmp = array();
+                    $tmp = [];
                 }
                 $tmp[$val->hash] = $val;
             }

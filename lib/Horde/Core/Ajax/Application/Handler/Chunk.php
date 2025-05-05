@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Defines AJAX calls used to send raw content to the browser.
  *
@@ -25,7 +26,7 @@ class Horde_Core_Ajax_Application_Handler_Chunk extends Horde_Core_Ajax_Applicat
     {
         $chunk = basename($this->vars->chunk);
 
-        $result = new stdClass;
+        $result = new stdClass();
         if (!empty($chunk)) {
             Horde::startBuffer();
             try {

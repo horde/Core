@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @category Horde
  * @package Core
@@ -10,15 +11,15 @@ class Horde_Core_Factory_ActiveSyncBackend extends Horde_Core_Factory_Injector
         global $conf, $registry;
 
         // Backend driver and dependencies
-        $params = array('registry' => $registry);
-        $adapter_params = array('factory' => new Horde_Core_ActiveSync_Imap_Factory());
+        $params = ['registry' => $registry];
+        $adapter_params = ['factory' => new Horde_Core_ActiveSync_Imap_Factory()];
 
         // Force emailsync to off if we don't have a mail API.
         if (!$registry->hasInterface('mail')) {
             $conf['activesync']['emailsync'] = false;
         }
 
-        $driver_params = array(
+        $driver_params = [
             'connector' => new Horde_Core_ActiveSync_Connector($params),
             'imap' => !empty($conf['activesync']['emailsync'])
                 ? new Horde_ActiveSync_Imap_Adapter($adapter_params)
@@ -26,7 +27,7 @@ class Horde_Core_Factory_ActiveSyncBackend extends Horde_Core_Factory_Injector
             'ping' => $conf['activesync']['ping'],
             'state' => $injector->getInstance('Horde_ActiveSyncState'),
             'auth' => $this->_getAuth(),
-            'cache' => $injector->getInstance('Horde_Cache'));
+            'cache' => $injector->getInstance('Horde_Cache')];
 
         return new Horde_Core_ActiveSync_Driver($driver_params);
     }
@@ -40,9 +41,9 @@ class Horde_Core_Factory_ActiveSyncBackend extends Horde_Core_Factory_Injector
     {
         global $conf, $injector;
 
-        $params = array(
+        $params = [
             'base_driver' => $injector->getInstance('Horde_Core_Factory_Auth')->create(),
-        );
+        ];
 
         if ($conf['activesync']['auth']['type'] != 'basic') {
             $x_params = $conf['activesync']['auth']['params'];

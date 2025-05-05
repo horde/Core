@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Provides basic functionality for both managing and displaying blocks.
  *
@@ -84,13 +85,14 @@ class Horde_Core_Block_Layout
         return Horde::url($this->_editUrl)
             ->unique()
             ->setAnchor('block')
-            ->add(array(
+            ->add(
+                [
                 'col' => $col,
                 'row' => $row,
                 'action' => $action,
-                'url' => Horde::signUrl($this->_viewUrl)
-            )
-        );
+                'url' => Horde::signUrl($this->_viewUrl),
+            ]
+            );
     }
 
     /**
@@ -108,19 +110,24 @@ class Horde_Core_Block_Layout
         $icons = '';
 
         if ($edit) {
-            $icons .= Horde::link($this->getActionUrl('edit', $row, $col),
-                                  Horde_Core_Translation::t("Edit"))
-                . Horde_Themes_Image::tag('edit.png', array('alt' => Horde_Core_Translation::t("Edit")))
+            $icons .= Horde::link(
+                $this->getActionUrl('edit', $row, $col),
+                Horde_Core_Translation::t('Edit')
+            )
+                . Horde_Themes_Image::tag('edit.png', ['alt' => Horde_Core_Translation::t('Edit')])
                 . '</a>';
         }
 
         if ($this->isRemovable($row, $col)) {
             $icons .= Horde::link(
-                $this->getActionUrl('removeBlock', $row, $col), Horde_Core_Translation::t("Remove"),
-                '', '',
+                $this->getActionUrl('removeBlock', $row, $col),
+                Horde_Core_Translation::t('Remove'),
+                '',
+                '',
                 'return window.confirm(\''
-                . addslashes(Horde_Core_Translation::t("Really delete this block?")) . '\')')
-                . Horde_Themes_Image::tag('delete.png', array('alt' => Horde_Core_Translation::t("Remove")))
+                . addslashes(Horde_Core_Translation::t('Really delete this block?')) . '\')'
+            )
+                . Horde_Themes_Image::tag('delete.png', ['alt' => Horde_Core_Translation::t('Remove')])
                 . '</a>';
         }
 

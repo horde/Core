@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory for creating Horde_SessionHandler objects.
  *
@@ -43,31 +44,31 @@ class Horde_Core_Factory_SessionHandler extends Horde_Core_Factory_Injector
         $noset = false;
 
         switch ($driver) {
-        case 'builtin':
-            $noset = true;
-            break;
+            case 'builtin':
+                $noset = true;
+                break;
 
-        case 'hashtable':
-        // DEPRECATED
-        case 'memcache':
-            $params['hashtable'] = $injector->getInstance('Horde_HashTable');
-            $driver = 'hashtable';
-            break;
+            case 'hashtable':
+                // DEPRECATED
+            case 'memcache':
+                $params['hashtable'] = $injector->getInstance('Horde_HashTable');
+                $driver = 'hashtable';
+                break;
 
-        case 'nosql':
-            $nosql = $injector->getInstance('Horde_Core_Factory_Nosql')->create('horde', 'sessionhandler');
-            if ($nosql instanceof Horde_Mongo_Client) {
-                $params['mongo_db'] = $nosql;
-                $driver = 'Horde_SessionHandler_Storage_Mongo';
-            }
-            break;
+            case 'nosql':
+                $nosql = $injector->getInstance('Horde_Core_Factory_Nosql')->create('horde', 'sessionhandler');
+                if ($nosql instanceof Horde_Mongo_Client) {
+                    $params['mongo_db'] = $nosql;
+                    $driver = 'Horde_SessionHandler_Storage_Mongo';
+                }
+                break;
 
-        case 'sql':
-            $factory = $injector->getInstance('Horde_Core_Factory_Db');
-            $config = $factory->getConfig('sessionhandler');
-            unset($config['umask'], $config['driverconfig']);
-            $params['db'] = $factory->createDb($config);
-            break;
+            case 'sql':
+                $factory = $injector->getInstance('Horde_Core_Factory_Db');
+                $config = $factory->getConfig('sessionhandler');
+                unset($config['umask'], $config['driverconfig']);
+                $params['db'] = $factory->createDb($config);
+                break;
         }
 
         $class = $this->_getDriverName($driver, 'Horde_SessionHandler_Storage');
@@ -75,25 +76,25 @@ class Horde_Core_Factory_SessionHandler extends Horde_Core_Factory_Injector
 
         if ((!empty($conf['sessionhandler']['hashtable']) ||
              !empty($conf['sessionhandler']['memcache'])) &&
-            !in_array($driver, array('builtin', 'hashtable'))) {
-            $storage = new Horde_SessionHandler_Storage_Stack(array(
-                'stack' => array(
-                    new Horde_SessionHandler_Storage_Hashtable(array(
-                        'hashtable' => $injector->getInstance('Horde_HashTable')
-                    )),
-                    $this->storage
-                )
-            ));
+            !in_array($driver, ['builtin', 'hashtable'])) {
+            $storage = new Horde_SessionHandler_Storage_Stack([
+                'stack' => [
+                    new Horde_SessionHandler_Storage_Hashtable([
+                        'hashtable' => $injector->getInstance('Horde_HashTable'),
+                    ]),
+                    $this->storage,
+                ],
+            ]);
         }
 
         return new Horde_SessionHandler(
             $storage,
-            array(
+            [
                 'logger' => $injector->getInstance('Horde_Log_Logger'),
                 'no_md5' => true,
                 'noset' => $noset,
-                'parse' => array($this, 'readSessionData')
-            )
+                'parse' => [$this, 'readSessionData'],
+            ]
         );
     }
 
@@ -118,7 +119,7 @@ class Horde_Core_Factory_SessionHandler extends Horde_Core_Factory_Injector
          * search for the needed auth entries and swap the old session data
          * back. */
         $old_sess = $_SESSION;
-        $_SESSION = array();
+        $_SESSION = [];
 
         if (session_id()) {
             $new_sess = false;
@@ -127,12 +128,12 @@ class Horde_Core_Factory_SessionHandler extends Horde_Core_Factory_Injector
             $stub = new Horde_Support_Stub();
 
             session_set_save_handler(
-                array($this, '_returnTrue'),
-                array($this, '_returnTrue'),
-                array($stub, 'read'),
-                array($stub, 'write'),
-                array($this, '_returnTrue'),
-                array($this, '_returnTrue')
+                [$this, '_returnTrue'],
+                [$this, '_returnTrue'],
+                [$stub, 'read'],
+                [$stub, 'write'],
+                [$this, '_returnTrue'],
+                [$this, '_returnTrue']
             );
 
             ob_start();
@@ -155,13 +156,13 @@ class Horde_Core_Factory_SessionHandler extends Horde_Core_Factory_Injector
         $_SESSION = $old_sess;
 
         return isset($data['userId'])
-            ? array(
+            ? [
                 'apps' => $apps,
                 'browser' => $data['browser'],
                 'remoteAddr' => $data['remoteAddr'],
                 'timestamp' => $data['timestamp'],
-                'userid' => $data['userId']
-            )
+                'userid' => $data['userId'],
+            ]
             : false;
     }
 

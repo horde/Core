@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2001-2017 Horde LLC (http://www.horde.org/)
  *
@@ -34,28 +35,28 @@ class Horde_Core_Prefs_Ui
      *
      * @var array
      */
-    public $prefGroups = array();
+    public $prefGroups = [];
 
     /**
      * Preferences.
      *
      * @var array
      */
-    public $prefs = array();
+    public $prefs = [];
 
     /**
      * Suppressed preference entries.
      *
      * @var array
      */
-    public $suppress = array();
+    public $suppress = [];
 
     /**
      * Suppressed prefGroup entries.
      *
      * @var array
      */
-    public $suppressGroups = array();
+    public $suppressGroups = [];
 
     /**
      * Current application.
@@ -90,7 +91,7 @@ class Horde_Core_Prefs_Ui
      *
      * @var array
      */
-    protected $_errors = array();
+    protected $_errors = [];
 
     /**
      * Constructor.
@@ -101,9 +102,8 @@ class Horde_Core_Prefs_Ui
     {
         global $registry;
 
-        $this->app = isset($vars->app)
-            ? $vars->app
-            : $this->getDefaultApp();
+        $this->app = $vars->app
+            ?? $this->getDefaultApp();
         $this->group = $vars->group;
         $this->vars = $vars;
 
@@ -147,7 +147,7 @@ class Horde_Core_Prefs_Ui
 
         if (is_null($group)) {
             if (!$this->group) {
-                return array();
+                return [];
             }
 
             $group = $this->group;
@@ -155,10 +155,10 @@ class Horde_Core_Prefs_Ui
 
         if (empty($this->prefGroups[$group]['members']) ||
             in_array($group, $this->suppressGroups)) {
-            return array();
+            return [];
         }
 
-        $cprefs = array();
+        $cprefs = [];
 
         foreach ($this->prefGroups[$group]['members'] as $pref) {
             $p = $this->prefs[$pref];
@@ -181,7 +181,7 @@ class Horde_Core_Prefs_Ui
                     continue;
                 }
 
-                $todo = array();
+                $todo = [];
 
                 if ($p['type'] == 'container') {
                     if (isset($p['value']) && is_array($p['value'])) {
@@ -266,28 +266,28 @@ class Horde_Core_Prefs_Ui
         }
 
         switch ($this->vars->actionID) {
-        case 'update_prefs':
-            if (isset($this->prefGroups[$this->group]['type']) &&
-                ($this->prefGroups[$this->group]['type'] == 'identities')) {
-                $this->_identitiesUpdate();
-            } else {
-                $this->_handleForm($this->getChangeablePrefs($this->group), $GLOBALS['prefs']);
-            }
-            break;
-
-        case 'update_special':
-            $special = array();
-            foreach ($this->getChangeablePrefs($this->group) as $pref) {
-                if ($this->prefs[$pref]['type'] == 'special') {
-                    $special[] = $pref;
+            case 'update_prefs':
+                if (isset($this->prefGroups[$this->group]['type']) &&
+                    ($this->prefGroups[$this->group]['type'] == 'identities')) {
+                    $this->_identitiesUpdate();
+                } else {
+                    $this->_handleForm($this->getChangeablePrefs($this->group), $GLOBALS['prefs']);
                 }
-            }
-            $this->_handleForm($special, $GLOBALS['prefs']);
-            break;
+                break;
+
+            case 'update_special':
+                $special = [];
+                foreach ($this->getChangeablePrefs($this->group) as $pref) {
+                    if ($this->prefs[$pref]['type'] == 'special') {
+                        $special[] = $pref;
+                    }
+                }
+                $this->_handleForm($special, $GLOBALS['prefs']);
+                break;
         }
 
         $this->nobuttons = false;
-        $this->suppress = array();
+        $this->suppress = [];
     }
 
     /*
@@ -313,64 +313,64 @@ class Horde_Core_Prefs_Ui
             }
 
             switch ($this->prefs[$pref]['type']) {
-            case 'checkbox':
-                $pref_updated = $save->setValue($pref, intval(isset($this->vars->$pref)));
-                break;
+                case 'checkbox':
+                    $pref_updated = $save->setValue($pref, intval(isset($this->vars->$pref)));
+                    break;
 
-            case 'enum':
-                $enum = $this->prefs[$pref]['enum'];
-                if (isset($enum[$this->vars->$pref])) {
-                    $pref_updated = $save->setValue($pref, $this->vars->$pref);
-                } else {
-                    $this->_errors[$pref] = Horde_Core_Translation::t("An illegal value was specified.");
-                }
-                break;
-
-            case 'multienum':
-                $set = array();
-
-                if (is_array($this->vars->$pref)) {
+                case 'enum':
                     $enum = $this->prefs[$pref]['enum'];
-                    foreach ($this->vars->$pref as $val) {
-                        if (isset($enum[$val])) {
-                            $set[] = $val;
-                        } else {
-                            $this->_errors[$pref] = Horde_Core_Translation::t("An illegal value was specified.");
-                            break 2;
+                    if (isset($enum[$this->vars->$pref])) {
+                        $pref_updated = $save->setValue($pref, $this->vars->$pref);
+                    } else {
+                        $this->_errors[$pref] = Horde_Core_Translation::t('An illegal value was specified.');
+                    }
+                    break;
+
+                case 'multienum':
+                    $set = [];
+
+                    if (is_array($this->vars->$pref)) {
+                        $enum = $this->prefs[$pref]['enum'];
+                        foreach ($this->vars->$pref as $val) {
+                            if (isset($enum[$val])) {
+                                $set[] = $val;
+                            } else {
+                                $this->_errors[$pref] = Horde_Core_Translation::t('An illegal value was specified.');
+                                break 2;
+                            }
                         }
                     }
-                }
 
-                $pref_updated = $save->setValue($pref, @serialize($set));
-                break;
+                    $pref_updated = $save->setValue($pref, @serialize($set));
+                    break;
 
-            case 'number':
-                $num = $this->vars->$pref;
-                if ((string)(double)$num !== $num) {
-                    $this->_errors[$pref] = Horde_Core_Translation::t("This value must be a number.");
-                } elseif (empty($num) && empty($this->prefs[$pref]['zero'])) {
-                    $this->_errors[$pref] = Horde_Core_Translation::t("This value must be non-zero.");
-                } else {
-                    $pref_updated = $save->setValue($pref, $num);
-                }
-                break;
+                case 'number':
+                    $num = $this->vars->$pref;
+                    if ((string)(float)$num !== $num) {
+                        $this->_errors[$pref] = Horde_Core_Translation::t('This value must be a number.');
+                    } elseif (empty($num) && empty($this->prefs[$pref]['zero'])) {
+                        $this->_errors[$pref] = Horde_Core_Translation::t('This value must be non-zero.');
+                    } else {
+                        $pref_updated = $save->setValue($pref, $num);
+                    }
+                    break;
 
-            case 'password':
-            case 'text':
-            case 'textarea':
-                $pref_updated = $save->setValue($pref, $this->vars->$pref);
-                break;
+                case 'password':
+                case 'text':
+                case 'textarea':
+                    $pref_updated = $save->setValue($pref, $this->vars->$pref);
+                    break;
 
 
-            case 'special':
-                /* Code for special elements written specifically for each
-                 * application. */
-                if (isset($this->prefs[$pref]['handler']) &&
-                    ($ob = $injector->getInstance($this->prefs[$pref]['handler']))) {
-                    $ob->init($this);
-                    $pref_updated = $ob->update($this);
-                }
-                break;
+                case 'special':
+                    /* Code for special elements written specifically for each
+                     * application. */
+                    if (isset($this->prefs[$pref]['handler']) &&
+                        ($ob = $injector->getInstance($this->prefs[$pref]['handler']))) {
+                        $ob->init($this);
+                        $pref_updated = $ob->update($this);
+                    }
+                    break;
             }
 
             if ($pref_updated) {
@@ -384,7 +384,7 @@ class Horde_Core_Prefs_Ui
         }
 
         if (count($this->_errors)) {
-            $notification->push(Horde_Core_Translation::t("There were errors encountered while updating your preferences."), 'horde.error');
+            $notification->push(Horde_Core_Translation::t('There were errors encountered while updating your preferences.'), 'horde.error');
         }
 
         if ($updated) {
@@ -394,9 +394,9 @@ class Horde_Core_Prefs_Ui
             }
 
             if ($prefs instanceof Horde_Prefs_Session) {
-                $notification->push(Horde_Core_Translation::t("Your preferences have been updated for the duration of this session."), 'horde.success');
+                $notification->push(Horde_Core_Translation::t('Your preferences have been updated for the duration of this session.'), 'horde.success');
             } else {
-                $notification->push(Horde_Core_Translation::t("Your preferences have been updated."), 'horde.success');
+                $notification->push(Horde_Core_Translation::t('Your preferences have been updated.'), 'horde.success');
             }
 
             $this->_loadPrefs($this->app);
@@ -415,7 +415,7 @@ class Horde_Core_Prefs_Ui
      *
      * @return Horde_Url  The URL object.
      */
-    public function selfUrl($options = array())
+    public function selfUrl($options = [])
     {
         $url = $GLOBALS['registry']->getServiceLink('prefs', $this->app);
         if ($this->group) {
@@ -440,7 +440,7 @@ class Horde_Core_Prefs_Ui
     {
         global $notification, $page_output, $prefs, $registry;
 
-        $columns = $pref_list = array();
+        $columns = $pref_list = [];
         $identities = false;
 
         $prefgroups = $this->_getPrefGroups();
@@ -470,7 +470,7 @@ class Horde_Core_Prefs_Ui
         }
 
         if (empty($columns) && empty($pref_list)) {
-            $notification->push(Horde_Core_Translation::t("There are no preferences available for this application."), 'horde.message');
+            $notification->push(Horde_Core_Translation::t('There are no preferences available for this application.'), 'horde.message');
             $this->nobuttons = true;
         }
 
@@ -519,81 +519,82 @@ class Horde_Core_Prefs_Ui
 
                 $type = $this->prefs[$pref]['type'];
                 switch ($type) {
-                case 'checkbox':
-                    $t->set('checked', $prefs->getValue($pref));
-                    break;
+                    case 'checkbox':
+                        $t->set('checked', $prefs->getValue($pref));
+                        break;
 
-                case 'enum':
-                    $enum = $this->prefs[$pref]['enum'];
-                    $esc = !empty($this->prefs[$pref]['escaped']);
-                    $curval = $prefs->getValue($pref);
+                    case 'enum':
+                        $enum = $this->prefs[$pref]['enum'];
+                        $esc = !empty($this->prefs[$pref]['escaped']);
+                        $curval = $prefs->getValue($pref);
 
-                    $tmp = array();
-                    foreach ($enum as $key => $val) {
-                        $tmp[] = array(
-                            'l' => $esc ? $val : htmlspecialchars($val),
-                            's' => ($curval == $key),
-                            'v' => $esc ? $key : htmlspecialchars($key)
-                        );
-                    }
-                    $t->set('enum', $tmp);
-                    break;
+                        $tmp = [];
+                        foreach ($enum as $key => $val) {
+                            $tmp[] = [
+                                'l' => $esc ? $val : htmlspecialchars($val),
+                                's' => ($curval == $key),
+                                'v' => $esc ? $key : htmlspecialchars($key),
+                            ];
+                        }
+                        $t->set('enum', $tmp);
+                        break;
 
-                case 'prefslink':
-                    $url = $this->selfUrl()->add('group', $this->prefs[$pref]['group']);
-                    if (!empty($this->prefs[$pref]['app'])) {
-                        $url->add('app', $this->prefs[$pref]['app']);
-                    }
-                    $this->prefs[$pref]['url'] = $url;
-                    $type = 'link';
-                    // Fall through to 'link'
+                    case 'prefslink':
+                        $url = $this->selfUrl()->add('group', $this->prefs[$pref]['group']);
+                        if (!empty($this->prefs[$pref]['app'])) {
+                            $url->add('app', $this->prefs[$pref]['app']);
+                        }
+                        $this->prefs[$pref]['url'] = $url;
+                        $type = 'link';
+                        // Fall through to 'link'
 
-                case 'link':
-                    if (isset($this->prefs[$pref]['img'])) {
-                        $t->set('img', Horde_Themes_Image::tag($this->prefs[$pref]['img'], array('alt' => $this->prefs[$pref]['desc'], 'attr' => array('class' => 'prefsLinkImg'))));
-                    }
-                    $t->set('url', isset($this->prefs[$pref]['url']) ? Horde::url($this->prefs[$pref]['url']) : $this->prefs[$pref]['xurl']);
-                    if (isset($this->prefs[$pref]['target'])) {
-                        $t->set('target', htmlspecialchars($this->prefs[$pref]['target']));
-                    }
-                    break;
+                        // no break
+                    case 'link':
+                        if (isset($this->prefs[$pref]['img'])) {
+                            $t->set('img', Horde_Themes_Image::tag($this->prefs[$pref]['img'], ['alt' => $this->prefs[$pref]['desc'], 'attr' => ['class' => 'prefsLinkImg']]));
+                        }
+                        $t->set('url', isset($this->prefs[$pref]['url']) ? Horde::url($this->prefs[$pref]['url']) : $this->prefs[$pref]['xurl']);
+                        if (isset($this->prefs[$pref]['target'])) {
+                            $t->set('target', htmlspecialchars($this->prefs[$pref]['target']));
+                        }
+                        break;
 
-                case 'multienum':
-                    $enum = $this->prefs[$pref]['enum'];
-                    $esc = !empty($this->prefs[$pref]['escaped']);
-                    if (!$selected = @unserialize($prefs->getValue($pref))) {
-                        $selected = array();
-                    }
+                    case 'multienum':
+                        $enum = $this->prefs[$pref]['enum'];
+                        $esc = !empty($this->prefs[$pref]['escaped']);
+                        if (!$selected = @unserialize($prefs->getValue($pref))) {
+                            $selected = [];
+                        }
 
-                    $tmp = array();
-                    foreach ($enum as $key => $val) {
-                        $tmp[] = array(
-                            'l' => $esc ? $val : htmlspecialchars($val),
-                            's' => in_array($key, $selected),
-                            'v' => $esc ? $key : htmlspecialchars($key)
-                        );
-                    }
-                    $t->set('enum', $tmp);
+                        $tmp = [];
+                        foreach ($enum as $key => $val) {
+                            $tmp[] = [
+                                'l' => $esc ? $val : htmlspecialchars($val),
+                                's' => in_array($key, $selected),
+                                'v' => $esc ? $key : htmlspecialchars($key),
+                            ];
+                        }
+                        $t->set('enum', $tmp);
 
-                    $t->set('size', min(4, count($enum)));
-                    break;
+                        $t->set('size', min(4, count($enum)));
+                        break;
 
-                case 'number':
-                    $t->set('val', htmlspecialchars(intval($prefs->getValue($pref))));
-                    break;
+                    case 'number':
+                        $t->set('val', htmlspecialchars(intval($prefs->getValue($pref))));
+                        break;
 
-                case 'password':
-                case 'text':
-                case 'textarea':
-                    $t->set('val', htmlspecialchars($prefs->getValue($pref)));
-                    break;
+                    case 'password':
+                    case 'text':
+                    case 'textarea':
+                        $t->set('val', htmlspecialchars($prefs->getValue($pref)));
+                        break;
 
-                case 'rawhtml':
-                    $t->set('html', $this->prefs[$pref]['value']);
-                    break;
+                    case 'rawhtml':
+                        $t->set('html', $this->prefs[$pref]['value']);
+                        break;
 
-                default:
-                    throw new LogicException(sprintf('Missing or invalid type option for the %s preference.', $pref));
+                    default:
+                        throw new LogicException(sprintf('Missing or invalid type option for the %s preference.', $pref));
                 }
 
                 echo $t->fetch(HORDE_TEMPLATES . '/prefs/' . $type . '.html');
@@ -612,20 +613,20 @@ class Horde_Core_Prefs_Ui
             $t = clone $base;
             $span = round(100 / count($columns));
 
-            $cols = array();
+            $cols = [];
             foreach ($columns as $key => $column) {
-                $tmp = array(
-                    'groups' => array(),
+                $tmp = [
+                    'groups' => [],
                     'hdr' => htmlspecialchars($key),
-                    'width' => $span - 1
-                );
+                    'width' => $span - 1,
+                ];
 
                 foreach ($column as $group => $gvals) {
                     if ($this->groupIsEditable($group)) {
-                        $tmp['groups'][] = array(
+                        $tmp['groups'][] = [
                             'desc' => htmlspecialchars($gvals['desc']),
-                            'link' => Horde::widget(array('url' => $options_link->copy()->add(array('app' => $this->app, 'group' => $group)), 'title' => $gvals['label']))
-                        );
+                            'link' => Horde::widget(['url' => $options_link->copy()->add(['app' => $this->app, 'group' => $group]), 'title' => $gvals['label']]),
+                        ];
                     }
                 }
                 $cols[] = $tmp;
@@ -642,7 +643,7 @@ class Horde_Core_Prefs_Ui
         $GLOBALS['page_output']->sidebar = false;
 
         /* Get list of accessible applications. */
-        $apps = array();
+        $apps = [];
         foreach ($registry->listApps() as $app) {
             // Make sure the app is installed and has a prefs file.
             if (file_exists($registry->get('fileroot', $app) . '/config/prefs.php')) {
@@ -652,14 +653,14 @@ class Horde_Core_Prefs_Ui
         asort($apps);
 
         /* Ouptut screen. */
-        $page_output->header(array(
+        $page_output->header([
             'body_id' => 'services_prefs',
-            'title' => Horde_Core_Translation::t("User Preferences"),
+            'title' => Horde_Core_Translation::t('User Preferences'),
             // For now, force to Basic view for preferences.
-            'view' => $registry::VIEW_BASIC
-        ));
+            'view' => $registry::VIEW_BASIC,
+        ]);
 
-        $notification->notify(array('listeners' => 'status'));
+        $notification->notify(['listeners' => 'status']);
 
         $base_ui = clone $base;
         $base_ui->set('action', $options_link);
@@ -670,19 +671,19 @@ class Horde_Core_Prefs_Ui
         $t = clone $base_ui;
         $t->set('horde', !empty($apps['horde']) && ($this->app != 'horde'));
         unset($apps['horde'], $apps[$this->app]);
-        $tmp = array();
+        $tmp = [];
         foreach ($apps as $key => $val) {
-            $tmp[] = array(
+            $tmp[] = [
                 'l' => htmlspecialchars($val),
-                'v' => htmlspecialchars($key)
-            );
+                'v' => htmlspecialchars($key),
+            ];
         }
         $t->set('apps', $tmp);
         if ($this->app == 'horde') {
-            $header = Horde_Core_Translation::t("Global Preferences");
+            $header = Horde_Core_Translation::t('Global Preferences');
         } else {
             $header = sprintf(
-                Horde_Core_Translation::t("Preferences for %s"),
+                Horde_Core_Translation::t('Preferences for %s'),
                 Horde::url($registry->getInitialPage($this->app))->link()
                     . htmlspecialchars($registry->get('name', $this->app))
                     . '</a>'
@@ -711,12 +712,10 @@ class Horde_Core_Prefs_Ui
             if (count($prefgroups) > 1) {
                 $prefgroups = array_keys($prefgroups);
                 $key = array_search($this->group, $prefgroups);
-                $previous = isset($prefgroups[$key - 1])
-                    ? $prefgroups[$key - 1]
-                    : end($prefgroups);
-                $next = isset($prefgroups[$key + 1])
-                    ? $prefgroups[$key + 1]
-                    : reset($prefgroups);
+                $previous = $prefgroups[$key - 1]
+                    ?? end($prefgroups);
+                $next = $prefgroups[$key + 1]
+                    ?? reset($prefgroups);
                 $prefs_url = $this->selfUrl();
 
                 if ($next != $previous) {
@@ -764,25 +763,24 @@ class Horde_Core_Prefs_Ui
         global $registry;
 
         try {
-            $pconf = $registry->loadConfigFile('prefs.php', array('prefGroups', '_prefs'), $app);
-            $res = array(
+            $pconf = $registry->loadConfigFile('prefs.php', ['prefGroups', '_prefs'], $app);
+            $res = [
                 'prefGroups' => $pconf->config['prefGroups'],
                 '_prefs' => $pconf->config['_prefs'],
-            );
+            ];
         } catch (Horde_Exception $e) {
-            $res = array(
-                'prefGroups' => array(),
-                '_prefs' => array()
-            );
+            $res = [
+                'prefGroups' => [],
+                '_prefs' => [],
+            ];
         }
 
         if ($data) {
             return $res;
         }
 
-        $this->prefGroups = isset($res['prefGroups'])
-            ? $res['prefGroups']
-            : array();
+        $this->prefGroups = $res['prefGroups']
+            ?? [];
         $this->prefs = $res['_prefs'];
 
         /* If there's only one prefGroup, just show it. */
@@ -800,7 +798,7 @@ class Horde_Core_Prefs_Ui
      */
     protected function _getPrefGroups()
     {
-        $out = array();
+        $out = [];
 
         foreach (array_diff(array_keys($this->prefGroups), $this->suppressGroups) as $val) {
             if ($this->groupIsEditable($val)) {
@@ -837,7 +835,8 @@ class Horde_Core_Prefs_Ui
                         $pref_list = array_merge($pgroup['members'], $pref_list);
                     }
                 }
-            } catch (Horde_Exception $e) {}
+            } catch (Horde_Exception $e) {
+            }
         }
 
         return $pref_list;
@@ -861,43 +860,45 @@ class Horde_Core_Prefs_Ui
 
         if ($GLOBALS['prefs']->isLocked('default_identity')) {
             $t->set('default_identity', intval($default_identity));
-            $identities = array($default_identity);
+            $identities = [$default_identity];
         } else {
-            $t->set('defaultid', Horde_Core_Translation::t("Your default identity:"));
-            $t->set('label', Horde::label('identity', Horde_Core_Translation::t("Select the identity you want to change:")));
+            $t->set('defaultid', Horde_Core_Translation::t('Your default identity:'));
+            $t->set('label', Horde::label('identity', Horde_Core_Translation::t('Select the identity you want to change:')));
             $identities = $identity->getAll('id');
         }
 
-        $entry = $js = array();
+        $entry = $js = [];
 
-        $tmp = array();
+        $tmp = [];
         foreach ($members as $member) {
             $tmp[] = $this->_generateEntry(
                 $member,
-                $GLOBALS['prefs']->getValue($member));
+                $GLOBALS['prefs']->getValue($member)
+            );
         }
         $js[-1] = $tmp;
 
         foreach ($identities as $key => $val) {
-            $entry[] = array(
+            $entry[] = [
                 'i' => $key,
                 'label' => htmlspecialchars($val),
-                'sel' => ($key == $default_identity)
-            );
+                'sel' => ($key == $default_identity),
+            ];
 
-            $tmp = array();
+            $tmp = [];
             foreach ($members as $member) {
                 $tmp[] = $this->_generateEntry(
                     $member,
-                    $identity->getValue($member, $key));
+                    $identity->getValue($member, $key)
+                );
             }
             $js[] = $tmp;
         }
         $t->set('entry', $entry);
 
-        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineScript(array(
-            'HordeIdentitySelect.identities = ' . Horde_Serialize::serialize($js, Horde_Serialize::JSON)
-        ));
+        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineScript([
+            'HordeIdentitySelect.identities = ' . Horde_Serialize::serialize($js, Horde_Serialize::JSON),
+        ]);
 
         return $t->fetch(HORDE_TEMPLATES . '/prefs/identityselect.html');
     }
@@ -913,29 +914,30 @@ class Horde_Core_Prefs_Ui
     protected function _generateEntry($member, $val)
     {
         switch ($this->prefs[$member]['type']) {
-        case 'checkbox':
-        case 'number':
-            $val2 = intval($val);
-            break;
+            case 'checkbox':
+            case 'number':
+                $val2 = intval($val);
+                break;
 
-        case 'textarea':
-            if (is_array($val)) {
-                $val = implode("\n", $val);
-            }
-            // Fall-through
+            case 'textarea':
+                if (is_array($val)) {
+                    $val = implode("\n", $val);
+                }
+                // Fall-through
 
-        default:
-            $val2 = $val;
+                // no break
+            default:
+                $val2 = $val;
         }
 
         // [0] = pref name
         // [1] = pref type
         // [2] = pref value
-        return array(
+        return [
             $member,
             $this->prefs[$member]['type'],
-            $val2
-        );
+            $val2,
+        ];
     }
 
     /**
@@ -951,7 +953,7 @@ class Horde_Core_Prefs_Ui
             $id = intval($this->vars->identity);
             $deleted_identity = $identity->delete($id);
             $this->_loadPrefs($this->app);
-            $notification->push(sprintf(Horde_Core_Translation::t("The identity \"%s\" has been deleted."), $deleted_identity['id']), 'horde.success');
+            $notification->push(sprintf(Horde_Core_Translation::t('The identity "%s" has been deleted.'), $deleted_identity['id']), 'horde.success');
             return;
         }
 
@@ -967,7 +969,7 @@ class Horde_Core_Prefs_Ui
             if ($new_default != $old_default) {
                 $identity->setDefault($new_default);
                 $old_default = $new_default;
-                $notification->push(Horde_Core_Translation::t("Your default identity has been changed."), 'horde.success');
+                $notification->push(Horde_Core_Translation::t('Your default identity has been changed.'), 'horde.success');
 
                 /* Need to immediately save, since we may short-circuit
                  * saving the identities below. */
@@ -996,7 +998,7 @@ class Horde_Core_Prefs_Ui
         $new_from = $identity->getValue('from_addr');
         if (!empty($conf['user']['verify_from_addr']) &&
             empty($new_from)) {
-            $notification->push(Horde_Core_Translation::t("The e-mail field cannot be empty."), 'horde.error');
+            $notification->push(Horde_Core_Translation::t('The e-mail field cannot be empty.'), 'horde.error');
         } elseif (!empty($conf['user']['verify_from_addr']) &&
             ($current_from != $new_from) &&
             !in_array($new_from, $from_addresses)) {

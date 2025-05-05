@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Horde_Core_Ui_TagCloud:: for creating and displaying tag clouds.
  *
@@ -44,17 +45,17 @@ class Horde_Core_Ui_TagCloud
     /**
      * @var array
      */
-    public $epoc_level = array(
+    public $epoc_level = [
         'earliest',
         'earlier',
         'later',
-        'latest'
-    );
+        'latest',
+    ];
 
     /**
      * @var array
      */
-    protected $_elements = array();
+    protected $_elements = [];
 
     /**
      * @var integer
@@ -79,7 +80,7 @@ class Horde_Core_Ui_TagCloud
     /**
      * @var array
      */
-    protected $_map = array();
+    protected $_map = [];
 
     /**
      * Constructor
@@ -105,9 +106,13 @@ class Horde_Core_Ui_TagCloud
      * @param integer $timestamp  UNIX timestamp.
      * @param string $onclick     Javascript onclick event handler.
      */
-    public function addElement($name, $url ='', $count = 0, $timestamp = null,
-                               $onclick = null)
-    {
+    public function addElement(
+        $name,
+        $url = '',
+        $count = 0,
+        $timestamp = null,
+        $onclick = null
+    ) {
 
         if (isset($this->_map[$name])) {
             $i = $this->_map[$name];
@@ -149,7 +154,7 @@ class Horde_Core_Ui_TagCloud
      */
     public function clearElements()
     {
-        $this->_elements = array();
+        $this->_elements = [];
     }
 
     /**
@@ -159,7 +164,7 @@ class Horde_Core_Ui_TagCloud
      *
      * @return string   HTML
      */
-    public function buildHTML($param = array())
+    public function buildHTML($param = [])
     {
         return $this->_wrapDiv($this->_buidHTMLTags($param));
     }
@@ -194,8 +199,8 @@ class Horde_Core_Ui_TagCloud
         $this->epoc_factor = ($this->_max_epoc == $this->_min_epoc)
             ? 1
             : count($this->epoc_level) / (sqrt($this->_max_epoc) - sqrt($this->_min_epoc));
-        $rtn = array();
-        foreach ($this->_elements as $tag){
+        $rtn = [];
+        foreach ($this->_elements as $tag) {
             $count_lv = $this->_getCountLevel($tag['count']);
             if (!isset($tag['timestamp']) || empty($tag['timestamp'])) {
                 $epoc_lv = count($this->epoc_level) - 1;
@@ -220,13 +225,15 @@ class Horde_Core_Ui_TagCloud
      */
     protected function _createHTMLTag($tag, $type, $fontsize)
     {
-        return sprintf('<a style="font-size:%d%s" class="%s" href="%s"%s>%s</a>' . "\n",
-                       $fontsize,
-                       $this->size_suffix,
-                       $type,
-                       $tag['url'],
-                       (empty($tag['onclick']) ? '' : ' onclick="' . $tag['onclick'] . '"'),
-                       htmlspecialchars($tag['name']));
+        return sprintf(
+            '<a style="font-size:%d%s" class="%s" href="%s"%s>%s</a>' . "\n",
+            $fontsize,
+            $this->size_suffix,
+            $type,
+            $tag['url'],
+            (empty($tag['onclick']) ? '' : ' onclick="' . $tag['onclick'] . '"'),
+            htmlspecialchars($tag['name'])
+        );
     }
 
     /**
@@ -236,8 +243,8 @@ class Horde_Core_Ui_TagCloud
      */
     protected function _sortTags($limit = 0)
     {
-        usort($this->_elements, array($this, 'cmpElementsName'));
-        if ($limit != 0){
+        usort($this->_elements, [$this, 'cmpElementsName']);
+        if ($limit != 0) {
             $this->_elements = array_splice($this->_elements, 0, $limit);
         }
     }
@@ -259,7 +266,7 @@ class Horde_Core_Ui_TagCloud
      */
     protected function _calcMumCount()
     {
-        foreach($this->_elements as $item){
+        foreach ($this->_elements as $item) {
             $array[] = $item['count'];
         }
         $this->_min = min($array);
@@ -271,7 +278,7 @@ class Horde_Core_Ui_TagCloud
      */
     protected function _calcMumEpoc()
     {
-        foreach($this->_elements as $item){
+        foreach ($this->_elements as $item) {
             $array[] = $item['timestamp'];
         }
         $this->_min_epoc = min($array);

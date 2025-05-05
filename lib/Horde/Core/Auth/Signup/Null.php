@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Null implementation of Horde_Core_Auth_Signup.
  *
@@ -55,7 +56,7 @@ class Horde_Core_Auth_Signup_Null extends Horde_Core_Auth_Signup_Base
      */
     public function getQueuedSignups()
     {
-        return array();
+        return [];
     }
 
     /**

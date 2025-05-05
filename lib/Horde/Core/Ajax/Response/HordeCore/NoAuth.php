@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Sends an authentication failure response to the HordeCore JS framework.
  *
@@ -56,17 +57,17 @@ class Horde_Core_Ajax_Response_HordeCore_NoAuth extends Horde_Core_Ajax_Response
      */
     protected function _jsonData()
     {
-        $msg = new stdClass;
-        $msg->message = strval($GLOBALS['registry']->getLogoutUrl(array(
-            'reason' => $this->_error
-        ))->add('url', Horde::url('', false, array(
+        $msg = new stdClass();
+        $msg->message = strval($GLOBALS['registry']->getLogoutUrl([
+            'reason' => $this->_error,
+        ])->add('url', Horde::url('', false, [
             'app' => $this->_app,
-            'append_session' => -1
-        ))));
+            'append_session' => -1,
+        ])));
         $msg->type = 'horde.noauth';
 
-        $ob = new stdClass;
-        $ob->msgs = array($msg);
+        $ob = new stdClass();
+        $ob->msgs = [$msg];
         $ob->response = false;
 
         return $ob;

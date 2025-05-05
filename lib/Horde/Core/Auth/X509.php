@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Core_Auth_X509 class provides Horde-specific authentication using
  * X509 certificates.
@@ -18,7 +19,7 @@ class Horde_Core_Auth_X509 extends Horde_Auth_X509
     protected function _validate($certificate)
     {
         try {
-            return Horde::callHook('x509_validate', array($certificate));
+            return Horde::callHook('x509_validate', [$certificate]);
         } catch (Horde_Exception_HookNotSet $e) {
         }
 

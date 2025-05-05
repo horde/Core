@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The abstract Horde injector class.
  *

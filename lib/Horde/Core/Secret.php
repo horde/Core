@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
  *
@@ -28,7 +29,7 @@
  */
 class Horde_Core_Secret extends Horde_Secret
 {
-    const HORDE_KEYNAME = 'horde_secret';
+    public const HORDE_KEYNAME = 'horde_secret';
 
     /**
      */

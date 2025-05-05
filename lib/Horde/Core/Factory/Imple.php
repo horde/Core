@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based Horde_Core_Ajax_Imple:: factory.
  *
@@ -37,9 +38,11 @@ class Horde_Core_Factory_Imple extends Horde_Core_Factory_Base
      * @return Horde_Core_Ajax_Imple  The newly created instance.
      * @throws Horde_Exception
      */
-    public function create($driver, array $params = array(),
-                           $noattach = false)
-    {
+    public function create(
+        $driver,
+        array $params = [],
+        $noattach = false
+    ) {
         $class = $this->_getDriverName($driver, 'Horde_Core_Ajax_Imple');
 
         $ob = new $class($params);

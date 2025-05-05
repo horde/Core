@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2009-2020 Horde LLC (http://www.horde.org/)
  *
@@ -12,7 +13,7 @@
  */
 
 /**
- * The Horde_Core_Controller_RequestMapper class provides 
+ * The Horde_Core_Controller_RequestMapper class provides
  * logic to identify which app is supposed to handle the request.
  *
  * It loads the relevant routes file.
@@ -102,21 +103,24 @@ class Horde_Core_Controller_RequestMapper
     {
         $matches = [];
         // listApps() would return empty on unauthenticated access
-        foreach ($registry->listApps(null, false, null) as $app)
-        {
+        foreach ($registry->listApps(null, false, null) as $app) {
             $default = [
                'scheme' => $scheme,
                'host' => $host,
                'path' => '',
-               'app' => $app
+               'app' => $app,
             ];
             $applicationUrl = array_merge($default, parse_url($registry->get('webroot', $app)));
             $applicationUrl['path'] = $this->_normalize($applicationUrl['path']);
             // sort out cases with wrong host or scheme
-            if ($scheme != $applicationUrl['scheme']) { continue; }
-            if ($host != $applicationUrl['host']) { continue; }
+            if ($scheme != $applicationUrl['scheme']) {
+                continue;
+            }
+            if ($host != $applicationUrl['host']) {
+                continue;
+            }
             // does the path match at all?
-            if (substr($request->getPath(),0, strlen($applicationUrl['path'])) == $applicationUrl['path']) {
+            if (substr($request->getPath(), 0, strlen($applicationUrl['path'])) == $applicationUrl['path']) {
                 $matches[] = $applicationUrl;
             }
         }
@@ -125,10 +129,11 @@ class Horde_Core_Controller_RequestMapper
             return $matches;
         }
         // Longest match path *should* always be the right app
-        usort($matches, function($a, $b) 
-        {
-             return strlen($a['path']) <=> strlen($b['path']);
-        }
+        usort(
+            $matches,
+            function ($a, $b) {
+                return strlen($a['path']) <=> strlen($b['path']);
+            }
         );
         return array_pop($matches);
     }
@@ -193,7 +198,7 @@ class Horde_Core_Controller_RequestMapper
 
         // Load application routes.
         $mapper = $this->_mapper;
-        $mapper->environ = array('REQUEST_METHOD' => $request->getMethod());
+        $mapper->environ = ['REQUEST_METHOD' => $request->getMethod()];
         include $routeFile;
         if (file_exists($fileroot . '/config/routes.local.php')) {
             include $fileroot . '/config/routes.local.php';

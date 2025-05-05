@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package Core
  */
@@ -20,7 +21,7 @@ class Horde_Core_Ui_Layout
 
     public function __call($method, $args)
     {
-        return call_user_func_array(array($this->_view, $method), $args);
+        return call_user_func_array([$this->_view, $method], $args);
     }
 
     public function setLayoutName($layoutName)

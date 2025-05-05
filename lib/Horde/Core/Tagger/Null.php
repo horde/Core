@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -39,7 +40,7 @@ class Horde_Core_Tagger_Null extends Horde_Core_Tagger
      */
     public function getTags($localId, $type = null)
     {
-        return array();
+        return [];
     }
 
     /**
@@ -58,51 +59,53 @@ class Horde_Core_Tagger_Null extends Horde_Core_Tagger
      */
     public function listTags($token)
     {
-        return array();
+        return [];
     }
 
     /**
      */
     public function getCloud($user, $limit = 5, $all = false)
     {
-        return array();
+        return [];
     }
 
     /**
      */
     public function getTagCountsByObjects(array $ids, $type = null)
     {
-        return array();
+        return [];
     }
 
     /**
      */
     public function browseTags($tags, $user)
     {
-        return array();
+        return [];
     }
 
     /**
      */
     public function getTagIds($tags)
     {
-        return array();
+        return [];
     }
 
     /**
      */
     public function getTagInfo(
-        $tags = null, $limit = 500, $type = null, $user = null
-    )
-    {
-        return array();
+        $tags = null,
+        $limit = 500,
+        $type = null,
+        $user = null
+    ) {
+        return [];
     }
 
     /**
      */
-    public function search($tags, $filter = array())
+    public function search($tags, $filter = [])
     {
-        return array();
+        return [];
     }
 
 }

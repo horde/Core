@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This class provides the information needed to output a javascript package
  * to the browser.
@@ -23,7 +24,7 @@ class Horde_Script_Package implements IteratorAggregate
      *
      * @var array
      */
-    protected $_files = array();
+    protected $_files = [];
 
     /* IteratorAggregate method. */
 

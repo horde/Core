@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based factory for creating Horde_Core_Block_Collection
  * objects.
@@ -32,7 +33,7 @@ class Horde_Core_Factory_BlockCollection extends Horde_Core_Factory_Base
      *
      * @var array
      */
-    private $_instances = array();
+    private $_instances = [];
 
     /**
      * Return the Block_Collection instance.
@@ -44,7 +45,7 @@ class Horde_Core_Factory_BlockCollection extends Horde_Core_Factory_Base
      * @return Horde_Core_Block_Collection  The singleton instance.
      * @throws Horde_Exception
      */
-    public function create(array $apps = array(), $layout = 'portal_layout')
+    public function create(array $apps = [], $layout = 'portal_layout')
     {
         global $registry;
 
@@ -52,7 +53,7 @@ class Horde_Core_Factory_BlockCollection extends Horde_Core_Factory_Base
             ? $registry->listApps()
             : array_intersect($registry->listApps(), $apps);
         sort($apps);
-        $sig = hash('md5', json_encode(array($apps, $layout)));
+        $sig = hash('md5', json_encode([$apps, $layout]));
 
         if (!isset($this->_instances[$sig])) {
             $this->_instances[$sig] =

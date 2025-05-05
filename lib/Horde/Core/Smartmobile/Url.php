@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Extend the base URL class to allow for use with the URL parameter scheme
  * used in Horde's smartmobile framework.

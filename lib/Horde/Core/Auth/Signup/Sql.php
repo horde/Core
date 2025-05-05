@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The SQL implementation of Horde_Core_Auth_Signup.
  *
@@ -19,7 +20,7 @@ class Horde_Core_Auth_Signup_Sql extends Horde_Core_Auth_Signup_Base
      *
      * @var array
      */
-    protected $_params = array();
+    protected $_params = [];
 
     /**
      * Constructor.
@@ -28,8 +29,9 @@ class Horde_Core_Auth_Signup_Sql extends Horde_Core_Auth_Signup_Base
     {
         $this->_params = array_merge(
             $this->_params,
-            array('table' => 'horde_signups'),
-            Horde::getDriverConfig('signup', 'Sql'));
+            ['table' => 'horde_signups'],
+            Horde::getDriverConfig('signup', 'Sql')
+        );
     }
 
     /**
@@ -47,12 +49,12 @@ class Horde_Core_Auth_Signup_Sql extends Horde_Core_Auth_Signup_Base
             . ' (user_name, signup_date, signup_host, signup_data) VALUES (?, ?, ?, ?) ';
         $remote = $registry->remoteHost();
 
-        $values = array(
+        $values = [
             $signup->getName(),
             time(),
             $remote->addr,
-            serialize($signup->getData())
-        );
+            serialize($signup->getData()),
+        ];
 
         $GLOBALS['injector']->getInstance('Horde_Core_Factory_Db')->create('horde', 'signup')->insert($query, $values);
     }
@@ -73,7 +75,7 @@ class Horde_Core_Auth_Signup_Sql extends Horde_Core_Auth_Signup_Base
 
         $query = 'SELECT 1 FROM ' . $this->_params['table'] .
                  ' WHERE user_name = ?';
-        $values = array($user);
+        $values = [$user];
 
         return (bool)$GLOBALS['injector']->getInstance('Horde_Core_Factory_Db')->create('horde', 'signup')->selectValue($query, $values);
     }
@@ -92,11 +94,11 @@ class Horde_Core_Auth_Signup_Sql extends Horde_Core_Auth_Signup_Base
     {
         $query = 'SELECT * FROM ' . $this->_params['table'] .
                  ' WHERE user_name = ?';
-        $values = array($username);
+        $values = [$username];
 
         $result = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Db')->create('horde', 'signup')->selectOne($query, $values);
         if (empty($result)) {
-            throw new Horde_Exception(sprintf(Horde_Core_Translation::t("User \"%s\" does not exist."), $username));
+            throw new Horde_Exception(sprintf(Horde_Core_Translation::t('User "%s" does not exist.'), $username));
         }
         $object = new Horde_Core_Auth_Signup_SqlObject($result['user_name']);
         $object->setData($result);
@@ -118,7 +120,7 @@ class Horde_Core_Auth_Signup_Sql extends Horde_Core_Auth_Signup_Base
 
         $result = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Db')->create('horde', 'signup')->select($query);
 
-        $signups = array();
+        $signups = [];
         foreach ($result as $signup) {
             $object = new Horde_Core_Auth_Signup_SqlObject($signup['user_name']);
             $object->setData($signup);
@@ -139,7 +141,7 @@ class Horde_Core_Auth_Signup_Sql extends Horde_Core_Auth_Signup_Base
     {
         $query = 'DELETE FROM ' . $this->_params['table'] .
                  ' WHERE user_name = ?';
-        $values = array($username);
+        $values = [$username];
 
         $GLOBALS['injector']->getInstance('Horde_Core_Factory_Db')->create('horde', 'signup')->delete($query, $values);
     }

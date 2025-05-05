@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based Horde_Kolab_Server:: factory.
  *
@@ -56,7 +57,7 @@ class Horde_Core_Factory_KolabServer extends Horde_Core_Factory_Base
      */
     private function _setupConfiguration()
     {
-        $configuration = array();
+        $configuration = [];
 
         //@todo: Update configuration parameters
         if (!empty($GLOBALS['conf']['kolab']['ldap'])) {
@@ -82,7 +83,8 @@ class Horde_Core_Factory_KolabServer extends Horde_Core_Factory_Base
         }
 
         $this->_injector->setInstance(
-            'Horde_Kolab_Server_Configuration', $configuration
+            'Horde_Kolab_Server_Configuration',
+            $configuration
         );
     }
 
@@ -147,12 +149,12 @@ class Horde_Core_Factory_KolabServer extends Horde_Core_Factory_Base
     private function _setupStructure()
     {
         $configuration = $this->getConfiguration();
-        $driver = isset($configuration['structure']['driver'])
-            ? $configuration['structure']['driver']
-            : 'Horde_Kolab_Server_Structure_Kolab';
+        $driver = $configuration['structure']['driver']
+            ?? 'Horde_Kolab_Server_Structure_Kolab';
 
         $this->_injector->bindImplementation(
-            'Horde_Kolab_Server_Structure_Interface', $driver
+            'Horde_Kolab_Server_Structure_Interface',
+            $driver
         );
     }
 
@@ -190,7 +192,8 @@ class Horde_Core_Factory_KolabServer extends Horde_Core_Factory_Base
                 $configuration['hostspec'] = $configuration['host_master'];
                 $ldap_write = new Horde_Ldap($configuration);
                 return new Horde_Kolab_Server_Connection_Splittedldap(
-                    $ldap_read, $ldap_write
+                    $ldap_read,
+                    $ldap_write
                 );
             }
 
@@ -199,13 +202,13 @@ class Horde_Core_Factory_KolabServer extends Horde_Core_Factory_Base
             );
         }
 
-        $data = isset($configuration['data'])
-            ? $configuration['data']
-            : array();
+        $data = $configuration['data']
+            ?? [];
 
         return new Horde_Kolab_Server_Connection_Mock(
             new Horde_Kolab_Server_Connection_Mock_Ldap(
-                $configuration, $data
+                $configuration,
+                $data
             )
         );
     }
@@ -249,19 +252,22 @@ class Horde_Core_Factory_KolabServer extends Horde_Core_Factory_Base
 
         if (isset($configuration['map'])) {
             $server = new Horde_Kolab_Server_Decorator_Map(
-                $server, $configuration['map']
+                $server,
+                $configuration['map']
             );
         }
 
         if (isset($configuration['debug']) || isset($configuration['log'])) {
             $server = new Horde_Kolab_Server_Decorator_Log(
-                $server, $this->_injector->getInstance('Horde_Log_Logger')
+                $server,
+                $this->_injector->getInstance('Horde_Log_Logger')
             );
         }
 
         if (isset($configuration['debug']) || isset($configuration['count'])) {
             $server = new Horde_Kolab_Server_Decorator_Count(
-                $server, $this->_injector->getInstance('Horde_Log_Logger')
+                $server,
+                $this->_injector->getInstance('Horde_Log_Logger')
             );
         }
 

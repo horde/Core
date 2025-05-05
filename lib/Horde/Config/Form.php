@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Form:: form that implements a user interface for the config
  * system.
@@ -83,7 +84,7 @@ class Horde_Config_Form extends Horde_Form
                 $this->setSection($configitem['tab'], $configitem['desc']);
             } elseif (isset($configitem['switch'])) {
                 $selected = $this->_vars->getExists($varname, $wasset);
-                $var_params = array();
+                $var_params = [];
                 $select_option = true;
                 if (is_bool($configitem['default'])) {
                     $configitem['default'] = $configitem['default'] ? 'true' : 'false';
@@ -101,7 +102,7 @@ class Horde_Config_Form extends Horde_Form
                 $name = '$conf[' . implode('][', explode('|', $prefixedname)) . ']';
                 $desc = $configitem['desc'];
 
-                $v = $this->addVariable($name, $varname, 'enum', true, false, $desc, array($var_params, $select_option));
+                $v = $this->addVariable($name, $varname, 'enum', true, false, $desc, [$var_params, $select_option]);
                 if (array_key_exists('default', $configitem)) {
                     $v->setDefault($configitem['default']);
                     if ($this->_fillvars) {
@@ -122,8 +123,8 @@ class Horde_Config_Form extends Horde_Form
                 }
 
                 $var_params = ($type == 'multienum' || $type == 'enum')
-                    ? array($configitem['values'])
-                    : array();
+                    ? [$configitem['values']]
+                    : [];
 
                 if ($type == 'header' || $type == 'description') {
                     $name = $configitem['desc'];
@@ -142,17 +143,17 @@ class Horde_Config_Form extends Horde_Form
                     $v->setDefault($configitem['default']);
                     if ($this->_fillvars) {
                         switch ($type) {
-                        case 'boolean':
-                            if ($configitem['default']) {
-                                $this->_vars->set($varname, 'on');
-                            }
-                            break;
-                        case 'int':
-                            $this->_vars->set($varname, (string)$configitem['default']);
-                            break;
-                        default:
-                            $this->_vars->set($varname, $configitem['default']);
-                            break;
+                            case 'boolean':
+                                if ($configitem['default']) {
+                                    $this->_vars->set($varname, 'on');
+                                }
+                                break;
+                            case 'int':
+                                $this->_vars->set($varname, (string)$configitem['default']);
+                                break;
+                            default:
+                                $this->_vars->set($varname, $configitem['default']);
+                                break;
                         }
                     }
                 }

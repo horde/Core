@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based Horde_Themes_Cache:: factory.
  *
@@ -23,16 +24,14 @@
  * @author   Michael Slusarz <slusarz@horde.org>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
-class Horde_Core_Factory_ThemesCache
-extends Horde_Core_Factory_Base
-implements Horde_Shutdown_Task
+class Horde_Core_Factory_ThemesCache extends Horde_Core_Factory_Base implements Horde_Shutdown_Task
 {
     /**
      * Instances.
      *
      * @var array
      */
-    private $_instances = array();
+    private $_instances = [];
 
     /**
      * Return the Horde_Themes_Cache:: instance.
@@ -44,7 +43,7 @@ implements Horde_Shutdown_Task
      */
     public function create($app, $theme)
     {
-        $sig = implode('|', array($app, $theme));
+        $sig = implode('|', [$app, $theme]);
 
         if (!isset($this->_instances[$sig])) {
             $cache = empty($GLOBALS['conf']['cachethemes'])
@@ -85,7 +84,7 @@ implements Horde_Shutdown_Task
      */
     public function expireCache($app, $theme)
     {
-        $sig = implode('|', array($app, $theme));
+        $sig = implode('|', [$app, $theme]);
 
         $cache = $this->_injector->getInstance('Horde_Cache');
 

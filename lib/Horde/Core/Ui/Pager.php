@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Core_Ui_Pager:: provides links to individual pages.
  *
@@ -23,10 +24,10 @@ class Horde_Core_Ui_Pager extends Horde_Core_Ui_Widget
      */
     public function __construct($name, $vars, $config)
     {
-        $config = array_merge(array(
+        $config = array_merge([
             'page_limit' => 10,
-            'perpage' => 100
-        ), $config);
+            'perpage' => 100,
+        ], $config);
 
         parent::__construct($name, $vars, $config);
 
@@ -70,9 +71,8 @@ class Horde_Core_Ui_Pager extends Horde_Core_Ui_Widget
             // Create the '<< Prev' link if we are not on the first page.
             $link = $this->_link($this->_addPreserved($url->copy()->add($this->_name, $current_page - 1)));
 
-            $prev_text = isset($this->_config['previousHTML'])
-                ? $this->_config['previousHTML']
-                : htmlspecialchars(Horde_Core_Translation::t("<Previous"));
+            $prev_text = $this->_config['previousHTML']
+                ?? htmlspecialchars(Horde_Core_Translation::t('<Previous'));
 
             $html .= Horde::link($link, '', 'prev') . $prev_text . '</a>';
         }
@@ -113,9 +113,8 @@ class Horde_Core_Ui_Pager extends Horde_Core_Ui_Widget
         if ($current_page < $pages) {
             $link = $this->_link($this->_addPreserved($url->copy()->add($this->_name, $current_page + 1)));
 
-            $next_text = isset($this->_config['nextHTML'])
-                ? $this->_config['nextHTML']
-                : htmlspecialchars(Horde_Core_Translation::t("Next>"));
+            $next_text = $this->_config['nextHTML']
+                ?? htmlspecialchars(Horde_Core_Translation::t('Next>'));
 
             $html .= ' ' . Horde::link($link, '', 'next') . $next_text . '</a>';
         }

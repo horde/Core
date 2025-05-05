@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2009-2020 Horde LLC (http://www.horde.org/)
  *
@@ -12,7 +13,7 @@
  */
 
 /**
- * The Horde_Core_Controller_NotFound class provides 
+ * The Horde_Core_Controller_NotFound class provides
  * a premade controller for scenarios where a resource
  * either does not exist or is not visible to the requester
  *
@@ -30,9 +31,10 @@ class Horde_Core_Controller_NotFound implements Horde_Controller
 {
     /**
      */
-    public function processRequest(Horde_Controller_Request $request,
-                                   Horde_Controller_Response $response)
-    {
+    public function processRequest(
+        Horde_Controller_Request $request,
+        Horde_Controller_Response $response
+    ) {
         $response->setHeader('HTTP/1.0 404 ', 'Not Found');
         $response->setBody('<!DOCTYPE html><html><head><title>404 File Not Found</title></head><body><h1>404 File Not Found</h1></body></html>');
     }

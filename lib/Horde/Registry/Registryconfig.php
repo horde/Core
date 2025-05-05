@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -33,14 +34,14 @@ class Horde_Registry_Registryconfig
      *
      * @var array
      */
-    public $applications = array();
+    public $applications = [];
 
     /**
      * Interfaces list.
      *
      * @var array
      */
-    public $interfaces = array();
+    public $interfaces = [];
 
     /**
      * Constructor.
@@ -77,14 +78,13 @@ class Horde_Registry_Registryconfig
         }
 
         /* Reset textdomain. */
-        if ($app != 'horde' AND $app != '') {
+        if ($app != 'horde' and $app != '') {
             textdomain($app);
         }
 
         if (!isset($this->applications['horde']['fileroot'])) {
-            $this->applications['horde']['fileroot'] = isset($app_fileroot)
-                ? $app_fileroot
-                : HORDE_BASE;
+            $this->applications['horde']['fileroot'] = $app_fileroot
+                ?? HORDE_BASE;
         }
         if (!isset($app_fileroot)) {
             $app_fileroot = $this->applications['horde']['fileroot'];
@@ -95,9 +95,8 @@ class Horde_Registry_Registryconfig
         $app_fileroot = rtrim($app_fileroot, '/') . '/';
 
         if (!isset($this->applications['horde']['webroot'])) {
-            $this->applications['horde']['webroot'] = isset($app_webroot)
-                ? $app_webroot
-                : $this->_detectWebroot();
+            $this->applications['horde']['webroot'] = $app_webroot
+                ?? $this->_detectWebroot();
         }
         if (!isset($app_webroot)) {
             $app_webroot = $this->applications['horde']['webroot'];
@@ -201,7 +200,7 @@ class Horde_Registry_Registryconfig
         $webroot = preg_split(';/;', $_SERVER['PHP_SELF'], 2, PREG_SPLIT_NO_EMPTY);
         $webroot = strstr(realpath($basedir), DIRECTORY_SEPARATOR . array_shift($webroot));
         if ($webroot !== false) {
-            return preg_replace(array('/\\\\/', ';/config$;'), array('/', ''), $webroot);
+            return preg_replace(['/\\\\/', ';/config$;'], ['/', ''], $webroot);
         }
 
         return ($webroot === false)

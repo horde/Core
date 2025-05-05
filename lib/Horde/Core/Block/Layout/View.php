@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This object represents the user defined portal layout.
  *
@@ -20,14 +21,14 @@ class Horde_Core_Block_Layout_View extends Horde_Core_Block_Layout
      *
      * @var array
      */
-    protected $_applications = array();
+    protected $_applications = [];
 
     /**
      * The current block layout.
      *
      * @var array
      */
-    protected $_layout = array();
+    protected $_layout = [];
 
     /**
      * Constructor.
@@ -61,8 +62,8 @@ class Horde_Core_Block_Layout_View extends Horde_Core_Block_Layout
         $html = '<table id="portal" class="nopadding" cellspacing="8" width="100%">';
 
         $bc = $GLOBALS['injector']->getInstance('Horde_Core_Factory_BlockCollection')->create();
-        $covered = array();
-        $js = array();
+        $covered = [];
+        $js = [];
         foreach ($this->_layout as $row_num => $row) {
             $width = floor(100 / count($row));
             $html .= '<tr>';
@@ -87,7 +88,7 @@ class Horde_Core_Block_Layout_View extends Horde_Core_Block_Layout
                         $colspan = $item['width'];
                         for ($i = 0; $i < $item['height']; $i++) {
                             if (!isset($covered[$row_num + $i])) {
-                                $covered[$row_num + $i] = array();
+                                $covered[$row_num + $i] = [];
                             }
                             for ($j = 0; $j < $item['width']; $j++) {
                                 $covered[$row_num + $i][$col_num + $j] = true;
@@ -104,9 +105,8 @@ class Horde_Core_Block_Layout_View extends Horde_Core_Block_Layout
 
                             if ($block->updateable &&
                                 $GLOBALS['browser']->hasFeature('xmlhttpreq')) {
-                                $refresh_time = isset($item['params']['params']['_refresh_time'])
-                                    ? $item['params']['params']['_refresh_time']
-                                    : $interval;
+                                $refresh_time = $item['params']['params']['_refresh_time']
+                                    ?? $interval;
 
                                 if (!empty($refresh_time)) {
                                     $js[] = 'HordeBlocks.addUpdateableBlock(' .
@@ -120,7 +120,7 @@ class Horde_Core_Block_Layout_View extends Horde_Core_Block_Layout
                             $html .= '<td width="' . ($width * $colspan) . '%">&nbsp;</td>';
                         }
                     } catch (Horde_Exception $e) {
-                        $header = Horde_Core_Translation::t("Error");
+                        $header = Horde_Core_Translation::t('Error');
                         $content = $e->getMessage();
                         ob_start();
                         include $tplDir . '/portal/block.inc';
@@ -155,15 +155,15 @@ class Horde_Core_Block_Layout_View extends Horde_Core_Block_Layout
     public function getStylesheets()
     {
         $css = $GLOBALS['injector']->getInstance('Horde_PageOutput')->css;
-        $stylesheets = array();
+        $stylesheets = [];
 
         foreach ($this->getApplications() as $app) {
-            $app_css = $css->getStylesheets('', array(
+            $app_css = $css->getStylesheets('', [
                 'app' => $app,
                 'nohorde' => !in_array('horde', $this->getApplications()),
                 'sub' => 'block',
-                'subonly' => true
-            ));
+                'subonly' => true,
+            ]);
 
             if (!empty($app_css)) {
                 $stylesheets = array_merge($stylesheets, $app_css);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based Horde_Kolab_Storage:: factory.
  *
@@ -50,7 +51,7 @@ class Horde_Core_Factory_KolabStorage extends Horde_Core_Factory_Base
      */
     private function _setupConfiguration()
     {
-        $configuration = array();
+        $configuration = [];
 
         //@todo: Update configuration parameters
         if (!empty($GLOBALS['conf']['imap'])) {
@@ -64,7 +65,8 @@ class Horde_Core_Factory_KolabStorage extends Horde_Core_Factory_Base
         }
 
         $this->_injector->setInstance(
-            'Horde_Kolab_Storage_Configuration', $configuration
+            'Horde_Kolab_Storage_Configuration',
+            $configuration
         );
     }
 
@@ -82,53 +84,53 @@ class Horde_Core_Factory_KolabStorage extends Horde_Core_Factory_Base
             ? $configuration['cache']
             : 'Mock';
         switch ($cache) {
-        case 'Horde':
-            $cacheob = $this->_injector->getInstance('Horde_Cache');
-            break;
-        case 'Mock':
-        default:
-            $cacheob = new Horde_Cache(
-                new Horde_Cache_Storage_Mock(), array('compress' => true)
-            );
+            case 'Horde':
+                $cacheob = $this->_injector->getInstance('Horde_Cache');
+                break;
+            case 'Mock':
+            default:
+                $cacheob = new Horde_Cache(
+                    new Horde_Cache_Storage_Mock(),
+                    ['compress' => true]
+                );
         }
 
-        $params = array(
+        $params = [
             'driver' => 'horde',
-            'params' => array(
+            'params' => [
                 'host' => $configuration['server'],
                 'username' => $GLOBALS['registry']->getAuth(),
                 'password' => $GLOBALS['registry']->getAuthCredential('password'),
                 'port'     => $configuration['port'],
                 'secure'   => $configuration['secure'],
-                'debug'    => isset($configuration['debug'])
-                    ? $configuration['debug']
-                    : null,
-                'cache' =>  array(
+                'debug'    => $configuration['debug']
+                    ?? null,
+                'cache' =>  [
                     'backend' => new Horde_Imap_Client_Cache_Backend_Cache(
-                        array('cacheob' => $cacheob)
-                    )
-                )
-            ),
-            'queries' => array(
-                'list' => array(
-                    Horde_Kolab_Storage_List_Tools::QUERY_BASE => array(
-                        'cache' => true
+                        ['cacheob' => $cacheob]
                     ),
-                    Horde_Kolab_Storage_List_Tools::QUERY_ACL => array(
-                        'cache' => true
-                    ),
-                    Horde_Kolab_Storage_List_Tools::QUERY_SHARE => array(
-                        'cache' => true
-                    ),
-                )
-            ),
-            'queryset' => array(
-                'data' => array('queryset' => 'horde'),
-            ),
+                ],
+            ],
+            'queries' => [
+                'list' => [
+                    Horde_Kolab_Storage_List_Tools::QUERY_BASE => [
+                        'cache' => true,
+                    ],
+                    Horde_Kolab_Storage_List_Tools::QUERY_ACL => [
+                        'cache' => true,
+                    ],
+                    Horde_Kolab_Storage_List_Tools::QUERY_SHARE => [
+                        'cache' => true,
+                    ],
+                ],
+            ],
+            'queryset' => [
+                'data' => ['queryset' => 'horde'],
+            ],
             'logger' => $this->_injector->getInstance('Horde_Log_Logger'),
-            'log' => array('debug'),
+            'log' => ['debug'],
             'cache' => $this->_injector->getInstance('Horde_Cache'),
-        );
+        ];
 
         // Check if the history system is enabled
         // @todo remove interface_exists check in H6.
@@ -137,7 +139,7 @@ class Horde_Core_Factory_KolabStorage extends Horde_Core_Factory_Base
                 $history = $this->_injector->getInstance('Horde_History');
                 $params['history'] = $history;
                 $params['history_prefix_generator'] = new Horde_Core_Kolab_Storage_HistoryPrefix();
-            } catch(Horde_Exception $e) {
+            } catch (Horde_Exception $e) {
             }
         }
 

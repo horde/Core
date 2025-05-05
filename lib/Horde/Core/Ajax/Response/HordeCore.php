@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
  *
@@ -30,7 +31,7 @@ class Horde_Core_Ajax_Response_HordeCore extends Horde_Core_Ajax_Response
      *
      * @var array
      */
-    public $cssfiles = array();
+    public $cssfiles = [];
 
     /**
      * JavaScript files to be loaded by the browser.
@@ -39,7 +40,7 @@ class Horde_Core_Ajax_Response_HordeCore extends Horde_Core_Ajax_Response
      *
      * @var array
      */
-    public $jsfiles = array();
+    public $jsfiles = [];
 
     /**
      * If true, output HTML-ized JSON instead of application/json.
@@ -105,24 +106,24 @@ class Horde_Core_Ajax_Response_HordeCore extends Horde_Core_Ajax_Response
     {
         global $notification, $page_output;
 
-        $ob = new stdClass;
+        $ob = new stdClass();
         $ob->response = $this->data;
 
-        $stack = $notification->notify(array(
+        $stack = $notification->notify([
             // @todo: Make this configurable for H6
-            'listeners' => array('status', 'audio', 'webnotification'),
-            'raw' => true
-        ));
+            'listeners' => ['status', 'audio', 'webnotification'],
+            'raw' => true,
+        ]);
 
         if (!empty($stack)) {
-            $ob->msgs = array();
+            $ob->msgs = [];
             foreach ($stack as $val) {
-                $ob->msgs[] = array_filter(array(
+                $ob->msgs[] = array_filter([
                     'flags' => $val->flags,
                     'message' => $val->message,
                     'type' => $val->type,
-                    'webnotify' => isset($val->webnotify) ? $val->webnotify : null
-                ));
+                    'webnotify' => $val->webnotify ?? null,
+                ]);
             }
         }
 
@@ -130,7 +131,7 @@ class Horde_Core_Ajax_Response_HordeCore extends Horde_Core_Ajax_Response
             $this->jsfiles[] = strval($val->url);
         }
         $page_output->hsl->clear();
-        foreach ($page_output->css->getStylesheetUrls(array('nobase' => true)) as $val) {
+        foreach ($page_output->css->getStylesheetUrls(['nobase' => true]) as $val) {
             $this->cssfiles[] = strval($val->url);
         }
 

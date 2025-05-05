@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Small factory class for wrapping the injection of Horde_Share objects into
  * the Horde_Share_Object objects. We must use $GLOBALS here instead of keeping

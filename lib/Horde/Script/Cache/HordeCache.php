@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -37,10 +38,10 @@ class Horde_Script_Cache_HordeCache extends Horde_Script_Cache
         global $injector;
 
         if (empty($scripts)) {
-            return array();
+            return [];
         }
 
-        $tmp = array();
+        $tmp = [];
         foreach ($scripts as $val) {
             $tmp[] = $val->modified;
         }
@@ -60,9 +61,9 @@ class Horde_Script_Cache_HordeCache extends Horde_Script_Cache
             : $this->_params['lifetime'];
 
         // Do lifetime checking here, not on cache display page.
-        $js_url = Horde::getCacheUrl('js', array('cid' => $sig));
+        $js_url = Horde::getCacheUrl('js', ['cid' => $sig]);
 
-        $out = array($js_url);
+        $out = [$js_url];
 
         if ($cache->exists($sig, $cache_lifetime)) {
             return $out;
@@ -88,7 +89,7 @@ class Horde_Script_Cache_HordeCache extends Horde_Script_Cache
             );
         }
 
-        $sourcemap_url = Horde::getCacheUrl('js', array('cid' => $sig . '.map'));
+        $sourcemap_url = Horde::getCacheUrl('js', ['cid' => $sig . '.map']);
         $jsmin = $this->_compress->getMinifier($scripts, $sourcemap_url);
 
         $cache->set($sig, $jsmin->minify());

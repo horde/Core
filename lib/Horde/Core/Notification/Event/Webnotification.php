@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -20,15 +21,14 @@
  * @license   http://www.horde.org/licenses/lgpl21 LGPL
  * @package   Core
  */
-class Horde_Core_Notification_Event_Webnotification
-extends Horde_Notification_Event
+class Horde_Core_Notification_Event_Webnotification extends Horde_Notification_Event
 {
     /**
      * Web notification display parameters.
      *
      * @var array
      */
-    public $webnotify = array();
+    public $webnotify = [];
 
     /**
      * Create a webnotification event.
@@ -38,7 +38,7 @@ extends Horde_Notification_Event
      *   - icon: (string) URL to icon to display.
      *   - text: (string) Extra content to display within notification.
      */
-    public static function createEvent($title, array $opts = array())
+    public static function createEvent($title, array $opts = [])
     {
         $ob = new self($title, 'webnotification');
         $ob->webnotify = $opts;

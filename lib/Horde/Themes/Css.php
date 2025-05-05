@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This class provides an interface to handling CSS stylesheets for Horde
  * applications.
@@ -19,7 +20,7 @@ class Horde_Themes_Css
      * @deprecated
      * @since Horde 2.3.0
      */
-    const CSS_URL_REGEX = '/url\s*\(["\']?(.*?)["\']?\)/i';
+    public const CSS_URL_REGEX = '/url\s*\(["\']?(.*?)["\']?\)/i';
 
     /**
      * The theme cache ID.
@@ -33,14 +34,14 @@ class Horde_Themes_Css
      *
      * @var array
      */
-    protected $_cssFiles = array();
+    protected $_cssFiles = [];
 
     /**
      * A list of additional themed stylesheet files to add to the output.
      *
      * @var array
      */
-    protected $_cssThemeFiles = array();
+    protected $_cssThemeFiles = [];
 
     /**
      * Adds an external stylesheet to the output.
@@ -83,16 +84,15 @@ class Horde_Themes_Css
      *
      * @return array  The list of URLs to display (Horde_Url objects).
      */
-    public function getStylesheetUrls(array $opts = array())
+    public function getStylesheetUrls(array $opts = [])
     {
         global $conf, $injector, $prefs;
 
-        $theme = isset($opts['theme'])
-            ? $opts['theme']
-            : $prefs->getValue('theme');
+        $theme = $opts['theme']
+            ?? $prefs->getValue('theme');
         $css = $this->getStylesheets($theme, $opts);
         if (!count($css)) {
-            return array();
+            return [];
         }
 
         $cache_ob = empty($opts['nocache'])
@@ -127,7 +127,7 @@ class Horde_Themes_Css
      *   - uri: (string) URI of stylesheet.
      * </pre>
      */
-    public function getStylesheets($theme = '', array $opts = array())
+    public function getStylesheets($theme = '', array $opts = [])
     {
         global $injector, $prefs, $registry;
 
@@ -135,10 +135,10 @@ class Horde_Themes_Css
             $theme = $prefs->getValue('theme');
         }
 
-        $add_css = $css_out = array();
+        $add_css = $css_out = [];
         $css_list = empty($opts['nobase'])
             ? $this->getBaseStylesheetList()
-            : array();
+            : [];
 
         $css_list = array_unique(array_merge($css_list, array_keys($this->_cssThemeFiles)));
 
@@ -159,11 +159,11 @@ class Horde_Themes_Css
          * by Horde code. */
         foreach ($this->_cssFiles as $f => $u) {
             if (file_exists($f)) {
-                $css_out[] = array(
+                $css_out[] = [
                     'app' => null,
                     'fs' => $f,
-                    'uri' => $u
-                );
+                    'uri' => $u,
+                ];
             }
         }
 
@@ -181,21 +181,23 @@ class Horde_Themes_Css
         /* Add user-defined additional stylesheets. */
         $hooks = $injector->getInstance('Horde_Core_Hooks');
         try {
-            $add_css = array_merge($add_css, $hooks->callHook('cssfiles', 'horde', array($theme)));
-        } catch (Horde_Exception_HookNotSet $e) {}
+            $add_css = array_merge($add_css, $hooks->callHook('cssfiles', 'horde', [$theme]));
+        } catch (Horde_Exception_HookNotSet $e) {
+        }
 
         if ($curr_app != 'horde') {
             try {
-                $add_css = array_merge($add_css, $hooks->callHook('cssfiles', $curr_app, array($theme)));
-            } catch (Horde_Exception_HookNotSet $e) {}
+                $add_css = array_merge($add_css, $hooks->callHook('cssfiles', $curr_app, [$theme]));
+            } catch (Horde_Exception_HookNotSet $e) {
+            }
         }
 
         foreach ($add_css as $f => $u) {
-            $css_out[] = array(
+            $css_out[] = [
                 'app' => $curr_app,
                 'fs' => $f,
-                'uri' => $u
-            );
+                'uri' => $u,
+            ];
         }
 
         return $css_out;
@@ -209,7 +211,7 @@ class Horde_Themes_Css
      */
     public function getBaseStylesheetList()
     {
-        $css_list = array('screen.css');
+        $css_list = ['screen.css'];
 
         if ($GLOBALS['registry']->nlsconfig->curr_rtl) {
             $css_list[] = 'rtl.css';
@@ -217,23 +219,23 @@ class Horde_Themes_Css
 
         /* Collect browser specific stylesheets if needed. */
         switch ($GLOBALS['browser']->getBrowser()) {
-        case 'msie':
-            $ie_major = $GLOBALS['browser']->getMajor();
-            if ($ie_major == 8) {
-                $css_list[] = 'ie8.css';
-            }
-            break;
+            case 'msie':
+                $ie_major = $GLOBALS['browser']->getMajor();
+                if ($ie_major == 8) {
+                    $css_list[] = 'ie8.css';
+                }
+                break;
 
-        case 'opera':
-            $css_list[] = 'opera.css';
-            break;
+            case 'opera':
+                $css_list[] = 'opera.css';
+                break;
 
-        case 'mozilla':
-            $css_list[] = 'mozilla.css';
-            break;
+            case 'mozilla':
+                $css_list[] = 'mozilla.css';
+                break;
 
-        case 'webkit':
-            $css_list[] = 'webkit.css';
+            case 'webkit':
+                $css_list[] = 'webkit.css';
         }
 
         return $css_list;

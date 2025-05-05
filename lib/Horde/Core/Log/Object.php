@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -11,6 +12,7 @@
  * @package   Core
  */
 use Horde\Exception\HordeException;
+
 /**
  * A loggable event, with the display controlled by Horde configuration.
  *
@@ -88,9 +90,11 @@ class Horde_Core_Log_Object
      *   - notracelog: (boolean) If true, don't output backtrace.
      *   - trace: (integer) The trace level of the original log location.
      */
-    public function __construct($event, $priority = null,
-                                array $options = array())
-    {
+    public function __construct(
+        $event,
+        $priority = null,
+        array $options = []
+    ) {
         $text = null;
         $timestamp = time();
 
@@ -124,10 +128,10 @@ class Horde_Core_Log_Object
             if (!empty($event->details)) {
                 $text .= ' ' . $event->details;
             }
-            $trace = array(
+            $trace = [
                 'file' => $event->getFile(),
-                'line' => $event->getLine()
-            );
+                'line' => $event->getLine(),
+            ];
 
             if (empty($options['notracelog']) &&
                 class_exists('Horde_Support_Backtrace')) {
@@ -149,7 +153,7 @@ class Horde_Core_Log_Object
             } elseif (is_object($event)) {
                 $text = strval($event);
                 if (!is_string($text)) {
-                    $text = is_callable(array($event, 'getMessage'))
+                    $text = is_callable([$event, 'getMessage'])
                         ? $event->getMessage()
                         : '';
                 }
@@ -164,11 +168,11 @@ class Horde_Core_Log_Object
                 : 0;
             while ($frame < $trace_count) {
                 if (isset($trace[$frame]['class'])) {
-                    if (!in_array($trace[$frame]['class'], array('Horde_Log_Logger', 'Horde_Core_Log_Logger'))) {
+                    if (!in_array($trace[$frame]['class'], ['Horde_Log_Logger', 'Horde_Core_Log_Logger'])) {
                         break;
                     }
                 } elseif (isset($trace[$frame]['function']) &&
-                          !in_array($trace[$frame]['function'], array('call_user_func', 'call_user_func_array'))) {
+                          !in_array($trace[$frame]['function'], ['call_user_func', 'call_user_func_array'])) {
                     break;
                 }
                 ++$frame;
@@ -190,12 +194,10 @@ class Horde_Core_Log_Object
                 ' [pid ' . getmypid();
 
             if (isset($options['file']) || isset($trace['file'])) {
-                $file = isset($options['file'])
-                    ? $options['file']
-                    : $trace['file'];
-                $line = isset($options['line'])
-                    ? $options['line']
-                    : $trace['line'];
+                $file = $options['file']
+                    ?? $trace['file'];
+                $line = $options['line']
+                    ?? $trace['line'];
 
                 $this->_message .= ' on line ' . $line . ' of "' . $file . '"]';
             } else {
@@ -211,13 +213,13 @@ class Horde_Core_Log_Object
     public function __get($name)
     {
         switch ($name) {
-        case 'backtrace':
-        case 'logged':
-        case 'message':
-        case 'priority':
-        case 'timestamp':
-            $varname = '_' . $name;
-            return $this->$varname;
+            case 'backtrace':
+            case 'logged':
+            case 'message':
+            case 'priority':
+            case 'timestamp':
+                $varname = '_' . $name;
+                return $this->$varname;
         }
     }
 
@@ -226,28 +228,28 @@ class Horde_Core_Log_Object
     public function __set($name, $value)
     {
         switch ($name) {
-        case 'logged':
-            if ($value && $this->_exception instanceof HordeException) {
-                $this->_exception->logged = true;
-            }
-            $this->_logged = $value;
-            break;
+            case 'logged':
+                if ($value && $this->_exception instanceof HordeException) {
+                    $this->_exception->logged = true;
+                }
+                $this->_logged = $value;
+                break;
 
-        case 'message':
-            $this->_message = strval($value);
-            break;
+            case 'message':
+                $this->_message = strval($value);
+                break;
 
-        case 'priority':
-            if (is_integer($value)) {
-                $this->_priority = $value;
-            } elseif (defined('Horde_Log::' . $value)) {
-                $this->_priority = constant('Horde_Log::' . $value);
-            }
-            break;
+            case 'priority':
+                if (is_integer($value)) {
+                    $this->_priority = $value;
+                } elseif (defined('Horde_Log::' . $value)) {
+                    $this->_priority = constant('Horde_Log::' . $value);
+                }
+                break;
 
-        case 'timestamp':
-            $this->_timestamp = intval($value);
-            break;
+            case 'timestamp':
+                $this->_timestamp = intval($value);
+                break;
         }
     }
 
@@ -260,10 +262,10 @@ class Horde_Core_Log_Object
     {
         global $conf;
 
-        $out = array(
+        $out = [
             'level' => $this->priority,
-            'message' => $this->message
-        );
+            'message' => $this->message,
+        ];
 
         if (!empty($conf['log']['time_format'])) {
             $out['timestamp'] = date($conf['log']['time_format'], $this->timestamp);

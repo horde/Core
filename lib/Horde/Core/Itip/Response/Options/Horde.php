@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -22,8 +23,7 @@
  * @package   Core
  * @since     2.17.0
  */
-class Horde_Core_Itip_Response_Options_Horde
-extends Horde_Itip_Response_Options_Horde
+class Horde_Core_Itip_Response_Options_Horde extends Horde_Itip_Response_Options_Horde
 {
     /**
      */

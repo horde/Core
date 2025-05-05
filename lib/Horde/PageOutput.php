@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
  *
@@ -72,21 +73,21 @@ class Horde_PageOutput
      *
      * @var array
      */
-    public $inlineScript = array();
+    public $inlineScript = [];
 
     /**
      * List of LINK tags to output.
      *
      * @var array
      */
-    public $linkTags = array();
+    public $linkTags = [];
 
     /**
      * List of META tags to output.
      *
      * @var array
      */
-    public $metaTags = array();
+    public $metaTags = [];
 
     /**
      * Load the sidebar in this page?
@@ -103,7 +104,7 @@ class Horde_PageOutput
      *
      * @var array
      */
-    public $smartmobileInit = array();
+    public $smartmobileInit = [];
 
     /**
      * Load the topbar in this page?
@@ -202,11 +203,11 @@ class Horde_PageOutput
         }
 
         if (!empty($this->smartmobileInit)) {
-            echo Horde::wrapInlineScript(array(
+            echo Horde::wrapInlineScript([
                 'var horde_jquerymobile_init = function() {' .
-                implode('', $this->smartmobileInit) . '};'
-            ));
-            $this->smartmobileInit = array();
+                implode('', $this->smartmobileInit) . '};',
+            ]);
+            $this->smartmobileInit = [];
         }
 
         $out = $injector->getInstance('Horde_Core_JavascriptCache')->process($this->hsl, $full);
@@ -277,18 +278,18 @@ class Horde_PageOutput
      *
      * @return array|void  Returns the variable list of 'ret_vars' option is true.
      */
-    public function addInlineJsVars($data, $opts = array())
+    public function addInlineJsVars($data, $opts = [])
     {
-        $out = array();
+        $out = [];
 
         if ($opts === true) {
-            $opts = array('onload' => true);
+            $opts = ['onload' => true];
         }
-        $opts = array_merge(array(
+        $opts = array_merge([
             'onload' => false,
             'ret_vars' => false,
-            'top' => false
-        ), $opts);
+            'top' => false,
+        ], $opts);
 
         foreach ($data as $key => $val) {
             if ($key[0] == '-') {
@@ -319,23 +320,23 @@ class Horde_PageOutput
             return;
         }
 
-        $script = array();
+        $script = [];
 
         foreach ($this->inlineScript as $key => $val) {
             $val = implode('', $val);
 
             if (!$raw && $key) {
                 switch ($key) {
-                case 'prototype':
-                // @todo Remove 'dom' which is here for BC only.
-                case 'dom':
-                    $script[] = 'document.observe("dom:loaded",function(){' . $val . '});';
-                    break;
-                case 'jquery':
-                    $script[] = '$(function(){' . $val . '});';
-                    break;
-                default:
-                    throw new RuntimeException('Unknown JS framework: ' . $key);
+                    case 'prototype':
+                        // @todo Remove 'dom' which is here for BC only.
+                    case 'dom':
+                        $script[] = 'document.observe("dom:loaded",function(){' . $val . '});';
+                        break;
+                    case 'jquery':
+                        $script[] = '$(function(){' . $val . '});';
+                        break;
+                    default:
+                        throw new RuntimeException('Unknown JS framework: ' . $key);
                 }
             } else {
                 $script[] = $val;
@@ -346,7 +347,7 @@ class Horde_PageOutput
             ? implode('', $script)
             : Horde::wrapInlineScript($script);
 
-        $this->inlineScript = array();
+        $this->inlineScript = [];
     }
 
     /**
@@ -354,14 +355,14 @@ class Horde_PageOutput
      */
     public function includeFavicon()
     {
-        $img = strval(Horde_Themes::img('favicon.ico', array(
-            'nohorde' => true
-        )));
+        $img = strval(Horde_Themes::img('favicon.ico', [
+            'nohorde' => true,
+        ]));
 
         if (!$img) {
-            $img = strval(Horde_Themes::img('favicon.ico', array(
-                'app' => 'horde'
-            )));
+            $img = strval(Horde_Themes::img('favicon.ico', [
+                'app' => 'horde',
+            ]));
         }
 
         echo '<link type="image/x-icon" href="' . $img . '" rel="shortcut icon" />';
@@ -376,10 +377,10 @@ class Horde_PageOutput
      */
     public function addMetaTag($name, $content, $http_equiv = true)
     {
-        $this->metaTags[$name] = array(
+        $this->metaTags[$name] = [
             'c' => $content,
-            'h' => $http_equiv
-        );
+            'h' => $http_equiv,
+        ];
     }
 
     /**
@@ -415,7 +416,7 @@ class Horde_PageOutput
                 '="' . $key . "\" />\n";
         }
 
-        $this->metaTags = array();
+        $this->metaTags = [];
     }
 
     /**
@@ -426,12 +427,12 @@ class Horde_PageOutput
      *
      * @param array $opts  Non-default tag elements.
      */
-    public function addLinkTag(array $opts = array())
+    public function addLinkTag(array $opts = [])
     {
-        $opts = array_merge(array(
+        $opts = array_merge([
             'rel' => 'alternate',
-            'type' => 'application/rss+xml'
-        ), $opts);
+            'type' => 'application/rss+xml',
+        ], $opts);
 
         $out = '<link';
 
@@ -450,7 +451,7 @@ class Horde_PageOutput
     public function outputLinkTags()
     {
         echo implode("\n", $this->linkTags);
-        $this->linkTags = array();
+        $this->linkTags = [];
     }
 
     /**
@@ -488,9 +489,10 @@ class Horde_PageOutput
      *                       Horde_Themes_Css::getStylesheetUrls().
      * @param boolean $full  Return a full URL? @since Horde_Core 2.28.0
      */
-    public function includeStylesheetFiles(array $opts = array(),
-                                           $full = false)
-    {
+    public function includeStylesheetFiles(
+        array $opts = [],
+        $full = false
+    ) {
         foreach ($this->css->getStylesheetUrls($opts) as $val) {
             echo '<link href="' . $val->toString(false, $full) . '" rel="stylesheet" type="text/css" />';
         }
@@ -550,16 +552,16 @@ class Horde_PageOutput
      *   - title: (string)
      *   - view: (integer)
      */
-    public function header(array $opts = array())
+    public function header(array $opts = [])
     {
         global $injector, $language, $registry, $session;
 
-        $view = new Horde_View(array(
-            'templatePath' => $registry->get('templates', 'horde') . '/common'
-        ));
+        $view = new Horde_View([
+            'templatePath' => $registry->get('templates', 'horde') . '/common',
+        ]);
 
         $view->outputJs = !$this->deferScripts;
-        $view->stylesheetOpts = array();
+        $view->stylesheetOpts = [];
 
         $this->_view = empty($opts['view'])
             ? ($registry->hasView($registry->getView()) ? $registry->getView() : Horde_Registry::VIEW_BASIC)
@@ -570,76 +572,77 @@ class Horde_PageOutput
         }
 
         switch ($this->_view) {
-        case $registry::VIEW_BASIC:
-            $this->_addBasicScripts();
-            break;
+            case $registry::VIEW_BASIC:
+                $this->_addBasicScripts();
+                break;
 
-        case $registry::VIEW_DYNAMIC:
-            $this->ajax = true;
-            $this->growler = true;
+            case $registry::VIEW_DYNAMIC:
+                $this->ajax = true;
+                $this->growler = true;
 
-            $this->_addBasicScripts();
-            $this->addScriptPackage('Horde_Core_Script_Package_Popup');
-            break;
+                $this->_addBasicScripts();
+                $this->addScriptPackage('Horde_Core_Script_Package_Popup');
+                break;
 
-        case $registry::VIEW_MINIMAL:
-            $view->stylesheetOpts['subonly'] = true;
+            case $registry::VIEW_MINIMAL:
+                $view->stylesheetOpts['subonly'] = true;
 
-            $view->minimalView = true;
+                $view->minimalView = true;
 
-            $this->sidebar = $this->topbar = false;
-            break;
+                $this->sidebar = $this->topbar = false;
+                break;
 
-        case $registry::VIEW_SMARTMOBILE:
-            $smobile_files = array(
-                ($this->debug ? 'jquery.mobile/jquery.js' : 'jquery.mobile/jquery.min.js'),
-                'growler-jquery.js',
-                'horde-jquery.js',
-                'smartmobile.js',
-                'horde-jquery-init.js',
-                ($this->debug ? 'jquery.mobile/jquery.mobile.js' : 'jquery.mobile/jquery.mobile.min.js')
-            );
-            foreach ($smobile_files as $val) {
-                $ob = $this->addScriptFile(new Horde_Script_File_JsFramework($val, 'horde'));
-                $ob->cache = 'package_smartmobile';
-            }
+            case $registry::VIEW_SMARTMOBILE:
+                $smobile_files = [
+                    ($this->debug ? 'jquery.mobile/jquery.js' : 'jquery.mobile/jquery.min.js'),
+                    'growler-jquery.js',
+                    'horde-jquery.js',
+                    'smartmobile.js',
+                    'horde-jquery-init.js',
+                    ($this->debug ? 'jquery.mobile/jquery.mobile.js' : 'jquery.mobile/jquery.mobile.min.js'),
+                ];
+                foreach ($smobile_files as $val) {
+                    $ob = $this->addScriptFile(new Horde_Script_File_JsFramework($val, 'horde'));
+                    $ob->cache = 'package_smartmobile';
+                }
 
-            $this->smartmobileInit = array_merge(array(
-                '$.mobile.page.prototype.options.backBtnText = "' . Horde_Core_Translation::t("Back") .'";',
-                '$.mobile.dialog.prototype.options.closeBtnText = "' . Horde_Core_Translation::t("Close") .'";',
-                '$.mobile.listview.prototype.options.filterPlaceholder = "' . Horde_Core_Translation::t("Filter items...") . '";',
-                '$.mobile.loader.prototype.options.text = "' . Horde_Core_Translation::t("loading") . '";'
-            ),
-                isset($opts['smartmobileinit']) ? $opts['smartmobileinit'] : array(),
-                $this->smartmobileInit
-            );
+                $this->smartmobileInit = array_merge(
+                    [
+                    '$.mobile.page.prototype.options.backBtnText = "' . Horde_Core_Translation::t('Back') .'";',
+                    '$.mobile.dialog.prototype.options.closeBtnText = "' . Horde_Core_Translation::t('Close') .'";',
+                    '$.mobile.listview.prototype.options.filterPlaceholder = "' . Horde_Core_Translation::t('Filter items...') . '";',
+                    '$.mobile.loader.prototype.options.text = "' . Horde_Core_Translation::t('loading') . '";',
+            ],
+                    $opts['smartmobileinit'] ?? [],
+                    $this->smartmobileInit
+                );
 
-            $this->addInlineJsVars(array(
-                'HordeMobile.conf' => array(
-                    'ajax_url' => $registry->getServiceLink('ajax', $registry->getApp())->url,
-                    'logout_url' => strval($registry->getServiceLink('logout')),
-                    'sid' => SID,
-                    'token' => $session->getToken()
-                )
-            ));
+                $this->addInlineJsVars([
+                    'HordeMobile.conf' => [
+                        'ajax_url' => $registry->getServiceLink('ajax', $registry->getApp())->url,
+                        'logout_url' => strval($registry->getServiceLink('logout')),
+                        'sid' => SID,
+                        'token' => $session->getToken(),
+                    ],
+                ]);
 
-            $this->addMetaTag('viewport', 'width=device-width, initial-scale=1', false);
+                $this->addMetaTag('viewport', 'width=device-width, initial-scale=1', false);
 
-            $view->stylesheetOpts['subonly'] = true;
+                $view->stylesheetOpts['subonly'] = true;
 
-            $this->addStylesheet(
-                $registry->get('jsfs', 'horde') . '/jquery.mobile/jquery.mobile.min.css',
-                $registry->get('jsuri', 'horde') . '/jquery.mobile/jquery.mobile.min.css'
-            );
+                $this->addStylesheet(
+                    $registry->get('jsfs', 'horde') . '/jquery.mobile/jquery.mobile.min.css',
+                    $registry->get('jsuri', 'horde') . '/jquery.mobile/jquery.mobile.min.css'
+                );
 
-            $view->smartmobileView = true;
+                $view->smartmobileView = true;
 
-            // Force JS to load at top of page, so we don't see flicker when
-            // mobile styles are applied.
-            $view->outputJs = true;
+                // Force JS to load at top of page, so we don't see flicker when
+                // mobile styles are applied.
+                $view->outputJs = true;
 
-            $this->sidebar = $this->topbar = false;
-            break;
+                $this->sidebar = $this->topbar = false;
+                break;
         }
 
         $view->stylesheetOpts['sub'] = Horde_Themes::viewDir($this->_view);
@@ -648,7 +651,7 @@ class Horde_PageOutput
             $this->addScriptFile(new Horde_Script_File_JsFramework('hordecore.js', 'horde'));
 
             /* Configuration used in core javascript files. */
-            $js_conf = array_filter(array(
+            $js_conf = array_filter([
                 /* URLs */
                 'URI_AJAX' => $registry->getServiceLink('ajax', $registry->getApp())->url,
                 'URI_DLOAD' => strval($registry->getServiceLink('download', $registry->getApp())),
@@ -662,36 +665,36 @@ class Horde_PageOutput
                 /* Other config. */
                 'growler_log' => $this->topbar,
                 'popup_height' => 610,
-                'popup_width' => 820
-            ));
+                'popup_width' => 820,
+            ]);
 
             /* Gettext strings used in core javascript files. */
-            $js_text = array(
-                'ajax_error' => Horde_Core_Translation::t("Error when communicating with the server."),
-                'ajax_recover' => Horde_Core_Translation::t("The connection to the server has been restored."),
-                'ajax_timeout' => Horde_Core_Translation::t("There has been no contact with the server for several minutes. The server may be temporarily unavailable or network problems may be interrupting your session. You will not see any updates until the connection is restored."),
-                'snooze' => sprintf(Horde_Core_Translation::t("You can snooze it for %s or %s dismiss %s it entirely"), '#{time}', '#{dismiss_start}', '#{dismiss_end}'),
-                'snooze_select' => array(
-                    '0' => Horde_Core_Translation::t("Select..."),
-                    '5' => Horde_Core_Translation::t("5 minutes"),
-                    '15' => Horde_Core_Translation::t("15 minutes"),
-                    '60' => Horde_Core_Translation::t("1 hour"),
-                    '360' => Horde_Core_Translation::t("6 hours"),
-                    '1440' => Horde_Core_Translation::t("1 day")
-                ),
-                'dismissed' => Horde_Core_Translation::t("The alarm was dismissed.")
-            );
+            $js_text = [
+                'ajax_error' => Horde_Core_Translation::t('Error when communicating with the server.'),
+                'ajax_recover' => Horde_Core_Translation::t('The connection to the server has been restored.'),
+                'ajax_timeout' => Horde_Core_Translation::t('There has been no contact with the server for several minutes. The server may be temporarily unavailable or network problems may be interrupting your session. You will not see any updates until the connection is restored.'),
+                'snooze' => sprintf(Horde_Core_Translation::t('You can snooze it for %s or %s dismiss %s it entirely'), '#{time}', '#{dismiss_start}', '#{dismiss_end}'),
+                'snooze_select' => [
+                    '0' => Horde_Core_Translation::t('Select...'),
+                    '5' => Horde_Core_Translation::t('5 minutes'),
+                    '15' => Horde_Core_Translation::t('15 minutes'),
+                    '60' => Horde_Core_Translation::t('1 hour'),
+                    '360' => Horde_Core_Translation::t('6 hours'),
+                    '1440' => Horde_Core_Translation::t('1 day'),
+                ],
+                'dismissed' => Horde_Core_Translation::t('The alarm was dismissed.'),
+            ];
 
             if ($this->topbar) {
-                $js_text['growlerclear'] = Horde_Core_Translation::t("Clear All");
-                $js_text['growlerinfo'] = Horde_Core_Translation::t("This is the notification log.");
-                $js_text['growlernoalerts'] = Horde_Core_Translation::t("No Alerts");
+                $js_text['growlerclear'] = Horde_Core_Translation::t('Clear All');
+                $js_text['growlerinfo'] = Horde_Core_Translation::t('This is the notification log.');
+                $js_text['growlernoalerts'] = Horde_Core_Translation::t('No Alerts');
             }
 
-            $this->addInlineJsVars(array(
+            $this->addInlineJsVars([
                 'HordeCore.conf' => $js_conf,
-                'HordeCore.text' => $js_text
-            ), array('top' => true));
+                'HordeCore.text' => $js_text,
+            ], ['top' => true]);
         }
 
         if ($this->growler) {
@@ -758,10 +761,10 @@ class Horde_PageOutput
     {
         global $prefs;
 
-        $base_js = array(
+        $base_js = [
             'prototype.js',
-            'horde.js'
-        );
+            'horde.js',
+        ];
 
         foreach ($base_js as $val) {
             $ob = $this->addScriptFile(new Horde_Script_File_JsFramework($val, 'horde'));
@@ -788,35 +791,35 @@ class Horde_PageOutput
      * @param array $opts  Options:
      *   - NONE currently
      */
-    public function footer(array $opts = array())
+    public function footer(array $opts = [])
     {
         global $browser, $notification, $registry;
 
-        $view = new Horde_View(array(
-            'templatePath' => $registry->get('templates', 'horde') . '/common'
-        ));
+        $view = new Horde_View([
+            'templatePath' => $registry->get('templates', 'horde') . '/common',
+        ]);
 
         if (!$browser->isMobile()) {
-            $notification->notify(array('listeners' => array('audio')));
+            $notification->notify(['listeners' => ['audio']]);
         }
         $view->outputJs = $this->deferScripts;
         $view->pageOutput = $this;
 
         switch ($this->_view) {
-        case $registry::VIEW_MINIMAL:
-            $view->minimalView = true;
-            break;
+            case $registry::VIEW_MINIMAL:
+                $view->minimalView = true;
+                break;
 
-        case $registry::VIEW_SMARTMOBILE:
-            $view->smartmobileView = true;
-            break;
+            case $registry::VIEW_SMARTMOBILE:
+                $view->smartmobileView = true;
+                break;
 
-        case $registry::VIEW_BASIC:
-            $view->basicView = true;
-            if ($this->sidebar) {
-                $view->sidebar = Horde::sidebar();
-            }
-            break;
+            case $registry::VIEW_BASIC:
+                $view->basicView = true;
+                if ($this->sidebar) {
+                    $view->sidebar = Horde::sidebar();
+                }
+                break;
         }
 
         echo $view->render('footer');

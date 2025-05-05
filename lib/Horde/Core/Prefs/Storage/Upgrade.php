@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Utility methods to upgrade Horde 3 preference values.
  *

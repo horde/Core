@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class that extends the base Highlightquotes class to allow toggling of
  * quoteblocks via javascript.
@@ -25,7 +26,7 @@ class Horde_Core_Text_Filter_Highlightquotes extends Horde_Text_Filter_Highlight
      *          DEFAULT: false
      * </pre>
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
         if (empty($params['noJS'])) {
             $page_output = $GLOBALS['injector']->getInstance('Horde_PageOutput');
@@ -48,8 +49,8 @@ class Horde_Core_Text_Filter_Highlightquotes extends Horde_Text_Filter_Highlight
     {
         return (($this->_params['citeblock']) ? '<br />' : '') .
             '<div class="toggleQuoteParent">' .
-            '<span class="widget toggleQuoteShow"' . ($this->_params['hideBlocks'] ? '' : ' style="display:none"') . '>' . htmlspecialchars(sprintf(Horde_Core_Translation::t("[Show Quoted Text - %d lines]"), $qcount)) . '</span>' .
-            '<span class="widget toggleQuoteHide"' . ($this->_params['hideBlocks'] ? ' style="display:none"' : '') . '>' . htmlspecialchars(Horde_Core_Translation::t("[Hide Quoted Text]")) . '</span>';
+            '<span class="widget toggleQuoteShow"' . ($this->_params['hideBlocks'] ? '' : ' style="display:none"') . '>' . htmlspecialchars(sprintf(Horde_Core_Translation::t('[Show Quoted Text - %d lines]'), $qcount)) . '</span>' .
+            '<span class="widget toggleQuoteHide"' . ($this->_params['hideBlocks'] ? ' style="display:none"' : '') . '>' . htmlspecialchars(Horde_Core_Translation::t('[Hide Quoted Text]')) . '</span>';
     }
 
     /**

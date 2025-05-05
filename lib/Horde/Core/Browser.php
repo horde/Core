@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Extend the base Browser class by allowing a hook to modify browser
  * behaviors.
@@ -23,8 +24,9 @@ class Horde_Core_Browser extends Horde_Browser
 
         try {
             $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
-                ->callHook('browser_modify', 'horde', array($this));
-        } catch (Horde_Exception_HookNotSet $e) {}
+                ->callHook('browser_modify', 'horde', [$this]);
+        } catch (Horde_Exception_HookNotSet $e) {
+        }
     }
 
 }

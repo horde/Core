@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based Horde_Tree:: factory.
  *
@@ -30,7 +31,7 @@ class Horde_Core_Factory_Tree extends Horde_Core_Factory_Base
      *
      * @var array
      */
-    private $_instances = array();
+    private $_instances = [];
 
     /**
      * Return the Horde_Tree:: instance.
@@ -47,33 +48,33 @@ class Horde_Core_Factory_Tree extends Horde_Core_Factory_Base
      * @return Horde_Tree_Renderer_Base  The singleton instance.
      * @throws Horde_Tree_Exception
      */
-    public function create($name, $renderer, array $params = array())
+    public function create($name, $renderer, array $params = [])
     {
         $lc_renderer = Horde_String::lower($renderer);
         $id = $name . '|' . $lc_renderer;
 
         if (!isset($this->_instances[$id])) {
             switch ($lc_renderer) {
-            case 'html':
-                $renderer = 'Horde_Core_Tree_Renderer_Html';
-                break;
+                case 'html':
+                    $renderer = 'Horde_Core_Tree_Renderer_Html';
+                    break;
 
-            case 'javascript':
-                $renderer = 'Horde_Core_Tree_Renderer_Javascript';
-                break;
+                case 'javascript':
+                    $renderer = 'Horde_Core_Tree_Renderer_Javascript';
+                    break;
 
-            case 'simplehtml':
-                $renderer = 'Horde_Core_Tree_Renderer_Simplehtml';
-                break;
+                case 'simplehtml':
+                    $renderer = 'Horde_Core_Tree_Renderer_Simplehtml';
+                    break;
             }
 
             $params['name'] = $name;
 
             if (empty($params['nosession'])) {
-                $params['session'] = array(
-                    'get' => array(__CLASS__, 'getSession'),
-                    'set' => array(__CLASS__, 'setSession')
-                );
+                $params['session'] = [
+                    'get' => [__CLASS__, 'getSession'],
+                    'set' => [__CLASS__, 'setSession'],
+                ];
             }
 
             $this->_instances[$id] = Horde_Tree_Renderer::factory($renderer, $params);

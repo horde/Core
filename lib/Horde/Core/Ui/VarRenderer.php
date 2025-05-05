@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2003-2017 Horde LLC (http://www.horde.org/)
  *
@@ -35,7 +36,7 @@ class Horde_Core_Ui_VarRenderer
      * @param array $params  The name of the variable which will track this UI
      *                       widget's state.
      */
-    public function __construct($params = array())
+    public function __construct($params = [])
     {
         $this->_params = $params;
     }
@@ -52,7 +53,7 @@ class Horde_Core_Ui_VarRenderer
      * @return Horde_Core_Ui_VarRenderer  A subclass instance.
      * @throws Horde_Exception
      */
-    public static function factory($driver, $params = array())
+    public static function factory($driver, $params = [])
     {
         if (is_array($driver)) {
             $app = $driver[0];

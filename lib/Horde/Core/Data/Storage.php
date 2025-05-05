@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
  *
@@ -23,7 +24,7 @@
 class Horde_Core_Data_Storage implements Horde_Data_Storage
 {
     /* Data storage prefix. */
-    const PREFIX = 'data_import';
+    public const PREFIX = 'data_import';
 
     /**
      * The HashTable object.
@@ -96,11 +97,11 @@ class Horde_Core_Data_Storage implements Horde_Data_Storage
      */
     private function _hkey($key)
     {
-        return implode(':', array(
+        return implode(':', [
             self::PREFIX,
             $GLOBALS['registry']->getAuth(),
-            $key
-        ));
+            $key,
+        ]);
     }
 
 }

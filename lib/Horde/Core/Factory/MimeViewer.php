@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
  *
@@ -27,7 +28,7 @@ class Horde_Core_Factory_MimeViewer extends Horde_Core_Factory_Base
      *
      * @var array
      */
-    private $_config = array();
+    private $_config = [];
 
     /**
      * Attempts to return a concrete Horde_Mime_Viewer object based on the
@@ -45,17 +46,15 @@ class Horde_Core_Factory_MimeViewer extends Horde_Core_Factory_Base
      * @return Horde_Mime_Viewer_Base  The newly created instance.
      * @throws Horde_Mime_Viewer_Exception
      */
-    public function create(Horde_Mime_Part $mime, array $opts = array())
+    public function create(Horde_Mime_Part $mime, array $opts = [])
     {
-        $app = isset($opts['app'])
-            ? $opts['app']
-            : $GLOBALS['registry']->getApp();
+        $app = $opts['app']
+            ?? $GLOBALS['registry']->getApp();
 
-        $type = isset($opts['type'])
-            ? $opts['type']
-            : $mime->getType();
+        $type = $opts['type']
+            ?? $mime->getType();
 
-        list($driver, $params) = $this->getViewerConfig($type, $app);
+        [$driver, $params] = $this->getViewerConfig($type, $app);
 
         return new $driver($mime, $params);
     }
@@ -77,78 +76,78 @@ class Horde_Core_Factory_MimeViewer extends Horde_Core_Factory_Base
             ? $config['driver']
             : $config['app'] . '_Mime_Viewer_' . $config['driver'];
 
-        $params = array_merge($config, array(
+        $params = array_merge($config, [
             'charset' => 'UTF-8',
             // TODO: Logging
             // 'logger' => $this->_injector->getInstance('Horde_Log_Logger'),
-            'temp_file' => array('Horde', 'getTempFile'),
-            'text_filter' => array($this->_injector->getInstance('Horde_Core_Factory_TextFilter'), 'filter')
-        ));
+            'temp_file' => ['Horde', 'getTempFile'],
+            'text_filter' => [$this->_injector->getInstance('Horde_Core_Factory_TextFilter'), 'filter'],
+        ]);
 
         switch ($config['driver']) {
-        case 'Deb':
-        case 'Rpm':
-            $params['monospace'] = 'fixed';
-            break;
+            case 'Deb':
+            case 'Rpm':
+                $params['monospace'] = 'fixed';
+                break;
 
-        case 'Html':
-            $params['browser'] = $GLOBALS['browser'];
-            $params['dns'] = $this->_injector->getInstance('Net_DNS2_Resolver');
-            $params['external_callback'] = array('Horde', 'externalUrl');
-            break;
+            case 'Html':
+                $params['browser'] = $GLOBALS['browser'];
+                $params['dns'] = $this->_injector->getInstance('Net_DNS2_Resolver');
+                $params['external_callback'] = ['Horde', 'externalUrl'];
+                break;
 
-        case 'Ooo':
-            $params['temp_dir'] = Horde::getTempDir();
-            $params['zip'] = Horde_Compress::factory('Zip');
-            break;
+            case 'Ooo':
+                $params['temp_dir'] = Horde::getTempDir();
+                $params['zip'] = Horde_Compress::factory('Zip');
+                break;
 
-        case 'Rar':
-            $params['monospace'] = 'fixed';
-            $params['rar'] = Horde_Compress::factory('Rar');
-            break;
+            case 'Rar':
+                $params['monospace'] = 'fixed';
+                $params['rar'] = Horde_Compress::factory('Rar');
+                break;
 
-        case 'Report':
-        case 'Security':
-            $params['viewer_callback'] = array($this, 'getViewerCallback');
-            break;
+            case 'Report':
+            case 'Security':
+                $params['viewer_callback'] = [$this, 'getViewerCallback'];
+                break;
 
-        case 'Syntaxhighlighter':
-            if ($config['app'] == 'horde') {
-                $driver = 'Horde_Core_Mime_Viewer_Syntaxhighlighter';
-            }
-            $params['registry'] = $GLOBALS['registry'];
-            break;
+            case 'Syntaxhighlighter':
+                if ($config['app'] == 'horde') {
+                    $driver = 'Horde_Core_Mime_Viewer_Syntaxhighlighter';
+                }
+                $params['registry'] = $GLOBALS['registry'];
+                break;
 
-        case 'Tgz':
-            $params['gzip'] = Horde_Compress::factory('Gzip');
-            $params['monospace'] = 'fixed';
-            $params['tar'] = Horde_Compress::factory('Tar');
-            break;
+            case 'Tgz':
+                $params['gzip'] = Horde_Compress::factory('Gzip');
+                $params['monospace'] = 'fixed';
+                $params['tar'] = Horde_Compress::factory('Tar');
+                break;
 
-        case 'Tnef':
-            $params['tnef'] = Horde_Compress::factory('Tnef');
-            break;
+            case 'Tnef':
+                $params['tnef'] = Horde_Compress::factory('Tnef');
+                break;
 
-        case 'Vcard':
-            if ($config['app'] == 'horde') {
-                $driver = 'Horde_Core_Mime_Viewer_Vcard';
-            }
-            $params['browser'] = $GLOBALS['browser'];
-            $params['notification'] = $GLOBALS['notification'];
-            $params['prefs'] = $GLOBALS['prefs'];
-            $params['registry'] = $GLOBALS['registry'];
-            break;
+            case 'Vcard':
+                if ($config['app'] == 'horde') {
+                    $driver = 'Horde_Core_Mime_Viewer_Vcard';
+                }
+                $params['browser'] = $GLOBALS['browser'];
+                $params['notification'] = $GLOBALS['notification'];
+                $params['prefs'] = $GLOBALS['prefs'];
+                $params['registry'] = $GLOBALS['registry'];
+                break;
 
-        case 'Zip':
-            $params['monospace'] = 'fixed';
-            $params['zip'] = Horde_Compress::factory('Zip');
-            break;
+            case 'Zip':
+                $params['monospace'] = 'fixed';
+                $params['zip'] = Horde_Compress::factory('Zip');
+                break;
         }
 
-        return array(
+        return [
             $this->_getDriverName($driver, 'Horde_Mime_Viewer'),
-            $params
-        );
+            $params,
+        ];
     }
 
     /**
@@ -165,10 +164,12 @@ class Horde_Core_Factory_MimeViewer extends Horde_Core_Factory_Base
      * @return Horde_Mime_Viewer_Base  The newly created instance.
      * @throws Horde_Mime_Viewer_Exception
      */
-    public function getViewerCallback(Horde_Mime_Viewer_Base $viewer,
-                                      Horde_Mime_Part $mime, $type)
-    {
-        return $this->create($mime, array('type' => $type));
+    public function getViewerCallback(
+        Horde_Mime_Viewer_Base $viewer,
+        Horde_Mime_Part $mime,
+        $type
+    ) {
+        return $this->create($mime, ['type' => $type]);
     }
 
     /**
@@ -184,11 +185,10 @@ class Horde_Core_Factory_MimeViewer extends Horde_Core_Factory_Base
      * @return Horde_Themes_Image  An object which contains the URI
      *                             and filesystem location of the image.
      */
-    public function getIcon($mime, array $opts = array())
+    public function getIcon($mime, array $opts = [])
     {
-        $app = isset($opts['app'])
-            ? $opts['app']
-            : $GLOBALS['registry']->getApp();
+        $app = $opts['app']
+            ?? $GLOBALS['registry']->getApp();
 
         $type = ($mime instanceof Horde_Mime_Part)
             ? $mime->getType()
@@ -197,10 +197,10 @@ class Horde_Core_Factory_MimeViewer extends Horde_Core_Factory_Base
         $config = $this->_getDriver($type, $app);
 
         if (!isset($config['icon'])) {
-            $config['icon'] = array(
+            $config['icon'] = [
                 'app' => 'horde',
-                'icon' => 'text.png'
-            );
+                'icon' => 'text.png',
+            ];
         }
 
         return Horde_Themes::img('mime/' . $config['icon']['icon'], $config['icon']['app']);
@@ -228,13 +228,13 @@ class Horde_Core_Factory_MimeViewer extends Horde_Core_Factory_Base
         try {
             $aconfig = $registry->loadConfigFile('mime_drivers.php', 'mime_drivers', $app)->config['mime_drivers'];
         } catch (Horde_Exception $e) {
-            $aconfig = array();
+            $aconfig = [];
         }
 
-        $config = array(
-            'config' => array(),
-            'handles' => array()
-        );
+        $config = [
+            'config' => [],
+            'handles' => [],
+        ];
 
         foreach ($aconfig as $key => $val) {
             if (empty($val['disable'])) {
@@ -249,7 +249,7 @@ class Horde_Core_Factory_MimeViewer extends Horde_Core_Factory_Base
 
         /* Make sure there is a default entry. */
         if (($app == 'horde') && !isset($config['config']['default'])) {
-            $config['config']['default'] = array();
+            $config['config']['default'] = [];
         }
 
         $this->_config[$app] = $config;
@@ -269,18 +269,18 @@ class Horde_Core_Factory_MimeViewer extends Horde_Core_Factory_Base
 
         /* Start with default driver, and then merge in wildcard and exact
          * match configs. */
-        $config = array();
-        list($ptype,) = explode('/', $type, 2);
+        $config = [];
+        [$ptype, ] = explode('/', $type, 2);
         $wild = $ptype . '/*';
 
-        $app_list = array(
-            array('horde', 'default', 'config'),
-            array($app, 'default', 'config'),
-            array('horde', $wild, 'handles'),
-            array($app, $wild, 'handles'),
-            array('horde', $type, 'handles'),
-            array($app, $type, 'handles')
-        );
+        $app_list = [
+            ['horde', 'default', 'config'],
+            [$app, 'default', 'config'],
+            ['horde', $wild, 'handles'],
+            [$app, $wild, 'handles'],
+            ['horde', $type, 'handles'],
+            [$app, $type, 'handles'],
+        ];
         if ($app == 'horde') {
             unset($app_list[1], $app_list[3], $app_list[5]);
         }
@@ -293,22 +293,22 @@ class Horde_Core_Factory_MimeViewer extends Horde_Core_Factory_Base
             if ($driver) {
                 $tmp = $this->_config[$val[0]]['config'][$driver];
                 if (isset($tmp['icons'])) {
-                    foreach (array($type, $wild, 'default') as $val2) {
+                    foreach ([$type, $wild, 'default'] as $val2) {
                         if (isset($tmp['icons'][$val2])) {
-                            $tmp['icon'] = array(
+                            $tmp['icon'] = [
                                 'app' => $val[0],
-                                'icon' => $tmp['icons'][$val2]
-                            );
+                                'icon' => $tmp['icons'][$val2],
+                            ];
                             break;
                         }
                     }
                     unset($tmp['icons']);
                 }
 
-                $config = array_merge(array_replace_recursive($config, $tmp), array(
+                $config = array_merge(array_replace_recursive($config, $tmp), [
                     'app' => $val[0],
-                    'driver' => $driver
-                ));
+                    'driver' => $driver,
+                ]);
 
             }
         }

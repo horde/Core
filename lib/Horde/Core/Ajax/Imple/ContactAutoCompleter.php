@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
  *
@@ -37,20 +38,20 @@ abstract class Horde_Core_Ajax_Imple_ContactAutoCompleter extends Horde_Core_Aja
      */
     protected function _getAutoCompleterParams()
     {
-        return array(
+        return [
             'onSelect' => 'function (v) { return v + ", "; }',
             'onType' => 'function (e) { return e.include("<") ? "" : e; }',
-            'tokens' => array(',')
-        );
+            'tokens' => [','],
+        ];
     }
 
     /**
      */
     protected function _handleAutoCompleter($input)
     {
-        return array_map('strval', $this->getAddressList($input, array(
-            'levenshtein' => true
-        ))->base_addresses);
+        return array_map('strval', $this->getAddressList($input, [
+            'levenshtein' => true,
+        ])->base_addresses);
     }
 
     /**
@@ -64,19 +65,19 @@ abstract class Horde_Core_Ajax_Imple_ContactAutoCompleter extends Horde_Core_Aja
      *
      * @return Horde_Mail_Rfc822_List  Expand results.
      */
-    public function getAddressList($str = '', array $opts = array())
+    public function getAddressList($str = '', array $opts = [])
     {
         $searchpref = $this->_getAddressbookSearchParams();
 
         try {
-            $search = $GLOBALS['registry']->call('contacts/search', array($str, array(
+            $search = $GLOBALS['registry']->call('contacts/search', [$str, [
                 'fields' => $searchpref->fields,
-                'returnFields' => array('email', 'name'),
+                'returnFields' => ['email', 'name'],
                 'rfc822Return' => true,
                 'sources' => $searchpref->sources,
                 'count_only' => !empty($opts['count_only']),
-                'emailSearch' => true
-            )));
+                'emailSearch' => true,
+            ]]);
         } catch (Horde_Exception $e) {
             Horde::log($e, 'ERR');
             return new Horde_Mail_Rfc822_List();
@@ -90,7 +91,7 @@ abstract class Horde_Core_Ajax_Imple_ContactAutoCompleter extends Horde_Core_Aja
             return $search;
         }
 
-        $sort_list = array();
+        $sort_list = [];
         foreach ($search->base_addresses as $val) {
             $sort_list[strval($val)] = @levenshtein($str, $val);
         }

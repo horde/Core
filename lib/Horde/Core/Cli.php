@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Wrapper for Horde_Cli that adds functionality specific to Horde
  * applications.
@@ -37,19 +38,19 @@ class Horde_Core_Cli extends Horde_Cli
         $default = $field['default'];
         $values = null;
         if (isset($field['switch'])) {
-            $values = array();
+            $values = [];
             foreach ($field['switch'] as $case => $case_field) {
                 $values[$case] = $case_field['desc'];
             }
         } else {
             switch ($field['_type']) {
-            case 'boolean':
-                $values = array(true => 'Yes', false => 'No');
-                $default = (int)$default;
-                break;
-            case 'enum':
-                $values = $field['values'];
-                break;
+                case 'boolean':
+                    $values = [true => 'Yes', false => 'No'];
+                    $default = (int)$default;
+                    break;
+                case 'enum':
+                    $values = $field['values'];
+                    break;
             }
             if (!empty($field['required'])) {
                 $question .= $this->red('*');

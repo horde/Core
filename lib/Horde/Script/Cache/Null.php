@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -28,7 +29,7 @@ class Horde_Script_Cache_Null extends Horde_Script_Cache
      */
     protected function _process($scripts, $full = false)
     {
-        $out = array();
+        $out = [];
 
         foreach ($scripts as $val) {
             $out[] = strval($full ? $val->url_full : $val->url);

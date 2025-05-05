@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based Horde_Alarm:: factory.
  *
@@ -59,24 +60,23 @@ class Horde_Core_Factory_Alarm extends Horde_Core_Factory_Base
         $params = Horde::getDriverConfig('alarms', $driver);
 
         switch (Horde_String::lower($driver)) {
-        case 'sql':
-            try {
-                $params['db'] = $this->_injector
-                    ->getInstance('Horde_Core_Factory_Db')
-                    ->create('horde', 'alarms');
-            } catch (Horde_Exception $e) {
-                $driver = 'null';
-                $params = Horde::getDriverConfig('alarms', $driver);
-            }
-            break;
+            case 'sql':
+                try {
+                    $params['db'] = $this->_injector
+                        ->getInstance('Horde_Core_Factory_Db')
+                        ->create('horde', 'alarms');
+                } catch (Horde_Exception $e) {
+                    $driver = 'null';
+                    $params = Horde::getDriverConfig('alarms', $driver);
+                }
+                break;
         }
 
         $params['logger'] = $this->_injector->getInstance('Horde_Log_Logger');
-        $params['loader'] = array($this, 'load');
+        $params['loader'] = [$this, 'load'];
 
-        $this->_ttl = isset($params['ttl'])
-            ? $params['ttl']
-            : 300;
+        $this->_ttl = $params['ttl']
+            ?? 300;
 
         $class = $this->_getDriverName($driver, 'Horde_Alarm');
         $this->_alarm = new $class($params);
@@ -92,21 +92,21 @@ class Horde_Core_Factory_Alarm extends Horde_Core_Factory_Base
 
         $this->_alarm->addHandler(
             'desktop',
-            new Horde_Core_Alarm_Handler_Desktop(array(
+            new Horde_Core_Alarm_Handler_Desktop([
                 'icon' => new Horde_Core_Alarm_Handler_Desktop_Icon('alerts/alarm.png'),
-                'js_notify' => array(
+                'js_notify' => [
                     $this->_injector->getInstance('Horde_PageOutput'),
-                    'addInlineScript'
-                )
-            ))
+                    'addInlineScript',
+                ],
+            ])
         );
 
         $this->_alarm->addHandler(
             'mail',
-            new Horde_Alarm_Handler_Mail(array(
+            new Horde_Alarm_Handler_Mail([
                 'identity' => $this->_injector->getInstance('Horde_Core_Factory_Identity'),
                 'mail' => $this->_injector->getInstance('Horde_Mail'),
-            ))
+            ])
         );
 
         return $this->_alarm;
@@ -138,13 +138,13 @@ class Horde_Core_Factory_Alarm extends Horde_Core_Factory_Base
         $cache = $session->get('horde', 'factory_alarm');
 
         if (is_null($cache)) {
-            $save = array();
+            $save = [];
             $changed = ($registry->getAuth() !== false);
 
             try {
                 $apps = $registry->listApps(null, false, Horde_Perms::READ);
             } catch (Horde_Exception $e) {
-                $apps = array();
+                $apps = [];
             }
         } else {
             $apps = $cache;
@@ -165,10 +165,11 @@ class Horde_Core_Factory_Alarm extends Horde_Core_Factory_Base
                 : time();
 
             try {
-                foreach ($registry->callAppMethod($app, 'listAlarms', array('args' => array($time, $user), 'noperms' => true)) as $alarm) {
+                foreach ($registry->callAppMethod($app, 'listAlarms', ['args' => [$time, $user], 'noperms' => true]) as $alarm) {
                     $this->_alarm->set($alarm, true);
                 }
-            } catch (Horde_Exception $e) {}
+            } catch (Horde_Exception $e) {
+            }
         }
 
         if ($changed) {

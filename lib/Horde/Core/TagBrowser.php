@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Horde_Core_TagBrowser:: class provides logic for dealing with tag browsing.
  *
@@ -27,7 +28,7 @@ abstract class Horde_Core_TagBrowser
      *
      * @var array
      */
-    protected $_tags = array();
+    protected $_tags = [];
 
     /**
      * Total count of matches.
@@ -55,7 +56,7 @@ abstract class Horde_Core_TagBrowser
      *
      * @var array
      */
-    protected $_results = array();
+    protected $_results = [];
 
     /**
      * The Tagger object.
@@ -74,8 +75,8 @@ abstract class Horde_Core_TagBrowser
     public function __construct(
         Horde_Core_Tagger $tagger,
         $tags = null,
-        $owner = null)
-    {
+        $owner = null
+    ) {
         $this->_tagger = $tagger;
         if (!empty($tags)) {
             $this->_tags = $this->_tagger->getTagIds($tags);
@@ -83,7 +84,8 @@ abstract class Horde_Core_TagBrowser
             $this->_tags = $GLOBALS['session']->get(
                 $this->_app,
                 'browsetags',
-                Horde_Session::TYPE_ARRAY);
+                Horde_Session::TYPE_ARRAY
+            );
         }
 
         $this->_owner = empty($owner) ? $GLOBALS['registry']->getAuth() : $owner;
@@ -189,7 +191,7 @@ abstract class Horde_Core_TagBrowser
         }
 
         // Get the results sorted by available totals for this user
-        uasort($results, array($this, '_sortTagInfo'));
+        uasort($results, [$this, '_sortTagInfo']);
         return $results;
     }
 
@@ -207,15 +209,15 @@ abstract class Horde_Core_TagBrowser
         // No results, and an empty default_results set is provided. We have
         // no objects to browse, don't attempt to look for their tags.
         if (empty($this->_results) && isset($default_results) && empty($default_results)) {
-            return array();
+            return [];
         }
 
-        $results = array();
+        $results = [];
         $tags = $this->_tagger->browseTags($this->getTags(), null);
-        $result_data = empty($this->_results) ? (!empty($default_results) ? $default_results : array()) : $this->_results;
+        $result_data = empty($this->_results) ? (!empty($default_results) ? $default_results : []) : $this->_results;
         if (!empty($result_data) && empty($result_data[0])) {
             // Multiple types.
-            $counts = array();
+            $counts = [];
             foreach ($result_data as $data) {
                 $counts = array_merge($counts, $this->_tagger->getTagCountsByObjects($data));
             }
@@ -226,7 +228,7 @@ abstract class Horde_Core_TagBrowser
         foreach ($counts as $result) {
             // Remove the tags we already included.
             if (in_array($result['tag_id'], $tag_ids)) {
-                $results[$result['tag_id']] = array('tag_name' => $result['tag_name'], 'total' => $result['count']);
+                $results[$result['tag_id']] = ['tag_name' => $result['tag_name'], 'total' => $result['count']];
             }
         }
         return $results;
@@ -242,7 +244,7 @@ abstract class Horde_Core_TagBrowser
      */
     protected function _getRelatedTagsWithNoResults()
     {
-        $results = array();
+        $results = [];
         $tags = $this->_tagger->browseTags($this->getTags(), null);
         $class = get_class($this);
         $search = new $class($this->_tagger, null, $this->_owner);
@@ -251,7 +253,7 @@ abstract class Horde_Core_TagBrowser
             $search->runSearch();
             $count = $search->count();
             if ($count > 0) {
-                $results[$id] = array('tag_name' => $tag, 'total' => $count);
+                $results[$id] = ['tag_name' => $tag, 'total' => $count];
             }
             $search->removeTag($tag);
         }
@@ -274,7 +276,7 @@ abstract class Horde_Core_TagBrowser
     public function clearSearch()
     {
         $GLOBALS['session']->remove($this->_app, 'browsetags');
-        $this->_tags = array();
+        $this->_tags = [];
     }
 
     /**
@@ -296,9 +298,9 @@ abstract class Horde_Core_TagBrowser
     protected function _runSearch()
     {
         if (!empty($this->_owner)) {
-            $filter = array('user' => $this->_owner);
+            $filter = ['user' => $this->_owner];
         } else {
-            $filter = array();
+            $filter = [];
         }
         if (empty($this->_results) || $this->_dirty) {
             return $this->_tagger->search($this->_tags, $filter);

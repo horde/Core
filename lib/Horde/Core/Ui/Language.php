@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Core_Ui_Language:: class provides a widget for changing the
  * currently selected language.
@@ -13,8 +14,8 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
-class Horde_Core_Ui_Language {
-
+class Horde_Core_Ui_Language
+{
     /**
      * Render the language selection.
      *
@@ -28,8 +29,10 @@ class Horde_Core_Ui_Language {
 
         if (!$prefs->isLocked('language')) {
             $session->set('horde', 'language', $registry->preferredLang());
-            $html = sprintf('<form name="language" action="%s">',
-                            Horde::url($registry->get('webroot', 'horde') . '/services/language.php', false, -1));
+            $html = sprintf(
+                '<form name="language" action="%s">',
+                Horde::url($registry->get('webroot', 'horde') . '/services/language.php', false, -1)
+            );
             $html .= '<input type="hidden" name="url" value="' . @htmlspecialchars(Horde::signUrl(Horde::selfUrl(false, false, true))) . '" />';
             $html .= '<select name="new_lang" onchange="document.language.submit()">';
             foreach ($registry->nlsconfig->languages as $key => $val) {

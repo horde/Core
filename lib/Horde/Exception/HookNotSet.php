@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Horde_Exception_HookNotSet is thrown when a called Horde hook does
  * not exist.

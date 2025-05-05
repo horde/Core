@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -38,24 +39,25 @@ class Horde_Core_Factory_History extends Horde_Core_Factory_Injector
         $user = $injector->getInstance('Horde_Registry')->getAuth();
 
         switch (Horde_String::lower($driver)) {
-        case 'nosql':
-            $nosql = $injector->getInstance('Horde_Core_Factory_Nosql')->create('horde', 'history');
-            if ($nosql instanceof Horde_History_Mongo) {
-                $history = new Horde_History_Mongo(
-                    $user,
-                    array('mongo_db' => $nosql)
-                );
-            }
-            break;
+            case 'nosql':
+                $nosql = $injector->getInstance('Horde_Core_Factory_Nosql')->create('horde', 'history');
+                if ($nosql instanceof Horde_History_Mongo) {
+                    $history = new Horde_History_Mongo(
+                        $user,
+                        ['mongo_db' => $nosql]
+                    );
+                }
+                break;
 
-        case 'sql':
-            try {
-                $history = new Horde_History_Sql(
-                    $user,
-                    $injector->getInstance('Horde_Core_Factory_Db')->create('horde', 'history')
-                );
-            } catch (Exception $e) {}
-            break;
+            case 'sql':
+                try {
+                    $history = new Horde_History_Sql(
+                        $user,
+                        $injector->getInstance('Horde_Core_Factory_Db')->create('horde', 'history')
+                    );
+                } catch (Exception $e) {
+                }
+                break;
         }
 
         if (is_null($history)) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This class implements the CKeditor in the Horde Core framework.
  *
@@ -16,7 +17,7 @@ class Horde_Core_Editor_Ckeditor extends Horde_Editor_Ckeditor
 {
     /**
      */
-    public function initialize(array $params = array())
+    public function initialize(array $params = [])
     {
         global $page_output, $registry;
 
