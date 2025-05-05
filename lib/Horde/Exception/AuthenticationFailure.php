@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This exception is used to indicate a fatal authentication error.
  *

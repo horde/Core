@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Core_Ui_Tabs:: class manages and renders a tab-like interface.
  *
@@ -21,7 +22,7 @@ class Horde_Core_Ui_Tabs extends Horde_Core_Ui_Widget
      *
      * @var array
      */
-    protected $_tabs = array();
+    protected $_tabs = [];
 
     /**
      * Adds a tab to the interface.
@@ -32,18 +33,20 @@ class Horde_Core_Ui_Tabs extends Horde_Core_Ui_Widget
      *                         or a hash of parameters. If an array, the tab
      *                         variable can be set by the 'tabname' key.
      */
-    public function addTab($title, $link, $params = array())
+    public function addTab($title, $link, $params = [])
     {
         if (!is_array($params)) {
-            $params = array('tabname' => $params);
+            $params = ['tabname' => $params];
         }
 
-        $this->_tabs[] = array_merge(array('title' => $title,
+        $this->_tabs[] = array_merge(
+            ['title' => $title,
                                            'link' => $link->copy(),
                                            'tabname' => null,
                                            'img' => null,
-                                           'class' => null),
-                                     $params);
+                                           'class' => null],
+            $params
+        );
     }
 
     /**
@@ -84,7 +87,7 @@ class Horde_Core_Ui_Tabs extends Horde_Core_Ui_Widget
                 $link->add($this->_name, $tab['tabname']);
             }
 
-            $classes = array();
+            $classes = [];
             if (isset($tab['class'])) {
                 $classes[] = $tab['class'];
             }
@@ -118,7 +121,7 @@ class Horde_Core_Ui_Tabs extends Horde_Core_Ui_Widget
             }
 
             $html .= '<li' . $class . $id . '>'
-                . $link->link(array('target' => $tab['target'], 'onclick' => $tab['onclick'], 'accesskey' => $accesskey))
+                . $link->link(['target' => $tab['target'], 'onclick' => $tab['onclick'], 'accesskey' => $accesskey])
                 . $img . Horde::highlightAccessKey(str_replace(' ', '&nbsp;', $tab['title']), $accesskey)
                 . "</a> </li>\n";
         }

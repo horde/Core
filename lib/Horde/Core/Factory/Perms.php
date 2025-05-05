@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory for creating Horde_Perms objects
  *
@@ -24,27 +25,27 @@ class Horde_Core_Factory_Perms extends Horde_Core_Factory_Injector
             : $conf['perms']['driver'];
         $params = isset($conf['perms'])
             ? Horde::getDriverConfig('perms', $driver)
-            : array();
+            : [];
 
         switch (Horde_String::lower($driver)) {
-        case 'sql':
-            try {
-                $params['db'] = $injector
-                    ->getInstance('Horde_Core_Factory_Db')
-                    ->create('horde', 'perms');
-            } catch (Horde_Exception $e) {
-                $driver = 'Null';
-            }
-            break;
+            case 'sql':
+                try {
+                    $params['db'] = $injector
+                        ->getInstance('Horde_Core_Factory_Db')
+                        ->create('horde', 'perms');
+                } catch (Horde_Exception $e) {
+                    $driver = 'Null';
+                }
+                break;
         }
 
         $params['cache'] = new Horde_Cache(
-            new Horde_Cache_Storage_Stack(array(
-                'stack' => array(
+            new Horde_Cache_Storage_Stack([
+                'stack' => [
                     new Horde_Cache_Storage_Memory(),
-                    $injector->getInstance('Horde_Cache')
-                )
-            ))
+                    $injector->getInstance('Horde_Cache'),
+                ],
+            ])
         );
         $params['logger'] = $injector->getInstance('Horde_Log_Logger');
 

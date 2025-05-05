@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -39,7 +40,7 @@ class Horde_Core_Factory_Mail extends Horde_Core_Factory_Base
     public function create($config = null)
     {
         if (is_null($config)) {
-            list($transport, $params) = $this->getConfig();
+            [$transport, $params] = $this->getConfig();
         } else {
             $transport = $config['transport'];
             $params = $config['params'];
@@ -91,9 +92,8 @@ class Horde_Core_Factory_Mail extends Horde_Core_Factory_Base
         $transport = isset($conf['mailer']['type'])
             ? Horde_String::lower($conf['mailer']['type'])
             : 'null';
-        $params = isset($conf['mailer']['params'])
-            ? $conf['mailer']['params']
-            : array();
+        $params = $conf['mailer']['params']
+            ?? [];
 
         /* Add username/password options now, regardless of current value of
          * 'auth'. Will remove in create() if final config doesn't require
@@ -114,7 +114,7 @@ class Horde_Core_Factory_Mail extends Horde_Core_Factory_Base
             unset($params['password_auth'], $params['username_auth']);
         }
 
-        return array($transport, $params);
+        return [$transport, $params];
     }
 
 }

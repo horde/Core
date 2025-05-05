@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based Horde_Prefs:: factory.
  *
@@ -39,7 +40,7 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
      *
      * @var array
      */
-    private $_instances = array();
+    private $_instances = [];
 
     /**
      * Return the Horde_Prefs:: instance.
@@ -54,28 +55,28 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
      *
      * @return Horde_Prefs  The singleton instance.
      */
-    public function create($scope = 'horde', array $opts = array())
+    public function create($scope = 'horde', array $opts = [])
     {
         global $conf, $registry;
 
         if (array_key_exists('driver', $opts)) {
             $driver = $opts['driver'];
-            $params = array();
+            $params = [];
         } elseif (empty($conf['prefs']['driver']) ||
                   $conf['prefs']['driver'] == 'Session') {
             $driver = 'Horde_Prefs_Storage_Null';
-            $params = array();
+            $params = [];
             $opts['cache'] = $conf['prefs']['driver'] == 'Session';
         } else {
             try {
                 $driver = $conf['prefs']['driver'];
                 switch (Horde_String::lower($driver)) {
-                case 'nosql':
-                    $nosql = $this->_injector->getInstance('Horde_Core_Factory_Nosql')->create('horde', 'prefs');
-                    if ($nosql instanceof Horde_Mongo_Client) {
-                        $driver = 'mongo';
-                    }
-                    break;
+                    case 'nosql':
+                        $nosql = $this->_injector->getInstance('Horde_Core_Factory_Nosql')->create('horde', 'prefs');
+                        if ($nosql instanceof Horde_Mongo_Client) {
+                            $driver = 'mongo';
+                        }
+                        break;
                 }
                 $driver = $this->_getDriverName($driver, 'Horde_Prefs_Storage');
             } catch (Horde_Exception $e) {
@@ -90,13 +91,13 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
             $params = $opts['driver_params'];
         }
 
-        $opts = array_merge(array(
+        $opts = array_merge([
             'cache' => true,
             'logger' => $this->_injector->getInstance('Horde_Log_Logger'),
             'password' => '',
-            'sizecallback' => ((isset($conf['prefs']['maxsize'])) ? array($this, 'sizeCallback') : null),
-            'user' => ''
-        ), $opts);
+            'sizecallback' => ((isset($conf['prefs']['maxsize'])) ? [$this, 'sizeCallback'] : null),
+            'user' => '',
+        ], $opts);
 
         /* If $params['user_hook'] is defined, use it to retrieve the value to
          * use for the username. */
@@ -107,10 +108,10 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
 
         /* To determine signature, don't serialize the logger or size
          * callback, since they may contain unserializable components. */
-        $sig_opts = array_merge($opts, array(
+        $sig_opts = array_merge($opts, [
             'logger' => get_class($opts['logger']),
-            'sizecallback' => !is_null($opts['sizecallback'])
-        ));
+            'sizecallback' => !is_null($opts['sizecallback']),
+        ]);
         ksort($sig_opts);
         $sig = hash('md5', serialize($sig_opts) . '|' . $registry->getAuth());
 
@@ -121,39 +122,39 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
 
         try {
             switch ($driver) {
-            case 'Horde_Prefs_Storage_Ldap':
-                $params['ldap'] = $this->_injector
-                    ->getInstance('Horde_Core_Factory_Ldap')
-                    ->create('horde', 'prefs');
-                break;
+                case 'Horde_Prefs_Storage_Ldap':
+                    $params['ldap'] = $this->_injector
+                        ->getInstance('Horde_Core_Factory_Ldap')
+                        ->create('horde', 'prefs');
+                    break;
 
-            case 'Horde_Prefs_Storage_Mongo':
-                $params['mongo_db'] = $nosql;
-                break;
+                case 'Horde_Prefs_Storage_Mongo':
+                    $params['mongo_db'] = $nosql;
+                    break;
 
-            case 'Horde_Prefs_Storage_Session':
-                $driver = 'Horde_Prefs_Storage_Null';
-                break;
+                case 'Horde_Prefs_Storage_Session':
+                    $driver = 'Horde_Prefs_Storage_Null';
+                    break;
 
-            case 'Horde_Prefs_Storage_Sql':
-                $params['db'] = $this->_injector->getInstance('Horde_Core_Factory_Db')->create('horde', 'prefs');
-                break;
+                case 'Horde_Prefs_Storage_Sql':
+                    $params['db'] = $this->_injector->getInstance('Horde_Core_Factory_Db')->create('horde', 'prefs');
+                    break;
 
-            case 'Horde_Prefs_Storage_KolabImap':
-                if ($registry->isAdmin()) {
-                    throw new Horde_Exception('The IMAP based Kolab preferences backend is unavailable for system administrators.');
-                }
-                $params['kolab'] = $this->_injector
-                    ->getInstance('Horde_Kolab_Storage');
-                $params['logger'] = $opts['logger'];
-                break;
+                case 'Horde_Prefs_Storage_KolabImap':
+                    if ($registry->isAdmin()) {
+                        throw new Horde_Exception('The IMAP based Kolab preferences backend is unavailable for system administrators.');
+                    }
+                    $params['kolab'] = $this->_injector
+                        ->getInstance('Horde_Kolab_Storage');
+                    $params['logger'] = $opts['logger'];
+                    break;
 
-            case 'Horde_Prefs_Storage_Imsp':
-                $imspParams = $conf['imsp'];
-                $imspParams['username'] = $registry->getAuth('bare');
-                $imspParams['password'] = $registry->getAuthCredential('password');
-                $params['imsp'] = $this->_injector
-                    ->getInstance('Horde_Core_Factory_Imsp')->create('Options', $imspParams);
+                case 'Horde_Prefs_Storage_Imsp':
+                    $imspParams = $conf['imsp'];
+                    $imspParams['username'] = $registry->getAuth('bare');
+                    $imspParams['password'] = $registry->getAuthCredential('password');
+                    $params['imsp'] = $this->_injector
+                        ->getInstance('Horde_Core_Factory_Imsp')->create('Options', $imspParams);
             }
             $this->storage = new $driver($opts['user'], $params);
         } catch (Horde_Exception $e) {
@@ -164,11 +165,11 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
         }
 
         $config_driver = new Horde_Core_Prefs_Storage_Configuration($opts['user']);
-        $hooks_driver = new Horde_Core_Prefs_Storage_Hooks($opts['user'], array('conf_ob' => $config_driver));
+        $hooks_driver = new Horde_Core_Prefs_Storage_Hooks($opts['user'], ['conf_ob' => $config_driver]);
 
         $drivers = $driver
-            ? array($config_driver, $this->storage, $hooks_driver)
-            : array($config_driver, $hooks_driver);
+            ? [$config_driver, $this->storage, $hooks_driver]
+            : [$config_driver, $hooks_driver];
 
         if ($driver && $opts['cache']) {
             $opts['cache'] = $this->_getCache($opts['user'], false);
@@ -187,7 +188,7 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
 
             $this->_instances[$sig] = new Horde_Prefs(
                 $scope,
-                array($config_driver, $hooks_driver),
+                [$config_driver, $hooks_driver],
                 $opts
             );
         }
@@ -206,7 +207,7 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
         if (!$GLOBALS['session']->get('horde', 'no_prefs')) {
             $GLOBALS['session']->set('horde', 'no_prefs', true);
             if (isset($GLOBALS['notification'])) {
-                $GLOBALS['notification']->push(Horde_Core_Translation::t("The preferences backend is currently unavailable and your preferences have not been loaded. You may continue to use the system with default preferences."));
+                $GLOBALS['notification']->push(Horde_Core_Translation::t('The preferences backend is currently unavailable and your preferences have not been loaded. You may continue to use the system with default preferences.'));
                 Horde::log($e);
             }
         }
@@ -224,10 +225,10 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
     {
         global $injector;
 
-        $params = array(
+        $params = [
             'app' => 'horde',
-            'storage_key' => 'horde_prefs_cache'
-        );
+            'storage_key' => 'horde_prefs_cache',
+        ];
 
         if ($fallback) {
             $params['cache'] = new Horde_Cache_Storage_Null();
@@ -238,19 +239,19 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
 
         return new Horde_Prefs_Cache_HordeCache(
             $user,
-            array(
+            [
                 'cache' => new Horde_Cache(
                     new Horde_Core_Cache_Session($params),
-                    array(
+                    [
                         /* Don't enable compression here. Data is either
                          * compressed in the main Horde_Cache object (if
                          * oversized) or is compressed within the session
                          * (if stored in session cache). */
                         'compress' => false,
-                        'logger' => $injector->getInstance('Horde_Core_Log_Wrapper')
-                    )
-                )
-            )
+                        'logger' => $injector->getInstance('Horde_Core_Log_Wrapper'),
+                    ]
+                ),
+            ]
         );
     }
 
@@ -259,7 +260,7 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
      */
     public function clearCache()
     {
-        $this->_instances = array();
+        $this->_instances = [];
     }
 
     /**
@@ -276,7 +277,7 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
             return false;
         }
 
-        $GLOBALS['notification']->push(sprintf(Horde_Core_Translation::t("The preference \"%s\" could not be saved because its data exceeds the maximum allowable size"), $pref), 'horde.error');
+        $GLOBALS['notification']->push(sprintf(Horde_Core_Translation::t('The preference "%s" could not be saved because its data exceeds the maximum allowable size'), $pref), 'horde.error');
         return true;
     }
 

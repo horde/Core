@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -35,16 +36,16 @@ class Horde_Themes_Css_Compress
     {
         global $browser, $conf, $injector;
 
-        $files = array();
+        $files = [];
         foreach ($css as $val) {
             $files[$val['uri']] = $val['fs'];
         }
 
-        $parser = new Horde_CssMinify_CssParser($files, array(
-            'dataurl' => (empty($conf['nobase64_img']) && $browser->hasFeature('dataurl')) ? array($this, 'dataurlCallback') : null,
-            'import' => array($this, 'importCallback'),
-            'logger' => $injector->getInstance('Horde_Log_Logger')
-        ));
+        $parser = new Horde_CssMinify_CssParser($files, [
+            'dataurl' => (empty($conf['nobase64_img']) && $browser->hasFeature('dataurl')) ? [$this, 'dataurlCallback'] : null,
+            'import' => [$this, 'importCallback'],
+            'logger' => $injector->getInstance('Horde_Log_Logger'),
+        ]);
 
         return $parser->minify();
     }
@@ -62,7 +63,7 @@ class Horde_Themes_Css_Compress
     public function importCallback($uri)
     {
         $ob = Horde_Themes_Element::fromUri($uri);
-        return array($ob->uri, $ob->fs);
+        return [$ob->uri, $ob->fs];
     }
 
 }

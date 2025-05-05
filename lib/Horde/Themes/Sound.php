@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Themes_Sound:: class provides an object-oriented interface to
  * a themed sound.

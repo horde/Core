@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Core_Ui_Widget:: class provides base functionality for other
  * Horde UI elements.
@@ -21,7 +22,7 @@ abstract class Horde_Core_Ui_Widget
      *
      * @var array
      */
-    protected $_preserve = array();
+    protected $_preserve = [];
 
     /**
      * The name of this widget.  This is used as the basename for variables
@@ -54,7 +55,7 @@ abstract class Horde_Core_Ui_Widget
      *
      * @var callable
      */
-    protected $_url_callback = array('Horde', 'url');
+    protected $_url_callback = ['Horde', 'url'];
 
     /**
      * Construct a new UI Widget interface.
@@ -64,7 +65,7 @@ abstract class Horde_Core_Ui_Widget
      * @param Horde_Variables $vars  A Horde_Variables:: object.
      * @param array $config          The widget's configuration.
      */
-    public function __construct($name, $vars, $config = array())
+    public function __construct($name, $vars, $config = [])
     {
         $this->_name = $name;
         $this->_vars = &$vars;
@@ -87,7 +88,7 @@ abstract class Horde_Core_Ui_Widget
     public function preserve($var, $value = null)
     {
         if (!is_array($var)) {
-            $var = array($var => $value);
+            $var = [$var => $value];
         }
 
         foreach ($var as $key => $value) {

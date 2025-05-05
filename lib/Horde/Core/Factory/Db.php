@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based factory for creating Horde_Db_Adapter objects.
  *
@@ -30,7 +31,7 @@ class Horde_Core_Factory_Db extends Horde_Core_Factory_Base
      *
      * @var array
      */
-    private $_instances = array();
+    private $_instances = [];
 
     /**
      * Returns the DB instance.
@@ -104,7 +105,8 @@ class Horde_Core_Factory_Db extends Horde_Core_Factory_Base
         } elseif (!isset($this->_instances[$sig])) {
             try {
                 $this->_createDb($config, $sig);
-            } catch (Horde_Exception $e) {}
+            } catch (Horde_Exception $e) {
+            }
         }
 
         if ($pushed) {
@@ -161,23 +163,23 @@ class Horde_Core_Factory_Db extends Horde_Core_Factory_Base
                 throw new Horde_Exception('The database configuration is missing.');
             } else {
                 switch ($config['phptype']) {
-                case 'mysqli':
-                    $class = 'Horde_Db_Adapter_Mysqli';
-                    break;
+                    case 'mysqli':
+                        $class = 'Horde_Db_Adapter_Mysqli';
+                        break;
 
-                case 'mysql':
-                    $class = extension_loaded('pdo_mysql')
-                        ? 'Horde_Db_Adapter_Pdo_Mysql'
-                        : 'Horde_Db_Adapter_Mysql';
-                    break;
+                    case 'mysql':
+                        $class = extension_loaded('pdo_mysql')
+                            ? 'Horde_Db_Adapter_Pdo_Mysql'
+                            : 'Horde_Db_Adapter_Mysql';
+                        break;
 
-                case 'oci8':
-                    $class = 'Horde_Db_Adapter_Oci8';
-                    break;
+                    case 'oci8':
+                        $class = 'Horde_Db_Adapter_Oci8';
+                        break;
 
-                default:
-                    $class = 'Horde_Db_Adapter_Pdo_' . Horde_String::ucfirst($config['phptype']);
-                    break;
+                    default:
+                        $class = 'Horde_Db_Adapter_Pdo_' . Horde_String::ucfirst($config['phptype']);
+                        break;
                 }
             }
 

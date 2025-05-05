@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A class that stores notifications in the session, using Horde_Session.
  *
@@ -21,15 +22,14 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
-class Horde_Core_Notification_Storage_Session
-implements Horde_Notification_Storage_Interface
+class Horde_Core_Notification_Storage_Session implements Horde_Notification_Storage_Interface
 {
     /**
      * Cached notifications if session is not active.
      *
      * @var array
      */
-    protected $_cached = array();
+    protected $_cached = [];
 
     /**
      */
@@ -49,7 +49,7 @@ implements Horde_Notification_Storage_Interface
                 $GLOBALS['session']->set('horde', 'notify/' . $key, $value);
             }
         } else {
-            $this->_cached[] = array($key, $value);
+            $this->_cached[] = [$key, $value];
         }
     }
 
@@ -65,7 +65,7 @@ implements Horde_Notification_Storage_Interface
      */
     public function clear($key)
     {
-        $this->_cached = array();
+        $this->_cached = [];
         $GLOBALS['session']->remove('horde', 'notify/' . $key);
     }
 
@@ -80,7 +80,7 @@ implements Horde_Notification_Storage_Interface
             $events[] = $event;
             $session->set('horde', 'notify/' . $listener, $events, Horde_Session::TYPE_OBJECT);
         } else {
-            $this->_cached[] = array($listener, $event);
+            $this->_cached[] = [$listener, $event];
         }
     }
 
@@ -90,7 +90,7 @@ implements Horde_Notification_Storage_Interface
     {
         if (!empty($this->_cached) && $GLOBALS['session']->isActive()) {
             $cached = $this->_cached;
-            $this->_cached = array();
+            $this->_cached = [];
 
             foreach ($cached as $val) {
                 if ($val[1] instanceof Horde_Notification_Event) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Core_Tree_Renderer_Html class extends the Horde_Tree_Html
  * class to provide for creation of Horde-specific URLs.
@@ -22,7 +23,7 @@ class Horde_Core_Tree_Renderer_Html extends Horde_Tree_Renderer_Html
      *
      * @var array
      */
-    protected $_images = array(
+    protected $_images = [
         'line' => 1,
         'blank' => '',
         'join' => 2,
@@ -37,8 +38,8 @@ class Horde_Core_Tree_Renderer_Html extends Horde_Tree_Renderer_Html
         'null_only' => 13,
         'folder' => 14,
         'folderopen' => 15,
-        'leaf' => 16
-    );
+        'leaf' => 16,
+    ];
 
     /**
      * Generate a link URL tag.
@@ -66,22 +67,22 @@ class Horde_Core_Tree_Renderer_Html extends Horde_Tree_Renderer_Html
     protected function _generateImage($src, $class = '', $alt = null)
     {
         switch ($class) {
-        case 'horde-tree-icon':
-            return parent::_generateImage($src, $class, $alt);
+            case 'horde-tree-icon':
+                return parent::_generateImage($src, $class, $alt);
 
-        case 'horde-tree-toggle':
-            $class .= ' horde-tree-image';
-            break;
+            case 'horde-tree-toggle':
+                $class .= ' horde-tree-image';
+                break;
 
-        default:
-            $class = 'horde-tree-image';
-            break;
+            default:
+                $class = 'horde-tree-image';
+                break;
         }
 
         $img = '<span class="' . $class . ' horde-tree-image-' . $src . '"';
 
         if (!is_null($alt)) {
-            $img.= ' alt="' . $alt . '"';
+            $img .= ' alt="' . $alt . '"';
         }
 
         return $img . '></span>';

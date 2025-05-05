@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class to attach PHP actions to javascript elements.
  *
@@ -40,7 +41,7 @@ abstract class Horde_Core_Ajax_Imple
      *
      * @var array
      */
-    protected $_params = array();
+    protected $_params = [];
 
     /**
      * The javascript event to observe.
@@ -55,7 +56,7 @@ abstract class Horde_Core_Ajax_Imple
      * @param array $params  Configuration parameters:
      *   - id: (string) [OPTIONAL] The DOM ID to attach to.
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
         if (!isset($params['id'])) {
             $params['id'] = 'horde_imple' . self::$_domid++;
@@ -83,20 +84,20 @@ abstract class Horde_Core_Ajax_Imple
             return;
         }
 
-        $args = array(
+        $args = [
             'id' => $this->getDomId(),
-            'observe' => $this->_observe
-        );
+            'observe' => $this->_observe,
+        ];
 
         $args['params'] = is_array($result)
             ? array_merge($result, $this->_impleParams())
             : $result;
 
-        $page_output->addInlineScript(array(
+        $page_output->addInlineScript([
             'HordeImple.add(' .
                 Horde_Serialize::serialize($args, Horde_Serialize::JSON) .
-            ')'
-        ), true);
+            ')',
+        ], true);
     }
 
     /**
@@ -151,10 +152,10 @@ abstract class Horde_Core_Ajax_Imple
      */
     final protected function _impleParams()
     {
-        return array(
+        return [
             'app' => $GLOBALS['registry']->getApp(),
-            'imple' => get_class($this)
-        );
+            'imple' => get_class($this),
+        ];
     }
 
     /**
@@ -165,10 +166,10 @@ abstract class Horde_Core_Ajax_Imple
      */
     protected function _jsOnDoAction($js)
     {
-        $GLOBALS['page_output']->addInlineScript(array(
+        $GLOBALS['page_output']->addInlineScript([
             'document.observe("' . get_class($this) . ':do", function(e) {' .
-            $js . '});'
-        ));
+            $js . '});',
+        ]);
     }
 
     /**
@@ -179,10 +180,10 @@ abstract class Horde_Core_Ajax_Imple
      */
     protected function _jsOnComplete($js)
     {
-        $GLOBALS['page_output']->addInlineScript(array(
+        $GLOBALS['page_output']->addInlineScript([
             'document.observe("' . get_class($this) . ':complete", function(e) {' .
-            $js . '});'
-        ));
+            $js . '});',
+        ]);
     }
 
     /**

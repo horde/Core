@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2009-2017 Horde LLC (http://www.horde.org/)
  *
@@ -33,14 +34,14 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      *
      * @var array
      */
-    public $auth = array();
+    public $auth = [];
 
     /**
      * List of features supported by this application.
      *
      * @var array
      */
-    public $features = array(
+    public $features = [
         // View Handlers
         'dynamicView' => false,
         'minimalView' => false,
@@ -48,15 +49,15 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
         // Notification Handler
         'notificationHandler' => false,
         // Alarm Handler
-        'alarmHandler' => false
-    );
+        'alarmHandler' => false,
+    ];
 
     /**
      * The init params used.
      *
      * @var array
      */
-    public $initParams = array();
+    public $initParams = [];
 
     /**
      * The application's version.
@@ -77,7 +78,7 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      *
      * @var array
      */
-    protected $_sessVars = array();
+    protected $_sessVars = [];
 
     /**
      * Constructor.
@@ -222,9 +223,9 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      * @return \Horde\Backup\Users  List of per-user data.
      * @throws Horde_Exception
      */
-    public function backup(array $users = array())
+    public function backup(array $users = [])
     {
-        return new Backup\Users(new EmptyIterator(), function(){});
+        return new Backup\Users(new EmptyIterator(), function () {});
     }
 
     /**
@@ -251,7 +252,7 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      */
     public function restoreDependencies()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -268,10 +269,10 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
         global $injector;
 
         $prefs = $injector->getInstance('Horde_Core_Factory_Prefs')
-            ->create($app, array('user' => $backup->user));
+            ->create($app, ['user' => $backup->user]);
         $prefs->retrieve();
         $scope = $prefs->getScopeObject($app);
-        $values = array();
+        $values = [];
         foreach ($scope as $key => $value) {
             if (!$scope->isDefault($key)) {
                 $values[$key] = $scope->get($key);
@@ -300,7 +301,7 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
         global $injector;
 
         $prefs = $injector->getInstance('Horde_Core_Factory_Prefs')
-            ->create($app, array('user' => $data->getUser()));
+            ->create($app, ['user' => $data->getUser()]);
         $prefs->retrieve();
 
         $count = 0;
@@ -335,7 +336,7 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      */
     public function perms()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -347,7 +348,7 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      *
      * @return mixed  The value of the specified permission.
      */
-    public function hasPermission($permission, $allowed, $opts = array())
+    public function hasPermission($permission, $allowed, $opts = [])
     {
         return true;
     }
@@ -376,7 +377,7 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      */
     public function download(Horde_Variables $vars)
     {
-        return array();
+        return [];
     }
 
 
@@ -405,7 +406,7 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      */
     public function listAlarms($time, $user = null)
     {
-        return array();
+        return [];
     }
 
 
@@ -418,11 +419,11 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      */
     public function authLoginParams()
     {
-        return array(
-            'js_code' => array(),
-            'js_files' => array(),
-            'params' => array()
-        );
+        return [
+            'js_code' => [],
+            'js_files' => [],
+            'params' => [],
+        ];
     }
 
     /**
@@ -522,7 +523,7 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      */
     public function authUserList()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -560,7 +561,7 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
         foreach ($this->_sessVars as $key => $val) {
             $GLOBALS['session']->set($this->_app, $key, $val);
         }
-        $this->_sessVars = array();
+        $this->_sessVars = [];
     }
 
 
@@ -575,7 +576,7 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      */
     public function configSpecialValues($what)
     {
-        return array();
+        return [];
     }
 
 
@@ -590,9 +591,11 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      *
      * @throws Horde_Exception
      */
-    public function topbarCreate(Horde_Tree_Renderer_Base $tree, $parent = null,
-                                 array $params = array())
-    {
+    public function topbarCreate(
+        Horde_Tree_Renderer_Base $tree,
+        $parent = null,
+        array $params = []
+    ) {
     }
 
 
@@ -620,7 +623,7 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      */
     public function nosqlDrivers()
     {
-        return array();
+        return [];
     }
 
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Core_Tree_Renderer_Javascript class provides javascript
  * rendering of a tree.
@@ -26,7 +27,7 @@ class Horde_Core_Tree_Renderer_Javascript extends Horde_Core_Tree_Renderer_Html
      *                            object in.
      *                            DEFAULT: Instance name.
      */
-    public function __construct(Horde_Tree $tree, array $params = array())
+    public function __construct(Horde_Tree $tree, array $params = [])
     {
         parent::__construct($tree, $params);
 
@@ -75,7 +76,7 @@ class Horde_Core_Tree_Renderer_Javascript extends Horde_Core_Tree_Renderer_Html
     {
         $this->_static = $static;
 
-        $opts = array(
+        $opts = [
             'extraColsLeft' => $this->_colsLeft,
             'extraColsRight' => $this->_colsRight,
             'header' => $this->_header,
@@ -102,16 +103,16 @@ class Horde_Core_Tree_Renderer_Javascript extends Horde_Core_Tree_Renderer_Html
             'imgNullOnly' => $this->_images['null_only'],
             'imgLeaf' => $this->_images['leaf'],
 
-            'initTree' => $this->renderNodeDefinitions()
-        );
+            'initTree' => $this->renderNodeDefinitions(),
+        ];
 
         if (!($js_var = $this->getOption('jsvar'))) {
             $js_var = $this->_tree->instance;
         }
 
-        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineScript(array(
-            'window.' . $js_var . ' = new Horde_Tree(' . Horde_Serialize::serialize($opts, Horde_Serialize::JSON) . ')'
-        ), true);
+        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineScript([
+            'window.' . $js_var . ' = new Horde_Tree(' . Horde_Serialize::serialize($opts, Horde_Serialize::JSON) . ')',
+        ], true);
 
         return '<div id="' . $this->_tree->instance . '"></div>';
     }
@@ -135,20 +136,20 @@ class Horde_Core_Tree_Renderer_Javascript extends Horde_Core_Tree_Renderer_Html
      */
     public function renderNodeDefinitions()
     {
-        $result = new stdClass;
+        $result = new stdClass();
         $result->is_static = intval($this->_static);
         $result->nodes = $this->_tree->getNodes();
         foreach ($this->_extra as $id => $extra_node) {
             $result->nodes[$id]['extra'] = $extra_node;
         }
         $result->root_nodes = $this->_tree->getRootNodes();
-        $result->files = array();
+        $result->files = [];
 
         foreach ($GLOBALS['page_output']->hsl as $val) {
             /* Ignore files that are already loaded before building the
              * tree. */
             if (($val->app != 'horde') ||
-                !in_array($val->file, array('prototype.js', 'hordetree.js', 'accesskeys.js'))) {
+                !in_array($val->file, ['prototype.js', 'hordetree.js', 'accesskeys.js'])) {
                 $result->files[] = strval($val->url);
             }
         }

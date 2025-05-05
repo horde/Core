@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This exception is thrown when pushing an application onto the stack is
  * unsuccesful.

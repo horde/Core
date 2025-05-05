@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -29,8 +30,7 @@
  * @package   Core
  * @since     2.13.0
  */
-class Horde_Core_HashTable_Vfs
-extends Horde_HashTable_Vfs
+class Horde_Core_HashTable_Vfs extends Horde_HashTable_Vfs
 {
     /**
      * Return get data as stream objects?
@@ -41,22 +41,23 @@ extends Horde_HashTable_Vfs
 
     /**
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
         global $injector;
 
         try {
             $vfs = $injector->getInstance('Horde_Core_Factory_Vfs')->create();
-        } catch (Horde_Vfs_Exception $e) {}
-
-        if (!isset($vfs) || ($vfs instanceof Horde_Vfs_Null)) {
-            $vfs = new Horde_Vfs_File(array('vfsroot' => Horde::getTempDir()));
+        } catch (Horde_Vfs_Exception $e) {
         }
 
-        parent::__construct(array_merge($params, array(
+        if (!isset($vfs) || ($vfs instanceof Horde_Vfs_Null)) {
+            $vfs = new Horde_Vfs_File(['vfsroot' => Horde::getTempDir()]);
+        }
+
+        parent::__construct(array_merge($params, [
             'logger' => $injector->getInstance('Horde_Core_Log_Wrapper'),
-            'vfs' => $vfs
-        )));
+            'vfs' => $vfs,
+        ]));
     }
 
     /**
@@ -84,14 +85,14 @@ extends Horde_HashTable_Vfs
             return parent::_get($keys);
         }
 
-        $out = array();
+        $out = [];
 
         foreach ($keys as $key) {
             try {
                 if (method_exists($this->_vfs, 'readStream')) {
-                    $data = new Horde_Stream_Existing(array(
-                        'stream' => $this->_vfs->readStream($this->_params['vfspath'], $key)
-                    ));
+                    $data = new Horde_Stream_Existing([
+                        'stream' => $this->_vfs->readStream($this->_params['vfspath'], $key),
+                    ]);
                     $data->rewind();
                 } else {
                     $data = new Horde_Stream_Temp();

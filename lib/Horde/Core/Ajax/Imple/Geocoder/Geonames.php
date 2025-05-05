@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Geocode client for the Geonames API.
  *
@@ -37,15 +38,15 @@ class Horde_Core_Ajax_Imple_Geocoder_Geonames extends Horde_Core_Ajax_Imple
     {
         if ($vars->location) {
             $url = new Horde_Url('https://secure.geonames.org/searchJSON');
-            $url->add(array(
-                'q' => $vars->location
-            ));
+            $url->add([
+                'q' => $vars->location,
+            ]);
         } elseif ($vars->lat && $vars->lon) {
             $url = new Horde_Url('https://secure.geonames.org/findNearestJSON');
-            $url->add(array(
+            $url->add([
                 'lat' => $vars->lat,
-                'lng' => $vars->lon
-            ));
+                'lng' => $vars->lon,
+            ]);
         } else {
             throw new Horde_Exception('Incorrect parameters');
         }
@@ -54,16 +55,16 @@ class Horde_Core_Ajax_Imple_Geocoder_Geonames extends Horde_Core_Ajax_Imple
             throw new Horde_Exception('Missing required key parameter');
         }
 
-        $url->add(array(
-            'username' => $vars->key
-        ));
+        $url->add([
+            'username' => $vars->key,
+        ]);
 
         $response = $GLOBALS['injector']->getInstance('Horde_Core_Factory_HttpClient')->create()->get($url);
 
-        return new Horde_Core_Ajax_Response_Prototypejs(array(
+        return new Horde_Core_Ajax_Response_Prototypejs([
             'results' => $response->getBody(),
-            'status' => 200
-        ));
+            'status' => 200,
+        ]);
     }
 
 }

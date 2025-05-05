@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
  *
@@ -58,18 +59,18 @@ class Horde_Script_File_External extends Horde_Script_File
     public function __get($name)
     {
         switch ($name) {
-        case 'hash':
-            return hash('md5', $this->_url);
+            case 'hash':
+                return hash('md5', $this->_url);
 
-        case 'modified':
-            return 0;
+            case 'modified':
+                return 0;
 
-        case 'path':
-            return null;
+            case 'path':
+                return null;
 
-        case 'url':
-        case 'url_full':
-            return $this->_url;
+            case 'url':
+            case 'url_full':
+                return $this->_url;
         }
 
         return parent::__get($name);

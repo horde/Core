@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Extends the base HordeCore object by outputting the JSON data in HTML
  * format.

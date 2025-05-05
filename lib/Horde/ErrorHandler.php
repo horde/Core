@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Provides methods used to handle error reporting.
  *
@@ -26,53 +27,55 @@ class Horde_ErrorHandler
 
         if (is_object($error)) {
             switch (get_class($error)) {
-            case 'Horde_Exception_AuthenticationFailure':
-                $auth_app = !$registry->clearAuthApp($error->application);
+                case 'Horde_Exception_AuthenticationFailure':
+                    $auth_app = !$registry->clearAuthApp($error->application);
 
-                if ($auth_app &&
-                    $registry->isAuthenticated(array('app' => $error->application, 'notransparent' => true))) {
-                    break;
-                }
+                    if ($auth_app &&
+                        $registry->isAuthenticated(['app' => $error->application, 'notransparent' => true])) {
+                        break;
+                    }
 
-                try {
-                    Horde::log($error, 'NOTICE');
-                } catch (Exception $e) {}
+                    try {
+                        Horde::log($error, 'NOTICE');
+                    } catch (Exception $e) {
+                    }
 
-                if (Horde_Cli::runningFromCLI()) {
-                    $cli = new Horde_Cli();
-                    $cli->fatal($error);
-                }
+                    if (Horde_Cli::runningFromCLI()) {
+                        $cli = new Horde_Cli();
+                        $cli->fatal($error);
+                    }
 
-                $params = array();
+                    $params = [];
 
-                if ($registry->getAuth()) {
-                    $params['app'] = $error->application;
-                }
+                    if ($registry->getAuth()) {
+                        $params['app'] = $error->application;
+                    }
 
-                switch ($error->getCode()) {
-                case Horde_Auth::REASON_MESSAGE:
-                    $params['msg'] = $error->getMessage();
-                    $params['reason'] = $error->getCode();
-                    break;
-                }
+                    switch ($error->getCode()) {
+                        case Horde_Auth::REASON_MESSAGE:
+                            $params['msg'] = $error->getMessage();
+                            $params['reason'] = $error->getCode();
+                            break;
+                    }
 
-                $logout_url = $registry->getLogoutUrl($params);
+                    $logout_url = $registry->getLogoutUrl($params);
 
-                /* Clear authentication here. Otherwise, there might be
-                 * issues on the login page since we would otherwise need
-                 * to do session token checking (which might not be
-                 * available, so logout won't happen, etc...) */
-                if ($auth_app && array_key_exists('app', $params)) {
-                    $registry->clearAuth();
-                }
+                    /* Clear authentication here. Otherwise, there might be
+                     * issues on the login page since we would otherwise need
+                     * to do session token checking (which might not be
+                     * available, so logout won't happen, etc...) */
+                    if ($auth_app && array_key_exists('app', $params)) {
+                        $registry->clearAuth();
+                    }
 
-                $logout_url->redirect();
+                    $logout_url->redirect();
             }
         }
 
         try {
             Horde::log($error, 'EMERG');
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+        }
 
         try {
             $cli = Horde_Cli::runningFromCLI();
@@ -89,7 +92,7 @@ class Horde_ErrorHandler
             header('Content-type: text/html; charset=UTF-8');
             header('HTTP/1.1 500: Internal Server Error');
         }
-        
+
         try {
             $admin = (isset($registry) && $registry->isAdmin());
             $errorHtml = self::getHtmlForError($error, $admin);
@@ -125,33 +128,34 @@ class Horde_ErrorHandler
             return;
         }
 
-        $options = array();
+        $options = [];
 
         try {
             switch ($errno) {
-            case E_WARNING:
-            case E_USER_WARNING:
-            case E_RECOVERABLE_ERROR:
-                $priority = Horde_Log::WARN;
-                break;
+                case E_WARNING:
+                case E_USER_WARNING:
+                case E_RECOVERABLE_ERROR:
+                    $priority = Horde_Log::WARN;
+                    break;
 
-            case E_NOTICE:
-            case E_USER_NOTICE:
-                $priority = Horde_Log::NOTICE;
-                break;
+                case E_NOTICE:
+                case E_USER_NOTICE:
+                    $priority = Horde_Log::NOTICE;
+                    break;
 
-            case E_STRICT:
-                $options['notracelog'] = true;
-                $priority = Horde_Log::DEBUG;
-                break;
+                case E_STRICT:
+                    $options['notracelog'] = true;
+                    $priority = Horde_Log::DEBUG;
+                    break;
 
-            default:
-                $priority = Horde_Log::DEBUG;
-                break;
+                default:
+                    $priority = Horde_Log::DEBUG;
+                    break;
             }
 
             Horde::log(new ErrorException('PHP ERROR: ' . $errstr, 0, $errno, $errfile, $errline), $priority, $options);
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+        }
     }
 
     /**
@@ -173,7 +177,7 @@ class Horde_ErrorHandler
 
     /**
      * Returns html for an error
-     * 
+     *
      * @param string|Throwable $error  The error as string message or Throwable
      * @param bool $isAdmin  If true will also output the complete trace
      *                       If $error is a Throwable its complete content will also be included in the output
@@ -188,10 +192,10 @@ class Horde_ErrorHandler
             $message = $error;
         }
         $fatalErrorHasOccoured = Horde_Core_Translation::t('A fatal error has occurred');
-        if ($isAdmin){
+        if ($isAdmin) {
             $detailsHtml = self::getErrorDetailsAsHtml($error);
         } else {
-            $detailsHtml = '<h3>' . Horde_Core_Translation::t("Details have been logged for the administrator.") . '</h3>';
+            $detailsHtml = '<h3>' . Horde_Core_Translation::t('Details have been logged for the administrator.') . '</h3>';
         }
         return <<<HTMLDELIM
             <html>
@@ -211,7 +215,7 @@ class Horde_ErrorHandler
 
     /**
      * Get the details of an error as html. This should usually only be output to admin users
-     * 
+     *
      * @param string|Throwable $error  The error as string message or Throwable
      * @return string  The details of that error as html
      */

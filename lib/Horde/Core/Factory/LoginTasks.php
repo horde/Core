@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based Horde_LoginTasks:: factory.
  *
@@ -30,7 +31,7 @@ class Horde_Core_Factory_LoginTasks extends Horde_Core_Factory_Base
      *
      * @var array
      */
-    private $_instances = array();
+    private $_instances = [];
 
     /**
      * Return the Horde_LoginTasks:: instance.

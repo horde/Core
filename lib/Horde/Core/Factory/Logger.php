@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @category Horde
  * @package  Core
@@ -33,75 +34,74 @@ class Horde_Core_Factory_Logger extends Horde_Core_Factory_Injector
         }
 
         switch ($conf['log']['type']) {
-        case 'file':
-        case 'stream':
-            $append = ($conf['log']['type'] == 'file')
-                ? ($conf['log']['params']['append'] ? 'a+' : 'w+')
-                : null;
-            $format = isset($conf['log']['params']['format'])
-                ? $conf['log']['params']['format']
-                : 'default';
+            case 'file':
+            case 'stream':
+                $append = ($conf['log']['type'] == 'file')
+                    ? ($conf['log']['params']['append'] ? 'a+' : 'w+')
+                    : null;
+                $format = $conf['log']['params']['format']
+                    ?? 'default';
 
-            switch ($format) {
-            case 'custom':
-                $formatter = new Horde_Log_Formatter_Simple(array('format' => $conf['log']['params']['template']));
-                break;
+                switch ($format) {
+                    case 'custom':
+                        $formatter = new Horde_Log_Formatter_Simple(['format' => $conf['log']['params']['template']]);
+                        break;
 
-            case 'default':
-            default:
-                // Use Horde_Log defaults.
-                $formatter = null;
-                break;
+                    case 'default':
+                    default:
+                        // Use Horde_Log defaults.
+                        $formatter = null;
+                        break;
 
-            case 'xml':
-                $formatter = new Horde_Log_Formatter_Xml();
-                break;
-            }
-
-            try {
-                $handler = new Horde_Log_Handler_Stream($conf['log']['name'], $append, $formatter);
-            } catch (Horde_Log_Exception $e) {
-                $this->error = $e;
-                return new Horde_Core_Log_Logger(new Horde_Log_Handler_Null());
-            }
-            try {
-                $handler->setOption('ident', $conf['log']['ident']);
-            } catch (Horde_Log_Exception $e) {
-            }
-            break;
-
-        case 'syslog':
-            try {
-                $handler = new Horde_Log_Handler_Syslog();
-                if (!empty($conf['log']['name'])) {
-                    $handler->setOption('facility', $conf['log']['name']);
+                    case 'xml':
+                        $formatter = new Horde_Log_Formatter_Xml();
+                        break;
                 }
-                if (!empty($conf['log']['ident'])) {
+
+                try {
+                    $handler = new Horde_Log_Handler_Stream($conf['log']['name'], $append, $formatter);
+                } catch (Horde_Log_Exception $e) {
+                    $this->error = $e;
+                    return new Horde_Core_Log_Logger(new Horde_Log_Handler_Null());
+                }
+                try {
                     $handler->setOption('ident', $conf['log']['ident']);
+                } catch (Horde_Log_Exception $e) {
                 }
-            } catch (Horde_Log_Exception $e) {
-                $this->error = $e;
-                return new Horde_Core_Log_Logger(new Horde_Log_Handler_Null());
-            }
-            break;
+                break;
 
-        case 'null':
-        default:
-            // Use default null handler.
-            return new Horde_Core_Log_Logger(new Horde_Log_Handler_Null());
+            case 'syslog':
+                try {
+                    $handler = new Horde_Log_Handler_Syslog();
+                    if (!empty($conf['log']['name'])) {
+                        $handler->setOption('facility', $conf['log']['name']);
+                    }
+                    if (!empty($conf['log']['ident'])) {
+                        $handler->setOption('ident', $conf['log']['ident']);
+                    }
+                } catch (Horde_Log_Exception $e) {
+                    $this->error = $e;
+                    return new Horde_Core_Log_Logger(new Horde_Log_Handler_Null());
+                }
+                break;
+
+            case 'null':
+            default:
+                // Use default null handler.
+                return new Horde_Core_Log_Logger(new Horde_Log_Handler_Null());
         }
 
         switch ($conf['log']['priority']) {
-        case 'WARNING':
-            // Bug #12109
-            $priority = 'WARN';
-            break;
+            case 'WARNING':
+                // Bug #12109
+                $priority = 'WARN';
+                break;
 
-        default:
-            $priority = defined('Horde_Log::' . $conf['log']['priority'])
-                ? $conf['log']['priority']
-                : 'NOTICE';
-            break;
+            default:
+                $priority = defined('Horde_Log::' . $conf['log']['priority'])
+                    ? $conf['log']['priority']
+                    : 'NOTICE';
+                break;
         }
         $handler->addFilter(constant('Horde_Log::' . $priority));
 
@@ -133,8 +133,8 @@ class Horde_Core_Factory_Logger extends Horde_Core_Factory_Injector
     public static function queue(Horde_Core_Log_Object $ob)
     {
         if (!isset(self::$_queue)) {
-            self::$_queue = array();
-            register_shutdown_function(array(__CLASS__, 'processQueue'));
+            self::$_queue = [];
+            register_shutdown_function([__CLASS__, 'processQueue']);
         }
 
         self::$_queue[] = $ob;
@@ -160,7 +160,7 @@ class Horde_Core_Factory_Logger extends Horde_Core_Factory_Injector
         } catch (Exception $e) {
         }
 
-        self::$_queue = array();
+        self::$_queue = [];
     }
 
 }

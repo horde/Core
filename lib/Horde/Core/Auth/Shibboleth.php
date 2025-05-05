@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Core_Auth_Shibboleth class provides Horde-specific code that
  * extends the base Shibboleth driver.

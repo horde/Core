@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -53,76 +54,76 @@ class Horde_Script_Compress
      * @param string $driver  Minification driver.
      * @param array $params   Configuration parameters.
      */
-    public function __construct($driver, array $params = array())
+    public function __construct($driver, array $params = [])
     {
         global $injector;
 
-        $this->_params = array(
-            'logger' => $injector->getInstance('Horde_Log_Logger')
-        );
+        $this->_params = [
+            'logger' => $injector->getInstance('Horde_Log_Logger'),
+        ];
 
         switch ($driver) {
-        case 'closure':
-            $this->_driver = 'Horde_JavascriptMinify_Closure';
-            $this->_params = array_merge($this->_params, array(
-                'closure' => $params['closurepath'],
-                'java' => $params['javapath']
-            ));
-            $this->_sourcemap = true;
-            break;
-
-        case 'none':
-            $this->_driver = 'Horde_JavascriptMinify_Null';
-            break;
-
-        case 'php':
-            /* Due to licensing issues, Jsmin might not be available. */
-            $this->_driver = class_exists('Horde_JavascriptMinify_Jsmin')
-                ? 'Horde_JavascriptMinify_Jsmin'
-                : 'Horde_JavascriptMinify_Null';
-            break;
-
-        case 'uglifyjs':
-            $this->_driver = 'Horde_JavascriptMinify_Uglifyjs';
-            $this->_params = array_merge($this->_params, array(
-                'uglifyjs' => $params['uglifyjspath']
-            ));
-
-            if (isset($params['uglifyjscmdline'])) {
-                $this->_params['cmdline'] = trim($params['uglifyjscmdline']);
-            }
-
-            if (isset($params['uglifyjsversion'])) {
-                switch ($params['uglifyjsversion']) {
-                case 2:
-                    if ($this->_params['cmdline'] != '-c') {
-                        $this->_params['cmdline'] = '-c';
-                    }
-                    $this->_sourcemap = true;
-                    break;
-                }
-            } else {
+            case 'closure':
+                $this->_driver = 'Horde_JavascriptMinify_Closure';
+                $this->_params = array_merge($this->_params, [
+                    'closure' => $params['closurepath'],
+                    'java' => $params['javapath'],
+                ]);
                 $this->_sourcemap = true;
-            }
-            break;
+                break;
 
-        case 'yui':
-            $this->_driver = 'Horde_JavascriptMinify_Yui';
-            $this->_params = array_merge($this->_params, array(
-                'java' => $params['javapath'],
-                'yui' => $params['yuipath']
-            ));
-            break;
-
-        default:
-            /* Treat as a custom driver. */
-            if (class_exists($driver)) {
-                $this->_driver = $driver;
-                $this->_params = array_merge($this->_params, $params);
-            } else {
+            case 'none':
                 $this->_driver = 'Horde_JavascriptMinify_Null';
-            }
-            break;
+                break;
+
+            case 'php':
+                /* Due to licensing issues, Jsmin might not be available. */
+                $this->_driver = class_exists('Horde_JavascriptMinify_Jsmin')
+                    ? 'Horde_JavascriptMinify_Jsmin'
+                    : 'Horde_JavascriptMinify_Null';
+                break;
+
+            case 'uglifyjs':
+                $this->_driver = 'Horde_JavascriptMinify_Uglifyjs';
+                $this->_params = array_merge($this->_params, [
+                    'uglifyjs' => $params['uglifyjspath'],
+                ]);
+
+                if (isset($params['uglifyjscmdline'])) {
+                    $this->_params['cmdline'] = trim($params['uglifyjscmdline']);
+                }
+
+                if (isset($params['uglifyjsversion'])) {
+                    switch ($params['uglifyjsversion']) {
+                        case 2:
+                            if ($this->_params['cmdline'] != '-c') {
+                                $this->_params['cmdline'] = '-c';
+                            }
+                            $this->_sourcemap = true;
+                            break;
+                    }
+                } else {
+                    $this->_sourcemap = true;
+                }
+                break;
+
+            case 'yui':
+                $this->_driver = 'Horde_JavascriptMinify_Yui';
+                $this->_params = array_merge($this->_params, [
+                    'java' => $params['javapath'],
+                    'yui' => $params['yuipath'],
+                ]);
+                break;
+
+            default:
+                /* Treat as a custom driver. */
+                if (class_exists($driver)) {
+                    $this->_driver = $driver;
+                    $this->_params = array_merge($this->_params, $params);
+                } else {
+                    $this->_driver = 'Horde_JavascriptMinify_Null';
+                }
+                break;
         }
     }
 
@@ -131,8 +132,8 @@ class Horde_Script_Compress
     public function __get($name)
     {
         switch ($name) {
-        case 'sourcemap_support':
-            return $this->_sourcemap;
+            case 'sourcemap_support':
+                return $this->_sourcemap;
         }
     }
 
@@ -146,16 +147,16 @@ class Horde_Script_Compress
      */
     public function getMinifier($scripts, $sourcemap = null)
     {
-        $js_files = array();
+        $js_files = [];
 
         foreach ($scripts as $val) {
             switch ($this->_driver) {
-            case 'Horde_JavascriptMinify_Null':
-                break;
+                case 'Horde_JavascriptMinify_Null':
+                    break;
 
-            default:
-                $val = $val->uncompressed;
-                break;
+                default:
+                    $val = $val->uncompressed;
+                    break;
             }
 
             $js_files[strval($val->url_full)] = $val->full_path;
@@ -165,9 +166,9 @@ class Horde_Script_Compress
             $js_files,
             array_merge(
                 $this->_params,
-                array(
-                    'sourcemap' => $sourcemap
-                )
+                [
+                    'sourcemap' => $sourcemap,
+                ]
             )
         );
     }

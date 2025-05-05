@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This class collects the javascript files needed for inclusion in the
  * browser output.
@@ -20,14 +21,14 @@ class Horde_Script_List implements Countable, Iterator
      *
      * @var array
      */
-    protected $_files = array();
+    protected $_files = [];
 
     /**
      * The list of files that has been previously output.
      *
      * @var array
      */
-    protected $_output = array();
+    protected $_output = [];
 
     /**
      * The temporary file list used when iterating.
@@ -64,7 +65,7 @@ class Horde_Script_List implements Countable, Iterator
      */
     public function clear()
     {
-        $this->_files = array();
+        $this->_files = [];
     }
 
     /* Countable methods. */
@@ -98,7 +99,7 @@ class Horde_Script_List implements Countable, Iterator
     #[\ReturnTypeWillChange]
     public function rewind()
     {
-        $files = array();
+        $files = [];
 
         foreach ($this->_files as $val) {
             $files[$val->priority][] = $val;
@@ -106,7 +107,7 @@ class Horde_Script_List implements Countable, Iterator
 
         ksort($files);
 
-        $this->_tmp = array();
+        $this->_tmp = [];
         foreach ($files as $val) {
             $this->_tmp = array_merge($this->_tmp, $val);
         }

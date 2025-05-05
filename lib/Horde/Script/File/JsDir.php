@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
  *
@@ -28,22 +29,22 @@ class Horde_Script_File_JsDir extends Horde_Script_File
     public function __get($name)
     {
         switch ($name) {
-        case 'path':
-            return $GLOBALS['registry']->get('jsfs', $this->_app) . '/';
+            case 'path':
+                return $GLOBALS['registry']->get('jsfs', $this->_app) . '/';
 
-        case 'uncompressed':
-            if (($pos = strripos($this->file, '.min.js')) !== false) {
-                $cname = get_class();
-                return new $cname(
-                    substr($this->file, 0, $pos) . '.js',
-                    $this->app
-                );
-            }
-            break;
+            case 'uncompressed':
+                if (($pos = strripos($this->file, '.min.js')) !== false) {
+                    $cname = get_class();
+                    return new $cname(
+                        substr($this->file, 0, $pos) . '.js',
+                        $this->app
+                    );
+                }
+                break;
 
-        case 'url':
-        case 'url_full':
-            return $this->_url($GLOBALS['registry']->get('jsuri', $this->_app) . '/' . $this->_file, ($name == 'url_full'));
+            case 'url':
+            case 'url_full':
+                return $this->_url($GLOBALS['registry']->get('jsuri', $this->_app) . '/' . $this->_file, ($name == 'url_full'));
         }
 
         return parent::__get($name);

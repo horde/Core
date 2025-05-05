@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @category Horde
  * @package  Core
@@ -12,13 +13,13 @@ class Horde_Core_Factory_Dns extends Horde_Core_Factory_Injector
         }
 
         if ($tmpdir = Horde::getTempDir()) {
-            $config = array(
+            $config = [
                 'cache_file' => $tmpdir . '/horde_dns.cache' . gethostname(),
                 'cache_size' => 100000,
                 'cache_type' => 'file',
-            );
+            ];
         } else {
-            $config = array();
+            $config = [];
         }
 
         $resolver = new Net_DNS2_Resolver($config);
@@ -26,7 +27,8 @@ class Horde_Core_Factory_Dns extends Horde_Core_Factory_Injector
         if (is_readable('/etc/resolv.conf')) {
             try {
                 $resolver->setServers('/etc/resolv.conf');
-            } catch (Net_DNS2_Exception $e) {}
+            } catch (Net_DNS2_Exception $e) {
+            }
         }
 
         return $resolver;

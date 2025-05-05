@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -28,7 +29,7 @@ class Horde_Core_Hooks
      *
      * @var array
      */
-    protected $_apps = array();
+    protected $_apps = [];
 
     /**
      * Call a Horde hook.
@@ -45,7 +46,7 @@ class Horde_Core_Hooks
      * @throws Horde_Exception  Thrown on error from hook code.
      * @throws Horde_Exception_HookNotSet  Thrown if hook is not active.
      */
-    public function callHook($hook, $app = 'horde', array $args = array())
+    public function callHook($hook, $app = 'horde', array $args = [])
     {
         if (!$this->hookExists($hook, $app)) {
             throw new Horde_Exception_HookNotSet();
@@ -57,7 +58,7 @@ class Horde_Core_Hooks
                 'DEBUG'
             );
             return call_user_func_array(
-                array($this->_apps[$app], $hook),
+                [$this->_apps[$app], $hook],
                 $args
             );
         } catch (Horde_Exception $e) {
@@ -87,8 +88,9 @@ class Horde_Core_Hooks
             if (!class_exists($hook_class, false)) {
                 try {
                     $registry->loadConfigFile('hooks.php', null, $app);
-                    $this->_apps[$app] = new $hook_class;
-                } catch (Horde_Exception $e) {}
+                    $this->_apps[$app] = new $hook_class();
+                } catch (Horde_Exception $e) {
+                }
             }
         }
 

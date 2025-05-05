@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Imple to allow in-place editing of a HTML element.
  *
@@ -21,14 +22,14 @@ abstract class Horde_Core_Ajax_Imple_InPlaceEditor extends Horde_Core_Ajax_Imple
      *   - dataid: (string) Data ID passed to the handler.
      *   - rows: (integer) Number of rows.
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
         /* Set up some defaults */
-        $params = array_merge(array(
+        $params = array_merge([
             'cols' => 20,
             'dataid' => '',
-            'rows' => 2
-        ), $params);
+            'rows' => 2,
+        ], $params);
 
         parent::__construct($params);
     }
@@ -43,35 +44,35 @@ abstract class Horde_Core_Ajax_Imple_InPlaceEditor extends Horde_Core_Ajax_Imple
             $page_output->addScriptFile('scriptaculous/effects.js', 'horde');
             $page_output->addScriptFile('inplaceeditor.js', 'horde');
 
-            $value_url = $this->getImpleUrl()->add(array(
+            $value_url = $this->getImpleUrl()->add([
                 'id' => $this->_params['dataid'],
-                'input' => 'value'
-            ))->setRaw(true);
-            $load_url = $value_url->copy()->add(array(
-                'action' => 'load'
-            ))->setRaw(true);
-            $config = new stdClass;
-            $config->config = array(
+                'input' => 'value',
+            ])->setRaw(true);
+            $load_url = $value_url->copy()->add([
+                'action' => 'load',
+            ])->setRaw(true);
+            $config = new stdClass();
+            $config->config = [
                 'cancelClassName' => '',
-                'cancelText' => Horde_Core_Translation::t("Cancel"),
-                'emptyText' => Horde_Core_Translation::t("Click to add caption..."),
-                'okText' => Horde_Core_Translation::t("Ok")
-            );
-            $config->ids = new stdClass;
-            $config->ids->{$this->getDomId()} = array(
+                'cancelText' => Horde_Core_Translation::t('Cancel'),
+                'emptyText' => Horde_Core_Translation::t('Click to add caption...'),
+                'okText' => Horde_Core_Translation::t('Ok'),
+            ];
+            $config->ids = new stdClass();
+            $config->ids->{$this->getDomId()} = [
                 'load_url' => (string)$load_url,
                 'rows' => $this->_params['rows'],
-                'value_url' => (string)$value_url
-            );
+                'value_url' => (string)$value_url,
+            ];
 
             if (!empty($this->_params['width'])) {
                 $config->ids->{$this->getDomId()}['width'] = $this->_params['width'];
             }
 
-            $page_output->addInlineJsVars(array(
-                'HordeImple.InPlaceEditor' . $this->getDomId() => $config
-            ));
-            $page_output->addInlineScript(array(
+            $page_output->addInlineJsVars([
+                'HordeImple.InPlaceEditor' . $this->getDomId() => $config,
+            ]);
+            $page_output->addInlineScript([
                 '$H(HordeImple.InPlaceEditor' . $this->getDomId() . '.ids).each(function(pair) {
                      new InPlaceEditor(pair.key, pair.value.value_url, Object.extend(HordeImple.InPlaceEditor' . $this->getDomId() . '.config, {
                          htmlResponse: false,
@@ -88,8 +89,8 @@ abstract class Horde_Core_Ajax_Imple_InPlaceEditor extends Horde_Core_Ajax_Imple
                          rows: pair.value.rows,
                          autoWidth: true
                      }));
-                 })'
-            ), true);
+                 })',
+            ], true);
         }
 
         return false;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Provides a method to display Growler messages using the HordeCore
  * javascript notification framework.
@@ -34,12 +35,12 @@ class Horde_Core_Notification_Listener_DynamicStatus extends Horde_Notification_
      * @param array $events   The list of events to handle.
      * @param array $options  An array of options. Not used.
      */
-    public function notify($events, $options = array())
+    public function notify($events, $options = [])
     {
         if (!empty($events)) {
-            $GLOBALS['page_output']->addInlineScript(array(
-                'window.HordeCore.showNotifications(' . Horde_Serialize::serialize($events, Horde_Serialize::JSON) . ')'
-            ), true);
+            $GLOBALS['page_output']->addInlineScript([
+                'window.HordeCore.showNotifications(' . Horde_Serialize::serialize($events, Horde_Serialize::JSON) . ')',
+            ], true);
         }
     }
 

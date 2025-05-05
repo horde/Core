@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2003-2017 Horde LLC (http://www.horde.org/)
  *
@@ -40,10 +41,10 @@ class Horde_Core_Ui_FlagImage
             return '';
         }
 
-        $img = Horde_Themes_Image::tag($data['ob'], array(
+        $img = Horde_Themes_Image::tag($data['ob'], [
             'alt' => $data['name'],
-            'attr' => array('title' => $data['name'])
-        ));
+            'attr' => ['title' => $data['name']],
+        ]);
 
         return $img
             ? $img
@@ -79,10 +80,10 @@ class Horde_Core_Ui_FlagImage
             return false;
         }
 
-        return array(
+        return [
             'name' => $data['name'],
-            'ob' => Horde_Themes::img('flags/' . $data['code'] . '.png')
-        );
+            'ob' => Horde_Themes::img('flags/' . $data['code'] . '.png'),
+        ];
     }
 
 }

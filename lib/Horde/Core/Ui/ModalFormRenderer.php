@@ -14,20 +14,22 @@
  */
 class Horde_Core_Ui_ModalFormRenderer extends Horde_Form_Renderer
 {
-    var $_stripedRows = false;
+    public $_stripedRows = false;
 
-    function _renderSectionBegin(&$form, $section)
+    public function _renderSectionBegin(&$form, $section)
     {
         $open_section = $form->getOpenSection();
         if (is_null($open_section)) {
             $open_section = '__base';
         }
-        printf('<div id="%s" style="display:%s;">',
-               htmlspecialchars($form->getName() . '_section_' . $section),
-               ($open_section == $section ? 'block' : 'none'));
+        printf(
+            '<div id="%s" style="display:%s;">',
+            htmlspecialchars($form->getName() . '_section_' . $section),
+            ($open_section == $section ? 'block' : 'none')
+        );
     }
 
-    function _renderSectionEnd()
+    public function _renderSectionEnd()
     {
         echo '</div>';
     }
@@ -35,12 +37,12 @@ class Horde_Core_Ui_ModalFormRenderer extends Horde_Form_Renderer
     /**
      * Implementation specific end function.
      */
-    function _renderEnd()
+    public function _renderEnd()
     {
         echo '</div>' . $this->_varRenderer->renderEnd();
     }
 
-    function _renderHeader($header, $error = '')
+    public function _renderHeader($header, $error = '')
     {
         echo '<div class="horde-form-header">';
         echo $header;
@@ -50,22 +52,24 @@ class Horde_Core_Ui_ModalFormRenderer extends Horde_Form_Renderer
         echo '</div>';
     }
 
-    function _renderDescription($text)
+    public function _renderDescription($text)
     {
-?><div><p class="horde-form-description" style="padding:8px"><?php echo $text ?></p></div>
+        ?><div><p class="horde-form-description" style="padding:8px"><?php echo $text ?></p></div>
 <?php
     }
 
-    function _renderSpacer()
+    public function _renderSpacer()
     {
-?><div>&nbsp;</div>
+        ?><div>&nbsp;</div>
 <?php
     }
 
-    function _renderSubmit($submit, $reset)
+    public function _renderSubmit($submit, $reset)
     {
-?><div>
-  <?php if (!is_array($submit)) $submit = array($submit); foreach ($submit as $submitbutton): ?>
+        ?><div>
+  <?php if (!is_array($submit)) {
+      $submit = [$submit];
+  } foreach ($submit as $submitbutton): ?>
     <input class="button submit-button" name="submitbutton" type="submit" value="<?php echo $submitbutton ?>" />
   <?php endforeach; ?>
 </div>
@@ -77,20 +81,24 @@ class Horde_Core_Ui_ModalFormRenderer extends Horde_Form_Renderer
         return htmlspecialchars(preg_replace('/[^A-Za-z0-9-_:.]+/', '_', $var->getVarName()));
     }
 
-    function _renderVarInputBegin(&$form, &$var, &$vars)
+    public function _renderVarInputBegin(&$form, &$var, &$vars)
     {
         $message = $form->getError($var);
         $isvalid = empty($message);
         echo "<div>\n";
-        printf('  <label for="%s">%s</label>%s' . "\n",
-               $this->_genId($var),
-               $var->getHumanName(),
-               $isvalid ? '' : ' <span class="horde-form-error">' . $message . '</span>');
-        printf('</div><div%s>',
-               ($var->isDisabled() ? ' class="horde-form-disabled"' : ''));
+        printf(
+            '  <label for="%s">%s</label>%s' . "\n",
+            $this->_genId($var),
+            $var->getHumanName(),
+            $isvalid ? '' : ' <span class="horde-form-error">' . $message . '</span>'
+        );
+        printf(
+            '</div><div%s>',
+            ($var->isDisabled() ? ' class="horde-form-disabled"' : '')
+        );
     }
 
-    function _renderVarInputEnd(&$form, &$var, &$vars)
+    public function _renderVarInputEnd(&$form, &$var, &$vars)
     {
         /* Display any description for the field. */
         if ($var->hasDescription()) {
@@ -100,7 +108,7 @@ class Horde_Core_Ui_ModalFormRenderer extends Horde_Form_Renderer
         echo "</div>\n";
     }
 
-    function _sectionHeader($title, $extra = '')
+    public function _sectionHeader($title, $extra = '')
     {
         if (strlen($title)) {
             echo '<div class="horde-form-header">';

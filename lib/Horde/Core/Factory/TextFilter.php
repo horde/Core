@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based Horde_Text_Filter_Base:: factory.
  *
@@ -36,9 +37,9 @@ class Horde_Core_Factory_TextFilter extends Horde_Core_Factory_Base
      * @return Horde_Text_Filter_Base  The singleton instance.
      * @throws Horde_Text_Filter_Exception
      */
-    public function create($driver, array $params = array())
+    public function create($driver, array $params = [])
     {
-        list($driver, $params) = $this->_getDriver($driver, $params);
+        [$driver, $params] = $this->_getDriver($driver, $params);
         $driver = $this->_getDriverName($driver, 'Horde_Text_Filter');
         return new $driver($params);
     }
@@ -52,18 +53,18 @@ class Horde_Core_Factory_TextFilter extends Horde_Core_Factory_Base
      *
      * @return string  The transformed text.
      */
-    public function filter($text, $filters = array(), $params = array())
+    public function filter($text, $filters = [], $params = [])
     {
         if (!is_array($filters)) {
-            $filters = array($filters);
-            $params = array($params);
+            $filters = [$filters];
+            $params = [$params];
         }
 
-        $filter_list = array();
+        $filter_list = [];
         $params = array_values($params);
 
         foreach (array_values($filters) as $num => $filter) {
-            list($driver, $driv_param) = $this->_getDriver($filter, isset($params[$num]) ? $params[$num] : array());
+            [$driver, $driv_param] = $this->_getDriver($filter, $params[$num] ?? []);
             $filter_list[$driver] = $driv_param;
         }
 
@@ -85,42 +86,42 @@ class Horde_Core_Factory_TextFilter extends Horde_Core_Factory_Base
         $lc_driver = Horde_String::lower($driver);
 
         switch ($lc_driver) {
-        case 'bbcode':
-            $driver = 'Horde_Core_Text_Filter_Bbcode';
-            break;
+            case 'bbcode':
+                $driver = 'Horde_Core_Text_Filter_Bbcode';
+                break;
 
-        case 'emails':
-            $driver = 'Horde_Core_Text_Filter_Emails';
-            break;
+            case 'emails':
+                $driver = 'Horde_Core_Text_Filter_Emails';
+                break;
 
-        case 'emoticons':
-            $driver = 'Horde_Core_Text_Filter_Emoticons';
-            break;
+            case 'emoticons':
+                $driver = 'Horde_Core_Text_Filter_Emoticons';
+                break;
 
-        case 'highlightquotes':
-            $driver = 'Horde_Core_Text_Filter_Highlightquotes';
-            break;
+            case 'highlightquotes':
+                $driver = 'Horde_Core_Text_Filter_Highlightquotes';
+                break;
 
-        case 'linkurls':
-            if (!isset($params['callback'])) {
-                $params['callback'] = 'Horde::externalUrl';
-            }
-            break;
-
-        case 'text2html':
-            $param_copy = $params;
-            foreach (array('emails', 'linkurls', 'space2html') as $val) {
-                if (!isset($params[$val])) {
-                    $tmp = $this->_getDriver($val, $param_copy);
-                    $params[$val] = array(
-                        $tmp[0] => $tmp[1]
-                    );
+            case 'linkurls':
+                if (!isset($params['callback'])) {
+                    $params['callback'] = 'Horde::externalUrl';
                 }
-            }
-            break;
+                break;
+
+            case 'text2html':
+                $param_copy = $params;
+                foreach (['emails', 'linkurls', 'space2html'] as $val) {
+                    if (!isset($params[$val])) {
+                        $tmp = $this->_getDriver($val, $param_copy);
+                        $params[$val] = [
+                            $tmp[0] => $tmp[1],
+                        ];
+                    }
+                }
+                break;
         }
 
-        return array($driver, $params);
+        return [$driver, $params];
     }
 
 }

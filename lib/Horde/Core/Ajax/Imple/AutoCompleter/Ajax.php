@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The AJAX autocompleter.
  *
@@ -19,7 +20,7 @@ class Horde_Core_Ajax_Imple_AutoCompleter_Ajax extends Horde_Core_Ajax_Imple_Aut
      *
      * @var array
      */
-    protected $_raw = array('onSelect', 'onShow', 'onType', 'filterCallback');
+    protected $_raw = ['onSelect', 'onShow', 'onType', 'filterCallback'];
 
     /**
      * @param array $params  Configuration options:
@@ -35,11 +36,11 @@ class Horde_Core_Ajax_Imple_AutoCompleter_Ajax extends Horde_Core_Ajax_Imple_Aut
      *   - paramName: (string) TODO
      *   - tokens: (array) Valid token separators.
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
-        parent::__construct(array_merge(array(
-            'tokens' => array(',', ';')
-        ), $params));
+        parent::__construct(array_merge([
+            'tokens' => [',', ';'],
+        ], $params));
     }
 
     /**
@@ -50,7 +51,7 @@ class Horde_Core_Ajax_Imple_AutoCompleter_Ajax extends Horde_Core_Ajax_Imple_Aut
 
         return 'new Ajax.Autocompleter(' .
             Horde_Serialize::serialize($dom_id, Horde_Serialize::JSON) . ',' .
-            Horde_Serialize::serialize(strval($ac->getImpleUrl()->setRaw(true)->add(array('input' => $dom_id))), Horde_Serialize::JSON) . ',' .
+            Horde_Serialize::serialize(strval($ac->getImpleUrl()->setRaw(true)->add(['input' => $dom_id])), Horde_Serialize::JSON) . ',' .
             '{' . implode(',', $this->_getOpts($ac)) . '})';
     }
 
@@ -61,7 +62,7 @@ class Horde_Core_Ajax_Imple_AutoCompleter_Ajax extends Horde_Core_Ajax_Imple_Aut
      */
     protected function _getOpts(Horde_Core_Ajax_Imple_AutoCompleter $ac)
     {
-        $opts = array();
+        $opts = [];
 
         if (!isset($this->params['indicator'])) {
             $this->params['indicator'] = $ac->getDomId() . '_loading_img';

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class that extends the base emoticons class to allow output of Horde image
  * tags.
@@ -24,13 +25,13 @@ class Horde_Core_Text_Filter_Emoticons extends Horde_Text_Filter_Emoticons
      */
     public function getIcon($icon)
     {
-        return Horde_Themes_Image::tag('emoticons/' . $this->getIcons($icon) . '.png', array(
+        return Horde_Themes_Image::tag('emoticons/' . $this->getIcons($icon) . '.png', [
             'alt' => $icon,
-            'attr' => array(
+            'attr' => [
                 'align' => 'middle',
-                'title' => $icon
-            )
-        ));
+                'title' => $icon,
+            ],
+        ]);
     }
 
 }

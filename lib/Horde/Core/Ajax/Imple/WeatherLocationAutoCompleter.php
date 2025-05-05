@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Imple to provide weather/location autocompletion.
  *
@@ -21,7 +22,7 @@ class Horde_Core_Ajax_Imple_WeatherLocationAutoCompleter extends Horde_Core_Ajax
         $indicator = $this->_params['id'] . '_loading_img';
 
         $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineScript(
-            array(
+            [
                 'window.weatherupdate = window.weatherupdate || {}',
                 'window.weatherupdate["' . $this->_params['instance'] . '"] = {
                     value: false,
@@ -51,13 +52,13 @@ class Horde_Core_Ajax_Imple_WeatherLocationAutoCompleter extends Horde_Core_Ajax
                 '$("button' . $this->_params['instance'] . '").observe("click", function(e) {
                     window.weatherupdate["' . $this->_params['instance'] . '"].update();
                     e.stop();
-                })'
-            )
+                })',
+            ]
         );
 
-        return new Horde_Core_Ajax_Imple_AutoCompleter_Ajax(array(
+        return new Horde_Core_Ajax_Imple_AutoCompleter_Ajax([
             'minChars' => 3,
-            'tokens' => array(),
+            'tokens' => [],
             'domParent' => 'horde-content',
             'filterCallback' => 'function(c) {
                 if (c) {
@@ -81,8 +82,8 @@ class Horde_Core_Ajax_Imple_WeatherLocationAutoCompleter extends Horde_Core_Ajax
                     }
                 });
                 return c;
-            }'
-        ));
+            }',
+        ]);
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @category Horde
  * @package  Core
@@ -13,11 +14,11 @@ class Horde_Core_Factory_HttpClient extends Horde_Core_Factory_Base
      * @return Horde_Http_Client  Client object.
      * @throws Horde_Http_Exception
      */
-    public function create(array $opts = array())
+    public function create(array $opts = [])
     {
         global $conf;
 
-        $copts = array();
+        $copts = [];
         if (!empty($conf['http']['proxy']['proxy_host'])) {
             $copts['request.proxyServer'] = $conf['http']['proxy']['proxy_host'];
             $copts['request.proxyPort'] = $conf['http']['proxy']['proxy_port'];

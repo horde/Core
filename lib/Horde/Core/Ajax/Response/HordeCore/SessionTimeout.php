@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Sends a session timeout request to the HordeCore JS framework.
  *
@@ -48,17 +49,17 @@ class Horde_Core_Ajax_Response_HordeCore_SessionTimeout extends Horde_Core_Ajax_
      */
     protected function _jsonData()
     {
-        $msg = new stdClass;
-        $msg->message = strval($GLOBALS['registry']->getLogoutUrl(array(
-            'reason' => Horde_Auth::REASON_SESSION
-        ))->add('url', Horde::url('', false, array(
+        $msg = new stdClass();
+        $msg->message = strval($GLOBALS['registry']->getLogoutUrl([
+            'reason' => Horde_Auth::REASON_SESSION,
+        ])->add('url', Horde::url('', false, [
             'app' => $this->_app,
-            'append_session' => -1
-        ))));
+            'append_session' => -1,
+        ])));
         $msg->type = 'horde.ajaxtimeout';
 
-        $ob = new stdClass;
-        $ob->msgs = array($msg);
+        $ob = new stdClass();
+        $ob->msgs = [$msg];
         $ob->response = false;
 
         return $ob;

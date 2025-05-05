@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
  *
@@ -38,7 +39,7 @@ class Horde_Themes_Element
      *
      * @var array
      */
-    protected $_data = array();
+    protected $_data = [];
 
     /**
      * The default directory name for this element type.
@@ -77,7 +78,7 @@ class Horde_Themes_Element
      *   - theme: (string) Use this theme instead of the Horde default.
      *   - uri: (string) Use this as the URI value.
      */
-    public function __construct($name = '', array $options = array())
+    public function __construct($name = '', array $options = [])
     {
         $this->app = empty($options['app'])
             ? $GLOBALS['registry']->getApp()
@@ -123,10 +124,10 @@ class Horde_Themes_Element
 
             if (is_null($this->_name)) {
                 /* Return directory only. */
-                $this->_data = array(
+                $this->_data = [
                     'fs' => $registry->get('themesfs', $this->app) . '/' . $theme . '/' . $this->_dirname,
-                    'uri' => $registry->get('themesuri', $this->app) . '/' . $theme . '/' . $this->_dirname
-                );
+                    'uri' => $registry->get('themesuri', $this->app) . '/' . $theme . '/' . $this->_dirname,
+                ];
             } else {
                 $cache = $GLOBALS['injector']->getInstance('Horde_Core_Factory_ThemesCache')->create($this->app, $theme);
                 $mask = empty($this->_opts['nohorde'])
@@ -144,15 +145,15 @@ class Horde_Themes_Element
             return null;
         }
         switch ($name) {
-        case 'fs':
-        case 'uri':
-            return $this->_data[$name];
+            case 'fs':
+            case 'uri':
+                return $this->_data[$name];
 
-        case 'fulluri':
-            return Horde::url($this->_data['uri'], true);
+            case 'fulluri':
+                return Horde::url($this->_data['uri'], true);
 
-        default:
-            return null;
+            default:
+                return null;
         }
     }
 
@@ -167,12 +168,12 @@ class Horde_Themes_Element
     {
         global $registry;
 
-        return new self('', array(
-            'data' => array(
+        return new self('', [
+            'data' => [
                 'fs' => realpath($registry->get('fileroot', 'horde')) . preg_replace('/^' . preg_quote($registry->get('webroot', 'horde'), '/') . '/', '', $uri),
-                'uri' => $uri
-            )
-        ));
+                'uri' => $uri,
+            ],
+        ]);
     }
 
 }

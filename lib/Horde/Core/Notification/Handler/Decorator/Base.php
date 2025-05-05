@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2001-2017 Horde LLC (http://www.horde.org/)
  *
@@ -43,10 +44,10 @@ class Horde_Core_Notification_Handler_Decorator_Base extends Horde_Notification_
         global $registry;
 
         try {
-            $pushed = $registry->pushApp($this->_app, array(
+            $pushed = $registry->pushApp($this->_app, [
                 'check_perms' => true,
-                'logintasks' => false
-            ));
+                'logintasks' => false,
+            ]);
         } catch (Exception $e) {
             return;
         }
@@ -81,17 +82,16 @@ class Horde_Core_Notification_Handler_Decorator_Base extends Horde_Notification_
     public function notify(
         Horde_Notification_Handler $handler,
         Horde_Notification_Listener $listener
-    )
-    {
+    ) {
         global $registry;
 
         $error = null;
 
         try {
-            $pushed = $registry->pushApp($this->_app, array(
+            $pushed = $registry->pushApp($this->_app, [
                 'check_perms' => true,
-                'logintasks' => false
-            ));
+                'logintasks' => false,
+            ]);
         } catch (Exception $e) {
             return;
         }
@@ -118,8 +118,7 @@ class Horde_Core_Notification_Handler_Decorator_Base extends Horde_Notification_
     protected function _notify(
         Horde_Notification_Handler $handler,
         Horde_Notification_Listener $listener
-    )
-    {
+    ) {
         parent::notify($handler, $listener);
     }
 

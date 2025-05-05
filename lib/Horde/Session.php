@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
  *
@@ -32,20 +33,20 @@
 class Horde_Session
 {
     /* Class constants. */
-    const BEGIN = '_b';
-    const ENCRYPTED = '_e'; /* @since 2.7.0 */
-    const MODIFIED = '_m'; /* @deprecated */
-    const PRUNE = '_p';
-    const REGENERATE = '_r'; /* @since 2.5.0 */
+    public const BEGIN = '_b';
+    public const ENCRYPTED = '_e'; /* @since 2.7.0 */
+    public const MODIFIED = '_m'; /* @deprecated */
+    public const PRUNE = '_p';
+    public const REGENERATE = '_r'; /* @since 2.5.0 */
 
-    const TYPE_ARRAY = 1;
-    const TYPE_OBJECT = 2;
-    const ENCRYPT = 4; /* @since 2.7.0 */
+    public const TYPE_ARRAY = 1;
+    public const TYPE_OBJECT = 2;
+    public const ENCRYPT = 4; /* @since 2.7.0 */
 
-    const NOT_SERIALIZED = "\0";
+    public const NOT_SERIALIZED = "\0";
 
-    const NONCE_ID = 'session_nonce'; /* @since 2.11.0 */
-    const TOKEN_ID = 'session_token';
+    public const NONCE_ID = 'session_nonce'; /* @since 2.11.0 */
+    public const TOKEN_ID = 'session_token';
 
     /**
      * Maximum size of the pruneable data store.
@@ -102,7 +103,7 @@ class Horde_Session
     public function __construct()
     {
         /* Make sure global session variable is always initialized. */
-        $_SESSION = array();
+        $_SESSION = [];
         $this->_data = &$_SESSION;
     }
 
@@ -111,18 +112,18 @@ class Horde_Session
     public function __get($name)
     {
         switch ($name) {
-        case 'begin':
-            return ($this->_active || $this->_relogin)
-                ? $this->_data[self::BEGIN]
-                : 0;
+            case 'begin':
+                return ($this->_active || $this->_relogin)
+                    ? $this->_data[self::BEGIN]
+                    : 0;
 
-        case 'regenerate_due':
-            return (isset($this->_data[self::REGENERATE]) &&
-                    (time() >= $this->_data[self::REGENERATE]));
+            case 'regenerate_due':
+                return (isset($this->_data[self::REGENERATE]) &&
+                        (time() >= $this->_data[self::REGENERATE]));
 
-        case 'regenerate_interval':
-            // DEFAULT: 6 hours
-            return 21600;
+            case 'regenerate_interval':
+                // DEFAULT: 6 hours
+                return 21600;
         }
     }
 
@@ -131,9 +132,9 @@ class Horde_Session
     public function __set($name, $value)
     {
         switch ($name) {
-        case 'session_data':
-            $this->_data = &$value;
-            break;
+            case 'session_data':
+                $this->_data = &$value;
+                break;
         }
     }
 
@@ -147,9 +148,11 @@ class Horde_Session
      *
      * @throws Horde_Exception
      */
-    public function setup($start = true, $cache_limiter = null,
-                          $session_id = null)
-    {
+    public function setup(
+        $start = true,
+        $cache_limiter = null,
+        $session_id = null
+    ) {
         global $conf, $injector;
 
         ini_set('url_rewriter.tags', 0);
@@ -237,7 +240,7 @@ class Horde_Session
     public function regenerate()
     {
         /* Load old encrypted data. */
-        $encrypted = array();
+        $encrypted = [];
         if (!empty($this->_data[self::ENCRYPTED])) {
             foreach ($this->_data[self::ENCRYPTED] as $app => $val) {
                 foreach (array_keys($val) as $val2) {
@@ -276,7 +279,7 @@ class Horde_Session
         // session data.
         session_regenerate_id(true);
         session_unset();
-        $this->_data = array();
+        $this->_data = [];
         $this->_start();
 
         $GLOBALS['injector']->getInstance('Horde_Secret_Cbc')->setKey();
@@ -372,7 +375,7 @@ class Horde_Session
         }
 
         if ($subkeys = $this->_subkeys($app, $name)) {
-            $ret = array();
+            $ret = [];
             foreach ($subkeys as $k => $v) {
                 $ret[$k] = $this->get($app, $v, $mask);
             }
@@ -385,11 +388,11 @@ class Horde_Session
         }
 
         switch ($mask) {
-        case self::TYPE_ARRAY:
-            return array();
+            case self::TYPE_ARRAY:
+                return [];
 
-        case self::TYPE_OBJECT:
-            return new stdClass;
+            case self::TYPE_OBJECT:
+                return new stdClass();
         }
 
         return null;
@@ -425,7 +428,7 @@ class Horde_Session
         if (($mask & self::ENCRYPT) ||
             is_object($value) || ($mask & self::TYPE_OBJECT) ||
             is_array($value) || ($mask & self::TYPE_ARRAY)) {
-            $opts = array('compress' => 0);
+            $opts = ['compress' => 0];
             if (is_object($value) || ($mask & self::TYPE_OBJECT)) {
                 $opts['phpob'] = true;
             }
@@ -498,7 +501,7 @@ class Horde_Session
      */
     private function _subkeys($app, $name)
     {
-        $ret = array();
+        $ret = [];
 
         if ($name &&
             isset($this->_data[$app]) &&
@@ -588,7 +591,7 @@ class Horde_Session
     /* Session object storage. */
 
     /** @deprecated */
-    const DATA = '_d';
+    public const DATA = '_d';
 
     /**
      * @deprecated  Use Horde_Core_Cache_SessionObjects instead.
@@ -617,7 +620,8 @@ class Horde_Session
         $ob = new Horde_Core_Cache_SessionObjects();
         try {
             return $injector->getInstance('Horde_Pack')->unpack($ob->get($id));
-        } catch (Horde_Pack_Exception $e) {}
+        } catch (Horde_Pack_Exception $e) {
+        }
 
         return null;
     }

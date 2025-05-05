@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Core_Perms class provides information about internal Horde
  * elements that can be managed through the Horde_Perms system.
@@ -42,9 +43,10 @@ class Horde_Core_Perms
      * @params Horde_Registry $registry
      * @params Horde_Perms_Base $perms
      */
-    public function __construct(Horde_Registry $registry,
-                                Horde_Perms_Base $perms)
-    {
+    public function __construct(
+        Horde_Registry $registry,
+        Horde_Perms_Base $perms
+    ) {
         $this->_registry = $registry;
         $this->_perms = $perms;
     }
@@ -67,7 +69,7 @@ class Horde_Core_Perms
         if (empty($name)) {
             /* No name passed, so top level permissions are requested. These
              * can only be applications. */
-            $apps = $this->_registry->listApps(array('notoolbar', 'active', 'hidden'), true);
+            $apps = $this->_registry->listApps(['notoolbar', 'active', 'hidden'], true);
             foreach (array_keys($apps) as $app) {
                 $apps[$app] = $this->_registry->get('name', $app) . ' (' . $app . ')';
             }
@@ -99,7 +101,7 @@ class Horde_Core_Perms
             return false;
         }
 
-        $perms_list = array();
+        $perms_list = [];
         foreach (array_keys($children) as $perm_key) {
             $perms_list[$perm_key] = $perms['title'][$name . ':' . $perm_key];
         }
@@ -118,7 +120,7 @@ class Horde_Core_Perms
     public function getTitle($name)
     {
         if ($name === Horde_Perms::ROOT) {
-            return Horde_Core_Translation::t("All Permissions");
+            return Horde_Core_Translation::t('All Permissions');
         }
 
         $levels = explode(':', $name);
@@ -153,7 +155,8 @@ class Horde_Core_Perms
                 if (isset($info['type']) && isset($info['type'][$name])) {
                     $type = $info['type'][$name];
                 }
-            } catch (Horde_Perms_Exception $e) {}
+            } catch (Horde_Perms_Exception $e) {
+            }
         }
         return $type;
     }
@@ -174,7 +177,8 @@ class Horde_Core_Perms
                 if (isset($info['params']) && isset($info['params'][$name])) {
                     $params = $info['params'][$name];
                 }
-            } catch (Horde_Perms_Exception $e) {}
+            } catch (Horde_Perms_Exception $e) {
+            }
         }
         return $params;
     }
@@ -191,9 +195,11 @@ class Horde_Core_Perms
      */
     public function newPermission($name)
     {
-        return $this->_perms->newPermission($name,
-                                            $this->getType($name),
-                                            $this->getParams($name));
+        return $this->_perms->newPermission(
+            $name,
+            $this->getType($name),
+            $this->getParams($name)
+        );
     }
 
     /**
@@ -209,19 +215,19 @@ class Horde_Core_Perms
             try {
                 $app_perms = $this->_registry->callAppMethod($app, 'perms');
             } catch (Horde_Exception $e) {
-                $app_perms = array();
+                $app_perms = [];
             }
 
             if (empty($app_perms)) {
-                $perms = array();
+                $perms = [];
             } else {
-                $perms = array(
-                    'title' => array(),
-                    'tree' => array(
-                        $app => array()
-                    ),
-                    'type' => array()
-                );
+                $perms = [
+                    'title' => [],
+                    'tree' => [
+                        $app => [],
+                    ],
+                    'type' => [],
+                ];
 
                 foreach ($app_perms as $key => $val) {
                     $ptr = &$perms['tree'][$app];
@@ -265,11 +271,10 @@ class Horde_Core_Perms
      *
      * @return mixed  The specified permissions.
      */
-    public function hasAppPermission($permission, $opts = array())
+    public function hasAppPermission($permission, $opts = [])
     {
-        $app = isset($opts['app'])
-            ? $opts['app']
-            : $this->_registry->getApp();
+        $app = $opts['app']
+            ?? $this->_registry->getApp();
 
         if ($this->_perms->exists($app . ':' . $permission)) {
             $perms = $this->_perms->getPermissions($app . ':' . $permission, $this->_registry->getAuth());
@@ -277,15 +282,16 @@ class Horde_Core_Perms
                 return false;
             }
 
-            $args = array(
+            $args = [
                 $permission,
                 $perms,
-                isset($opts['opts']) ? $opts['opts'] : array()
-            );
+                $opts['opts'] ?? [],
+            ];
 
             try {
-                return $this->_registry->callAppMethod($app, 'hasPermission', array('args' => $args));
-            } catch (Horde_Exception $e) {}
+                return $this->_registry->callAppMethod($app, 'hasPermission', ['args' => $args]);
+            } catch (Horde_Exception $e) {
+            }
         }
 
         return true;

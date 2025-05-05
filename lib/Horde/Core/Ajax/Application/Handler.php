@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Defines AJAX actions to be handled by an application's endpoint.
  *
@@ -29,21 +30,21 @@ class Horde_Core_Ajax_Application_Handler
      *
      * @var array
      */
-    protected $_external = array();
+    protected $_external = [];
 
     /**
      * A list of public method names to ignore as actions.
      *
      * @var array
      */
-    protected $_ignored = array();
+    protected $_ignored = [];
 
     /**
       * A list of actions that require read-only session access.
       *
       * @var array
       */
-    protected $_readOnly = array();
+    protected $_readOnly = [];
 
     /**
      * Constructor.
@@ -61,8 +62,8 @@ class Horde_Core_Ajax_Application_Handler
     final public function __get($name)
     {
         switch ($name) {
-        case 'vars':
-            return $this->_base->vars;
+            case 'vars':
+                return $this->_base->vars;
         }
     }
 

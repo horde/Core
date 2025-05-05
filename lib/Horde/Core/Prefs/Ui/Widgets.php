@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Collection of prefs UI widgets for use with application-specific (a/k/a
  * 'special') configuration.
@@ -50,26 +51,26 @@ class Horde_Core_Prefs_Ui_Widgets
         $t->set('selectlabel', $data['selectlabel']);
         $t->set('unselectlabel', $data['unselectlabel']);
 
-        $sources = $labels = array();
+        $sources = $labels = [];
         foreach ($data['sources'] as $key => $val) {
-            $selected = $unselected = array();
+            $selected = $unselected = [];
 
             foreach ($val['selected'] as $key2 => $val2) {
-                $selected[] = array(
+                $selected[] = [
                     'l' => $val2,
-                    'v' => $key2
-                );
+                    'v' => $key2,
+                ];
             }
 
             foreach ($val['unselected'] as $key2 => $val2) {
-                $unselected[] = array(
+                $unselected[] = [
                     'l' => $val2,
-                    'v' => $key2
-                );
+                    'v' => $key2,
+                ];
             }
 
-            $sources[$key] = array($selected, $unselected);
-            $labels[] = array('key' => $key, 'label' => isset($val['label']) ? $val['label'] : '');
+            $sources[$key] = [$selected, $unselected];
+            $labels[] = ['key' => $key, 'label' => $val['label'] ?? ''];
         }
 
         if (count($sources) == 1) {
@@ -80,25 +81,25 @@ class Horde_Core_Prefs_Ui_Widgets
             $t->set('source_select', true);
             $t->set('sources', $labels);
             $t->set('sourcelabel', $data['sourcelabel']);
-            $js = array();
+            $js = [];
             foreach ($sources as $key => $val) {
-                $js[] = array(
+                $js[] = [
                     'selected' => $val[0],
                     'source' => $key,
-                    'unselected' => $val[1]
-                );
+                    'unselected' => $val[1],
+                ];
             }
-            $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineJsVars(array(
-                'HordeSourceSelectPrefs.source_list' => $js
-            ));
+            $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineJsVars([
+                'HordeSourceSelectPrefs.source_list' => $js,
+            ]);
         }
 
-        $t->set('addimg', Horde_Themes_Image::tag($GLOBALS['registry']->nlsconfig->curr_rtl ? 'lhand.png' : 'rhand.png', array('alt' => Horde_Core_Translation::t("Add source"))));
-        $t->set('removeimg', Horde_Themes_Image::tag($GLOBALS['registry']->nlsconfig->curr_rtl ? 'rhand.png' : 'lhand.png', array('alt' => Horde_Core_Translation::t("Remove source"))));
+        $t->set('addimg', Horde_Themes_Image::tag($GLOBALS['registry']->nlsconfig->curr_rtl ? 'lhand.png' : 'rhand.png', ['alt' => Horde_Core_Translation::t('Add source')]));
+        $t->set('removeimg', Horde_Themes_Image::tag($GLOBALS['registry']->nlsconfig->curr_rtl ? 'rhand.png' : 'lhand.png', ['alt' => Horde_Core_Translation::t('Remove source')]));
 
         if (empty($data['no_up'])) {
-            $t->set('upimg', Horde_Themes_Image::tag('nav/up.png', array('alt' => Horde_Core_Translation::t("Move up"))));
-            $t->set('downimg', Horde_Themes_Image::tag('nav/down.png', array('alt' => Horde_Core_Translation::t("Move down"))));
+            $t->set('upimg', Horde_Themes_Image::tag('nav/up.png', ['alt' => Horde_Core_Translation::t('Move up')]));
+            $t->set('downimg', Horde_Themes_Image::tag('nav/down.png', ['alt' => Horde_Core_Translation::t('Move down')]));
         }
 
         return $t->fetch($GLOBALS['registry']->get('templates', 'horde') . '/prefs/source.html');
@@ -117,7 +118,7 @@ class Horde_Core_Prefs_Ui_Widgets
      */
     public static function sourceUpdate($ui)
     {
-        $out = array();
+        $out = [];
 
         if (isset($ui->vars->sources)) {
             $out['sources'] = $ui->vars->sources;
@@ -154,7 +155,7 @@ class Horde_Core_Prefs_Ui_Widgets
     {
         global $registry;
 
-        $selected = $unselected = array();
+        $selected = $unselected = [];
         $out = '';
 
         if (!$registry->hasMethod('contacts/sources')) {
@@ -167,13 +168,13 @@ class Horde_Core_Prefs_Ui_Widgets
         try {
             $readable = $registry->call('contacts/sources');
         } catch (Horde_Exception $e) {
-            $readable = array();
+            $readable = [];
         }
 
         try {
-            $writeable = $registry->call('contacts/sources', array(true));
+            $writeable = $registry->call('contacts/sources', [true]);
         } catch (Horde_Exception $e) {
-            $writeable = array();
+            $writeable = [];
         }
 
         if (count($readable) == 1) {
@@ -192,47 +193,48 @@ class Horde_Core_Prefs_Ui_Widgets
         }
 
         if (!empty($selected) || !empty($unselected)) {
-            $out = Horde_Core_Prefs_Ui_Widgets::source(array(
-                  'mainlabel' => Horde_Core_Translation::t("Choose the order of address books to search when expanding addresses."),
-                  'selectlabel' => Horde_Core_Translation::t("Selected address books:"),
-                  'sources' => array(array(
+            $out = Horde_Core_Prefs_Ui_Widgets::source([
+                  'mainlabel' => Horde_Core_Translation::t('Choose the order of address books to search when expanding addresses.'),
+                  'selectlabel' => Horde_Core_Translation::t('Selected address books:'),
+                  'sources' => [[
                       'selected' => $selected,
-                      'unselected' => $unselected
-                  )),
-                  'unselectlabel' => Horde_Core_Translation::t("Available address books:")
-             ));
+                      'unselected' => $unselected,
+                  ]],
+                  'unselectlabel' => Horde_Core_Translation::t('Available address books:'),
+             ]);
 
             $t->set('selected', count($unselected) > 1);
 
-            $js = array();
+            $js = [];
             foreach (array_keys($readable) as $source) {
-                $tmp = $tmpsel = array();
+                $tmp = $tmpsel = [];
 
                 try {
-                    foreach ($registry->call('contacts/fields', array($source)) as $field) {
+                    foreach ($registry->call('contacts/fields', [$source]) as $field) {
                         if ($field['search']) {
-                            $tmp[] = array(
+                            $tmp[] = [
                                 'name' => $field['name'],
-                                'label' => $field['label']
-                            );
+                                'label' => $field['label'],
+                            ];
                             if (isset($data['fields'][$source]) &&
                                 in_array($field['name'], $data['fields'][$source])) {
                                 $tmpsel[] = $field['name'];
                             }
                         }
                     }
-                } catch (Horde_Exception $e) {}
+                } catch (Horde_Exception $e) {
+                }
 
-                $js[$source] = array(
+                $js[$source] = [
                     'entries' => $tmp,
-                    'selected' => $tmpsel
-                );
+                    'selected' => $tmpsel,
+                ];
             }
 
-            $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineJsVars(array(
+            $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineJsVars([
                 'HordeAddressbooksPrefs.fields' => $js,
-                'HordeAddressbooksPrefs.nonetext' => Horde_Core_Translation::t("No address book selected.")
-            ));
+                'HordeAddressbooksPrefs.nonetext' => Horde_Core_Translation::t('No address book selected.'),
+            ]);
         }
 
         return $out . $t->fetch($GLOBALS['registry']->get('templates', 'horde') . '/prefs/addressbooks.html');
@@ -288,72 +290,71 @@ class Horde_Core_Prefs_Ui_Widgets
     {
         $pref = $data['pref'];
 
-        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineJsVars(array(
-            'HordeAlarmPrefs.pref' => $pref
-        ));
+        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineJsVars([
+            'HordeAlarmPrefs.pref' => $pref,
+        ]);
 
-        $alarm_pref = isset($data['value'])
-            ? $data['value']
-            : unserialize($GLOBALS['prefs']->getValue($pref));
+        $alarm_pref = $data['value']
+            ?? unserialize($GLOBALS['prefs']->getValue($pref));
         $selected = array_keys($alarm_pref);
 
         $t = $GLOBALS['injector']->createInstance('Horde_Template');
         $t->setOption('gettext', true);
 
-        $param_list = $select_list = array();
+        $param_list = $select_list = [];
 
         foreach ($GLOBALS['injector']->getInstance('Horde_Alarm')->handlers() as $method => $handler) {
-            $select_list[] = array(
+            $select_list[] = [
                 'l' => $handler->getDescription(),
                 's' => in_array($method, $selected),
-                'v' => $method
-            );
+                'v' => $method,
+            ];
 
-            $tmp = array(
+            $tmp = [
                 'method' => $method,
-                'param' => array()
-            );
+                'param' => [],
+            ];
 
             foreach ($handler->getParameters() as $name => $param) {
                 switch ($param['type']) {
-                case 'text':
-                    $tmp['param'][] = array(
-                        'label' => Horde::label($pref . '_' . $name, $param['desc']),
-                        'name' => $pref . '_' . $name,
-                        'text' => true,
-                        'value' => empty($alarm_pref[$method][$name]) ? '' : htmlspecialchars($alarm_pref[$method][$name])
-                        );
-                    break;
+                    case 'text':
+                        $tmp['param'][] = [
+                            'label' => Horde::label($pref . '_' . $name, $param['desc']),
+                            'name' => $pref . '_' . $name,
+                            'text' => true,
+                            'value' => empty($alarm_pref[$method][$name]) ? '' : htmlspecialchars($alarm_pref[$method][$name]),
+                            ];
+                        break;
 
-                case 'bool':
-                    $tmp['param'][] = array(
-                        'bool' => true,
-                        'checked' => !empty($alarm_pref[$method][$name]),
-                        'label' => Horde::label($pref . '_' . $name, $param['desc']),
-                        'name' => $pref . '_' . $name
-                    );
-                    break;
+                    case 'bool':
+                        $tmp['param'][] = [
+                            'bool' => true,
+                            'checked' => !empty($alarm_pref[$method][$name]),
+                            'label' => Horde::label($pref . '_' . $name, $param['desc']),
+                            'name' => $pref . '_' . $name,
+                        ];
+                        break;
 
-                case 'sound':
-                    $current_sound = empty($alarm_pref[$method][$name])
-                        ? ''
-                        : $alarm_pref[$method][$name];
-                    $sounds = array();
-                    foreach (Horde_Themes::soundList() as $key => $val) {
-                        $sounds[] = array(
-                            'c' => ($current_sound == $key),
-                            'uri' => htmlspecialchars($val->uri),
-                            'val' => htmlspecialchars($key)
-                        );
-                    }
-                    $t->set('sounds', $sounds);
+                    case 'sound':
+                        $current_sound = empty($alarm_pref[$method][$name])
+                            ? ''
+                            : $alarm_pref[$method][$name];
+                        $sounds = [];
+                        foreach (Horde_Themes::soundList() as $key => $val) {
+                            $sounds[] = [
+                                'c' => ($current_sound == $key),
+                                'uri' => htmlspecialchars($val->uri),
+                                'val' => htmlspecialchars($key),
+                            ];
+                        }
+                        $t->set('sounds', $sounds);
 
-                    $tmp['param'][] = array(
-                        'sound' => true,
-                        'checked' => !$current_sound,
-                        'name' => $pref . '_' . $name
-                    );
-                    break;
+                        $tmp['param'][] = [
+                            'sound' => true,
+                            'checked' => !$current_sound,
+                            'name' => $pref . '_' . $name,
+                        ];
+                        break;
                 }
             }
 
@@ -388,16 +389,16 @@ class Horde_Core_Prefs_Ui_Widgets
         $methods = $GLOBALS['injector']->getInstance('Horde_Alarm')->handlers();
         $val = (isset($ui->vars->$pref) && is_array($ui->vars->$pref))
             ? $ui->vars->$pref
-            : array();
-        $value = array();
+            : [];
+        $value = [];
 
         foreach ($val as $method) {
-            $value[$method] = array();
+            $value[$method] = [];
             if (!empty($methods[$method])) {
                 foreach ($methods[$method]->getParameters() as $param => $info) {
                     $value[$method][$param] = $ui->vars->get($pref . '_' . $param, '');
                     if ($info['required'] && ($value[$method][$param] === '')) {
-                        $GLOBALS['notification']->push(sprintf(Horde_Core_Translation::t("You must provide a setting for \"%s\"."), $methods[$method]->getDescription()), 'horde.error');
+                        $GLOBALS['notification']->push(sprintf(Horde_Core_Translation::t('You must provide a setting for "%s".'), $methods[$method]->getDescription()), 'horde.error');
                         return null;
                     }
                 }

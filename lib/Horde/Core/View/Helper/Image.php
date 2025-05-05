@@ -1,4 +1,5 @@
 <?php
+
 /**
  * View helper class to allow access to the Horde_Themes_Image::tag() method.
  *
@@ -21,10 +22,10 @@ class Horde_Core_View_Helper_Image extends Horde_View_Helper_Base
      */
     public function hordeImage($src, $alt = '', $attr = '')
     {
-        return Horde_Themes_Image::tag($src, array(
+        return Horde_Themes_Image::tag($src, [
             'alt' => $alt,
-            'attr' => $attr
-        ));
+            'attr' => $attr,
+        ]);
     }
 
 }

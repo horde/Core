@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SQL storage object for auth signup information.
  *
@@ -20,7 +21,7 @@ class Horde_Core_Auth_Signup_SqlObject
      * @see getData()
      * @var array
      */
-    protected $_data = array();
+    protected $_data = [];
 
     /**
      * The unique name of this object. These names have the same requirements

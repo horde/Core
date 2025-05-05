@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2009-2017 Horde LLC (http://www.horde.org/)
  *
@@ -27,7 +28,7 @@ abstract class Horde_Core_Tagger
      *
      * @var array
      */
-    protected $_type_ids = array();
+    protected $_type_ids = [];
 
     /**
      * Application this tagger is for.
@@ -91,7 +92,7 @@ abstract class Horde_Core_Tagger
         // Short circuit empty tags since explode() will return an array
         // such as [ 0 => '' ] in this case. See Bug #14203
         if (empty($tags)) {
-            return array();
+            return [];
         }
         $split_tags = explode(',', $tags);
 
@@ -123,10 +124,11 @@ abstract class Horde_Core_Tagger
 
         try {
             $this->_tagger->tag(
-                    $owner,
-                    array('object' => $localId,
-                          'type' => $this->_type_ids[$content_type]),
-                    $tags);
+                $owner,
+                ['object' => $localId,
+                          'type' => $this->_type_ids[$content_type]],
+                $tags
+            );
         } catch (Content_Exception $e) {
             throw new Horde_Exception($e);
         }
@@ -146,7 +148,7 @@ abstract class Horde_Core_Tagger
     public function getTags($localId, $type = null)
     {
         if (empty($localId)) {
-            return array();
+            return [];
         }
         if (empty($type)) {
             $type = $this->_types[0];
@@ -161,12 +163,12 @@ abstract class Horde_Core_Tagger
 
         try {
             return $this->_tagger->getTags(
-                array(
-                    'objectId' => array(
+                [
+                    'objectId' => [
                         'object' => $localId,
-                        'type' => $this->_type_ids[$type]
-                    )
-                )
+                        'type' => $this->_type_ids[$type],
+                    ],
+                ]
             );
         } catch (Content_Exception $e) {
             throw new Horde_Exception($e);
@@ -194,11 +196,11 @@ abstract class Horde_Core_Tagger
 
         try {
             $this->_tagger->removeTagFromObject(
-                array(
+                [
                     'object' => $localId,
-                    'type' => $this->_type_ids[$content_type]),
-                    $tags
-                );
+                    'type' => $this->_type_ids[$content_type]],
+                $tags
+            );
         } catch (Content_Exception $e) {
             throw new Horde_Exception($e);
         }
@@ -229,7 +231,7 @@ abstract class Horde_Core_Tagger
         if (!is_array($tags)) {
             $tags = $this->split($tags);
         }
-        $remove = array();
+        $remove = [];
         foreach ($existing_tags as $tag_id => $existing_tag) {
             $found = false;
             foreach ($tags as $tag_text) {
@@ -245,7 +247,7 @@ abstract class Horde_Core_Tagger
         }
 
         $this->untag($localId, $remove, $content_type);
-        $add = array();
+        $add = [];
         foreach ($tags as $tag_text) {
             $found = false;
             foreach ($existing_tags as $existing_tag) {
@@ -276,10 +278,10 @@ abstract class Horde_Core_Tagger
     {
         try {
             return $this->_tagger->getTags(
-                array(
+                [
                     'q' => $token,
-                    'userId' => $GLOBALS['registry']->getAuth())
-                );
+                    'userId' => $GLOBALS['registry']->getAuth()]
+            );
         } catch (Content_Exception $e) {
             throw new Horde_Exception($e);
         }
@@ -302,11 +304,11 @@ abstract class Horde_Core_Tagger
     {
         try {
             return $this->_tagger->getTagCloud(
-                array(
+                [
                     'userId' => $user,
                     'limit' => $limit,
-                    'typeId' => ($all ? null : $this->_types)
-                )
+                    'typeId' => ($all ? null : $this->_types),
+                ]
             );
         } catch (Content_Exception $e) {
             throw new Horde_Exception($e);
@@ -325,17 +327,17 @@ abstract class Horde_Core_Tagger
     public function getTagCountsByObjects(array $ids, $type = null)
     {
         if (empty($ids)) {
-            return array();
+            return [];
         }
 
         if (!isset($type)) {
             $type = (int)$this->_type_ids[$this->_types[0]];
         }
 
-        return $this->_tagger->getTagCloud(array(
+        return $this->_tagger->getTagCloud([
             'objectId' => $ids,
-            'typeId' => $type
-        ));
+            'typeId' => $type,
+        ]);
     }
 
     /**
@@ -354,14 +356,15 @@ abstract class Horde_Core_Tagger
     public function browseTags($tags, $user)
     {
         if (empty($tags)) {
-            return $this->_tagger->getTags(array(
+            return $this->_tagger->getTags(
+                [
                 'userId' => $user,
-                'typeId' => $this->_type_ids)
+                'typeId' => $this->_type_ids]
             );
         }
         try {
             $tags = array_values($this->_tagger->getTagIds($tags));
-            $all_tags = array();
+            $all_tags = [];
             foreach ($this->_type_ids as $tid) {
                 $iTags = $this->_tagger->browseTags($tags, $tid, $user);
                 foreach ($iTags as $id => $name) {
@@ -406,15 +409,17 @@ abstract class Horde_Core_Tagger
      * @throws Horde_Exception
      */
     public function getTagInfo(
-        $tags = null, $limit = 500, $type = null, $user = null
-    )
-    {
-        $filter = array(
+        $tags = null,
+        $limit = 500,
+        $type = null,
+        $user = null
+    ) {
+        $filter = [
             'typeId' => empty($type) ? array_values($this->_type_ids) : $this->_type_ids[$type],
             'tagIds' => $tags,
             'limit' => $limit,
-            'userId' => $user
-        );
+            'userId' => $user,
+        ];
 
         try {
             return $this->_tagger->getTagCloud($filter);
@@ -431,6 +436,6 @@ abstract class Horde_Core_Tagger
      *
      * @return array  A hash of results.
      */
-    abstract public function search($tags, $filter = array());
+    abstract public function search($tags, $filter = []);
 
 }

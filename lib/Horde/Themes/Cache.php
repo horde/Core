@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
  *
@@ -24,11 +25,11 @@
 class Horde_Themes_Cache implements Serializable
 {
     /* Constants */
-    const HORDE_DEFAULT = 1;
-    const APP_DEFAULT = 2;
-    const HORDE_THEME = 4;
-    const APP_THEME = 8;
-    const VIEW = 16;
+    public const HORDE_DEFAULT = 1;
+    public const APP_DEFAULT = 2;
+    public const HORDE_THEME = 4;
+    public const APP_THEME = 8;
+    public const VIEW = 16;
 
     /**
      * Has the data changed?
@@ -63,7 +64,7 @@ class Horde_Themes_Cache implements Serializable
      *
      * @var array
      */
-    protected $_data = array();
+    protected $_data = [];
 
     /**
      * Theme name.
@@ -92,7 +93,7 @@ class Horde_Themes_Cache implements Serializable
     public function build()
     {
         if (!$this->_complete) {
-            $this->_data = array();
+            $this->_data = [];
 
             $this->_build('horde', 'default', self::HORDE_DEFAULT);
             $this->_build('horde', $this->_theme, self::HORDE_THEME);
@@ -213,11 +214,11 @@ class Horde_Themes_Cache implements Serializable
      */
     protected function _getOutput($app, $theme, $item)
     {
-        return array(
+        return [
             'app' => $app,
             'fs' => $GLOBALS['registry']->get('themesfs', $app) . '/' . $theme . '/' . $item,
-            'uri' => $GLOBALS['registry']->get('themesuri', $app) . '/' . $theme . '/' . $item
-        );
+            'uri' => $GLOBALS['registry']->get('themesuri', $app) . '/' . $theme . '/' . $item,
+        ];
     }
 
     /**
@@ -225,13 +226,13 @@ class Horde_Themes_Cache implements Serializable
     public function getAll($item, $mask = 0)
     {
         if (!($entry = $this->_get($item))) {
-            return array();
+            return [];
         }
 
         if ($mask) {
             $entry &= $mask;
         }
-        $out = array();
+        $out = [];
 
         if ($entry & self::APP_THEME) {
             $out[] = $this->_getOutput($this->_app, $this->_theme, $item);
@@ -256,23 +257,22 @@ class Horde_Themes_Cache implements Serializable
         global $conf, $registry;
 
         if (!isset($this->_cacheid)) {
-            $check = isset($conf['cachethemesparams']['check'])
-                ? $conf['cachethemesparams']['check']
-                : null;
+            $check = $conf['cachethemesparams']['check']
+                ?? null;
 
             switch ($check) {
-            case 'appversion':
-            default:
-                $id = array($registry->getVersion($this->_app));
-                if ($this->_app != 'horde') {
-                    $id[] = $registry->getVersion('horde');
-                }
-                $this->_cacheid = 'v:' . implode('|', $id);
-                break;
+                case 'appversion':
+                default:
+                    $id = [$registry->getVersion($this->_app)];
+                    if ($this->_app != 'horde') {
+                        $id[] = $registry->getVersion('horde');
+                    }
+                    $this->_cacheid = 'v:' . implode('|', $id);
+                    break;
 
-            case 'none':
-                $this->_cacheid = '';
-                break;
+                case 'none':
+                    $this->_cacheid = '';
+                    break;
             }
         }
 
@@ -290,14 +290,14 @@ class Horde_Themes_Cache implements Serializable
 
     public function __serialize(): array
     {
-        return array(
+        return [
             'a' => $this->_app,
             'c' => $this->_complete,
             'd' => $this->_data,
             'id' => $this->getCacheId(),
-            't' => $this->_theme
-        );
-        
+            't' => $this->_theme,
+        ];
+
     }
 
     public function __unserialize(array $data): void
@@ -305,16 +305,16 @@ class Horde_Themes_Cache implements Serializable
 
         // Needed to generate cache ID.
         if (isset($data['a'])) {
-                $this->_app = $data['a'];
+            $this->_app = $data['a'];
         }
 
         if (isset($data['id']) && ($data['id'] != $this->getCacheId())) {
-            throw new Exception('Cache invalidated for ' . $data['a'] . ': ' . $data['id'] . " != ".$this->getCacheId());
+            throw new Exception('Cache invalidated for ' . $data['a'] . ': ' . $data['id'] . ' != '.$this->getCacheId());
         }
 
         $this->_complete = $data['c'];
         $this->_data = $data['d'];
-        $this->_theme = $data['t'];    
+        $this->_theme = $data['t'];
     }
     /**
      */

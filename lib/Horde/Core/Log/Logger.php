@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
  *
@@ -32,7 +33,7 @@ class Horde_Core_Log_Logger extends Horde_Log_Logger
      * @param mixed $priority  See Horde_Core_Log_Object#__construct().
      * @param array $options   See Horde_Core_Log_Object#__construct().
      */
-    public function log($event, $priority = null, array $options = array())
+    public function log($event, $priority = null, array $options = [])
     {
         if (!($event instanceof Horde_Core_Log_Object)) {
             $options['trace'] = isset($options['trace'])

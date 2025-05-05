@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class that extends the base Bbcode class to allow output of Horde urls.
  *

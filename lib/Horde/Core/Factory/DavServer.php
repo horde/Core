@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2021 Horde LLC (http://www.horde.org/)
  *
@@ -32,11 +33,11 @@ class Horde_Core_Factory_DavServer extends Horde_Core_Factory_Injector
 
         $principalBackend = new Horde_Dav_Principals(
             new Horde_Core_Auth_UsernameHook(
-                array(
+                [
                     'base' => $injector
                         ->getInstance('Horde_Core_Factory_Auth')
-                        ->create()
-                )
+                        ->create(),
+                ]
             ),
             $injector->getInstance('Horde_Core_Factory_Identity_DavUsernameHook')
         );
@@ -51,8 +52,8 @@ class Horde_Core_Factory_DavServer extends Horde_Core_Factory_Injector
         $server = new DAV\Server(
             new Horde_Dav_RootCollection(
                 $registry,
-                array($principals, $caldav, $carddav),
-                isset($conf['mime']['magic_db']) ? $conf['mime']['magic_db'] : null
+                [$principals, $caldav, $carddav],
+                $conf['mime']['magic_db'] ?? null
             )
         );
         $server->debugExceptions = false;
@@ -64,7 +65,7 @@ class Horde_Core_Factory_DavServer extends Horde_Core_Factory_Injector
         if (!empty($conf['dav_root'])) {
             $candidates = explode(';', $conf['dav_root']);
             // Ensure longer hits overrule shorter hits regardless of input order
-            usort($candidates, function($a, $b) { return strlen($a) <=> strlen($b);});
+            usort($candidates, function ($a, $b) { return strlen($a) <=> strlen($b);});
             foreach ($candidates as $davBaseTest) {
                 if (!empty($_SERVER['REQUEST_URI']) && (strpos($_SERVER['REQUEST_URI'], $davBaseTest) === 0)) {
                     $davBaseUri = $davBaseTest;

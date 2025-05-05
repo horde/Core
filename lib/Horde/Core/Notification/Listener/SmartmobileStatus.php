@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Provides a method to display notification messages in Smartmobile views
  * (using the mobile jquery framework).
@@ -22,7 +23,7 @@ class Horde_Core_Notification_Listener_SmartmobileStatus extends Horde_Notificat
      * @param array $events   The list of events to handle.
      * @param array $options  An array of options. Not used.
      */
-    public function notify($events, $options = array())
+    public function notify($events, $options = [])
     {
         if (empty($events)) {
             return;
@@ -31,11 +32,11 @@ class Horde_Core_Notification_Listener_SmartmobileStatus extends Horde_Notificat
         // TODO: Need to add delay to allow browser to correctly populate
         // location of original page, or else closing notification reloads
         // previous page (Ticket #11103).
-        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineScript(array(
+        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineScript([
             '$(function() {HordeMobile.showNotifications(' .
             Horde_Serialize::serialize($events, Horde_Serialize::JSON) .
-            ');});'
-        ));
+            ');});',
+        ]);
     }
 
 }

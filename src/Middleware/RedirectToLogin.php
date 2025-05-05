@@ -59,7 +59,7 @@ class RedirectToLogin implements MiddlewareInterface
             // set baseurl: if no alternative login, use Horde login as baseurl
             $baseUrl = $this->registry->getServiceLink('login');
         };
-        
+
         $redirectUrl = (string) Horde::Url($baseUrl, true)->add('url', $signedRequestUrl);
 
         return $this->responseFactory->createResponse(302)->withHeader('Location', $redirectUrl);

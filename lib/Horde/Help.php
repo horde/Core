@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Help:: class provides an interface to the online help subsystem.
  *
@@ -15,17 +16,17 @@
 class Horde_Help
 {
     /* Raw help in the string. */
-    const SOURCE_RAW = 0;
+    public const SOURCE_RAW = 0;
 
     /* Help text is in a file. */
-    const SOURCE_FILE = 1;
+    public const SOURCE_FILE = 1;
 
     /**
      * A list of DOM help entry nodes.
      *
      * @var array
      */
-    protected $_xml = array();
+    protected $_xml = [];
 
     /**
      * Constructor.
@@ -40,7 +41,7 @@ class Horde_Help
      * @throws Exception
      * @throws Horde_Exception
      */
-    public function __construct($source, $data, array $views = array())
+    public function __construct($source, $data, array $views = [])
     {
         if (!Horde_Util::extensionExists('dom')) {
             throw new Horde_Exception('DOM not available.');
@@ -49,16 +50,16 @@ class Horde_Help
         $dom = new DOMDocument('1.0', 'UTF-8');
 
         switch ($source) {
-        case self::SOURCE_RAW:
-            $dom->loadXML($data);
-            break;
+            case self::SOURCE_RAW:
+                $dom->loadXML($data);
+                break;
 
-        case self::SOURCE_FILE:
-            if (!@is_file($data)) {
-                throw new Horde_Exception(Horde_Core_Translation::t("Help file not found."));
-            }
-            $dom->load($data);
-            break;
+            case self::SOURCE_FILE:
+                if (!@is_file($data)) {
+                    throw new Horde_Exception(Horde_Core_Translation::t('Help file not found.'));
+                }
+                $dom->load($data);
+                break;
         }
 
         /* Get list of active entries. */
@@ -72,17 +73,17 @@ class Horde_Help
         foreach ($node->childNodes as $val) {
             if ($val instanceof DOMElement) {
                 switch ($val->tagName) {
-                case 'entry':
-                    $this->_xml[] = $val;
-                    break;
+                    case 'entry':
+                        $this->_xml[] = $val;
+                        break;
 
-                case 'view':
-                    if (!empty($views) &&
-                        $val->hasChildNodes() &&
-                        in_array($val->getAttribute('id'), $views)) {
-                        $this->_processXml($val, array());
-                    }
-                    break;
+                    case 'view':
+                        if (!empty($views) &&
+                            $val->hasChildNodes() &&
+                            in_array($val->getAttribute('id'), $views)) {
+                            $this->_processXml($val, []);
+                        }
+                        break;
                 }
             }
         }
@@ -105,29 +106,29 @@ class Horde_Help
                 foreach ($entry->childNodes as $child) {
                     if ($child instanceof DOMElement) {
                         switch ($child->tagName) {
-                        case 'heading':
-                            $out .= '<h2>' . $this->_processNode($child) . '</h2>';
-                            break;
+                            case 'heading':
+                                $out .= '<h2>' . $this->_processNode($child) . '</h2>';
+                                break;
 
-                        case 'para':
-                            $out .= '<p>' . $this->_processNode($child) . '</p>';
-                            break;
+                            case 'para':
+                                $out .= '<p>' . $this->_processNode($child) . '</p>';
+                                break;
 
-                        case 'raw':
-                            $out .= '<p class="fixed">' . htmlspecialchars($this->_processNode($child)) . '</p>';
-                            break;
+                            case 'raw':
+                                $out .= '<p class="fixed">' . htmlspecialchars($this->_processNode($child)) . '</p>';
+                                break;
 
-                        case 'tip':
-                            $out .= '<em class="helpTip">' . $this->_processNode($child) . '</em>';
-                            break;
+                            case 'tip':
+                                $out .= '<em class="helpTip">' . $this->_processNode($child) . '</em>';
+                                break;
 
-                        case 'title':
-                            $out .= '<h1>' . $this->_processNode($child) . '</h1>';
-                            break;
+                            case 'title':
+                                $out .= '<h1>' . $this->_processNode($child) . '</h1>';
+                                break;
 
-                        case 'warn':
-                            $out .= '<em class="helpWarn">' . $this->_processNode($child) . '</em>';
-                            break;
+                            case 'warn':
+                                $out .= '<em class="helpWarn">' . $this->_processNode($child) . '</em>';
+                                break;
                         }
                     }
                 }
@@ -151,41 +152,41 @@ class Horde_Help
         foreach ($node->childNodes as $child) {
             if ($child instanceof DOMElement) {
                 switch ($child->tagName) {
-                case 'ref':
-                    $out .= Horde::link(Horde::selfUrl()->add(array(
-                        'module' => $child->getAttribute('module'),
-                        'show' => 'entry',
-                        'topic'  => $child->getAttribute('entry')
-                    ))) . $child->textContent . '</a>';
-                    break;
+                    case 'ref':
+                        $out .= Horde::link(Horde::selfUrl()->add([
+                            'module' => $child->getAttribute('module'),
+                            'show' => 'entry',
+                            'topic'  => $child->getAttribute('entry'),
+                        ])) . $child->textContent . '</a>';
+                        break;
 
-                case 'text':
-                    $out .= $child->textContent;
-                    break;
+                    case 'text':
+                        $out .= $child->textContent;
+                        break;
 
-                case 'eref':
-                    $out .= Horde::link($child->getAttribute('url'), null, '', '_blank') . $child->textContent . '</a>';
-                    break;
+                    case 'eref':
+                        $out .= Horde::link($child->getAttribute('url'), null, '', '_blank') . $child->textContent . '</a>';
+                        break;
 
-                case 'href':
-                    $out .= Horde::link(Horde::url($GLOBALS['registry']->get('webroot', $child->getAttribute('app') . '/' . $child->getAttribute('url'))), null, '', '_blank') . $child->textContent . '</a>';
-                    break;
+                    case 'href':
+                        $out .= Horde::link(Horde::url($GLOBALS['registry']->get('webroot', $child->getAttribute('app') . '/' . $child->getAttribute('url'))), null, '', '_blank') . $child->textContent . '</a>';
+                        break;
 
-                case 'b':
-                    $out .= '<strong>' . $this->_processNode($child) . '</strong>';
-                    break;
+                    case 'b':
+                        $out .= '<strong>' . $this->_processNode($child) . '</strong>';
+                        break;
 
-                case 'i':
-                    $out .= '<em>' . $this->_processNode($child) . '</em>';
-                    break;
+                    case 'i':
+                        $out .= '<em>' . $this->_processNode($child) . '</em>';
+                        break;
 
-                case 'pre':
-                    $out .= '<pre>' . $this->_processNode($child) . '</pre>';
-                    break;
+                    case 'pre':
+                        $out .= '<pre>' . $this->_processNode($child) . '</pre>';
+                        break;
 
-                case 'css':
-                    $out .= '<span class="' . $child->getAttribute('class') . '">' . $this->_processNode($child) . '</span>';
-                    break;
+                    case 'css':
+                        $out .= '<span class="' . $child->getAttribute('class') . '">' . $this->_processNode($child) . '</span>';
+                        break;
                 }
             } else {
                 $out .= $child->textContent;
@@ -205,7 +206,7 @@ class Horde_Help
      */
     public function search($keyword)
     {
-        $results = array();
+        $results = [];
 
         foreach ($this->_xml as $elt) {
             if (stripos($elt->textContent, $keyword) !== false) {
@@ -224,7 +225,7 @@ class Horde_Help
      */
     public function topics()
     {
-        $topics = array();
+        $topics = [];
 
         foreach ($this->_xml as $elt) {
             $topics[$elt->getAttribute('id')] = $elt->getElementsByTagName('title')->item(0)->textContent;
@@ -250,8 +251,8 @@ class Horde_Help
         }
 
         $url = $GLOBALS['registry']->getServiceLink('help', $module)->add('topic', $topic);
-        return $url->link(array('title' => Horde_Core_Translation::t("Help"), 'class' => 'helplink', 'target' => 'hordehelpwin', 'onclick' => Horde::popupJs($url, array('urlencode' => true)) . 'return false;'))
-            . Horde_Themes_Image::tag('help.png', array('alt' => Horde_Core_Translation::t("Help"))) . '</a>';
+        return $url->link(['title' => Horde_Core_Translation::t('Help'), 'class' => 'helplink', 'target' => 'hordehelpwin', 'onclick' => Horde::popupJs($url, ['urlencode' => true]) . 'return false;'])
+            . Horde_Themes_Image::tag('help.png', ['alt' => Horde_Core_Translation::t('Help')]) . '</a>';
     }
 
 }

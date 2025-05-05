@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This class identifies the javascript necessary to output the date.js
  * javascript code to the browser.
@@ -37,8 +38,8 @@ class Horde_Core_Script_Package_Datejs extends Horde_Script_Package
      */
     public static function translateFormat($format)
     {
-        $from = array('%e', '%-d', '%d', '%a', '%A', '%-m', '%m', '%h', '%b', '%B', '%y', '%Y');
-        $to = array(' d', 'd', 'dd', 'ddd', 'dddd', 'M', 'MM', 'MMM', 'MMM', 'MMMM', 'yy', 'yyyy');
+        $from = ['%e', '%-d', '%d', '%a', '%A', '%-m', '%m', '%h', '%b', '%B', '%y', '%Y'];
+        $to = [' d', 'd', 'dd', 'ddd', 'dddd', 'M', 'MM', 'MMM', 'MMM', 'MMMM', 'yy', 'yyyy'];
         if (defined('D_FMT')) {
             $from[] = '%x';
             $to[] = str_replace($from, $to, Horde_Nls::getLangInfo(D_FMT));

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2015-2017 Horde LLC (http://www.horde.org/)
  *
@@ -42,10 +43,10 @@ class Horde_Core_Secret_Cbc extends Horde_Core_Secret
             /* Use more secure CBC mode (rather than ECB). */
             $this->_cipherCache[self::HORDE_KEYNAME] = new Horde_Crypt_Blowfish(
                 substr($key, 0, 56),
-                array(
+                [
                     'cipher' => 'cbc',
-                    'iv' => $this->_params['iv']
-                )
+                    'iv' => $this->_params['iv'],
+                ]
             );
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2003-2017 Horde LLC (http://www.horde.org/)
  *
@@ -37,7 +38,7 @@ class Horde_Core_Imsp_Utils
     public static function getAllBooks(array $serverInfo)
     {
         $foundDefault = false;
-        $results = array();
+        $results = [];
         $imsp = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Imsp')->create('Book', $serverInfo['params']);
         $books = $imsp->getAddressBookList();
         $bCount = count($books);
@@ -101,9 +102,9 @@ class Horde_Core_Imsp_Utils
      */
     public function synchShares($share_obj, array $serverInfo)
     {
-        $found_shares = array();
-        $return = array('added' => array(), 'removed' => array());
-        $params = array();
+        $found_shares = [];
+        $return = ['added' => [], 'removed' => []];
+        $params = [];
 
         $imsp = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Imsp')->create('Book', $serverInfo['params']);
         $abooks = $imsp->getAddressBookList();
@@ -128,8 +129,8 @@ class Horde_Core_Imsp_Utils
                 }
             }
             if (!$found) {
-                $shareparams = array('name' => $abook_uid,
-                                     'source' => 'imsp');
+                $shareparams = ['name' => $abook_uid,
+                                     'source' => 'imsp'];
 
                 $params['uid'] = hash('md5', mt_rand());
                 $params['name'] = $abook_uid . ' (IMSP)';
@@ -140,9 +141,11 @@ class Horde_Core_Imsp_Utils
                 } else {
                     $shareparams['default'] = false;
                 }
-                if (self::_isOwner($abook_uid,
-                                             $serverInfo['params']['username'],
-                                             $params['acl'])) {
+                if (self::_isOwner(
+                    $abook_uid,
+                    $serverInfo['params']['username'],
+                    $params['acl']
+                )) {
                     $params['owner'] = $GLOBALS['registry']->getAuth();
                 } else {
                     // TODO: What to do for the owner when it's not current user?
@@ -160,15 +163,15 @@ class Horde_Core_Imsp_Utils
         }
 
         // Now prune any shares that no longer exist on the IMSP server.
-        $existing = $share_obj->listShares($GLOBALS['registry']->getAuth(), array('perm' => Horde_Perms::READ));
+        $existing = $share_obj->listShares($GLOBALS['registry']->getAuth(), ['perm' => Horde_Perms::READ]);
         foreach ($existing as $share) {
             $temp = unserialize($share->get('params'));
             if (is_array($temp)) {
                 $sourceType = $temp['source'];
                 if ($sourceType == 'imsp' &&
                     array_search($temp['name'], $found_shares) === false) {
-                        $share_obj->removeShare($share);
-                        $return['removed'][] = $share->getName();
+                    $share_obj->removeShare($share);
+                    $return['removed'][] = $share->getName();
                 }
             }
         }
@@ -224,19 +227,19 @@ class Horde_Core_Imsp_Utils
      */
     protected static function _setPerms(&$share, $acl)
     {
-         $hPerms = 0;
-         if (strpos($acl, 'w') !== false) {
-             $hPerms |= Horde_Perms::EDIT;
-         }
-         if (strpos($acl, 'r') !== false) {
-             $hPerms |= Horde_Perms::READ;
-         }
-         if (strpos($acl, 'd') !== false) {
-             $hPerms |= Horde_Perms::DELETE;
-         }
-         if (strpos($acl, 'l') !== false) {
-             $hPerms |= Horde_Perms::SHOW;
-         }
+        $hPerms = 0;
+        if (strpos($acl, 'w') !== false) {
+            $hPerms |= Horde_Perms::EDIT;
+        }
+        if (strpos($acl, 'r') !== false) {
+            $hPerms |= Horde_Perms::READ;
+        }
+        if (strpos($acl, 'd') !== false) {
+            $hPerms |= Horde_Perms::DELETE;
+        }
+        if (strpos($acl, 'l') !== false) {
+            $hPerms |= Horde_Perms::SHOW;
+        }
         $share->addUserPermission($GLOBALS['registry']->getAuth(), $hPerms);
     }
 

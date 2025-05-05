@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -28,7 +29,7 @@ class Horde_Registry_Loadconfig
      *
      * @var array
      */
-    public $config = array();
+    public $config = [];
 
     /**
      * The PHP output from loading the files.
@@ -50,7 +51,7 @@ class Horde_Registry_Loadconfig
     {
         global $conf, $registry;
 
-        $flist = array();
+        $flist = [];
 
         /* Load global configuration file. */
         $conf_dir = (($app == 'horde') && defined('HORDE_BASE'))

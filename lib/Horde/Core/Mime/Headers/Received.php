@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -21,8 +22,7 @@
  * @package   Core
  * @since     2.17.0
  */
-class Horde_Core_Mime_Headers_Received
-extends Horde_Mime_Headers_Received
+class Horde_Core_Mime_Headers_Received extends Horde_Mime_Headers_Received
 {
     /**
      * Generate a 'Received' header for the Web browser -> Horde hop (conforms

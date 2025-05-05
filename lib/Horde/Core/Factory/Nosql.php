@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -27,7 +28,7 @@ class Horde_Core_Factory_Nosql extends Horde_Core_Factory_Base
      *
      * @var array
      */
-    private $_instances = array();
+    private $_instances = [];
 
     /**
      * Returns the instance.
@@ -42,7 +43,7 @@ class Horde_Core_Factory_Nosql extends Horde_Core_Factory_Base
      */
     public function create($app = 'horde', $backend = null)
     {
-        $sig = hash('md5', serialize(array($app, $backend)));
+        $sig = hash('md5', serialize([$app, $backend]));
 
         if (isset($this->_instances[$sig])) {
             return $this->_instances[$sig];
@@ -68,7 +69,8 @@ class Horde_Core_Factory_Nosql extends Horde_Core_Factory_Base
         $e = null;
         try {
             $this->_instances[$sig] = $this->createNosql($config);
-        } catch (Horde_Exception $e) {}
+        } catch (Horde_Exception $e) {
+        }
 
         if ($pushed) {
             $GLOBALS['registry']->popApp();
@@ -98,15 +100,15 @@ class Horde_Core_Factory_Nosql extends Horde_Core_Factory_Base
         }
 
         switch ($config['phptype']) {
-        case 'mongo':
-            $ob = new Horde_Mongo_Client(empty($config['hostspec']) ? 'localhost' : $config['hostspec']);
-            if (isset($config['dbname']) && strlen($config['dbname'])) {
-                $ob->dbname = $config['dbname'];
-            }
-            return $ob;
+            case 'mongo':
+                $ob = new Horde_Mongo_Client(empty($config['hostspec']) ? 'localhost' : $config['hostspec']);
+                if (isset($config['dbname']) && strlen($config['dbname'])) {
+                    $ob->dbname = $config['dbname'];
+                }
+                return $ob;
 
-        default:
-            throw new Horde_Exception(sprintf('Nosql driver %s doesn\'t exist.', $config['phptype']));
+            default:
+                throw new Horde_Exception(sprintf('Nosql driver %s doesn\'t exist.', $config['phptype']));
         }
     }
 

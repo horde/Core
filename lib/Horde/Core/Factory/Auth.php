@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based Horde_Auth:: factory.
  *
@@ -30,7 +31,7 @@ class Horde_Core_Factory_Auth extends Horde_Core_Factory_Base
      *
      * @var array
      */
-    private $_instances = array();
+    private $_instances = [];
 
     /**
      * Return the Horde_Auth:: instance.
@@ -47,11 +48,11 @@ class Horde_Core_Factory_Auth extends Horde_Core_Factory_Base
         }
 
         if (!isset($this->_instances[$app])) {
-            $this->_instances[$app] = new Horde_Core_Auth_Application(array_filter(array(
+            $this->_instances[$app] = new Horde_Core_Auth_Application(array_filter([
                 'app' => $app,
                 'base' => ($app === 'horde') ? $this->_create($GLOBALS['conf']['auth']['driver']) : null,
-                'logger' => $this->_injector->getInstance('Horde_Log_Logger')
-            )));
+                'logger' => $this->_injector->getInstance('Horde_Log_Logger'),
+            ]));
         }
 
         return $this->_instances[$app];
@@ -98,78 +99,78 @@ class Horde_Core_Factory_Auth extends Horde_Core_Factory_Base
         $lc_driver = Horde_String::lower($driver);
 
         switch ($lc_driver) {
-        case 'horde_core_auth_composite':
-            // Both of these params are required, but we need to skip if
-            // non-existent to return a useful error message later.
-            if (!empty($params['admin_driver'])) {
-                $params['admin_driver'] = $this->_create($params['admin_driver']['driver'], $params['admin_driver']['params']);
-            }
-            if (!empty($params['auth_driver'])) {
-                $params['auth_driver'] = $this->_create($params['auth_driver']['driver'], $params['auth_driver']['params']);
-            }
-            break;
+            case 'horde_core_auth_composite':
+                // Both of these params are required, but we need to skip if
+                // non-existent to return a useful error message later.
+                if (!empty($params['admin_driver'])) {
+                    $params['admin_driver'] = $this->_create($params['admin_driver']['driver'], $params['admin_driver']['params']);
+                }
+                if (!empty($params['auth_driver'])) {
+                    $params['auth_driver'] = $this->_create($params['auth_driver']['driver'], $params['auth_driver']['params']);
+                }
+                break;
 
-        case 'horde_auth_cyrsql':
-            $imap_config = array(
-                'hostspec' => empty($params['cyrhost']) ? null : $params['cyrhost'],
-                'password' => $params['cyrpass'],
-                'port' => empty($params['cyrport']) ? null : $params['cyrport'],
-                'secure' => ($params['secure'] == 'none') ? null : $params['secure'],
-                'username' => $params['cyradmin'],
-            );
+            case 'horde_auth_cyrsql':
+                $imap_config = [
+                    'hostspec' => empty($params['cyrhost']) ? null : $params['cyrhost'],
+                    'password' => $params['cyrpass'],
+                    'port' => empty($params['cyrport']) ? null : $params['cyrport'],
+                    'secure' => ($params['secure'] == 'none') ? null : $params['secure'],
+                    'username' => $params['cyradmin'],
+                ];
 
-            try {
-                $ob = new Horde_Imap_Client_Socket($imap_config);
-                $ob->login();
-                $params['imap'] = $ob;
-            } catch (Horde_Imap_Client_Exception $e) {
-                throw new Horde_Auth_Exception($e);
-            }
+                try {
+                    $ob = new Horde_Imap_Client_Socket($imap_config);
+                    $ob->login();
+                    $params['imap'] = $ob;
+                } catch (Horde_Imap_Client_Exception $e) {
+                    throw new Horde_Auth_Exception($e);
+                }
 
-            $params['db'] = $this->_injector
-                ->getInstance('Horde_Core_Factory_Db')
-                ->create('horde', is_null($orig_params) ? 'auth' : $orig_params);
-            break;
+                $params['db'] = $this->_injector
+                    ->getInstance('Horde_Core_Factory_Db')
+                    ->create('horde', is_null($orig_params) ? 'auth' : $orig_params);
+                break;
 
-        case 'horde_auth_http_remote':
-            $params['client'] = $this->_injector->getInstance('Horde_Core_Factory_HttpClient')->create();
-            break;
+            case 'horde_auth_http_remote':
+                $params['client'] = $this->_injector->getInstance('Horde_Core_Factory_HttpClient')->create();
+                break;
 
-        case 'horde_core_auth_application':
-            if (isset($this->_instances[$params['app']])) {
-                return $this->_instances[$params['app']];
-            }
-            break;
+            case 'horde_core_auth_application':
+                if (isset($this->_instances[$params['app']])) {
+                    return $this->_instances[$params['app']];
+                }
+                break;
 
-        case 'horde_core_auth_imsp':
-            $params['imsp'] = $this->_injector->getInstance('Horde_Core_Factory_Imsp')->create();
-            break;
+            case 'horde_core_auth_imsp':
+                $params['imsp'] = $this->_injector->getInstance('Horde_Core_Factory_Imsp')->create();
+                break;
 
-        case 'horde_auth_kolab':
-            $params['kolab'] = $this->_injector
-                ->getInstance('Horde_Kolab_Session');
-            break;
+            case 'horde_auth_kolab':
+                $params['kolab'] = $this->_injector
+                    ->getInstance('Horde_Kolab_Session');
+                break;
 
-        case 'horde_core_auth_ldap':
-        case 'horde_core_auth_msad':
-            $params['ldap'] = $this->_injector
-                ->getInstance('Horde_Core_Factory_Ldap')
-                ->create('horde', is_null($orig_params) ? 'auth' : $orig_params);
-            break;
-        case 'horde_core_auth_x509':
-            if (!empty($params['password_source']) && $params['password_source'] == 'unified') {
-                $params['password'] = $params['unified_password'];
-                unset($params['password_source'], $params['unified_password']);
-            }
-            // @TODO: Add filters
-            break;
+            case 'horde_core_auth_ldap':
+            case 'horde_core_auth_msad':
+                $params['ldap'] = $this->_injector
+                    ->getInstance('Horde_Core_Factory_Ldap')
+                    ->create('horde', is_null($orig_params) ? 'auth' : $orig_params);
+                break;
+            case 'horde_core_auth_x509':
+                if (!empty($params['password_source']) && $params['password_source'] == 'unified') {
+                    $params['password'] = $params['unified_password'];
+                    unset($params['password_source'], $params['unified_password']);
+                }
+                // @TODO: Add filters
+                break;
 
-        case 'horde_auth_customsql':
-        case 'horde_auth_sql':
-            $params['db'] = $this->_injector
-                ->getInstance('Horde_Core_Factory_Db')
-                ->create('horde', is_null($orig_params) ? 'auth' : $orig_params);
-            break;
+            case 'horde_auth_customsql':
+            case 'horde_auth_sql':
+                $params['db'] = $this->_injector
+                    ->getInstance('Horde_Core_Factory_Db')
+                    ->create('horde', is_null($orig_params) ? 'auth' : $orig_params);
+                break;
         }
 
         $params['default_user'] = $GLOBALS['registry']->getAuth();

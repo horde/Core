@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
  *
@@ -26,7 +27,7 @@ class Horde_Core_Factory_Identity extends Horde_Core_Factory_Base
      *
      * @var array
      */
-    private $_instances = array();
+    private $_instances = [];
 
     /**
      * Returns the Horde_Identity instance.
@@ -44,39 +45,39 @@ class Horde_Core_Factory_Identity extends Horde_Core_Factory_Base
 
         $class = 'Horde_Core_Prefs_Identity';
         switch ($driver) {
-        case 'horde':
-            // Bug #9936: There is a conflict between the horde/Prefs
-            // Identity base driver and the application-specific Identity
-            // driver for Horde.
-            $temp_class = 'Horde_Prefs_HordeIdentity';
-            if (class_exists($temp_class)) {
-                $class = $temp_class;
-            }
-            break;
-
-        default:
-            if (!is_null($driver)) {
-                $class = Horde_String::ucfirst($driver) . '_Prefs_Identity';
-                if (!class_exists($class)) {
-                    throw new Horde_Exception($driver . ' identity driver does not exist.');
+            case 'horde':
+                // Bug #9936: There is a conflict between the horde/Prefs
+                // Identity base driver and the application-specific Identity
+                // driver for Horde.
+                $temp_class = 'Horde_Prefs_HordeIdentity';
+                if (class_exists($temp_class)) {
+                    $class = $temp_class;
                 }
-            }
-            break;
+                break;
+
+            default:
+                if (!is_null($driver)) {
+                    $class = Horde_String::ucfirst($driver) . '_Prefs_Identity';
+                    if (!class_exists($class)) {
+                        throw new Horde_Exception($driver . ' identity driver does not exist.');
+                    }
+                }
+                break;
         }
         $key = $class . '|' . $user;
 
         if (!isset($this->_instances[$key])) {
-            $params = array(
+            $params = [
                 'user' => is_null($user) ? $registry->getAuth() : $user,
-            );
+            ];
 
             if (isset($prefs) && ($params['user'] == $registry->getAuth())) {
                 $params['prefs'] = $prefs;
             } else {
-                $params['prefs'] = $this->_injector->getInstance('Horde_Core_Factory_Prefs')->create($registry->getApp() ?: 'horde', array(
+                $params['prefs'] = $this->_injector->getInstance('Horde_Core_Factory_Prefs')->create($registry->getApp() ?: 'horde', [
                     'cache' => false,
-                    'user' => $user
-                ));
+                    'user' => $user,
+                ]);
             }
 
             $this->_instances[$key] = new $class($params);

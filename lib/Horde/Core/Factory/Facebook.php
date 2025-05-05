@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @category Horde
  * @package Core
@@ -20,10 +21,10 @@ class Horde_Core_Factory_Facebook extends Horde_Core_Factory_Injector
         $fb = new Horde_Service_Facebook(
             $conf['facebook']['id'],
             $conf['facebook']['secret'],
-            array(
+            [
                 'http_client' => $injector->getInstance('Horde_Core_Factory_HttpClient')->create(),
-                'http_request' => $injector->getInstance('Horde_Controller_Request_Http')
-            )
+                'http_request' => $injector->getInstance('Horde_Controller_Request_Http'),
+            ]
         );
 
         /* Check for facebook session */

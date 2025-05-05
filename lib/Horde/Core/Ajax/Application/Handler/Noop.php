@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Defines a no-operation AJAX call.
  *

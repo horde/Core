@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -22,8 +23,7 @@
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
-class Horde_Core_Notification_Listener_Webnotification
-extends Horde_Notification_Listener
+class Horde_Core_Notification_Listener_Webnotification extends Horde_Notification_Listener
 {
     /**
      */
@@ -39,7 +39,7 @@ extends Horde_Notification_Listener
 
     /**
      */
-    public function notify($events, $options = array())
+    public function notify($events, $options = [])
     {
         /* No support for basic view at this time. */
     }

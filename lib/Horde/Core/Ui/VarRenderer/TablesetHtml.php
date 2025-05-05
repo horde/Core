@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2003-2017 Horde LLC (http://www.horde.org/)
  *
@@ -21,13 +22,14 @@ class Horde_Core_Ui_VarRenderer_TablesetHtml extends Horde_Core_Ui_VarRenderer_H
         $checkedValues = $var->getValue($vars);
         $actions = $this->_getActionScripts($form, $var);
         $function_name = 'select'  . $form_name . $var->getVarName();
-        $enable = Horde_Core_Translation::t("Select all");
-        $disable = Horde_Core_Translation::t("Select none");
-        $invert = Horde_Core_Translation::t("Invert selection");
+        $enable = Horde_Core_Translation::t('Select all');
+        $disable = Horde_Core_Translation::t('Select none');
+        $invert = Horde_Core_Translation::t('Invert selection');
 
         $page = $GLOBALS['injector']->getInstance('Horde_PageOutput');
         $page->addScriptFile('tables.js', 'horde');
-        $page->addInlineScript(sprintf('
+        $page->addInlineScript(sprintf(
+            '
 function %s()
 {
     for (var i = 0; i < document.%s.elements.length; i++) {
@@ -42,15 +44,18 @@ function %s()
         }
     }
 }',
-                    $function_name, $form_name, $var_name));
+            $function_name,
+            $form_name,
+            $var_name
+        ));
 
         $html = <<<EOT
-<a href="#" onclick="$function_name(true); return false;">$enable</a>,
-<a href="#" onclick="$function_name(false); return false;">$disable</a>,
-<a href="#" onclick="$function_name(); return false;">$invert</a>
-<table style="width: 100%" class="sortable striped" id="tableset_' . $name . '"><thead><tr>
-<th>&nbsp;</th>
-EOT;
+            <a href="#" onclick="$function_name(true); return false;">$enable</a>,
+            <a href="#" onclick="$function_name(false); return false;">$disable</a>,
+            <a href="#" onclick="$function_name(); return false;">$invert</a>
+            <table style="width: 100%" class="sortable striped" id="tableset_' . $name . '"><thead><tr>
+            <th>&nbsp;</th>
+            EOT;
 
         foreach ($header as $col_title) {
             $html .= sprintf('<th class="leftAlign">%s</th>', $col_title);
@@ -58,18 +63,20 @@ EOT;
         $html .= '</tr></thead>';
 
         if (!is_array($checkedValues)) {
-            $checkedValues = array();
+            $checkedValues = [];
         }
         $i = 0;
         foreach ($values as $value => $displays) {
             $checked = (in_array($value, $checkedValues)) ? ' checked="checked"' : '';
             $html .= '<tr>' .
-                sprintf('<td style="text-align: center"><input id="%s[]" type="checkbox" name="%s[]" value="%s"%s%s /></td>',
-                        $name,
-                        $name,
-                        $value,
-                        $checked,
-                        $actions);
+                sprintf(
+                    '<td style="text-align: center"><input id="%s[]" type="checkbox" name="%s[]" value="%s"%s%s /></td>',
+                    $name,
+                    $name,
+                    $value,
+                    $checked,
+                    $actions
+                );
             foreach ($displays as $col) {
                 $html .= sprintf('<td>&nbsp;%s</td>', $col);
             }
@@ -101,7 +108,7 @@ EOT;
         $html .= '</tr></thead>';
 
         if (!is_array($checkedValues)) {
-            $checkedValues = array();
+            $checkedValues = [];
         }
         $i = 0;
         foreach ($values as $value => $displays) {

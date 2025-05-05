@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -21,8 +22,7 @@
  * @package   Core
  * @since     2.12.0
  */
-class Horde_Registry_Hordeconfig
-implements ArrayAccess, Countable, IteratorAggregate
+class Horde_Registry_Hordeconfig implements ArrayAccess, Countable, IteratorAggregate
 {
     /**
      * The application.
@@ -78,7 +78,7 @@ implements ArrayAccess, Countable, IteratorAggregate
                 $c = new Horde_Registry_Loadconfig($this->app, 'conf.php', 'conf');
                 $this->_config = $c->config['conf'];
             } catch (Horde_Exception $e) {
-                $this->_config = array();
+                $this->_config = [];
             }
         }
     }
@@ -100,9 +100,8 @@ implements ArrayAccess, Countable, IteratorAggregate
     public function offsetGet($offset)
     {
         $this->_load($offset);
-        return isset($this->_config[$offset])
-            ? $this->_config[$offset]
-            : null;
+        return $this->_config[$offset]
+            ?? null;
     }
 
     #[\ReturnTypeWillChange]

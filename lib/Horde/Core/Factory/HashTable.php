@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -32,10 +33,10 @@ class Horde_Core_Factory_HashTable extends Horde_Core_Factory_Injector
 
         // DEPRECATED: BC config
         if (!empty($conf['memcache']['enabled'])) {
-            return new Horde_HashTable_Memcache(array(
+            return new Horde_HashTable_Memcache([
                 'logger' => $logger,
-                'memcache' => $injector->getInstance('Horde_Memcache')
-            ));
+                'memcache' => $injector->getInstance('Horde_Memcache'),
+            ]);
         }
 
         $driver = empty($conf['hashtable']['driver'])
@@ -46,72 +47,72 @@ class Horde_Core_Factory_HashTable extends Horde_Core_Factory_Injector
         $params = Horde::getDriverConfig('hashtable', $driver);
 
         switch ($lc_driver) {
-        case 'memcache':
-            return new Horde_HashTable_Memcache(array(
-                'logger' => $logger,
-                'memcache' => new Horde_Memcache(array_merge($params, array(
-                    'logger' => $logger
-                )))
-            ));
+            case 'memcache':
+                return new Horde_HashTable_Memcache([
+                    'logger' => $logger,
+                    'memcache' => new Horde_Memcache(array_merge($params, [
+                        'logger' => $logger,
+                    ])),
+                ]);
 
-        case 'predis':
-            $params = array_merge(array(
-                'hostspec' => array(),
-                'password' => null,
-                'database' => null,
-                'port' => '',
-                'protocol' => 'tcp',
-            ), $params);
-            $redis_params = array();
+            case 'predis':
+                $params = array_merge([
+                    'hostspec' => [],
+                    'password' => null,
+                    'database' => null,
+                    'port' => '',
+                    'protocol' => 'tcp',
+                ], $params);
+                $redis_params = [];
 
-            $common = array_filter(array(
-                'password' => strlen($params['password']) ? $params['password'] : null,
-                'persistent' => !empty($params['persistent']),
-                'database' => !empty($params['database']) ? $params['database'] : null
-            ));
+                $common = array_filter([
+                    'password' => strlen($params['password']) ? $params['password'] : null,
+                    'persistent' => !empty($params['persistent']),
+                    'database' => !empty($params['database']) ? $params['database'] : null,
+                ]);
 
-            switch ($params['protocol']) {
-            case 'tcp':
-                foreach ($params['hostspec'] as $key => $val) {
-                    $redis_params[] = array_merge($common, array_filter(array(
-                        'host' => trim($val),
-                        'port' => isset($params['port'][$key]) ? trim($params['port'][$key]) : null,
-                        'scheme' => 'tcp'
-                    )));
+                switch ($params['protocol']) {
+                    case 'tcp':
+                        foreach ($params['hostspec'] as $key => $val) {
+                            $redis_params[] = array_merge($common, array_filter([
+                                'host' => trim($val),
+                                'port' => isset($params['port'][$key]) ? trim($params['port'][$key]) : null,
+                                'scheme' => 'tcp',
+                            ]));
+                        }
+                        break;
+
+                    case 'unix':
+                        $redis_params[] = array_merge($common, [
+                            'path' => trim($params['socket']),
+                            'scheme' => 'unix',
+                        ]);
+                        break;
                 }
-                break;
 
-            case 'unix':
-                $redis_params[] = array_merge($common, array(
-                    'path' => trim($params['socket']),
-                    'scheme' => 'unix'
-                ));
-                break;
-            }
+                /* No need to use complex clustering if not needed. */
+                if (count($redis_params) === 1) {
+                    $redis_params = reset($redis_params);
+                }
 
-            /* No need to use complex clustering if not needed. */
-            if (count($redis_params) === 1) {
-                $redis_params = reset($redis_params);
-            }
+                $redis_replication_options = [];
+                if (!empty($params['replication'])) {
+                    $redis_replication_options = [
+                        'replication' => $params['replication'],
+                        'service'  => !empty($params['service']) ? $params['service'] : null,
+                    ];
+                }
 
-            $redis_replication_options = array();
-            if (!empty($params['replication'])) {
-                $redis_replication_options = array(
-                    'replication' => $params['replication'],
-                    'service'  => !empty($params['service']) ? $params['service'] : null,
-                );
-            }
+                return new Horde_HashTable_Predis([
+                    'logger' => $logger,
+                    'predis' => new Predis\Client($redis_params, $redis_replication_options),
+                ]);
 
-            return new Horde_HashTable_Predis(array(
-                'logger' => $logger,
-                'predis' => new Predis\Client($redis_params, $redis_replication_options)
-            ));
-
-        case 'memory':
-        default:
-            return new Horde_HashTable_Memory(array(
-                'logger' => $logger
-            ));
+            case 'memory':
+            default:
+                return new Horde_HashTable_Memory([
+                    'logger' => $logger,
+                ]);
         }
     }
 

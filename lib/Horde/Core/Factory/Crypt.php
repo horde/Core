@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based Horde_Crypt:: factory.
  *
@@ -34,14 +35,14 @@ class Horde_Core_Factory_Crypt extends Horde_Core_Factory_Base
      * @return Horde_Crypt  The instance.
      * @throws Horde_Exception
      */
-    public function create($driver, $params = array())
+    public function create($driver, $params = [])
     {
         global $registry;
 
-        $params = array_merge(array(
+        $params = array_merge([
             'email_charset' => $registry->getEmailCharset(),
-            'temp' => Horde::getTempDir()
-        ), $params);
+            'temp' => Horde::getTempDir(),
+        ], $params);
 
         return Horde_Crypt::factory($driver, $params);
     }

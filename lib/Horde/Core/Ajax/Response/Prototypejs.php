@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A data object that represents JSON data that is output with prototypejs
  * security delimiters.

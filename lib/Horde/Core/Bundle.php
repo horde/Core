@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base class for the Horde bundle API.
  *
@@ -57,7 +58,7 @@ abstract class Horde_Core_Bundle
 
         // Initialization
         $umask = umask();
-        Horde_Registry::appInit('horde', array('nocompress' => true, 'authentication' => 'none'));
+        Horde_Registry::appInit('horde', ['nocompress' => true, 'authentication' => 'none']);
         $this->_config = new Horde_Config();
         umask($umask);
     }
@@ -78,7 +79,8 @@ abstract class Horde_Core_Bundle
             $vars,
             'sql',
             'phptype',
-            $sql_config['switch']['custom']['fields']['phptype']);
+            $sql_config['switch']['custom']['fields']['phptype']
+        );
 
         $this->writeConfig($vars);
     }

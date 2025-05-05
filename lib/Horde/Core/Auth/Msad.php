@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Core_Auth_Msad class provides Horde-specific code that
  * extends the base LDAP driver.
@@ -25,7 +26,7 @@ class Horde_Core_Auth_Msad extends Horde_Auth_Msad
      */
     public function addUser($userId, $credentials)
     {
-        list($userId, $credentials) = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Auth')->create()->runHook($userId, $credentials, 'preauthenticate', 'admin');
+        [$userId, $credentials] = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Auth')->create()->runHook($userId, $credentials, 'preauthenticate', 'admin');
 
         parent::addUser($userId, $credentials);
     }
@@ -39,10 +40,14 @@ class Horde_Core_Auth_Msad extends Horde_Auth_Msad
      *
      * @throws Horde_Auth_Exception
      */
-    public function updateUser($oldID, $newID, $credentials, $olddn = null,
-                               $newdn = null)
-    {
-        list($oldId, $credentials) = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Auth')->create()->runHook($oldId, $credentials, 'preauthenticate', 'admin');
+    public function updateUser(
+        $oldID,
+        $newID,
+        $credentials,
+        $olddn = null,
+        $newdn = null
+    ) {
+        [$oldId, $credentials] = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Auth')->create()->runHook($oldId, $credentials, 'preauthenticate', 'admin');
 
         parent::updateUser($oldID, $newID, $credentials, $olddn, $newdn);
     }
@@ -57,7 +62,7 @@ class Horde_Core_Auth_Msad extends Horde_Auth_Msad
      */
     public function removeUser($userId, $dn = null)
     {
-        list($userId, $credentials) = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Auth')->create()->runHook($userId, array(), 'preauthenticate', 'admin');
+        [$userId, $credentials] = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Auth')->create()->runHook($userId, [], 'preauthenticate', 'admin');
 
         parent::removeUser($userId, isset($credentials['ldap']) ? $credentials['ldap']['dn'] : $dn);
     }

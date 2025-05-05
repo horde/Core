@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This class provides an API to the blocks (applets) framework.
  *
@@ -60,22 +61,22 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
         $layout = @unserialize($GLOBALS['prefs']->getValue($this->_layout));
 
         if (empty($layout)) {
-            $layout = array();
+            $layout = [];
 
             if (isset($GLOBALS['conf']['portal']['fixed_blocks'])) {
                 foreach ($GLOBALS['conf']['portal']['fixed_blocks'] as $block) {
-                    list($app, $type) = explode(':', $block, 2);
-                    $layout[] = array(
-                        array(
+                    [$app, $type] = explode(':', $block, 2);
+                    $layout[] = [
+                        [
                             'app' => $app,
-                            'params' => array(
+                            'params' => [
                                 'type2' => $type,
-                                'params' => false
-                            ),
+                                'params' => false,
+                            ],
                             'height' => 1,
-                            'width' => 1
-                        )
-                    );
+                            'width' => 1,
+                        ],
+                    ];
                 }
             }
         }
@@ -154,7 +155,7 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
      */
     public function getBlocksList()
     {
-        $blocks = array();
+        $blocks = [];
 
         $this->_loadBlocks();
 
@@ -177,7 +178,7 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
      */
     public function getFixedBlocks()
     {
-        $layout = array();
+        $layout = [];
 
 
         return $layout;
@@ -193,9 +194,12 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
      *
      * @return string  The select tag with all available blocks.
      */
-    public function getBlocksWidget($cur_app = null, $cur_block = null,
-                                    $onchange = false, $readonly = false)
-    {
+    public function getBlocksWidget(
+        $cur_app = null,
+        $cur_block = null,
+        $onchange = false,
+        $readonly = false
+    ) {
         $widget = '<select name=' . (!$readonly ? '"app"' : '"roapp"');
 
         if ($onchange) {
@@ -253,9 +257,8 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
     {
         /* getParams() loads $_blocks */
         $this->getParams($app, $block);
-        return isset($this->_blocks[$app][$block]['params'][$param_id]['required'])
-            ? $this->_blocks[$app][$block]['params'][$param_id]['required']
-            : true;
+        return $this->_blocks[$app][$block]['params'][$param_id]['required']
+            ?? true;
     }
 
     /**
@@ -296,86 +299,94 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
         }
 
         switch ($param['type']) {
-        case 'boolean':
-        case 'checkbox':
-            $checked = !empty($val[$param_id]) ? ' checked="checked"' : '';
-            $widget = sprintf('<input type="checkbox" name="params[%s]"%s />', $param_id, $checked);
-            break;
+            case 'boolean':
+            case 'checkbox':
+                $checked = !empty($val[$param_id]) ? ' checked="checked"' : '';
+                $widget = sprintf('<input type="checkbox" name="params[%s]"%s />', $param_id, $checked);
+                break;
 
-        case 'enum':
-            $widget = sprintf('<select name="params[%s]">', $param_id);
-            foreach ($param['values'] as $key => $name) {
-                if (Horde_String::length($name) > 30) {
-                    $name = substr($name, 0, 27) . '...';
+            case 'enum':
+                $widget = sprintf('<select name="params[%s]">', $param_id);
+                foreach ($param['values'] as $key => $name) {
+                    if (Horde_String::length($name) > 30) {
+                        $name = substr($name, 0, 27) . '...';
+                    }
+                    $widget .= sprintf(
+                        "<option value=\"%s\"%s>%s</option>\n",
+                        htmlspecialchars($key),
+                        (isset($val[$param_id]) && $val[$param_id] == $key) ? ' selected="selected"' : '',
+                        htmlspecialchars($name)
+                    );
                 }
-                $widget .= sprintf("<option value=\"%s\"%s>%s</option>\n",
-                                   htmlspecialchars($key),
-                                   (isset($val[$param_id]) && $val[$param_id] == $key) ? ' selected="selected"' : '',
-                                   htmlspecialchars($name));
-            }
 
-            $widget .= '</select>';
-            break;
+                $widget .= '</select>';
+                break;
 
-        case 'multienum':
-            $widget = sprintf('<select multiple="multiple" name="params[%s][]">', $param_id);
-            foreach ($param['values'] as $key => $name) {
-                if (Horde_String::length($name) > 30) {
-                    $name = substr($name, 0, 27) . '...';
+            case 'multienum':
+                $widget = sprintf('<select multiple="multiple" name="params[%s][]">', $param_id);
+                foreach ($param['values'] as $key => $name) {
+                    if (Horde_String::length($name) > 30) {
+                        $name = substr($name, 0, 27) . '...';
+                    }
+                    $widget .= sprintf(
+                        "<option value=\"%s\"%s>%s</option>\n",
+                        htmlspecialchars($key),
+                        (isset($val[$param_id]) && in_array($key, $val[$param_id])) ? ' selected="selected"' : '',
+                        htmlspecialchars($name)
+                    );
                 }
-                $widget .= sprintf("<option value=\"%s\"%s>%s</option>\n",
-                                   htmlspecialchars($key),
-                                   (isset($val[$param_id]) && in_array($key, $val[$param_id])) ? ' selected="selected"' : '',
-                                   htmlspecialchars($name));
-            }
 
-            $widget .= '</select>';
-            break;
+                $widget .= '</select>';
+                break;
 
-        case 'mlenum':
-            // Multi-level enum.
-            if (is_array($val) && isset($val['__' . $param_id])) {
-                $firstval = $val['__' . $param_id];
-            } else {
-                $tmp = array_keys($param['values']);
-                $firstval = current($tmp);
-            }
-            $blockvalues = $param['values'][$firstval];
-            asort($blockvalues);
+            case 'mlenum':
+                // Multi-level enum.
+                if (is_array($val) && isset($val['__' . $param_id])) {
+                    $firstval = $val['__' . $param_id];
+                } else {
+                    $tmp = array_keys($param['values']);
+                    $firstval = current($tmp);
+                }
+                $blockvalues = $param['values'][$firstval];
+                asort($blockvalues);
 
-            $widget = sprintf('<select name="params[__%s]" onchange="document.blockform.action.value=\'save-resume\';document.blockform.submit()">', $param_id) . "\n";
-            foreach (array_keys($param['values']) as $key) {
-                $name = Horde_String::length($key) > 30 ? Horde_String::substr($key, 0, 27) . '...' : $key;
-                $widget .= sprintf("<option value=\"%s\"%s>%s</option>\n",
-                                   htmlspecialchars($key),
-                                   $key == $firstval ? ' selected="selected"' : '',
-                                   htmlspecialchars($name));
-            }
-            $widget .= "</select><br />\n";
+                $widget = sprintf('<select name="params[__%s]" onchange="document.blockform.action.value=\'save-resume\';document.blockform.submit()">', $param_id) . "\n";
+                foreach (array_keys($param['values']) as $key) {
+                    $name = Horde_String::length($key) > 30 ? Horde_String::substr($key, 0, 27) . '...' : $key;
+                    $widget .= sprintf(
+                        "<option value=\"%s\"%s>%s</option>\n",
+                        htmlspecialchars($key),
+                        $key == $firstval ? ' selected="selected"' : '',
+                        htmlspecialchars($name)
+                    );
+                }
+                $widget .= "</select><br />\n";
 
-            $widget .= sprintf("<select name=\"params[%s]\">\n", $param_id);
-            foreach ($blockvalues as $key => $name) {
-                $name = (Horde_String::length($name) > 30) ? Horde_String::substr($name, 0, 27) . '...' : $name;
-                $widget .= sprintf("<option value=\"%s\"%s>%s</option>\n",
-                                   htmlspecialchars($key),
-                                   $val[$param_id] == $key ? ' selected="selected"' : '',
-                                   htmlspecialchars($name));
-            }
-            $widget .= "</select><br />\n";
-            break;
+                $widget .= sprintf("<select name=\"params[%s]\">\n", $param_id);
+                foreach ($blockvalues as $key => $name) {
+                    $name = (Horde_String::length($name) > 30) ? Horde_String::substr($name, 0, 27) . '...' : $name;
+                    $widget .= sprintf(
+                        "<option value=\"%s\"%s>%s</option>\n",
+                        htmlspecialchars($key),
+                        $val[$param_id] == $key ? ' selected="selected"' : '',
+                        htmlspecialchars($name)
+                    );
+                }
+                $widget .= "</select><br />\n";
+                break;
 
-        case 'int':
-        case 'text':
-            $widget = sprintf('<input type="text" name="params[%s]" value="%s" />', $param_id, !isset($val[$param_id]) ? $param['default'] : $val[$param_id]);
-            break;
+            case 'int':
+            case 'text':
+                $widget = sprintf('<input type="text" name="params[%s]" value="%s" />', $param_id, !isset($val[$param_id]) ? $param['default'] : $val[$param_id]);
+                break;
 
-        case 'password':
-            $widget = sprintf('<input type="password" name="params[%s]" value="%s" />', $param_id, !isset($val[$param_id]) ? $param['default'] : $val[$param_id]);
-            break;
+            case 'password':
+                $widget = sprintf('<input type="password" name="params[%s]" value="%s" />', $param_id, !isset($val[$param_id]) ? $param['default'] : $val[$param_id]);
+                break;
 
-        case 'error':
-            $widget = '<span class="form-error">' . $param['default'] . '</span>';
-            break;
+            case 'error':
+                $widget = '<span class="form-error">' . $param['default'] . '</span>';
+                break;
         }
 
         return $widget;
@@ -395,7 +406,7 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
 
         return isset($this->_blocks[$app][$block])
             ? $this->_blocks[$app][$block]['name']
-            : sprintf(Horde_Core_Translation::t("Block \"%s\" of application \"%s\" not found."), $block, $app);
+            : sprintf(Horde_Core_Translation::t('Block "%s" of application "%s" not found.'), $block, $app);
     }
 
     /**
@@ -411,7 +422,7 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
         $this->_loadBlocks();
 
         if (!isset($this->_blocks[$app][$block])) {
-            return array();
+            return [];
         }
 
         if (!isset($this->_blocks[$app][$block]['params'])) {
@@ -424,7 +435,7 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
             return array_keys($this->_blocks[$app][$block]['params']);
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -456,9 +467,8 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
     {
         /* getParams() loads $_blocks */
         $this->getParams($app, $block);
-        return isset($this->_blocks[$app][$block]['params'][$param]['default'])
-            ? $this->_blocks[$app][$block]['params'][$param]['default']
-            : null;
+        return $this->_blocks[$app][$block]['params'][$param]['default']
+            ?? null;
     }
 
     /**
@@ -491,7 +501,7 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
         }
 
         $currentApp = $registry->getApp();
-        $this->_blocks = array();
+        $this->_blocks = [];
 
         foreach ($this->_apps as $app) {
             $drivers = $registry->getAppDrivers($app, 'Block');
@@ -516,16 +526,16 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
 
     public function __serialize(): array
     {
-        return array(
+        return [
             $this->_apps,
             $this->_blocks,
-            $this->_layout
-        );
+            $this->_layout,
+        ];
     }
 
     public function jsonSerialize(): mixed
     {
-        return json_encode($this->__serialize());        
+        return json_encode($this->__serialize());
     }
 
     public function unserialize($data)
@@ -535,11 +545,11 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
 
     public function __unserialize(array $data): void
     {
-        list(
+        [
             $this->_apps,
             $this->_blocks,
             $this->_layout
-        ) = $data;
+        ] = $data;
     }
 
 }

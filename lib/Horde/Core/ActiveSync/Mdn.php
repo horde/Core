@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  */
@@ -38,9 +39,11 @@ class Horde_Core_ActiveSync_Mdn
      * @param  Horde_Core_ActiveSync_Connector $connector
      */
     public function __construct(
-        $mailbox, $uid, Horde_ActiveSync_Imap_Adapter $imap,
-        Horde_Core_ActiveSync_Connector $connector)
-    {
+        $mailbox,
+        $uid,
+        Horde_ActiveSync_Imap_Adapter $imap,
+        Horde_Core_ActiveSync_Connector $connector
+    ) {
         $this->_imap = $imap;
         $this->_mailbox = $mailbox;
         $this->_uid = $uid;
@@ -50,15 +53,15 @@ class Horde_Core_ActiveSync_Mdn
     public function __call($method, $args)
     {
         switch ($method) {
-        case 'headers':
-            if (empty($this->_msg)) {
-                return false;
-            }
-            return $this->_msg->getHeaders();
-        case 'mailbox':
-            return $this->_mailbox;
-        case 'uid':
-            return $this->_uid;
+            case 'headers':
+                if (empty($this->_msg)) {
+                    return false;
+                }
+                return $this->_msg->getHeaders();
+            case 'mailbox':
+                return $this->_mailbox;
+            case 'uid':
+                return $this->_uid;
         }
     }
 
@@ -84,7 +87,7 @@ class Horde_Core_ActiveSync_Mdn
      */
     protected function _msgCheck()
     {
-        $msgs = $this->_imap->getImapMessage($this->_mailbox, $this->_uid, array('headers' => true));
+        $msgs = $this->_imap->getImapMessage($this->_mailbox, $this->_uid, ['headers' => true]);
         if (!count($msgs)) {
             return false;
         }

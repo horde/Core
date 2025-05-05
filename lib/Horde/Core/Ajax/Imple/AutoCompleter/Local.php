@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The local (browser-side) autocompleter.
  *
@@ -42,16 +43,16 @@ class Horde_Core_Ajax_Imple_AutoCompleter_Local extends Horde_Core_Ajax_Imple_Au
      *   - score: (integer) TODO
      *   - tokens: (array) Valid token separators.
      */
-    public function __construct($search, array $params = array())
+    public function __construct($search, array $params = [])
     {
         $this->_search = $search;
 
-        parent::__construct(array_merge(array(
+        parent::__construct(array_merge([
             'fullSearch' => 1,
             'partialSearch' => 1,
             'score' => 1,
-            'tokens' => array(',', ';')
-        ), $params));
+            'tokens' => [',', ';'],
+        ], $params));
     }
 
     /**

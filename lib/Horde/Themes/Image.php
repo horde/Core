@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
  *
@@ -37,11 +38,11 @@ class Horde_Themes_Image extends Horde_Themes_Element
     public function __get($name)
     {
         switch ($name) {
-        case 'base64img':
-            return self::base64ImgData($this);
+            case 'base64img':
+                return self::base64ImgData($this);
 
-        default:
-            return parent::__get($name);
+            default:
+                return parent::__get($name);
         }
     }
 
@@ -60,16 +61,16 @@ class Horde_Themes_Image extends Horde_Themes_Element
      *
      * @return string  The full image tag.
      */
-    public static function tag($src, array $opts = array())
+    public static function tag($src, array $opts = [])
     {
         global $browser, $conf;
 
-        $opts = array_merge(array(
+        $opts = array_merge([
             'alt' => '',
-            'attr' => array(),
+            'attr' => [],
             'fullsrc' => false,
-            'imgopts' => array()
-        ), $opts);
+            'imgopts' => [],
+        ], $opts);
 
         /* If browser does not support images, simply return the ALT text. */
         if (!$browser->hasFeature('images')) {
@@ -99,7 +100,7 @@ class Horde_Themes_Image extends Horde_Themes_Element
             $src = self::base64ImgData($src);
         }
         if ($opts['fullsrc'] && (substr($src, 0, 10) != 'data:image')) {
-            $src = Horde::url($src, true, array('append_session' => -1));
+            $src = Horde::url($src, true, ['append_session' => -1]);
         }
 
         $img->addAttribute('src', $src);

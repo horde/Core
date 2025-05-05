@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
  *
@@ -40,10 +41,10 @@ class Horde_Themes
      * @return Horde_Themes_Image  An object which contains the URI
      *                             and filesystem location of the image.
      */
-    public static function img($name = null, $options = array())
+    public static function img($name = null, $options = [])
     {
         if (is_string($options)) {
-            $options = array('app' => $options);
+            $options = ['app' => $options];
         }
 
         return new Horde_Themes_Image($name, $options);
@@ -67,10 +68,10 @@ class Horde_Themes
      * @return Horde_Themes_Sound  An object which contains the URI
      *                             and filesystem location of the sound.
      */
-    public static function sound($name = null, $options = array())
+    public static function sound($name = null, $options = [])
     {
         if (is_string($options)) {
-            $options = array('app' => $options);
+            $options = ['app' => $options];
         }
 
         return new Horde_Themes_Sound($name, $options);
@@ -84,7 +85,7 @@ class Horde_Themes
      */
     public static function themeList()
     {
-        $out = array();
+        $out = [];
 
         // Throws UnexpectedValueException
         $di = new DirectoryIterator($GLOBALS['registry']->get('themesfs', 'horde'));
@@ -125,7 +126,7 @@ class Horde_Themes
 
         $cache = $GLOBALS['injector']->getInstance('Horde_Core_Factory_ThemesCache')->create($app, $theme);
 
-        $sounds = array();
+        $sounds = [];
         foreach ($cache->build() as $val) {
             if ((strpos($val, 'sounds/') === 0) &&
                 (substr(strrchr($val, '.'), 1) == 'wav')) {
@@ -146,7 +147,7 @@ class Horde_Themes
      */
     public static function getFeedXsl()
     {
-         return $GLOBALS['registry']->get('themesuri', 'horde') . '/default/feed-rss.xsl';
+        return $GLOBALS['registry']->get('themesuri', 'horde') . '/default/feed-rss.xsl';
     }
 
     /**
@@ -163,20 +164,20 @@ class Horde_Themes
         global $registry;
 
         switch ($view) {
-        case $registry::VIEW_BASIC:
-            return 'basic';
+            case $registry::VIEW_BASIC:
+                return 'basic';
 
-        case $registry::VIEW_DYNAMIC:
-            return 'dynamic';
+            case $registry::VIEW_DYNAMIC:
+                return 'dynamic';
 
-        case $registry::VIEW_MINIMAL:
-            return 'minimal';
+            case $registry::VIEW_MINIMAL:
+                return 'minimal';
 
-        case $registry::VIEW_SMARTMOBILE:
-            return 'smartmobile';
+            case $registry::VIEW_SMARTMOBILE:
+                return 'smartmobile';
 
-        default:
-            return null;
+            default:
+                return null;
         }
     }
 

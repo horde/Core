@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Text_Filter_Emails:: class finds email addresses in a block of
  * text and turns them into links.
@@ -28,12 +29,12 @@ class Horde_Core_Text_Filter_Emails extends Horde_Text_Filter_Emails
      *               API call.
      *               DEFAULT: Use mail/compose API call.
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
-        $this->_params = array_merge(array(
+        $this->_params = array_merge([
             'always_mailto' => false,
-            'callback' => null
-        ), $this->_params, $params);
+            'callback' => null,
+        ], $this->_params, $params);
 
         parent::__construct($params);
     }
@@ -59,16 +60,16 @@ class Horde_Core_Text_Filter_Emails extends Horde_Text_Filter_Emails
             $email = $matches[3];
             $args_long = $matches[5];
         } else {
-            $args = isset($matches[13]) ? $matches[13] : '';
+            $args = $matches[13] ?? '';
             $email = $matches[10];
-            $args_long = isset($matches[11]) ? $matches[11] : '';
+            $args_long = $matches[11] ?? '';
         }
 
         parse_str($args, $extra);
         try {
             $url = $this->_params['callback']
-                ? strval(call_user_func($this->_params['callback'], array('to' => $email), $extra))
-                : strval($GLOBALS['registry']->call('mail/compose', array(array('to' => $email), $extra)));
+                ? strval(call_user_func($this->_params['callback'], ['to' => $email], $extra))
+                : strval($GLOBALS['registry']->call('mail/compose', [['to' => $email], $extra]));
         } catch (Horde_Exception $e) {
             return parent::_regexCallback($matches);
         }

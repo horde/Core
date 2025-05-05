@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This class provides Horde-specific code that extends the base LDAP driver.
  *
@@ -29,7 +30,7 @@ class Horde_Core_Group_Ldap extends Horde_Group_Ldap
         try {
             return parent::create(
                 $name,
-                $GLOBALS['injector']->getInstance('Horde_Core_Hooks')->callHook('groupldap', 'horde', array($name, $email))
+                $GLOBALS['injector']->getInstance('Horde_Core_Hooks')->callHook('groupldap', 'horde', [$name, $email])
             );
         } catch (Horde_Exception_HookNotSet $e) {
             return parent::create($name, $email);

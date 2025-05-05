@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2016-2017 Horde LLC (http://www.horde.org/)
  *
@@ -36,7 +37,7 @@ class Horde_Core_Factory_Identity_DavUsernameHook extends Horde_Core_Factory_Ide
     {
         try {
             $user = $this->_injector->getInstance('Horde_Core_Hooks')
-                ->callHook('davusername', 'horde', array($user, true));
+                ->callHook('davusername', 'horde', [$user, true]);
         } catch (Horde_Exception_HookNotSet $e) {
         }
         return parent::create($user, $driver);

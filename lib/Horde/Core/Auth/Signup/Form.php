@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Horde Signup Form.
  *
@@ -26,9 +27,9 @@ class Horde_Core_Auth_Signup_Form extends Horde_Form
      */
     public function __construct(&$vars)
     {
-        parent::__construct($vars, Horde_Core_Translation::t("Sign up for an account"));
+        parent::__construct($vars, Horde_Core_Translation::t('Sign up for an account'));
 
-        $this->setButtons(Horde_Core_Translation::t("Sign up"));
+        $this->setButtons(Horde_Core_Translation::t('Sign up'));
 
         $this->addHidden('', 'url', 'text', false);
 
@@ -36,28 +37,35 @@ class Horde_Core_Auth_Signup_Form extends Horde_Form
         try {
             $extra = $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
                 ->callHook('signup_getextra', 'horde');
-        } catch (Horde_Exception_HookNotSet $e) {}
+        } catch (Horde_Exception_HookNotSet $e) {
+        }
 
         if (!empty($extra)) {
             if (!isset($extra['user_name'])) {
-                $this->addVariable(Horde_Core_Translation::t("Choose a username"), 'user_name', 'text', true);
+                $this->addVariable(Horde_Core_Translation::t('Choose a username'), 'user_name', 'text', true);
             }
             if (!isset($extra['password'])) {
-                $this->addVariable(Horde_Core_Translation::t("Choose a password"), 'password', 'passwordconfirm', true, false, Horde_Core_Translation::t("Type your password twice to confirm"));
+                $this->addVariable(Horde_Core_Translation::t('Choose a password'), 'password', 'passwordconfirm', true, false, Horde_Core_Translation::t('Type your password twice to confirm'));
             }
             foreach ($extra as $field_name => $field) {
-                $readonly = isset($field['readonly']) ? $field['readonly'] : null;
-                $desc = isset($field['desc']) ? $field['desc'] : null;
-                $required = isset($field['required']) ? $field['required'] : false;
-                $field_params = isset($field['params']) ? $field['params'] : array();
+                $readonly = $field['readonly'] ?? null;
+                $desc = $field['desc'] ?? null;
+                $required = $field['required'] ?? false;
+                $field_params = $field['params'] ?? [];
 
-                $this->addVariable($field['label'], 'extra[' . $field_name . ']',
-                                   $field['type'], $required, $readonly,
-                                   $desc, $field_params);
+                $this->addVariable(
+                    $field['label'],
+                    'extra[' . $field_name . ']',
+                    $field['type'],
+                    $required,
+                    $readonly,
+                    $desc,
+                    $field_params
+                );
             }
         } else {
-            $this->addVariable(Horde_Core_Translation::t("Choose a username"), 'user_name', 'text', true);
-            $this->addVariable(Horde_Core_Translation::t("Choose a password"), 'password', 'passwordconfirm', true, false, Horde_Core_Translation::t("Type your password twice to confirm"));
+            $this->addVariable(Horde_Core_Translation::t('Choose a username'), 'user_name', 'text', true);
+            $this->addVariable(Horde_Core_Translation::t('Choose a password'), 'password', 'passwordconfirm', true, false, Horde_Core_Translation::t('Type your password twice to confirm'));
         }
     }
 
@@ -84,7 +92,7 @@ class Horde_Core_Auth_Signup_Form extends Horde_Form
     /**
      * Get the renderer for this form
      */
-    function getRenderer($params = array())
+    public function getRenderer($params = [])
     {
         $renderer = new Horde_Core_Ui_ModalFormRenderer($params);
         return $renderer;

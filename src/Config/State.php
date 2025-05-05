@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 1999-2021 Horde LLC (http://www.horde.org/)
  *
@@ -36,7 +37,7 @@ class State
      *
      * @param array $conf The config tree as provided by registry
      */
-    public function __construct(array $conf = null)
+    public function __construct(?array $conf = null)
     {
         $this->conf = $conf ?? $GLOBALS['conf'] ?? null;
         // If we still have no array, give up.

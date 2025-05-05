@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -82,10 +83,10 @@ class Horde_Script_Cache_File extends Horde_Script_Cache
         global $registry;
 
         if (empty($scripts)) {
-            return array();
+            return [];
         }
 
-        $tmp = array();
+        $tmp = [];
         foreach ($scripts as $val) {
             $tmp[] = $val->modified;
         }
@@ -110,7 +111,7 @@ class Horde_Script_Cache_File extends Horde_Script_Cache
             $js_url = (string)Horde::url($js_url, true, -1);
         }
 
-        $out = array($js_url);
+        $out = [$js_url];
 
         if (file_exists($js_path)) {
             return $out;
@@ -141,7 +142,7 @@ class Horde_Script_Cache_File extends Horde_Script_Cache
 
         $temp = Horde_Util::getTempFile('staticjs', true, $js_fs);
         if (!file_put_contents($temp, $jsmin->minify(), LOCK_EX) ||
-            !chmod($temp, 0777 & ~umask()) ||
+            !chmod($temp, 0o777 & ~umask()) ||
             !rename($temp, $js_path)) {
             Horde::log('Could not write cached JS file to disk.', Horde_Log::EMERG);
         } elseif ($this->_compress->sourcemap_support) {

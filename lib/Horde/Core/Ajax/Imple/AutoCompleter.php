@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2009-2017 Horde LLC (http://www.horde.org/)
  *
@@ -36,16 +37,16 @@ abstract class Horde_Core_Ajax_Imple_AutoCompleter extends Horde_Core_Ajax_Imple
 
         if (!self::$_initAc) {
             $page_output->addScriptPackage('Horde_Core_Script_Package_Autocomplete');
-            $page_output->addInlineJsVars(array(
-                'HordeImple.AutoCompleter' => new stdClass
-            ));
+            $page_output->addInlineJsVars([
+                'HordeImple.AutoCompleter' => new stdClass(),
+            ]);
 
             self::$_initAc = true;
         }
 
-        $page_output->addInlineScript(array(
-            'HordeImple.AutoCompleter["' . $this->getDomId() . '"]=' . $this->_getAutoCompleter()->generate($this)
-        ), true);
+        $page_output->addInlineScript([
+            'HordeImple.AutoCompleter["' . $this->getDomId() . '"]=' . $this->_getAutoCompleter()->generate($this),
+        ], true);
 
         return false;
     }
@@ -56,12 +57,12 @@ abstract class Horde_Core_Ajax_Imple_AutoCompleter extends Horde_Core_Ajax_Imple
     {
         // Avoid errors if 'input' isn't set and short-circuit empty searches.
         if (!isset($vars->input)) {
-            $result = array();
+            $result = [];
         } else {
             $input = $vars->get($vars->input);
             $result = strlen($input)
                 ? $this->_handleAutoCompleter($input)
-                : array();
+                : [];
         }
 
         return new Horde_Core_Ajax_Response_Prototypejs($result);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Core_Tree_Renderer_Simplehtml class extends the
  * Horde_Tree_Simplehtml class to provide for creation of

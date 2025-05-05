@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -28,7 +29,7 @@ class Horde_Shutdown
      *
      * @var array
      */
-    private $_tasks = array();
+    private $_tasks = [];
 
     /**
      * Add a task to the global Horde shutdown queue.
@@ -45,7 +46,7 @@ class Horde_Shutdown
      */
     public function __construct()
     {
-        register_shutdown_function(array($this, 'runTasks'));
+        register_shutdown_function([$this, 'runTasks']);
     }
 
     /**
@@ -66,7 +67,8 @@ class Horde_Shutdown
         foreach ($this->_tasks as $val) {
             try {
                 $val->shutdown();
-            } catch (Exception $e) {}
+            } catch (Exception $e) {
+            }
         }
     }
 

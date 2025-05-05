@@ -1,4 +1,5 @@
 <?php
+
 /**
  * History system prefix generator for use with Kolab_Storage.
  *
@@ -14,8 +15,7 @@
  * @category Horde
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
-class Horde_Core_Kolab_Storage_HistoryPrefix
-implements Horde_Kolab_Storage_HistoryPrefix
+class Horde_Core_Kolab_Storage_HistoryPrefix implements Horde_Kolab_Storage_HistoryPrefix
 {
     protected static $_mapping;
 
@@ -31,7 +31,9 @@ implements Horde_Kolab_Storage_HistoryPrefix
         $app = self::_type2app($data->getType());
         if (empty($app)) {
             Horde::log(sprintf(
-                'Unsupported app type: %s', $data->getType()), 'WARN');
+                'Unsupported app type: %s',
+                $data->getType()
+            ), 'WARN');
             return false;
         }
 
@@ -44,7 +46,7 @@ implements Horde_Kolab_Storage_HistoryPrefix
             ->create($app)
             ->listAllShares();
 
-        foreach($all_shares as $id => $share) {
+        foreach ($all_shares as $id => $share) {
             if ($folder == $share->get('folder')) {
                 $share_id = $id;
                 break;
@@ -75,13 +77,13 @@ implements Horde_Kolab_Storage_HistoryPrefix
         global $registry;
 
         if (!isset(self::$_mapping)) {
-            self::$_mapping = array(
+            self::$_mapping = [
                 'contact' => $registry->hasInterface('contacts'),
                 'distribution-list' => $registry->hasInterface('contacts'),
                 'event' => $registry->hasInterface('calendar'),
                 'note' => $registry->hasInterface('notes'),
-                'task' => $registry->hasInterface('tasks')
-            );
+                'task' => $registry->hasInterface('tasks'),
+            ];
         }
 
         return !empty(self::$_mapping[$type])

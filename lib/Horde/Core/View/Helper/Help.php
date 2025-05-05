@@ -1,4 +1,5 @@
 <?php
+
 /**
  * View helper class to allow access to the Horde_Help::link() method.
  *

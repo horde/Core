@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -37,42 +38,42 @@ class Horde_Deprecated
     {
         // Output headers and encoded response.
         switch ($ct) {
-        case 'json':
-        case 'js-json':
-            /* JSON responses are a structured object which always
-             * includes the response in a member named 'response', and an
-             * additional array of messages in 'msgs' which may be updates
-             * for the server or notification messages.
-             *
-             * Make sure no null bytes sneak into the JSON output stream.
-             * Null bytes cause IE to stop reading from the input stream,
-             * causing malformed JSON data and a failed request.  These
-             * bytes don't seem to break any other browser, but might as
-             * well remove them anyway.
-             *
-             * Finally, add prototypejs security delimiters to returned
-             * JSON. */
-            $s_data = str_replace("\00", '', Horde::escapeJson($data));
+            case 'json':
+            case 'js-json':
+                /* JSON responses are a structured object which always
+                 * includes the response in a member named 'response', and an
+                 * additional array of messages in 'msgs' which may be updates
+                 * for the server or notification messages.
+                 *
+                 * Make sure no null bytes sneak into the JSON output stream.
+                 * Null bytes cause IE to stop reading from the input stream,
+                 * causing malformed JSON data and a failed request.  These
+                 * bytes don't seem to break any other browser, but might as
+                 * well remove them anyway.
+                 *
+                 * Finally, add prototypejs security delimiters to returned
+                 * JSON. */
+                $s_data = str_replace("\00", '', Horde::escapeJson($data));
 
-            if ($ct == 'json') {
-                header('Content-Type: application/json');
+                if ($ct == 'json') {
+                    header('Content-Type: application/json');
+                    echo $s_data;
+                } else {
+                    header('Content-Type: text/html; charset=UTF-8');
+                    echo htmlspecialchars($s_data);
+                }
+                break;
+
+            case 'html':
+            case 'plain':
+            case 'xml':
+                $s_data = is_string($data) ? $data : $data->response;
+                header('Content-Type: text/' . $ct . '; charset=UTF-8');
                 echo $s_data;
-            } else {
-                header('Content-Type: text/html; charset=UTF-8');
-                echo htmlspecialchars($s_data);
-            }
-            break;
+                break;
 
-        case 'html':
-        case 'plain':
-        case 'xml':
-            $s_data = is_string($data) ? $data : $data->response;
-            header('Content-Type: text/' . $ct . '; charset=UTF-8');
-            echo $s_data;
-            break;
-
-        default:
-            echo $data;
+            default:
+                echo $data;
         }
 
         exit;
@@ -97,7 +98,7 @@ class Horde_Deprecated
         $response->response = $data;
 
         if ($notify) {
-            $stack = $GLOBALS['notification']->notify(array('listeners' => 'status', 'raw' => true));
+            $stack = $GLOBALS['notification']->notify(['listeners' => 'status', 'raw' => true]);
             if (!empty($stack)) {
                 $response->msgs = $stack;
             }
@@ -122,10 +123,10 @@ class Horde_Deprecated
      */
     public static function img($src, $alt = '', $attr = '')
     {
-        return Horde_Themes_Image::tag($src, array(
+        return Horde_Themes_Image::tag($src, [
             'alt' => $alt,
-            'attr' => $attr
-        ));
+            'attr' => $attr,
+        ]);
     }
 
     /**
@@ -136,13 +137,13 @@ class Horde_Deprecated
      * @deprecated  Use Horde_Themes_Image::tag()
      * @see img()
      */
-    public static function fullSrcImg($src, array $opts = array())
+    public static function fullSrcImg($src, array $opts = [])
     {
-        return Horde_Themes_Image::tag($src, array_filter(array(
-            'attr' => isset($opts['attr']) ? $opts['attr'] : null,
+        return Horde_Themes_Image::tag($src, array_filter([
+            'attr' => $opts['attr'] ?? null,
             'fullsrc' => true,
-            'imgopts' => $opts
-        )));
+            'imgopts' => $opts,
+        ]));
     }
 
     /**
@@ -182,7 +183,7 @@ class Horde_Deprecated
      * @throws Horde_Exception  Thrown on error from hook code.
      * @throws Horde_Exception_HookNotSet  Thrown if hook is not active.
      */
-    public static function callHook($hook, $args = array(), $app = 'horde')
+    public static function callHook($hook, $args = [], $app = 'horde')
     {
         return $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
             ->callHook($hook, $app, $args);
@@ -226,9 +227,12 @@ class Horde_Deprecated
      *                $var_names is an array.
      * @throws Horde_Exception
      */
-    public static function loadConfiguration($config_file, $var_names = null,
-                                             $app = null, $show_output = false)
-    {
+    public static function loadConfiguration(
+        $config_file,
+        $var_names = null,
+        $app = null,
+        $show_output = false
+    ) {
         global $registry;
 
         $app_conf = $registry->loadConfigFile($config_file, $var_names, $app);
@@ -253,7 +257,7 @@ class Horde_Deprecated
      *
      * @param array $params
      */
-    public static function initMap(array $params = array())
+    public static function initMap(array $params = [])
     {
         Horde_Core_HordeMap::init($params);
     }

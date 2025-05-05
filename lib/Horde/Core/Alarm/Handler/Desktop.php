@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package Alarm
  *
@@ -43,7 +44,7 @@ class Horde_Core_Alarm_Handler_Desktop extends Horde_Alarm_Handler
      *                       @todo Change this to be dynamically generated
      *                             when needed.
      */
-    public function __construct(array $params = null)
+    public function __construct(?array $params = null)
     {
         if ($GLOBALS['registry']->getView() != Horde_Registry::VIEW_DYNAMIC) {
             if (!isset($params['js_notify'])) {
@@ -74,14 +75,21 @@ class Horde_Core_Alarm_Handler_Desktop extends Horde_Alarm_Handler
 
         if ($registry->getView() == Horde_Registry::VIEW_DYNAMIC) {
             $alarm['params']['desktop']['icon'] = $icon;
-            $notification->push($alarm['title'], 'horde.alarm', array(
-                'alarm' => $alarm
-            ));
-       } else {
-            $js = sprintf('if(window.Notification){if (window.Notification.permission != "granted") {window.Notification.requestPermission(function(){if (window.Notification.permission == "granted") { new window.Notification("%s", {body: "%s", icon: "%s" }); } }) } else { new window.Notification("%s", {body: "%s", icon: "%s" }); } };',
-               $alarm['title'], $alarm['params']['desktop']['subtitle'], $icon, $alarm['title'], $alarm['params']['desktop']['subtitle'], $icon);
+            $notification->push($alarm['title'], 'horde.alarm', [
+                'alarm' => $alarm,
+            ]);
+        } else {
+            $js = sprintf(
+                'if(window.Notification){if (window.Notification.permission != "granted") {window.Notification.requestPermission(function(){if (window.Notification.permission == "granted") { new window.Notification("%s", {body: "%s", icon: "%s" }); } }) } else { new window.Notification("%s", {body: "%s", icon: "%s" }); } };',
+                $alarm['title'],
+                $alarm['params']['desktop']['subtitle'],
+                $icon,
+                $alarm['title'],
+                $alarm['params']['desktop']['subtitle'],
+                $icon
+            );
             call_user_func($this->_jsNotify, $js);
-       }
+        }
     }
 
     /**
@@ -91,7 +99,7 @@ class Horde_Core_Alarm_Handler_Desktop extends Horde_Alarm_Handler
      */
     public function getDescription()
     {
-        return Horde_Alarm_Translation::t("Desktop notification (with certain browsers)");
+        return Horde_Alarm_Translation::t('Desktop notification (with certain browsers)');
     }
 
 }

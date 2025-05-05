@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -66,7 +67,7 @@ class Horde_Core_History extends Horde_History
      *
      * Overridden to ensure we have the current auth username.
      */
-    public function log($guid, array $attributes = array(), $replaceAction = false)
+    public function log($guid, array $attributes = [], $replaceAction = false)
     {
         if (empty($attributes['who'])) {
             $attributes['who'] = $GLOBALS['registry']->getAuth()
@@ -87,7 +88,7 @@ class Horde_Core_History extends Horde_History
     /**
      * @see Horde_History::getByTimestamp()
      */
-    public function getByTimestamp($cmp, $ts, array $filters = array(), $parent = null)
+    public function getByTimestamp($cmp, $ts, array $filters = [], $parent = null)
     {
         return $this->_history->getByTimestamp($cmp, $ts, $filters, $parent);
     }
@@ -95,7 +96,7 @@ class Horde_Core_History extends Horde_History
     /**
      * @see Horde_History:getByModSeq()
      */
-    public function getByModSeq($start, $end, $filters = array(), $parent = null)
+    public function getByModSeq($start, $end, $filters = [], $parent = null)
     {
         return $this->_history->getByModSeq($start, $end, $filters, $parent);
     }
@@ -159,7 +160,7 @@ class Horde_Core_History extends Horde_History
         // Horde_History class to satisfy any typehints.
     }
 
-    public function _getByTimestamp($cmp, $ts, array $filters = array(), $parent = null)
+    public function _getByTimestamp($cmp, $ts, array $filters = [], $parent = null)
     {
         // NOOP
     }

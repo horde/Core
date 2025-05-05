@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The pretty AJAX autocompleter.
  *
@@ -32,22 +33,25 @@ class Horde_Core_Ajax_Imple_AutoCompleter_Pretty extends Horde_Core_Ajax_Imple_A
      *   - triggerContainer
      *   - uri
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
-        parent::__construct(array_merge(
-            array(
+        parent::__construct(
+            array_merge(
+                [
                 'deleteIcon' => strval(Horde_Themes::img('delete-small.png')),
-                'triggerContainer' => strval(new Horde_Support_Randomid())
-            ), $params)
+                'triggerContainer' => strval(new Horde_Support_Randomid()),
+            ],
+                $params
+            )
         );
 
-        $this->_raw = array_merge($this->_raw, array(
+        $this->_raw = array_merge($this->_raw, [
             'displayFilter',
             'filterCallback',
             'onAdd',
             'onRemove',
-            'beforeUpdate'
-        ));
+            'beforeUpdate',
+        ]);
 
         $GLOBALS['page_output']->addScriptFile('prettyautocomplete.js', 'horde');
     }

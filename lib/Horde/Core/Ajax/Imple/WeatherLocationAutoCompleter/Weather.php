@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Imple to provide weather/location autocompletion.
  *
@@ -11,8 +12,7 @@
  * @category Horde
  * @license  http://www.horde.org/licenses/gpl GPL
  */
-class Horde_Core_Ajax_Imple_WeatherLocationAutoCompleter_Weather
-  extends Horde_Core_Ajax_Imple_WeatherLocationAutoCompleter_Base
+class Horde_Core_Ajax_Imple_WeatherLocationAutoCompleter_Weather extends Horde_Core_Ajax_Imple_WeatherLocationAutoCompleter_Base
 {
     /**
      */

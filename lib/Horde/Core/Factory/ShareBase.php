@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector based Horde_Share factory.
  *
@@ -22,21 +23,21 @@
 class Horde_Core_Factory_ShareBase extends Horde_Core_Factory_Base
 {
     /** Session storage key. */
-    const STORAGE_KEY = 'horde_share/';
+    public const STORAGE_KEY = 'horde_share/';
 
     /**
      * Local cache of created share instances.
      *
      * @var array
      */
-    protected $_instances = array();
+    protected $_instances = [];
 
     /**
      * Cache of share entries.
      *
      * @var array
      */
-    protected $_toCache = array();
+    protected $_toCache = [];
 
     /**
      * Returns the share driver instance.
@@ -68,7 +69,7 @@ class Horde_Core_Factory_ShareBase extends Horde_Core_Factory_Base
         $class = $this->_getDriverName($driver, 'Horde_Share');
         $ob = new $class($app, $registry->getAuth(), $this->_injector->getInstance('Horde_Perms'), $this->_injector->getInstance('Horde_Group'));
         $cb = new Horde_Core_Share_FactoryCallback($app, $driver);
-        $ob->setShareCallback(array($cb, 'create'));
+        $ob->setShareCallback([$cb, 'create']);
         $ob->setLogger($this->_injector->getInstance('Horde_Log_Logger'));
 
         if (!empty($conf['share']['cache'])) {
@@ -77,10 +78,10 @@ class Horde_Core_Factory_ShareBase extends Horde_Core_Factory_Base
             $ob->setListCache($listCache);
 
             if (empty($this->_toCache)) {
-                register_shutdown_function(array($this, 'shutdown'));
+                register_shutdown_function([$this, 'shutdown']);
             }
 
-            $this->_toCache[$sig] = array($app, $cache_sig);
+            $this->_toCache[$sig] = [$app, $cache_sig];
         }
 
         $this->_instances[$sig] = $ob;

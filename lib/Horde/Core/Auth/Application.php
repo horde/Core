@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2002-2017 Horde LLC (http://www.horde.org/)
  *
@@ -31,9 +32,9 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
      *   - REASON_SESSIONMAXTIME: Logout due to the session exceeding the
      *                            maximum allowed length.
      */
-    const REASON_BROWSER = 100;
-    const REASON_SESSIONIP = 101;
-    const REASON_SESSIONMAXTIME = 102;
+    public const REASON_BROWSER = 100;
+    public const REASON_SESSIONIP = 101;
+    public const REASON_SESSIONMAXTIME = 102;
 
     /**
      * Application for authentication.
@@ -68,7 +69,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
      *
      * @var array
      */
-    protected $_capabilities = array(
+    protected $_capabilities = [
         'add'           => true,
         'authenticate'  => true,
         'exists'        => true,
@@ -77,8 +78,8 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
         'resetpassword' => true,
         'transparent'   => true,
         'update'        => true,
-        'validate'      => true
-    );
+        'validate'      => true,
+    ];
 
     /**
      * Constructor.
@@ -90,7 +91,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
      *
      * @throws InvalidArgumentException
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
         if (!isset($params['app'])) {
             throw new InvalidArgumentException('Missing app parameter.');
@@ -129,8 +130,8 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
         }
 
         try {
-            list($userId, $credentials) = $this->runHook(trim($userId), $credentials, 'preauthenticate', 'authenticate');
-         } catch (Horde_Auth_Exception $e) {
+            [$userId, $credentials] = $this->runHook(trim($userId), $credentials, 'preauthenticate', 'authenticate');
+        } catch (Horde_Auth_Exception $e) {
             return false;
         }
 
@@ -167,7 +168,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
 
         $credentials['auth_ob'] = $this;
 
-        $GLOBALS['registry']->callAppMethod($this->_app, 'authAuthenticate', array('args' => array($userId, $credentials), 'noperms' => true));
+        $GLOBALS['registry']->callAppMethod($this->_app, 'authAuthenticate', ['args' => [$userId, $credentials], 'noperms' => true]);
     }
 
     /**
@@ -184,7 +185,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
 
         try {
             return $this->hasCapability('validate')
-                ? $GLOBALS['registry']->callAppMethod($this->_app, 'authValidate', array('noperms' => true))
+                ? $GLOBALS['registry']->callAppMethod($this->_app, 'authValidate', ['noperms' => true])
                 : parent::validateAuth();
         } catch (Horde_Exception_AuthenticationFailure $e) {
             return false;
@@ -207,7 +208,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
         }
 
         if ($this->hasCapability('add')) {
-            $GLOBALS['registry']->callAppMethod($this->_app, 'authAddUser', array('args' => array($userId, $credentials)));
+            $GLOBALS['registry']->callAppMethod($this->_app, 'authAddUser', ['args' => [$userId, $credentials]]);
         } else {
             parent::addUser($userId, $credentials);
         }
@@ -287,7 +288,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
         }
 
         if ($this->hasCapability('update')) {
-            $GLOBALS['registry']->callAppMethod($this->_app, 'authUpdateUser', array('args' => array($oldID, $newID, $credentials)));
+            $GLOBALS['registry']->callAppMethod($this->_app, 'authUpdateUser', ['args' => [$oldID, $newID, $credentials]]);
         } else {
             parent::updateUser($oldID, $newID, $credentials);
         }
@@ -306,7 +307,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
             $this->_base->removeUser($userId);
         } else {
             if ($this->hasCapability('remove')) {
-                $GLOBALS['registry']->callAppMethod($this->_app, 'authRemoveUser', array('args' => array($userId)));
+                $GLOBALS['registry']->callAppMethod($this->_app, 'authRemoveUser', ['args' => [$userId]]);
             } else {
                 parent::removeUser($userId);
             }
@@ -342,7 +343,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
     {
         $factory = $GLOBALS['injector']
             ->getInstance('Horde_Core_Factory_Identity');
-        $names = array();
+        $names = [];
         foreach ($this->listUsers() as $user) {
             $names[$user] = $factory->create($user)->getName();
         }
@@ -364,7 +365,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
         }
 
         return $this->hasCapability('exists')
-            ? $GLOBALS['registry']->callAppMethod($this->_app, 'authUserExists', array('args' => array($userId)))
+            ? $GLOBALS['registry']->callAppMethod($this->_app, 'authUserExists', ['args' => [$userId]])
             : parent::exists($userId);
     }
 
@@ -385,7 +386,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
             $credentials = $registry->getAuthCredential();
         }
 
-        list($userId, $credentials) = $this->runHook($userId, $credentials, 'preauthenticate', 'transparent');
+        [$userId, $credentials] = $this->runHook($userId, $credentials, 'preauthenticate', 'transparent');
 
         $this->setCredential('userId', $userId);
         $this->setCredential('credentials', $credentials);
@@ -393,7 +394,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
         if ($this->_base) {
             $result = $this->_base->transparent();
         } elseif ($this->hasCapability('transparent')) {
-            $result = $registry->callAppMethod($this->_app, 'authTransparent', array('args' => array($this), 'noperms' => true));
+            $result = $registry->callAppMethod($this->_app, 'authTransparent', ['args' => [$this], 'noperms' => true]);
         } else {
             /* If this application contains neither transparent nor
              * authenticate capabilities, it does not require any
@@ -420,7 +421,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
         }
 
         return $this->hasCapability('resetpassword')
-            ? $GLOBALS['registry']->callAppMethod($this->_app, 'authResetPassword', array('args' => array($userId)))
+            ? $GLOBALS['registry']->callAppMethod($this->_app, 'authResetPassword', ['args' => [$userId]])
             : parent::resetPassword();
     }
 
@@ -439,7 +440,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
         }
         // The follow capabilities are not determined by the Application,
         // but by 'Horde'.
-        if (in_array(Horde_String::lower($capability), array('badlogincount', 'lock'))) {
+        if (in_array(Horde_String::lower($capability), ['badlogincount', 'lock'])) {
             return parent::hasCapability($capability);
         } elseif (!isset($this->_appCapabilities)) {
             $this->_appCapabilities = $GLOBALS['registry']->getApiInstance($this->_app, 'application')->auth;
@@ -558,7 +559,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
     {
         return ($this->_base && method_exists($this->_base, 'getLoginParams'))
             ? $this->_base->getLoginParams()
-            : $GLOBALS['registry']->callAppMethod($this->_app, 'authLoginParams', array('noperms' => true));
+            : $GLOBALS['registry']->callAppMethod($this->_app, 'authLoginParams', ['noperms' => true]);
     }
 
     /**
@@ -590,11 +591,11 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
     {
         if (!is_array($credentials)) {
             $credentials = empty($credentials)
-                ? array()
-                : array($credentials);
+                ? []
+                : [$credentials];
         }
 
-        $ret_array = array($userId, $credentials);
+        $ret_array = [$userId, $credentials];
 
         if ($type == 'preauthenticate') {
             $credentials['authMethod'] = $method;
@@ -602,7 +603,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
 
         try {
             $result = $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
-                ->callHook($type, $this->_app, array($userId, $credentials));
+                ->callHook($type, $this->_app, [$userId, $credentials]);
         } catch (Horde_Exception_HookNotSet $e) {
             return $ret_array;
         } catch (Horde_Exception $e) {
@@ -644,7 +645,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
     {
         global $registry;
 
-        if ($registry->isAuthenticated(array('app' => $this->_app, 'notransparent' => true))) {
+        if ($registry->isAuthenticated(['app' => $this->_app, 'notransparent' => true])) {
             return true;
         }
 
@@ -661,16 +662,16 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
         $credentials = $this->getCredential('credentials');
 
         try {
-            list(,$credentials) = $this->runHook($userId, $credentials, 'postauthenticate');
+            [, $credentials] = $this->runHook($userId, $credentials, 'postauthenticate');
         } catch (Horde_Auth_Exception $e) {
             return false;
         }
 
-        $registry->setAuth($userId, $credentials, array(
+        $registry->setAuth($userId, $credentials, [
             'app' => $this->_app,
             'change' => $this->getCredential('change'),
-            'language' => $language
-        ));
+            'language' => $language,
+        ]);
 
         /* Only set the view mode on initial authentication */
         if (!$GLOBALS['session']->exists('horde', 'view')) {
@@ -681,7 +682,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
             isset($GLOBALS['notification']) &&
             ($expire = $this->_base->getCredential('expire'))) {
             $toexpire = ($expire - time()) / 86400;
-            $GLOBALS['notification']->push(sprintf(Horde_Core_Translation::ngettext("%d day until your password expires.", "%d days until your password expires.", $toexpire), $toexpire), 'horde.warning');
+            $GLOBALS['notification']->push(sprintf(Horde_Core_Translation::ngettext('%d day until your password expires.', '%d days until your password expires.', $toexpire), $toexpire), 'horde.warning');
         }
 
         return true;
@@ -719,63 +720,63 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
         /* $mode now contains the user's preference for view based on the
          * login screen parameters and configuration. */
         switch ($mode) {
-        case 'auto':
-            if ($browser->hasFeature('ajax')) {
-                $mode = $browser->isMobile()
-                    ? 'smartmobile'
-                    : 'dynamic';
-            } else {
-                $mode = $browser->isMobile()
-                    ? 'mobile'
-                    : 'basic';
-            }
-            break;
-
-        case 'basic':
-            if (!$browser->hasFeature('javascript')) {
-                $notification->push(Horde_Core_Translation::t("Your browser does not support javascript. Using minimal view instead."), 'horde.warning');
-                $mode = 'mobile';
-            }
-            break;
-
-        case 'dynamic':
-            if (!$browser->hasFeature('ajax')) {
-                if ($browser->hasFeature('javascript')) {
-                    $notification->push(Horde_Core_Translation::t("Your browser does not support the dynamic view. Using basic view instead."), 'horde.warning');
-                    $mode = 'basic';
+            case 'auto':
+                if ($browser->hasFeature('ajax')) {
+                    $mode = $browser->isMobile()
+                        ? 'smartmobile'
+                        : 'dynamic';
                 } else {
-                    $notification->push(Horde_Core_Translation::t("Your browser does not support the dynamic view. Using minimal view instead."), 'horde.warning');
+                    $mode = $browser->isMobile()
+                        ? 'mobile'
+                        : 'basic';
+                }
+                break;
+
+            case 'basic':
+                if (!$browser->hasFeature('javascript')) {
+                    $notification->push(Horde_Core_Translation::t('Your browser does not support javascript. Using minimal view instead.'), 'horde.warning');
                     $mode = 'mobile';
                 }
-            }
-            break;
+                break;
 
-        case 'smartmobile':
-            if (!$browser->hasFeature('ajax')) {
-                $notification->push(Horde_Core_Translation::t("Your browser does not support the dynamic view. Using minimal view instead."), 'horde.warning');
+            case 'dynamic':
+                if (!$browser->hasFeature('ajax')) {
+                    if ($browser->hasFeature('javascript')) {
+                        $notification->push(Horde_Core_Translation::t('Your browser does not support the dynamic view. Using basic view instead.'), 'horde.warning');
+                        $mode = 'basic';
+                    } else {
+                        $notification->push(Horde_Core_Translation::t('Your browser does not support the dynamic view. Using minimal view instead.'), 'horde.warning');
+                        $mode = 'mobile';
+                    }
+                }
+                break;
+
+            case 'smartmobile':
+                if (!$browser->hasFeature('ajax')) {
+                    $notification->push(Horde_Core_Translation::t('Your browser does not support the dynamic view. Using minimal view instead.'), 'horde.warning');
+                    $mode = 'mobile';
+                }
+                break;
+
+            case 'mobile':
+            default:
                 $mode = 'mobile';
-            }
-            break;
-
-        case 'mobile':
-        default:
-            $mode = 'mobile';
-            break;
+                break;
         }
 
         if (($browser->getBrowser() == 'msie') &&
             ($browser->getMajor() < 8) &&
             ($mode != 'mobile')) {
-            $notification->push(Horde_Core_Translation::t("You are using an old, unsupported version of Internet Explorer. You need at least Internet Explorer 8. If you already run IE8 or higher, disable the Compatibility View. Minimal view will be used until you upgrade your browser."));
+            $notification->push(Horde_Core_Translation::t('You are using an old, unsupported version of Internet Explorer. You need at least Internet Explorer 8. If you already run IE8 or higher, disable the Compatibility View. Minimal view will be used until you upgrade your browser.'));
             $mode = 'mobile';
         }
 
-        $registry_map = array(
+        $registry_map = [
             'basic' => Horde_Registry::VIEW_BASIC,
             'dynamic' => Horde_Registry::VIEW_DYNAMIC,
             'mobile' => Horde_Registry::VIEW_MINIMAL,
-            'smartmobile' => Horde_Registry::VIEW_SMARTMOBILE
-        );
+            'smartmobile' => Horde_Registry::VIEW_SMARTMOBILE,
+        ];
 
         $this->_view = $mode;
         $registry->setView($registry_map[$mode]);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based factory for creating Horde_Ldap objects.
  *
@@ -30,7 +31,7 @@ class Horde_Core_Factory_Ldap extends Horde_Core_Factory_Base
      *
      * @var array
      */
-    private $_instances = array();
+    private $_instances = [];
 
     /**
      * Return the LDAP instance.
@@ -46,7 +47,7 @@ class Horde_Core_Factory_Ldap extends Horde_Core_Factory_Base
      */
     public function create($app = 'horde', $backend = null)
     {
-        $sig = hash('md5', serialize(array($app, $backend)));
+        $sig = hash('md5', serialize([$app, $backend]));
 
         if (isset($this->_instances[$sig])) {
             return $this->_instances[$sig];
@@ -78,7 +79,8 @@ class Horde_Core_Factory_Ldap extends Horde_Core_Factory_Base
                     $GLOBALS['registry']->getAuth()) {
                     $this->_instances[$sig]->bind(
                         $this->_instances[$sig]->findUserDN($GLOBALS['registry']->getAuth()),
-                        $GLOBALS['registry']->getAuthCredential('password'));
+                        $GLOBALS['registry']->getAuthCredential('password')
+                    );
                 }
             } catch (Horde_Exception_NotFound $notfound) {
             }

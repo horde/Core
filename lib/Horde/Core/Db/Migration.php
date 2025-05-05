@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Horde_Core_Db_Migration provides a wrapper for all migration scripts
  * distributed through Horde applications or libraries.
@@ -23,21 +24,21 @@ class Horde_Core_Db_Migration
      *
      * @var array
      */
-    public $dirs = array();
+    public $dirs = [];
 
     /**
      * List of all module names matching the directories in $dirs.
      *
      * @var array
      */
-    public $apps = array();
+    public $apps = [];
 
     /**
      * List of all lower case module names matching the directories in $dirs.
      *
      * @var array
      */
-    protected $_lower = array();
+    protected $_lower = [];
 
     /**
      * Constructor.
@@ -72,7 +73,7 @@ class Horde_Core_Db_Migration
               is relative to the package root and that it should
               be in the vendor dir - wherever that is. We also
               know migration files have a canonical place inside a package
-              So loop through vendors and packages to identify packages with a 
+              So loop through vendors and packages to identify packages with a
               migration dir. We cannot hardcode the horde vendor, this would
               break third party solutions using the horde framework.
               Would be more fun to deduce from the package lock file
@@ -92,7 +93,7 @@ class Horde_Core_Db_Migration
                         continue;
                     }
                     // Find out if it is an app or a lib - This could be more robust
-                    if (file_exists("$packageDir/lib/Application.php") or file_exists("packageDir/src/Application.php")) {
+                    if (file_exists("$packageDir/lib/Application.php") or file_exists('packageDir/src/Application.php')) {
                         // For now just skip apps and trust the registry to handle them. See above. This should probably be refactored
                         continue;
                     }
@@ -132,7 +133,9 @@ class Horde_Core_Db_Migration
         $registry = $pear->getRegistry();
         foreach (glob($pear->get('data_dir') . '/*/migration') as $dir) {
             $package = $registry->getPackage(
-                basename(dirname($dir)), 'pear.horde.org');
+                basename(dirname($dir)),
+                'pear.horde.org'
+            );
             if ($package == false) {
                 Horde::log("Ignoring package in directory $dir", Horde_Log::WARN);
                 continue;
@@ -156,16 +159,16 @@ class Horde_Core_Db_Migration
      *
      * @return Horde_Db_Migration_Migrator  A migrator for the specified module.
      */
-    public function getMigrator($app, Horde_Log_Logger $logger = null)
+    public function getMigrator($app, ?Horde_Log_Logger $logger = null)
     {
         $app = Horde_String::lower($app);
         $db = $GLOBALS['injector']->getInstance('Horde_Db_Adapter');
         return new Horde_Db_Migration_Migrator(
             $db,
             $logger,
-            array(
+            [
                 'migrationsPath' => $this->dirs[array_search($app, $this->_lower)],
-                'schemaTableName' => $db->tableAliasFor($app . '_schema_info'))
-            );
+                'schemaTableName' => $db->tableAliasFor($app . '_schema_info')]
+        );
     }
 }

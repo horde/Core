@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Horde_Core_ActiveSync_Mail_Draft::
  *
@@ -55,14 +56,14 @@ class Horde_Core_ActiveSync_Mail_Draft extends Horde_Core_ActiveSync_Mail
      *
      * @var array An array of Horde_Mime_Part objects.
      */
-    protected $_atcAdd = array();
+    protected $_atcAdd = [];
 
     /**
      * Attachments to remove
      *
      * @var array An array of MIME part ids to remove.
      */
-    protected $_atcDelete = array();
+    protected $_atcDelete = [];
 
     /**
      * Append the current Draft message to the IMAP server.
@@ -74,8 +75,8 @@ class Horde_Core_ActiveSync_Mail_Draft extends Horde_Core_ActiveSync_Mail
     public function append($folderid)
     {
         // Init
-        $atc_map = array();
-        $atc_hash = array();
+        $atc_map = [];
+        $atc_hash = [];
 
         // Create the wrapper part.
         $base = new Horde_Mime_Part();
@@ -97,8 +98,9 @@ class Horde_Core_ActiveSync_Mail_Draft extends Horde_Core_ActiveSync_Mail
         $base->addPart($this->_textPart);
 
         // Add Mime headers
-        $base->addMimeHeaders(array(
-            'headers' => $this->_headers)
+        $base->addMimeHeaders(
+            [
+            'headers' => $this->_headers]
         );
 
         foreach ($this->_atcAdd as $atc) {
@@ -106,15 +108,15 @@ class Horde_Core_ActiveSync_Mail_Draft extends Horde_Core_ActiveSync_Mail
             $atc_map[$atc->displayname] = $atc->clientid;
         }
 
-        $stream = $base->toString(array(
+        $stream = $base->toString([
             'stream' => true,
-            'headers' => $this->_headers->toString()
-        ));
+            'headers' => $this->_headers->toString(),
+        ]);
 
         $new_uid = $this->_imap->appendMessage(
             $folderid,
             $stream,
-            array('\draft', '\seen')
+            ['\draft', '\seen']
         );
 
         foreach ($base as $part) {
@@ -127,13 +129,13 @@ class Horde_Core_ActiveSync_Mail_Draft extends Horde_Core_ActiveSync_Mail
         // If we pulled down an existing Draft, delete it now since the
         // new one will replace it.
         if (!empty($this->_imapMessage)) {
-            $this->_imap->deleteMessages(array($this->_draftUid), $folderid);
+            $this->_imap->deleteMessages([$this->_draftUid], $folderid);
         }
 
-        return array(
+        return [
             'uid' => $new_uid,
-            'atchash' => $atc_hash
-        );
+            'atchash' => $atc_hash,
+        ];
     }
 
     /**
@@ -192,16 +194,16 @@ class Horde_Core_ActiveSync_Mail_Draft extends Horde_Core_ActiveSync_Mail
         // New attachments
         foreach ($this->_draftMessage->airsyncbaseattachments as $atc) {
             switch (get_class($atc)) {
-            case 'Horde_ActiveSync_Message_AirSyncBaseAdd':
-                $atc_mime = new Horde_Mime_Part();
-                $atc_mime->setType($atc->contenttype);
-                $atc_mime->setName($atc->displayname);
-                $atc_mime->setContents($atc->content);
-                $this->_atcAdd[] = $atc_mime;
-                break;
-            case 'Horde_ActiveSync_Message_AirSyncBaseDelete':
-                list($mailbox, $uid, $part) = explode(':', $atc->filereference, 3);
-                $this->_atcDelete[] = $part;
+                case 'Horde_ActiveSync_Message_AirSyncBaseAdd':
+                    $atc_mime = new Horde_Mime_Part();
+                    $atc_mime->setType($atc->contenttype);
+                    $atc_mime->setName($atc->displayname);
+                    $atc_mime->setContents($atc->content);
+                    $this->_atcAdd[] = $atc_mime;
+                    break;
+                case 'Horde_ActiveSync_Message_AirSyncBaseDelete':
+                    [$mailbox, $uid, $part] = explode(':', $atc->filereference, 3);
+                    $this->_atcDelete[] = $part;
             }
         }
     }
@@ -217,11 +219,14 @@ class Horde_Core_ActiveSync_Mail_Draft extends Horde_Core_ActiveSync_Mail
      */
     public function getExistingDraftMessage($folderid, $uid)
     {
-        $imap_msg = $this->_imap->getImapMessage($folderid,$uid);
+        $imap_msg = $this->_imap->getImapMessage($folderid, $uid);
         if (empty($imap_msg[$uid])) {
-             throw new Horde_ActiveSync_Exception(sprintf(
-                'Unable to fetch %d from %s.',
-                $uid, $folderid)
+            throw new Horde_ActiveSync_Exception(
+                sprintf(
+                    'Unable to fetch %d from %s.',
+                    $uid,
+                    $folderid
+                )
             );
         }
         $this->_imapMessage = $imap_msg[$uid];

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
  *
@@ -27,9 +28,9 @@ class Horde_Script_File_JsFramework extends Horde_Script_File_JsDir
     public function __get($name)
     {
         switch ($name) {
-        case 'priority':
-            // Framework files are always the highest priority.
-            return 0;
+            case 'priority':
+                // Framework files are always the highest priority.
+                return 0;
         }
 
         return parent::__get($name);

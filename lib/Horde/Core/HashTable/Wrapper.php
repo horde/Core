@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -30,7 +31,7 @@ class Horde_Core_HashTable_Wrapper
     public function __call($name, $arguments)
     {
         return call_user_func_array(
-            array($GLOBALS['injector']->getInstance('Horde_HashTable'), $name),
+            [$GLOBALS['injector']->getInstance('Horde_HashTable'), $name],
             $arguments
         );
     }

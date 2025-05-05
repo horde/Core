@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -29,7 +30,7 @@ class Horde_Themes_Css_Cache_Null extends Horde_Themes_Css_Cache
     {
         global $registry;
 
-        $out = array();
+        $out = [];
 
         foreach ($css as $file) {
             $url = Horde::url($file['uri'], true, -1);

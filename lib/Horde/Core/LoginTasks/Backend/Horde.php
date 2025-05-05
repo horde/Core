@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This class provides the Horde specific implementation of the LoginTasks
  * backend.
@@ -62,7 +63,7 @@ class Horde_Core_LoginTasks_Backend_Horde extends Horde_LoginTasks_Backend
      */
     public function getTasks()
     {
-        $tasks = array();
+        $tasks = [];
 
         foreach (array_merge($GLOBALS['registry']->getAppDrivers($this->_app, 'LoginTasks_SystemTask'), $GLOBALS['registry']->getAppDrivers($this->_app, 'LoginTasks_Task')) as $val) {
             $tasks[$val] = $this->_app;
@@ -83,12 +84,12 @@ class Horde_Core_LoginTasks_Backend_Horde extends Horde_LoginTasks_Backend
         try {
             $lasttask_pref = @unserialize($GLOBALS['prefs']->getValue('last_logintasks'));
         } catch (Horde_Prefs_Exception $e) {
-            return array();
+            return [];
         }
 
         return is_array($lasttask_pref)
             ? $lasttask_pref
-            : array();
+            : [];
     }
 
     /**

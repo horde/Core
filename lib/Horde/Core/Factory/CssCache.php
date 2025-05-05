@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -34,21 +35,21 @@ class Horde_Core_Factory_CssCache extends Horde_Core_Factory_Injector
             : Horde_String::lower($conf['cachecssparams']['driver']);
 
         switch ($driver) {
-        case 'filesystem':
-            $driver = 'Horde_Themes_Css_Cache_File';
-            $params = $conf['cachecssparams'];
-            break;
+            case 'filesystem':
+                $driver = 'Horde_Themes_Css_Cache_File';
+                $params = $conf['cachecssparams'];
+                break;
 
-        case 'horde_cache':
-            $driver = 'Horde_Themes_Css_Cache_HordeCache';
-            $params = $conf['cachecssparams'];
-            break;
+            case 'horde_cache':
+                $driver = 'Horde_Themes_Css_Cache_HordeCache';
+                $params = $conf['cachecssparams'];
+                break;
 
-        case 'none':
-        default:
-            $driver = 'Horde_Themes_Css_Cache_Null';
-            $params = array();
-            break;
+            case 'none':
+            default:
+                $driver = 'Horde_Themes_Css_Cache_Null';
+                $params = [];
+                break;
         }
 
         return new $driver($params);

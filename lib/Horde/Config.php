@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Horde_Config:: package provides a framework for managing the
  * configuration of Horde applications, writing conf.php files from
@@ -63,7 +64,7 @@ class Horde_Config
      *
      * @var array
      */
-    protected $_currentConfig = array();
+    protected $_currentConfig = [];
 
     /**
      * The SHA-1 hash of the conf.xml file which will be copied into the
@@ -126,10 +127,10 @@ class Horde_Config
     {
         $response = $GLOBALS['injector']
             ->getInstance('Horde_Core_Factory_HttpClient')
-            ->create(array(
+            ->create([
                 'request.timeout' => 60,
-                'request.userAgent' => 'Horde ' . $GLOBALS['registry']->getVersion('horde', true)
-            ))
+                'request.userAgent' => 'Horde ' . $GLOBALS['registry']->getVersion('horde', true),
+            ])
             ->get($this->_versionUrl);
         if ($response->code != 200) {
             throw new Horde_Exception('Unexpected response from server.');
@@ -138,15 +139,15 @@ class Horde_Config
             throw new Horde_Exception('Unexpected response from server.');
         }
 
-        $versions = array();
+        $versions = [];
 
         foreach ($result as $package) {
             uksort($package['versions'], 'version_compare');
             $version = end($package['versions']);
-            $versions[str_replace('pear-horde/', '', $package['name'])] = array(
+            $versions[str_replace('pear-horde/', '', $package['name'])] = [
                 'version' => $version['version'],
-                'url' => 'https://pear.horde.org/'
-            );
+                'url' => 'https://pear.horde.org/',
+            ];
         }
 
         return $versions;
@@ -212,7 +213,7 @@ class Horde_Config
         }
 
         /* Parse the config file. */
-        $this->_xmlConfigTree = array();
+        $this->_xmlConfigTree = [];
         $root = $dom->documentElement;
         if ($root->hasChildNodes()) {
             $this->_parseLevel($this->_xmlConfigTree, $root->childNodes, '');
@@ -224,7 +225,7 @@ class Horde_Config
             $dom->load($additional);
             $root = $dom->documentElement;
             if ($root->hasChildNodes()) {
-                $tree = array();
+                $tree = [];
                 $this->_parseLevel($tree, $root->childNodes, '');
                 $this->_xmlConfigTree = array_replace_recursive($this->_xmlConfigTree, $tree);
             }
@@ -305,9 +306,9 @@ class Horde_Config
         $configFile = $this->configFile();
         if (file_exists($configFile)) {
             if (@copy($configFile, $path . '/conf.bak.php')) {
-                $GLOBALS['notification']->push(sprintf(Horde_Core_Translation::t("Successfully saved the backup configuration file %s."), Horde_Util::realPath($path . '/conf.bak.php')), 'horde.success');
+                $GLOBALS['notification']->push(sprintf(Horde_Core_Translation::t('Successfully saved the backup configuration file %s.'), Horde_Util::realPath($path . '/conf.bak.php')), 'horde.success');
             } else {
-                $GLOBALS['notification']->push(sprintf(Horde_Core_Translation::t("Could not save the backup configuration file %s."), Horde_Util::realPath($path . '/conf.bak.php')), 'horde.warning');
+                $GLOBALS['notification']->push(sprintf(Horde_Core_Translation::t('Could not save the backup configuration file %s.'), Horde_Util::realPath($path . '/conf.bak.php')), 'horde.warning');
             }
         }
         if ($fp = @fopen($configFile, 'w')) {
@@ -315,7 +316,7 @@ class Horde_Config
             fwrite($fp, $php);
             fclose($fp);
             $GLOBALS['registry']->rebuild();
-            $GLOBALS['notification']->push(sprintf(Horde_Core_Translation::t("Successfully wrote %s"), Horde_Util::realPath($configFile)), 'horde.success');
+            $GLOBALS['notification']->push(sprintf(Horde_Core_Translation::t('Successfully wrote %s'), Horde_Util::realPath($configFile)), 'horde.success');
             return true;
         }
 
@@ -390,7 +391,7 @@ class Horde_Config
             } elseif (isset($configitem['switch'])) {
                 $val = $formvars->getExists($configname, $wasset);
                 if (!$wasset) {
-                    $val = isset($configitem['default']) ? $configitem['default'] : null;
+                    $val = $configitem['default'] ?? null;
                 }
                 if (isset($configitem['switch'][$val])) {
                     $value = $val;
@@ -405,74 +406,74 @@ class Horde_Config
                     ((array_key_exists('is_default', $configitem) && $configitem['is_default'])
                      || !array_key_exists('is_default', $configitem))) {
 
-                    $val = isset($configitem['default']) ? $configitem['default'] : null;
+                    $val = $configitem['default'] ?? null;
                 }
 
                 $type = $configitem['_type'];
                 switch ($type) {
-                case 'multienum':
-                    if (is_array($val)) {
-                        $encvals = array();
-                        foreach ($val as $v) {
-                            $encvals[] = $this->_quote($v);
-                        }
-                        $arrayval = "'" . implode('\', \'', $encvals) . "'";
-                        if ($arrayval == "''") {
-                            $arrayval = '';
-                        }
-                    } else {
-                        $arrayval = '';
-                    }
-                    $value = 'array(' . $arrayval . ')';
-                    break;
-
-                case 'boolean':
-                    if (is_bool($val)) {
-                        $value = $val ? 'true' : 'false';
-                    } else {
-                        $value = ($val == 'on') ? 'true' : 'false';
-                    }
-                    break;
-
-                case 'stringlist':
-                    $values = explode(',', $val);
-                    if (!is_array($values)) {
-                        $value = "array('" . $this->_quote(trim($values)) . "')";
-                    } else {
-                        $encvals = array();
-                        foreach ($values as $v) {
-                            $encvals[] = $this->_quote(trim($v));
-                        }
-                        $arrayval = "'" . implode('\', \'', $encvals) . "'";
-                        if ($arrayval == "''") {
+                    case 'multienum':
+                        if (is_array($val)) {
+                            $encvals = [];
+                            foreach ($val as $v) {
+                                $encvals[] = $this->_quote($v);
+                            }
+                            $arrayval = "'" . implode('\', \'', $encvals) . "'";
+                            if ($arrayval == "''") {
+                                $arrayval = '';
+                            }
+                        } else {
                             $arrayval = '';
                         }
                         $value = 'array(' . $arrayval . ')';
-                    }
-                    break;
+                        break;
 
-                case 'int':
-                    if (strlen($val)) {
-                        $value = (int)$val;
-                    }
-                    break;
-
-                case 'octal':
-                    $value = sprintf('0%o', octdec($val));
-                    break;
-
-                case 'header':
-                case 'description':
-                    break;
-
-                default:
-                    if ($val != '') {
-                        $value = $val;
-                        if ($quote && $value != 'true' && $value != 'false') {
-                            $value = "'" . $this->_quote($value) . "'";
+                    case 'boolean':
+                        if (is_bool($val)) {
+                            $value = $val ? 'true' : 'false';
+                        } else {
+                            $value = ($val == 'on') ? 'true' : 'false';
                         }
-                    }
-                    break;
+                        break;
+
+                    case 'stringlist':
+                        $values = explode(',', $val);
+                        if (!is_array($values)) {
+                            $value = "array('" . $this->_quote(trim($values)) . "')";
+                        } else {
+                            $encvals = [];
+                            foreach ($values as $v) {
+                                $encvals[] = $this->_quote(trim($v));
+                            }
+                            $arrayval = "'" . implode('\', \'', $encvals) . "'";
+                            if ($arrayval == "''") {
+                                $arrayval = '';
+                            }
+                            $value = 'array(' . $arrayval . ')';
+                        }
+                        break;
+
+                    case 'int':
+                        if (strlen($val)) {
+                            $value = (int)$val;
+                        }
+                        break;
+
+                    case 'octal':
+                        $value = sprintf('0%o', octdec($val));
+                        break;
+
+                    case 'header':
+                    case 'description':
+                        break;
+
+                    default:
+                        if ($val != '') {
+                            $value = $val;
+                            if ($quote && $value != 'true' && $value != 'false') {
+                                $value = "'" . $this->_quote($value) . "'";
+                            }
+                        }
+                        break;
                 }
             } else {
                 $this->_generatePHPConfig($configitem, $prefixedname, $formvars);
@@ -514,244 +515,244 @@ class Horde_Config
                 : $ctx . '|' . $name;
 
             switch ($node->tagName) {
-            case 'configdescription':
-                if (empty($name)) {
-                    $name = uniqid(mt_rand());
-                }
+                case 'configdescription':
+                    if (empty($name)) {
+                        $name = uniqid(mt_rand());
+                    }
 
-                $conf[$name] = array(
-                    '_type' => 'description',
-                    'desc' => $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($this->_default($curctx, $this->_getNodeOnlyText($node)), 'linkurls')
-                );
-                break;
+                    $conf[$name] = [
+                        '_type' => 'description',
+                        'desc' => $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($this->_default($curctx, $this->_getNodeOnlyText($node)), 'linkurls'),
+                    ];
+                    break;
 
-            case 'configheader':
-                if (empty($name)) {
-                    $name = uniqid(mt_rand());
-                }
+                case 'configheader':
+                    if (empty($name)) {
+                        $name = uniqid(mt_rand());
+                    }
 
-                $conf[$name] = array(
-                    '_type' => 'header',
-                    'desc' => $this->_default($curctx, $this->_getNodeOnlyText($node))
-                );
-                break;
+                    $conf[$name] = [
+                        '_type' => 'header',
+                        'desc' => $this->_default($curctx, $this->_getNodeOnlyText($node)),
+                    ];
+                    break;
 
-            case 'configswitch':
-                $values = $this->_getSwitchValues($node, $ctx);
-                list($default, $isDefault) = $quote
-                    ? $this->__default($curctx, $this->_getNodeOnlyText($node))
-                    : $this->__defaultRaw($curctx, $this->_getNodeOnlyText($node));
+                case 'configswitch':
+                    $values = $this->_getSwitchValues($node, $ctx);
+                    [$default, $isDefault] = $quote
+                        ? $this->__default($curctx, $this->_getNodeOnlyText($node))
+                        : $this->__defaultRaw($curctx, $this->_getNodeOnlyText($node));
 
-                if ($default === '') {
-                    $default = key($values);
-                }
+                    if ($default === '') {
+                        $default = key($values);
+                    }
 
-                if (is_bool($default)) {
-                    $default = $default ? 'true' : 'false';
-                }
+                    if (is_bool($default)) {
+                        $default = $default ? 'true' : 'false';
+                    }
 
-                $conf[$name] = array(
-                    'desc' => $desc,
-                    'switch' => $values,
-                    'default' => $default,
-                    'is_default' => $isDefault,
-                    'quote' => $quote
-                );
-                break;
+                    $conf[$name] = [
+                        'desc' => $desc,
+                        'switch' => $values,
+                        'default' => $default,
+                        'is_default' => $isDefault,
+                        'quote' => $quote,
+                    ];
+                    break;
 
-            case 'configenum':
-                $values = $this->_getEnumValues($node);
-                list($default, $isDefault) = $quote
-                    ? $this->__default($curctx, $this->_getNodeOnlyText($node))
-                    : $this->__defaultRaw($curctx, $this->_getNodeOnlyText($node));
+                case 'configenum':
+                    $values = $this->_getEnumValues($node);
+                    [$default, $isDefault] = $quote
+                        ? $this->__default($curctx, $this->_getNodeOnlyText($node))
+                        : $this->__defaultRaw($curctx, $this->_getNodeOnlyText($node));
 
-                if ($default === '') {
-                    $default = key($values);
-                }
+                    if ($default === '') {
+                        $default = key($values);
+                    }
 
-                if (is_bool($default)) {
-                    $default = $default ? 'true' : 'false';
-                }
+                    if (is_bool($default)) {
+                        $default = $default ? 'true' : 'false';
+                    }
 
-                $conf[$name] = array(
-                    '_type' => 'enum',
-                    'required' => $required,
-                    'quote' => $quote,
-                    'values' => $values,
-                    'desc' => $desc,
-                    'default' => $default,
-                    'is_default' => $isDefault
-                );
-                break;
+                    $conf[$name] = [
+                        '_type' => 'enum',
+                        'required' => $required,
+                        'quote' => $quote,
+                        'values' => $values,
+                        'desc' => $desc,
+                        'default' => $default,
+                        'is_default' => $isDefault,
+                    ];
+                    break;
 
-            case 'configlist':
-                list($default, $isDefault) = $this->__default($curctx, null);
+                case 'configlist':
+                    [$default, $isDefault] = $this->__default($curctx, null);
 
-                if (is_null($default)) {
+                    if (is_null($default)) {
+                        $default = $this->_getNodeOnlyText($node);
+                    } elseif (is_array($default)) {
+                        $default = implode(', ', $default);
+                    }
+
+                    $conf[$name] = [
+                        '_type' => 'stringlist',
+                        'required' => $required,
+                        'desc' => $desc,
+                        'default' => $default,
+                        'is_default' => $isDefault,
+                    ];
+                    break;
+
+                case 'configmultienum':
                     $default = $this->_getNodeOnlyText($node);
-                } elseif (is_array($default)) {
-                    $default = implode(', ', $default);
-                }
+                    if (strlen($default)) {
+                        $default = explode(',', $default);
+                    } else {
+                        $default = [];
+                    }
+                    [$default, $isDefault] = $this->__default($curctx, $default);
 
-                $conf[$name] = array(
-                    '_type' => 'stringlist',
-                    'required' => $required,
-                    'desc' => $desc,
-                    'default' => $default,
-                    'is_default' => $isDefault
-                );
-                break;
+                    $conf[$name] = [
+                        '_type' => 'multienum',
+                        'required' => $required,
+                        'values' => $this->_getEnumValues($node),
+                        'desc' => $desc,
+                        'default' => Horde_Array::valuesToKeys($default),
+                        'is_default' => $isDefault,
+                    ];
+                    break;
 
-            case 'configmultienum':
-                $default = $this->_getNodeOnlyText($node);
-                if (strlen($default)) {
-                    $default = explode(',', $default);
-                } else {
-                    $default = array();
-                }
-                list($default, $isDefault) = $this->__default($curctx, $default);
+                case 'configpassword':
+                    $conf[$name] = [
+                        '_type' => 'password',
+                        'required' => $required,
+                        'desc' => $desc,
+                        'default' => $this->_default($curctx, $this->_getNodeOnlyText($node)),
+                        'is_default' => $this->_isDefault($curctx, $this->_getNodeOnlyText($node)),
+                    ];
+                    break;
 
-                $conf[$name] = array(
-                    '_type' => 'multienum',
-                    'required' => $required,
-                    'values' => $this->_getEnumValues($node),
-                    'desc' => $desc,
-                    'default' => Horde_Array::valuesToKeys($default),
-                    'is_default' => $isDefault
-                );
-                break;
+                case 'configstring':
+                    $conf[$name] = [
+                        '_type' => 'text',
+                        'required' => $required,
+                        'desc' => $desc,
+                        'default' => $this->_default($curctx, $this->_getNodeOnlyText($node)),
+                        'is_default' => $this->_isDefault($curctx, $this->_getNodeOnlyText($node)),
+                    ];
 
-            case 'configpassword':
-                $conf[$name] = array(
-                    '_type' => 'password',
-                    'required' => $required,
-                    'desc' => $desc,
-                    'default' => $this->_default($curctx, $this->_getNodeOnlyText($node)),
-                    'is_default' => $this->_isDefault($curctx, $this->_getNodeOnlyText($node))
-                );
-                break;
+                    if ($conf[$name]['default'] === false) {
+                        $conf[$name]['default'] = 'false';
+                    } elseif ($conf[$name]['default'] === true) {
+                        $conf[$name]['default'] = 'true';
+                    }
+                    break;
 
-            case 'configstring':
-                $conf[$name] = array(
-                    '_type' => 'text',
-                    'required' => $required,
-                    'desc' => $desc,
-                    'default' => $this->_default($curctx, $this->_getNodeOnlyText($node)),
-                    'is_default' => $this->_isDefault($curctx, $this->_getNodeOnlyText($node))
-                );
+                case 'configboolean':
+                    $default = $this->_getNodeOnlyText($node);
+                    $default = !(empty($default) || $default === 'false');
 
-                if ($conf[$name]['default'] === false) {
-                    $conf[$name]['default'] = 'false';
-                } elseif ($conf[$name]['default'] === true) {
-                    $conf[$name]['default'] = 'true';
-                }
-                break;
+                    $conf[$name] = [
+                        '_type' => 'boolean',
+                        'required' => $required,
+                        'desc' => $desc,
+                        'default' => $this->_default($curctx, $default),
+                        'is_default' => $this->_isDefault($curctx, $default),
+                    ];
+                    break;
 
-            case 'configboolean':
-                $default = $this->_getNodeOnlyText($node);
-                $default = !(empty($default) || $default === 'false');
+                case 'configinteger':
+                    $values = $this->_getEnumValues($node);
 
-                $conf[$name] = array(
-                    '_type' => 'boolean',
-                    'required' => $required,
-                    'desc' => $desc,
-                    'default' => $this->_default($curctx, $default),
-                    'is_default' => $this->_isDefault($curctx, $default)
-                );
-                break;
+                    $conf[$name] = [
+                        '_type' => 'int',
+                        'required' => $required,
+                        'values' => $values,
+                        'desc' => $desc,
+                        'default' => $this->_default($curctx, $this->_getNodeOnlyText($node)),
+                        'is_default' => $this->_isDefault($curctx, $this->_getNodeOnlyText($node)),
+                    ];
 
-            case 'configinteger':
-                $values = $this->_getEnumValues($node);
+                    if ($node->getAttribute('octal') == 'true' &&
+                        $conf[$name]['default'] != '') {
+                        $conf[$name]['_type'] = 'octal';
+                        $conf[$name]['default'] = sprintf('0%o', $this->_default($curctx, octdec($this->_getNodeOnlyText($node))));
+                    }
+                    break;
 
-                $conf[$name] = array(
-                    '_type' => 'int',
-                    'required' => $required,
-                    'values' => $values,
-                    'desc' => $desc,
-                    'default' => $this->_default($curctx, $this->_getNodeOnlyText($node)),
-                    'is_default' => $this->_isDefault($curctx, $this->_getNodeOnlyText($node))
-                );
+                case 'configldap':
+                    $conf[$node->getAttribute('switchname')] = $this->_configLDAP($ctx, $node);
+                    break;
 
-                if ($node->getAttribute('octal') == 'true' &&
-                    $conf[$name]['default'] != '') {
-                    $conf[$name]['_type'] = 'octal';
-                    $conf[$name]['default'] = sprintf('0%o', $this->_default($curctx, octdec($this->_getNodeOnlyText($node))));
-                }
-                break;
+                case 'configldapuser':
+                    $conf = array_merge($conf, $this->_configLDAPUser($ctx, $node));
+                    break;
 
-            case 'configldap':
-                $conf[$node->getAttribute('switchname')] = $this->_configLDAP($ctx, $node);
-                break;
+                case 'configphp':
+                    $conf[$name] = [
+                        '_type' => 'php',
+                        'required' => $required,
+                        'quote' => false,
+                        'desc' => $desc,
+                        'default' => $this->_defaultRaw($curctx, $this->_getNodeOnlyText($node)),
+                        'is_default' => $this->_isDefaultRaw($curctx, $this->_getNodeOnlyText($node)),
+                    ];
+                    break;
 
-            case 'configldapuser':
-                $conf = array_merge($conf, $this->_configLDAPUser($ctx, $node));
-                break;
+                case 'configsecret':
+                    $conf[$name] = [
+                        '_type' => 'text',
+                        'required' => true,
+                        'desc' => $desc,
+                        'default' => $this->_default($curctx, strval(new Horde_Support_Randomid())),
+                        'is_default' => $this->_isDefault($curctx, $this->_getNodeOnlyText($node)),
+                    ];
+                    break;
 
-            case 'configphp':
-                $conf[$name] = array(
-                    '_type' => 'php',
-                    'required' => $required,
-                    'quote' => false,
-                    'desc' => $desc,
-                    'default' => $this->_defaultRaw($curctx, $this->_getNodeOnlyText($node)),
-                    'is_default' => $this->_isDefaultRaw($curctx, $this->_getNodeOnlyText($node))
-                );
-                break;
+                case 'configsql':
+                    $conf[$node->getAttribute('switchname')] = $this->configSQL($ctx, $node);
+                    break;
 
-            case 'configsecret':
-                $conf[$name] = array(
-                    '_type' => 'text',
-                    'required' => true,
-                    'desc' => $desc,
-                    'default' => $this->_default($curctx, strval(new Horde_Support_Randomid())),
-                    'is_default' => $this->_isDefault($curctx, $this->_getNodeOnlyText($node))
-                );
-                break;
+                case 'confignosql':
+                    $conf[$node->getAttribute('switchname')] = $this->configNoSQL($ctx, $node);
+                    break;
 
-            case 'configsql':
-                $conf[$node->getAttribute('switchname')] = $this->configSQL($ctx, $node);
-                break;
+                case 'configvfs':
+                    $conf[$node->getAttribute('switchname')] = $this->_configVFS($ctx, $node);
+                    break;
 
-            case 'confignosql':
-                $conf[$node->getAttribute('switchname')] = $this->configNoSQL($ctx, $node);
-                break;
+                case 'configsection':
+                    $conf[$name] = [];
+                    $cur = &$conf[$name];
+                    if ($node->hasChildNodes()) {
+                        $this->_parseLevel($cur, $node->childNodes, $curctx);
+                    }
+                    break;
 
-            case 'configvfs':
-                $conf[$node->getAttribute('switchname')] = $this->_configVFS($ctx, $node);
-                break;
+                case 'configtab':
+                    $key = uniqid(mt_rand());
 
-            case 'configsection':
-                $conf[$name] = array();
-                $cur = &$conf[$name];
-                if ($node->hasChildNodes()) {
-                    $this->_parseLevel($cur, $node->childNodes, $curctx);
-                }
-                break;
+                    $conf[$key] = [
+                        'tab' => $name,
+                        'desc' => $desc,
+                    ];
 
-            case 'configtab':
-                $key = uniqid(mt_rand());
+                    if ($node->hasChildNodes()) {
+                        $this->_parseLevel($conf, $node->childNodes, $ctx);
+                    }
+                    break;
 
-                $conf[$key] = array(
-                    'tab' => $name,
-                    'desc' => $desc
-                );
+                case 'configplaceholder':
+                    $conf[uniqid(mt_rand())] = 'placeholder';
+                    break;
 
-                if ($node->hasChildNodes()) {
-                    $this->_parseLevel($conf, $node->childNodes, $ctx);
-                }
-                break;
-
-            case 'configplaceholder':
-                $conf[uniqid(mt_rand())] = 'placeholder';
-                break;
-
-            default:
-                $conf[$name] = array();
-                $cur = &$conf[$name];
-                if ($node->hasChildNodes()) {
-                    $this->_parseLevel($cur, $node->childNodes, $curctx);
-                }
-                break;
+                default:
+                    $conf[$name] = [];
+                    $cur = &$conf[$name];
+                    if ($node->hasChildNodes()) {
+                        $this->_parseLevel($cur, $node->childNodes, $curctx);
+                    }
+                    break;
             }
         }
     }
@@ -770,56 +771,58 @@ class Horde_Config
      *
      * @return array  An associative array with the LDAP configuration tree.
      */
-    protected function _configLDAP($ctx, $node = null,
-                                   $switchname = 'driverconfig')
-    {
+    protected function _configLDAP(
+        $ctx,
+        $node = null,
+        $switchname = 'driverconfig'
+    ) {
         if ($node) {
             $xpath = new DOMXPath($node->ownerDocument);
         }
 
         $host = $node
             ? explode(',', ($xpath->evaluate('string(configstring[@name="hostspec"])', $node) ?: ''))
-            : array();
+            : [];
         $host = $this->_default($ctx . '|hostspec', $host);
-        $fields = array(
-            'hostspec' => array(
+        $fields = [
+            'hostspec' => [
                 '_type' => 'stringlist',
                 'required' => true,
                 'desc' => 'LDAP server(s)/hostname(s)',
                 'default' => is_array($host) ? implode(',', $host) : $host,
-            ),
+            ],
 
-            'port' => array(
+            'port' => [
                 '_type' => 'int',
                 'required' => false,
                 'desc' => 'Port on which LDAP is listening, if non-standard',
                 'default' => $this->_default(
                     $ctx . '|port',
                     $node ? ($xpath->evaluate('string(configinteger[@name="port"])', $node) ?: null) : null
-                )
-            ),
+                ),
+            ],
 
-            'tls' => array(
+            'tls' => [
                 '_type' => 'boolean',
                 'required' => false,
                 'desc' => 'Use TLS to connect to the server?',
                 'default' => $this->_default(
                     $ctx . '|tls',
                     $node ? ($xpath->evaluate('string(configboolean[@name="tls"])', $node) ?: false) : false
-                )
-            ),
+                ),
+            ],
 
-            'timeout' => array(
+            'timeout' => [
                 '_type' => 'int',
                 'required' => false,
                 'desc' => 'Connection timeout',
                 'default' => $this->_default(
                     $ctx . '|timeout',
                     $node ? ($xpath->evaluate('string(configinteger[@name="timeout"])', $node) ?: 5) : 5
-                )
-            ),
+                ),
+            ],
 
-            'version' => array(
+            'version' => [
                 '_type' => 'int',
                 'required' => true,
                 'quote' => false,
@@ -828,61 +831,62 @@ class Horde_Config
                     $ctx . '|version',
                     $node ? ($xpath->evaluate('normalize-space(configswitch[@name="version"]/text())', $node) ?: 3) : 3
                 ),
-                'switch' => array(
-                    '2' => array(
+                'switch' => [
+                    '2' => [
                         'desc' => '2 (deprecated)',
-                        'fields' => array()
-                    ),
-                    '3' => array(
+                        'fields' => [],
+                    ],
+                    '3' => [
                         'desc' => '3',
-                        'fields' => array()
-                    )
-                ),
-            ),
+                        'fields' => [],
+                    ],
+                ],
+            ],
 
-            'bindas' => array(
+            'bindas' => [
                 'desc' => 'Bind to LDAP as which user?',
                 'default' => $this->_default(
                     $ctx . '|bindas',
                     $node ? ($xpath->evaluate('normalize-space(configswitch[@name="bindas"]/text())', $node) ?: 'admin') : 'admin'
                 ),
-                'switch' => array(
-                    'anon' => array(
+                'switch' => [
+                    'anon' => [
                         'desc' => 'Bind anonymously',
-                        'fields' => $this->_configLDAPUser($ctx, $node)
-                    ),
-                    'user' => array(
+                        'fields' => $this->_configLDAPUser($ctx, $node),
+                    ],
+                    'user' => [
                         'desc' => 'Bind as the currently logged-in user',
-                        'fields' => $this->_configLDAPUser($ctx, $node)
-                    ),
-                    'admin' => array(
+                        'fields' => $this->_configLDAPUser($ctx, $node),
+                    ],
+                    'admin' => [
                         'desc' => 'Bind with administrative/system credentials',
                         'fields' => array_merge(
-                            array(
-                                'binddn' => array(
+                            [
+                                'binddn' => [
                                     '_type' => 'text',
                                     'required' => true,
                                     'desc' => 'DN used to bind to LDAP',
                                     'default' => $this->_default(
                                         $ctx . '|binddn',
                                         $node ? ($xpath->evaluate('string(configsection/configstring[@name="binddn"])', $node) ?: '') : ''
-                                    )
-                                ),
-                                'bindpw' => array(
+                                    ),
+                                ],
+                                'bindpw' => [
                                     '_type' => 'text',
                                     'required' => true,
                                     'desc' => 'Password for bind DN',
                                     'default' => $this->_default(
                                         $ctx . '|bindpw',
-                                        $node ? ($xpath->evaluate('string(configsection/configstring[@name="bindpw"])', $node) ?: '') : '')
-                                )
-                            ),
+                                        $node ? ($xpath->evaluate('string(configsection/configstring[@name="bindpw"])', $node) ?: '') : ''
+                                    ),
+                                ],
+                            ],
                             $this->_configLDAPUser($ctx, $node)
                         ),
-                    ),
-                )
-            ),
-        );
+                    ],
+                ],
+            ],
+        ];
 
         if (isset($node) && $node->getAttribute('excludebind')) {
             $excludes = explode(',', $node->getAttribute('excludebind'));
@@ -892,67 +896,68 @@ class Horde_Config
         }
 
         if (isset($node) && $node->getAttribute('baseconfig') == 'true') {
-            return array(
+            return [
                 'desc' => 'Use LDAP?',
                 'default' => $this->_default(
                     $ctx . '|' . $node->getAttribute('switchname'),
                     $node ? ($xpath->evaluate('normalize-space(text())', $node) ?: false) : false
                 ),
-                'switch' => array(
-                    'false' => array(
+                'switch' => [
+                    'false' => [
                         'desc' => 'No',
-                        'fields' => array()
-                    ),
-                    'true' => array(
+                        'fields' => [],
+                    ],
+                    'true' => [
                         'desc' => 'Yes',
-                        'fields' => $fields
-                    ),
-                )
-            );
+                        'fields' => $fields,
+                    ],
+                ],
+            ];
         }
 
-        $standardFields = array(
-            'basedn' => array(
+        $standardFields = [
+            'basedn' => [
                 '_type' => 'text',
                 'required' => true,
                 'desc' => 'Base DN',
                 'default' => $this->_default(
                     $ctx . '|basedn',
                     $node ? ($xpath->evaluate('string(configstring[@name="basedn"])', $node) ?: '') : ''
-                )
-            ),
-            'scope' => array(
+                ),
+            ],
+            'scope' => [
                 '_type' => 'enum',
                 'required' => true,
                 'desc' => 'Search scope',
                 'default' => $this->_default(
                     $ctx . '|scope',
-                    $node ? ($xpath->evaluate('normalize-space(configenum[@name="scope"]/text())', $node) ?: '') : ''),
-                'values' => array(
+                    $node ? ($xpath->evaluate('normalize-space(configenum[@name="scope"]/text())', $node) ?: '') : ''
+                ),
+                'values' => [
                     'sub' => 'Subtree search',
-                    'one' => 'One level'),
-            ),
-        );
+                    'one' => 'One level'],
+            ],
+        ];
 
-        list($default, $isDefault) = $this->__default($ctx . '|' . (isset($node) ? $node->getAttribute('switchname') : $switchname), 'horde');
-        $config = array(
+        [$default, $isDefault] = $this->__default($ctx . '|' . (isset($node) ? $node->getAttribute('switchname') : $switchname), 'horde');
+        $config = [
             'desc' => 'Driver configuration',
             'default' => $default,
             'is_default' => $isDefault,
-            'switch' => array(
-                'horde' => array(
+            'switch' => [
+                'horde' => [
                     'desc' => 'Horde defaults',
                     'fields' => $standardFields,
-                ),
-                'custom' => array(
+                ],
+                'custom' => [
                     'desc' => 'Custom parameters',
                     'fields' => $fields + $standardFields,
-                )
-            )
-        );
+                ],
+            ],
+        ];
 
         if (isset($node) && $node->hasChildNodes()) {
-            $cur = array();
+            $cur = [];
             $this->_parseLevel($cur, $node->childNodes, $ctx);
             $config['switch']['horde']['fields'] = array_merge($config['switch']['horde']['fields'], $cur);
             $config['switch']['custom']['fields'] = array_merge($config['switch']['custom']['fields'], $cur);
@@ -980,64 +985,66 @@ class Horde_Config
             $xpath = new DOMXPath($node->ownerDocument);
         }
 
-        return array(
-            'user' => array(
-                'basedn' => array(
+        return [
+            'user' => [
+                'basedn' => [
                     '_type' => 'text',
                     'required' => false,
                     'desc' => 'Base DN for searching the user\'s DN',
                     'default' => $this->_default(
                         $ctx . '|user|basedn',
                         $node ? ($xpath->evaluate('string(configsection/configstring[@name="basedn"])', $node) ?: '') : ''
-                    )
-                ),
-                'uid' => array(
+                    ),
+                ],
+                'uid' => [
                     '_type' => 'text',
                     'required' => true,
                     'desc' => 'The username search key (set to samaccountname for AD).',
                     'default' => $this->_default(
                         $ctx . '|user|uid',
                         $node ? ($xpath->evaluate('string(configsection/configstring[@name="uid"])', $node) ?: 'uid') : 'uid'
-                    )
-                ),
-                'filter_type' => array(
+                    ),
+                ],
+                'filter_type' => [
                     'required' => false,
                     'desc' => 'How to specify a filter for the user lists.',
                     'default' => $this->_default(
                         $ctx . '|user|filter_type',
-                        $node ? ($xpath->evaluate('normalize-space(configsection/configswitch[@name="filter_type"]/text())', $node) ?: 'objectclass') : 'objectclass'),
-                    'switch' => array(
-                        'filter' => array(
+                        $node ? ($xpath->evaluate('normalize-space(configsection/configswitch[@name="filter_type"]/text())', $node) ?: 'objectclass') : 'objectclass'
+                    ),
+                    'switch' => [
+                        'filter' => [
                             'desc' => 'LDAP filter string',
-                            'fields' => array(
-                                'filter' => array(
+                            'fields' => [
+                                'filter' => [
                                     '_type' => 'text',
                                     'required' => true,
                                     'desc' => 'The LDAP filter string used to search for users.',
                                     'default' => $this->_default(
                                         $ctx . '|user|filter',
                                         $node ? ($xpath->evaluate('string(configsection/configstring[@name="filter"])', $node) ?: '(objectClass=*)') : '(objectClass=*)'
-                                    )
-                                ),
-                            ),
-                        ),
-                        'objectclass' => array(
+                                    ),
+                                ],
+                            ],
+                        ],
+                        'objectclass' => [
                             'desc' => 'List of objectClasses',
-                            'fields' => array(
-                                'objectclass' => array(
+                            'fields' => [
+                                'objectclass' => [
                                     '_type' => 'stringlist',
                                     'required' => true,
                                     'desc' => 'The objectclass filter used to search for users. Can be a single objectclass or a comma-separated list.',
                                     'default' => implode(', ', $this->_default(
                                         $ctx . '|user|objectclass',
-                                        $node ? ($xpath->evaluate('string(configsection/configlist[@name="objectclass"])', $node) ?: array('*')) : array('*')))
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        );
+                                        $node ? ($xpath->evaluate('string(configsection/configlist[@name="objectclass"])', $node) ?: ['*']) : ['*']
+                                    )),
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -1054,76 +1061,78 @@ class Horde_Config
      *
      * @return array  An associative array with the SQL configuration tree.
      */
-    public function configNoSQL($ctx, $node = null,
-                                $switchname = 'driverconfig')
-    {
+    public function configNoSQL(
+        $ctx,
+        $node = null,
+        $switchname = 'driverconfig'
+    ) {
         if ($node) {
             $xpath = new DOMXPath($node->ownerDocument);
         }
 
-        $custom_fields = array(
+        $custom_fields = [
             'required' => true,
             'desc' => 'What database backend should we use?',
             'default' => $this->_default(
                 $ctx . '|phptype',
                 $node ? $node->getAttribute('default') : ''
             ),
-            'switch' => array(
-                'false' => array(
+            'switch' => [
+                'false' => [
                     'desc' => '[None]',
-                    'fields' => array()
-                ),
-                'mongo' => array(
+                    'fields' => [],
+                ],
+                'mongo' => [
                     'desc' => 'MongoDB',
-                    'fields' => array(
-                        'hostspec' => array(
+                    'fields' => [
+                        'hostspec' => [
                             '_type' => 'text',
                             'required' => false,
                             'desc' => 'Server specification (format: "mongodb://[username:password@]host1[:port1][,host2[:port2:],...]/db"; see http://www.php.net/manual/en/mongoclient.construct.php for further details)',
                             'default' => $this->_default(
                                 $ctx . '|hostspec',
                                 $node ? ($xpath->evaluate('string(configstring[@name="hostspec"])', $node) ?: '') : ''
-                            )
-                        ),
-                        'dbname' => array(
+                            ),
+                        ],
+                        'dbname' => [
                             '_type' => 'text',
                             'required' => false,
                             'desc' => 'Database name to use',
                             'default' => $this->_default(
                                 $ctx . '|dbname',
                                 $node ? ($xpath->evaluate('string(configstring[@name="dbname"])', $node) ?: '') : ''
-                            )
-                        )
-                    )
-                )
-            )
-        );
+                            ),
+                        ],
+                    ],
+                ],
+            ],
+        ];
 
         if (isset($node) && $node->getAttribute('baseconfig') == 'true') {
             return $custom_fields;
         }
 
-        list($default, $isDefault) = $this->__default($ctx . '|' . (isset($node) ? $node->getAttribute('switchname') : $switchname), 'horde');
-        $config = array(
+        [$default, $isDefault] = $this->__default($ctx . '|' . (isset($node) ? $node->getAttribute('switchname') : $switchname), 'horde');
+        $config = [
             'desc' => 'NoSQL driver configuration',
             'default' => $default,
             'is_default' => $isDefault,
-            'switch' => array(
-                'horde' => array(
+            'switch' => [
+                'horde' => [
                     'desc' => 'Horde defaults',
-                    'fields' => array()
-                ),
-                'custom' => array(
+                    'fields' => [],
+                ],
+                'custom' => [
                     'desc' => 'Custom parameters',
-                    'fields' => array(
-                        'phptype' => $custom_fields
-                    )
-                )
-            )
-        );
+                    'fields' => [
+                        'phptype' => $custom_fields,
+                    ],
+                ],
+            ],
+        ];
 
         if (isset($node) && $node->hasChildNodes()) {
-            $cur = array();
+            $cur = [];
             $this->_parseLevel($cur, $node->childNodes, $ctx);
             $config['switch']['horde']['fields'] = array_merge($config['switch']['horde']['fields'], $cur);
             $config['switch']['custom']['fields'] = array_merge($config['switch']['custom']['fields'], $cur);
@@ -1152,86 +1161,88 @@ class Horde_Config
             $xpath = new DOMXPath($node->ownerDocument);
         }
 
-        $hostspec = array(
+        $hostspec = [
             '_type' => 'text',
             'required' => true,
             'desc' => 'Database server/host',
             'default' => $this->_default(
                 $ctx . '|hostspec',
                 $node ? ($xpath->evaluate('string(configstring[@name="hostspec"])', $node) ?: '') : ''
-            )
-        );
+            ),
+        ];
 
-        $username = array(
+        $username = [
             '_type' => 'text',
             'required' => true,
             'desc' => 'Username to connect to the database as',
             'default' => $this->_default(
                 $ctx . '|username',
                 $node ? ($xpath->evaluate('string(configstring[@name="username"])', $node) ?: '') : ''
-            )
-        );
+            ),
+        ];
 
-        $password = array(
+        $password = [
             '_type' => 'text',
             'required' => false,
             'desc' => 'Password to connect with',
             'default' => $this->_default(
                 $ctx . '|password',
-                $node ? ($xpath->evaluate('string(configstring[@name="password"])', $node) ?: '') :  ''
-            )
-        );
+                $node ? ($xpath->evaluate('string(configstring[@name="password"])', $node) ?: '') : ''
+            ),
+        ];
 
-        $database = array(
+        $database = [
             '_type' => 'text',
             'required' => true,
             'desc' => 'Database name to use',
             'default' => $this->_default(
                 $ctx . '|database',
                 $node ? ($xpath->evaluate('string(configstring[@name="database"])', $node) ?: '') : ''
-            )
-        );
+            ),
+        ];
 
-        $socket = array(
+        $socket = [
             '_type' => 'text',
             'required' => false,
             'desc' => 'Location of UNIX socket',
             'default' => $this->_default(
                 $ctx . '|socket',
                 $node ? ($xpath->evaluate('string(configstring[@name="socket"])', $node) ?: '') : ''
-            )
-        );
+            ),
+        ];
 
-        $port = array(
+        $port = [
             '_type' => 'int',
             'required' => false,
             'desc' => 'Port the DB is running on, if non-standard',
             'default' => $this->_default(
                 $ctx . '|port',
-                $node ? ($xpath->evaluate('string(configinteger[@name="port"])', $node) ?: null) : null)
-        );
+                $node ? ($xpath->evaluate('string(configinteger[@name="port"])', $node) ?: null) : null
+            ),
+        ];
 
-        $protocol = array(
+        $protocol = [
             'desc' => 'How should we connect to the database?',
             'default' => $this->_default(
                 $ctx . '|protocol',
-                $node ? ($xpath->evaluate('normalize-space(configswitch[@name="protocol"]/text())', $node) ?: 'unix') : 'unix'),
-            'switch' => array(
-                'unix' => array(
+                $node ? ($xpath->evaluate('normalize-space(configswitch[@name="protocol"]/text())', $node) ?: 'unix') : 'unix'
+            ),
+            'switch' => [
+                'unix' => [
                     'desc' => 'UNIX Sockets',
-                    'fields' => array(
-                        'socket' => $socket
-                    )
-                ),
-                'tcp' => array(
+                    'fields' => [
+                        'socket' => $socket,
+                    ],
+                ],
+                'tcp' => [
                     'desc' => 'TCP/IP',
-                    'fields' => array(
+                    'fields' => [
                         'hostspec' => $hostspec,
-                        'port' => $port
-                    )
-                )
-            )
-        );
+                        'port' => $port,
+                    ],
+                ],
+            ],
+        ];
 
         $mysql_protocol = $protocol;
         $mysql_protocol['switch']['tcp']['fields']['port']['default'] =
@@ -1243,69 +1254,72 @@ class Horde_Config
         $pgsql_protocol = $protocol;
         $pgsql_protocol['switch']['unix']['fields']['port'] = $port;
 
-        $charset = array(
+        $charset = [
             '_type' => 'text',
             'required' => true,
             'desc' => 'Internally used charset',
             'default' => $this->_default(
                 $ctx . '|charset',
-                $node ? ($xpath->evaluate('string(configstring[@name="charset"])', $node) ?: 'utf-8') : 'utf-8')
-        );
+                $node ? ($xpath->evaluate('string(configstring[@name="charset"])', $node) ?: 'utf-8') : 'utf-8'
+            ),
+        ];
 
-        $ssl = array(
+        $ssl = [
             '_type' => 'boolean',
             'required' => false,
             'desc' => 'Use SSL to connect to the server?',
             'default' => $this->_default(
                 $ctx . '|ssl',
-                $node ? ($xpath->evaluate('string(configboolean[@name="ssl"])', $node) ?: false) : false),
-            'switch' => array(
-                'false' => array('desc' => 'No', 'fields' => array()),
-                'true' => array(
+                $node ? ($xpath->evaluate('string(configboolean[@name="ssl"])', $node) ?: false) : false
+            ),
+            'switch' => [
+                'false' => ['desc' => 'No', 'fields' => []],
+                'true' => [
                     'desc' => 'Yes',
-                    'fields' => array(
-                        'ca' => array(
+                    'fields' => [
+                        'ca' => [
                             '_type' => 'text',
                             'required' => false,
                             'desc' => 'Certification Authority to use for SSL connections',
                             'default' => $this->_default(
                                 $ctx . '|ca',
                                 $node ? ($xpath->evaluate('string(configstring[@name="ca"])', $node) ?: '') : ''
-                            )
-                        )
-                    )
-                )
-            )
-        );
+                            ),
+                        ],
+                    ],
+                ],
+            ],
+        ];
 
-        list($default, $isDefault) = $this->__default(
+        [$default, $isDefault] = $this->__default(
             $ctx . '|logqueries',
             $node
             ? ($xpath->evaluate('string(configboolean[@name="logqueries"])', $node) ?: false)
-            : false);
-        $logqueries = array(
+            : false
+        );
+        $logqueries = [
             '_type' => 'boolean',
             'required' => false,
             'desc' => 'Should Horde log all queries. If selected, queries will be logged at the DEBUG level to your configured logger.',
             'default' => $default,
             'is_default' => $isDefault,
-        );
+        ];
 
-        $custom_fields = array(
+        $custom_fields = [
             'required' => true,
             'desc' => 'What database backend should we use?',
             'default' => $this->_default(
                 $ctx . '|phptype',
                 $node ? $node->getAttribute('default') : ''
             ),
-            'switch' => array(
-                'false' => array(
+            'switch' => [
+                'false' => [
                     'desc' => '[None]',
-                    'fields' => array()
-                ),
-                'mysql' => array(
+                    'fields' => [],
+                ],
+                'mysql' => [
                     'desc' => 'MySQL / PDO',
-                    'fields' => array(
+                    'fields' => [
                         'username' => $username,
                         'password' => $password,
                         'protocol' => $mysql_protocol,
@@ -1314,11 +1328,11 @@ class Horde_Config
                         'ssl' => $ssl,
                         'splitread' => $this->_configSQLSplitRead($ctx, $node, 'mysql'),
                         'logqueries' => $logqueries,
-                    )
-                ),
-                'mysqli' => array(
+                    ],
+                ],
+                'mysqli' => [
                     'desc' => 'MySQL (mysqli)',
-                    'fields' => array(
+                    'fields' => [
                         'username' => $username,
                         'password' => $password,
                         'protocol' => $mysql_protocol,
@@ -1327,72 +1341,77 @@ class Horde_Config
                         'ssl' => $ssl,
                         'splitread' => $this->_configSQLSplitRead($ctx, $node, 'mysqli'),
                         'logqueries' => $logqueries,
-                    )
-                ),
-                'oci8' => array(
+                    ],
+                ],
+                'oci8' => [
                     'desc' => 'Oracle',
-                    'fields' => array(
+                    'fields' => [
                         'username' => $username,
                         'password' => $password,
                         'charset' => $charset,
-                        'method' => array(
+                        'method' => [
                             'desc' => 'How should the database connection be specified',
                             'default' => $this->_default(
                                 $ctx . '|method',
-                                $node ? ($xpath->evaluate('normalize-space(configswitch[@name="method"]/text())', $node) ?: 'easy') : 'easy'),
-                            'switch' => array(
-                                'tns' => array(
+                                $node ? ($xpath->evaluate('normalize-space(configswitch[@name="method"]/text())', $node) ?: 'easy') : 'easy'
+                            ),
+                            'switch' => [
+                                'tns' => [
                                     'desc' => 'TNS',
-                                    'fields' => array(
-                                        'tns' => array(
+                                    'fields' => [
+                                        'tns' => [
                                             '_type' => 'text',
                                             'required' => true,
                                             'desc' => 'Connect name from tnsnames.ora',
                                             'default' => $this->_default(
                                                 $ctx . '|tns',
-                                                $node ? ($xpath->evaluate('string(configstring[@name="tns"])', $node) ?: false) : false),
-                                        ),
-                                    ),
-                                ),
-                                'easy' => array(
+                                                $node ? ($xpath->evaluate('string(configstring[@name="tns"])', $node) ?: false) : false
+                                            ),
+                                        ],
+                                    ],
+                                ],
+                                'easy' => [
                                     'desc' => 'Easy Connect',
-                                    'fields' => array(
+                                    'fields' => [
                                         'hostspec' => $hostspec,
                                         'port' => $port,
-                                        'service' => array(
+                                        'service' => [
                                             '_type' => 'text',
                                             'required' => false,
                                             'desc' => 'Service name',
                                             'default' => $this->_default(
                                                 $ctx . '|service',
-                                                $node ? ($xpath->evaluate('string(configstring[@name="service"])', $node) ?: false) : false),
-                                        ),
-                                        'type' => array(
+                                                $node ? ($xpath->evaluate('string(configstring[@name="service"])', $node) ?: false) : false
+                                            ),
+                                        ],
+                                        'type' => [
                                             '_type' => 'text',
                                             'required' => false,
                                             'desc' => 'Server type',
                                             'default' => $this->_default(
                                                 $ctx . '|type',
-                                                $node ? ($xpath->evaluate('string(configstring[@name="type"])', $node) ?: false) : false),
-                                        ),
-                                        'instance' => array(
+                                                $node ? ($xpath->evaluate('string(configstring[@name="type"])', $node) ?: false) : false
+                                            ),
+                                        ],
+                                        'instance' => [
                                             '_type' => 'text',
                                             'required' => false,
                                             'desc' => 'Instance name',
                                             'default' => $this->_default(
                                                 $ctx . '|instance',
-                                                $node ? ($xpath->evaluate('string(configstring[@name="instance"])', $node) ?: false) : false),
-                                        ),
-                                    ),
-                                ),
-                            ),
-                        ),
+                                                $node ? ($xpath->evaluate('string(configstring[@name="instance"])', $node) ?: false) : false
+                                            ),
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
                         'logqueries' => $logqueries,
-                    ),
-                ),
-                'pgsql' => array(
+                    ],
+                ],
+                'pgsql' => [
                     'desc' => 'PostgreSQL',
-                    'fields' => array(
+                    'fields' => [
                         'username' => $username,
                         'password' => $password,
                         'protocol' => $pgsql_protocol,
@@ -1400,52 +1419,52 @@ class Horde_Config
                         'charset' => $charset,
                         'splitread' => $this->_configSQLSplitRead($ctx, $node, 'pgsql'),
                         'logqueries' => $logqueries,
-                    )
-                ),
-                'sqlite' => array(
+                    ],
+                ],
+                'sqlite' => [
                     'desc' => 'SQLite',
-                    'fields' => array(
-                        'database' => array(
+                    'fields' => [
+                        'database' => [
                             '_type' => 'text',
                             'required' => true,
                             'desc' => 'Absolute path to the database file',
                             'default' => $this->_default(
                                 $ctx . '|database',
                                 $node ? ($xpath->evaluate('string(configstring[@name="database"])', $node) ?: '') : ''
-                            )
-                        ),
+                            ),
+                        ],
                         'charset' => $charset,
                         'logqueries' => $logqueries,
-                    )
-                )
-            )
-        );
+                    ],
+                ],
+            ],
+        ];
 
         if (isset($node) && $node->getAttribute('baseconfig') == 'true') {
             return $custom_fields;
         }
 
-        list($default, $isDefault) = $this->__default($ctx . '|' . (isset($node) ? $node->getAttribute('switchname') : $switchname), 'horde');
-        $config = array(
+        [$default, $isDefault] = $this->__default($ctx . '|' . (isset($node) ? $node->getAttribute('switchname') : $switchname), 'horde');
+        $config = [
             'desc' => 'Driver configuration',
             'default' => $default,
             'is_default' => $isDefault,
-            'switch' => array(
-                'horde' => array(
+            'switch' => [
+                'horde' => [
                     'desc' => 'Horde defaults',
-                    'fields' => array()
-                ),
-                'custom' => array(
+                    'fields' => [],
+                ],
+                'custom' => [
                     'desc' => 'Custom parameters',
-                    'fields' => array(
-                        'phptype' => $custom_fields
-                    )
-                )
-            )
-        );
+                    'fields' => [
+                        'phptype' => $custom_fields,
+                    ],
+                ],
+            ],
+        ];
 
         if (isset($node) && $node->hasChildNodes()) {
-            $cur = array();
+            $cur = [];
             $this->_parseLevel($cur, $node->childNodes, $ctx);
             $config['switch']['horde']['fields'] = array_merge($config['switch']['horde']['fields'], $cur);
             $config['switch']['custom']['fields'] = array_merge($config['switch']['custom']['fields'], $cur);
@@ -1477,24 +1496,25 @@ class Horde_Config
 
         $splitread_fields = $this->configSQL($ctx . '|read');
         $splitread_fields = $splitread_fields['switch']['custom']['fields']['phptype']['switch'][$phptype]['fields'];
-        return array(
+        return [
             '_type' => 'boolean',
             'required' => false,
             'desc' => 'Split reads to a different server?',
             'default' => $this->_default(
                 $ctx . '|splitread',
-                $node ? ($xpath->evaluate('normalize-space(configswitch[@name="splitread"]/text())', $node) ?: 'false') : 'false'),
-            'switch' => array(
-                'false' => array(
+                $node ? ($xpath->evaluate('normalize-space(configswitch[@name="splitread"]/text())', $node) ?: 'false') : 'false'
+            ),
+            'switch' => [
+                'false' => [
                     'desc' => 'Disabled',
-                    'fields' => array()
-                ),
-                'true' => array(
+                    'fields' => [],
+                ],
+                'true' => [
                     'desc' => 'Enabled',
-                    'fields' => array('read' => $splitread_fields)
-                )
-            )
-        );
+                    'fields' => ['read' => $splitread_fields],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -1515,107 +1535,108 @@ class Horde_Config
         $sql = $this->configSQL($ctx . '|params');
         $default = $node->getAttribute('default');
         $default = empty($default) ? 'horde' : $default;
-        list($default, $isDefault) = $this->__default($ctx . '|' . $node->getAttribute('switchname'), $default);
+        [$default, $isDefault] = $this->__default($ctx . '|' . $node->getAttribute('switchname'), $default);
         $xpath = new DOMXPath($node->ownerDocument);
 
-        $config = array(
+        $config = [
             'desc' => 'What VFS driver should we use?',
             'default' => $default,
             'is_default' => $isDefault,
-            'switch' => array(
-                'None' => array(
+            'switch' => [
+                'None' => [
                     'desc' => 'None',
-                    'fields' => array()
-                ),
-                'File' => array(
+                    'fields' => [],
+                ],
+                'File' => [
                     'desc' => 'Files on the local system',
-                    'fields' => array(
-                        'params' => array(
-                            'vfsroot' => array(
+                    'fields' => [
+                        'params' => [
+                            'vfsroot' => [
                                 '_type' => 'text',
                                 'desc' => 'Where on the real filesystem should Horde use as root of the virtual filesystem?',
                                 'default' => $this->_default(
                                     $ctx . '|params|vfsroot',
                                     $xpath->evaluate('string(configsection/configstring[@name="vfsroot"])', $node) ?: '/tmp'
-                                )
-                            )
-                        )
-                    )
-                ),
-                'Nosql' => array(
+                                ),
+                            ],
+                        ],
+                    ],
+                ],
+                'Nosql' => [
                     'desc' => 'NoSQL database',
-                    'fields' => array(
-                        'params' => array(
-                            'driverconfig' => $nosql
-                        )
-                    )
-                ),
-                'Sql' => array(
+                    'fields' => [
+                        'params' => [
+                            'driverconfig' => $nosql,
+                        ],
+                    ],
+                ],
+                'Sql' => [
                     'desc' => 'SQL database',
-                    'fields' => array(
-                        'params' => array(
-                            'driverconfig' => $sql
-                        )
-                    )
-                ),
-                'Ssh2' => array(
+                    'fields' => [
+                        'params' => [
+                            'driverconfig' => $sql,
+                        ],
+                    ],
+                ],
+                'Ssh2' => [
                     'desc' => 'SSH2 (SFTP)',
-                    'fields' => array(
-                        'params' => array(
-                            'hostspec' => array(
+                    'fields' => [
+                        'params' => [
+                            'hostspec' => [
                                 '_type' => 'text',
                                 'required' => true,
                                 'desc' => 'SSH server/host',
                                 'default' => $this->_default(
                                     $ctx . '|hostspec',
                                     $xpath->evaluate('string(configsection/configstring[@name="hostspec"])', $node) ?: ''
-                                )
-                            ),
-                            'port' => array(
+                                ),
+                            ],
+                            'port' => [
                                 '_type' => 'text',
                                 'required' => false,
                                 'desc' => 'Port number on which SSH listens',
                                 'default' => $this->_default(
                                     $ctx . '|port',
                                     $xpath->evaluate('string(configsection/configstring[@name="port"])', $node) ?: '22'
-                                )
-                            ),
-                            'username' => array(
+                                ),
+                            ],
+                            'username' => [
                                 '_type' => 'text',
                                 'required' => true,
                                 'desc' => 'Username to connect to the SSH server',
                                 'default' => $this->_default(
                                     $ctx . '|username',
                                     $xpath->evaluate('string(configsection/configstring[@name="username"])', $node) ?: ''
-                                )
-                            ),
-                            'password' => array(
+                                ),
+                            ],
+                            'password' => [
                                 '_type' => 'text',
                                 'required' => true,
                                 'desc' => 'Password with which to connect',
                                 'default' => $this->_default(
                                     $ctx . '|password',
                                     $xpath->evaluate('string(configsection/configstring[@name="password"])', $node) ?: ''
-                                )
-                            ),
-                            'vfsroot' => array(
+                                ),
+                            ],
+                            'vfsroot' => [
                                 '_type' => 'text',
                                 'desc' => 'Where on the real filesystem should Horde use as root of the virtual filesystem?',
                                 'default' => $this->_default(
                                     $ctx . '|vfsroot',
-                                    $xpath->evaluate('string(configsection/configstring[@name="vfsroot"])', $node) ?: '/tmp')
-                            )
-                        )
-                    )
-                )
-            )
-        );
+                                    $xpath->evaluate('string(configsection/configstring[@name="vfsroot"])', $node) ?: '/tmp'
+                                ),
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
 
         if (isset($node) && $node->getAttribute('baseconfig') != 'true') {
-            $config['switch']['horde'] = array(
+            $config['switch']['horde'] = [
                 'desc' => 'Horde defaults',
-                'fields' => array()
-            );
+                'fields' => [],
+            ];
         }
         $cases = $this->_getSwitchValues($node, $ctx . '|params');
         foreach ($cases as $case => $fields) {
@@ -1641,7 +1662,7 @@ class Horde_Config
      */
     protected function _default($ctx, $default)
     {
-        list ($ptr,) = $this->__default($ctx, $default);
+        [$ptr, ] = $this->__default($ctx, $default);
         return $ptr;
     }
 
@@ -1658,7 +1679,7 @@ class Horde_Config
      */
     protected function _isDefault($ctx, $default)
     {
-        list (,$isDefault) = $this->__default($ctx, $default);
+        [, $isDefault] = $this->__default($ctx, $default);
         return $isDefault;
     }
 
@@ -1685,13 +1706,13 @@ class Horde_Config
 
         for ($i = 0, $ctx_count = count($ctx); $i < $ctx_count; ++$i) {
             if (!isset($ptr[$ctx[$i]])) {
-                return array($default, true);
+                return [$default, true];
             }
 
             $ptr = $ptr[$ctx[$i]];
         }
 
-        return array($ptr, false);
+        return [$ptr, false];
     }
 
     /**
@@ -1710,7 +1731,7 @@ class Horde_Config
      */
     protected function _defaultRaw($ctx, $default)
     {
-        list ($ptr,) = $this->__defaultRaw($ctx, $default);
+        [$ptr, ] = $this->__defaultRaw($ctx, $default);
         return $ptr;
     }
 
@@ -1727,7 +1748,7 @@ class Horde_Config
      */
     protected function _isDefaultRaw($ctx, $default)
     {
-        list (,$isDefault) = $this->__defaultRaw($ctx, $default);
+        [, $isDefault] = $this->__defaultRaw($ctx, $default);
         return $isDefault;
     }
 
@@ -1756,8 +1777,8 @@ class Horde_Config
         $pattern = '/^\$conf\[\'' . implode("'\]\['", $ctx) . '\'\] = (.*);\r?$/m';
 
         return preg_match($pattern, $this->getPHPConfig(), $matches)
-            ? array($matches[1], false)
-            : array($default, true);
+            ? [$matches[1], false]
+            : [$default, true];
     }
 
     /**
@@ -1799,7 +1820,7 @@ class Horde_Config
      */
     protected function _getEnumValues($node)
     {
-        $values = array();
+        $values = [];
 
         if (!$node->hasChildNodes()) {
             return $values;
@@ -1809,7 +1830,7 @@ class Horde_Config
             if ($vnode->nodeType == XML_ELEMENT_NODE &&
                 $vnode->tagName == 'values') {
                 if (!$vnode->hasChildNodes()) {
-                    return array();
+                    return [];
                 }
 
                 foreach ($vnode->childNodes as $value) {
@@ -1841,7 +1862,7 @@ class Horde_Config
      */
     protected function _getSwitchValues(&$node, $curctx)
     {
-        $values = array();
+        $values = [];
 
         if (!$node->hasChildNodes()) {
             return $values;
@@ -1850,10 +1871,10 @@ class Horde_Config
         foreach ($node->childNodes as $case) {
             if ($case->nodeType == XML_ELEMENT_NODE) {
                 $name = $case->getAttribute('name');
-                $values[$name] = array(
+                $values[$name] = [
                     'desc' => $case->getAttribute('desc'),
-                    'fields' => array()
-                );
+                    'fields' => [],
+                ];
                 if ($case->hasChildNodes()) {
                     $this->_parseLevel($values[$name]['fields'], $case->childNodes, $curctx);
                 }
@@ -1880,15 +1901,15 @@ class Horde_Config
                 $app = $GLOBALS['registry']->hasInterface($app);
             }
         } catch (Horde_Exception $e) {
-            return array();
+            return [];
         }
         if (!$app) {
-            return array();
+            return [];
         }
         try {
-            return $GLOBALS['registry']->callAppMethod($app, 'configSpecialValues', array('args' => array($node->getAttribute('name')), 'noperms' => true));
+            return $GLOBALS['registry']->callAppMethod($app, 'configSpecialValues', ['args' => [$node->getAttribute('name')], 'noperms' => true]);
         } catch (Horde_Exception $e) {
-            return array();
+            return [];
         }
     }
 

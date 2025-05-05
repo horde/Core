@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2016-2017 Horde LLC (http://www.horde.org/)
  *
@@ -19,15 +20,14 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
-class Horde_Core_Ajax_Imple_UserAutoCompleter
-extends Horde_Core_Ajax_Imple_AutoCompleter
+class Horde_Core_Ajax_Imple_UserAutoCompleter extends Horde_Core_Ajax_Imple_AutoCompleter
 {
     /**
      */
     protected function _getAutoCompleter()
     {
         return new Horde_Core_Ajax_Imple_AutoCompleter_Ajax(
-            array('tokens' => array(','))
+            ['tokens' => [',']]
         );
     }
 

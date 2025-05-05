@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Login system task for automated upgrade tasks.
  *
@@ -40,14 +41,14 @@ abstract class Horde_Core_LoginTasks_SystemTask_Upgrade extends Horde_LoginTasks
      *
      * @var array
      */
-    protected $_toupgrade = array();
+    protected $_toupgrade = [];
 
     /**
      * The list of versions which upgrades will occur.
      *
      * @var array
      */
-    protected $_versions = array();
+    protected $_versions = [];
 
     /**
      * Constructor.
@@ -62,7 +63,7 @@ abstract class Horde_Core_LoginTasks_SystemTask_Upgrade extends Horde_LoginTasks
                  * version_compare, since x.0.foo is ALWAYS greater than
                  * x.0foo. */
                 $compare = (substr_count($val, '.') != substr_count($vers, '.'))
-                    ? preg_replace("/(\.0)((?:alpha|beta|RC)\d+)/i", "$2", $vers)
+                    ? preg_replace("/(\.0)((?:alpha|beta|RC)\d+)/i", '$2', $vers)
                     : $vers;
                 if (version_compare($compare, $val) === -1) {
                     $this->_toupgrade[] = $val;
@@ -114,7 +115,7 @@ abstract class Horde_Core_LoginTasks_SystemTask_Upgrade extends Horde_LoginTasks
     {
         /* Skip task until we are authenticated. */
         return ($this->_auth &&
-                !$GLOBALS['registry']->isAuthenticated(array('app' => $this->_app)));
+                !$GLOBALS['registry']->isAuthenticated(['app' => $this->_app]));
     }
 
     /**
@@ -136,17 +137,16 @@ abstract class Horde_Core_LoginTasks_SystemTask_Upgrade extends Horde_LoginTasks
         $upgrade = @unserialize($prefs->getValue('upgrade_tasks'));
 
         switch ($action) {
-        case 'get':
-            $val = isset($upgrade[$key])
-                ? $upgrade[$key]
-                : null;
-            break;
+            case 'get':
+                $val = $upgrade[$key]
+                    ?? null;
+                break;
 
-        case 'set':
-            $val = $registry->getVersion($this->_app, true);
-            $upgrade[$key] = $val;
-            $prefs->setValue('upgrade_tasks', serialize($upgrade));
-            break;
+            case 'set':
+                $val = $registry->getVersion($this->_app, true);
+                $upgrade[$key] = $val;
+                $prefs->setValue('upgrade_tasks', serialize($upgrade));
+                break;
         }
 
         return $val;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @todo  Replace Horde_Core_Factory_Secret with this class.
  *
@@ -11,12 +12,12 @@ class Horde_Core_Factory_Secret_Cbc extends Horde_Core_Factory_Injector
     {
         global $conf;
 
-        return new Horde_Core_Secret_Cbc(array(
+        return new Horde_Core_Secret_Cbc([
             'cookie_domain' => $conf['cookie']['domain'],
             'cookie_path' => $conf['cookie']['path'],
             'cookie_ssl' => $conf['use_ssl'] == 1,
             'iv' => $conf['secret_key'],
-            'session_name' => $conf['session']['name']
-        ));
+            'session_name' => $conf['session']['name'],
+        ]);
     }
 }

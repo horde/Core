@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
  *
@@ -24,7 +25,7 @@
 class Horde_Registry_Logout
 {
     /** Session storage key. */
-    const SESSION_KEY = 'registry_logout';
+    public const SESSION_KEY = 'registry_logout';
 
     /**
      * Add a class to the logout queue.
@@ -62,10 +63,11 @@ class Horde_Registry_Logout
                 if ($ob instanceof Horde_Registry_Logout_Task) {
                     $ob->logoutTask();
                 }
-            } catch (Exception $e) {}
+            } catch (Exception $e) {
+            }
         }
 
-        $this->_setTasks(array());
+        $this->_setTasks([]);
     }
 
     /**

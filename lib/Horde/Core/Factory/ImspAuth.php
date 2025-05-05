@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Horde_Injector:: based Horde_Imsp_Auth:: factory.
  *
@@ -30,7 +31,7 @@ class Horde_Core_Factory_ImspAuth
      *
      * @var array
      */
-    protected static $_instances = array();
+    protected static $_instances = [];
 
     /**
      *
@@ -58,7 +59,7 @@ class Horde_Core_Factory_ImspAuth
      *
      * @return Horde_Imsp_Auth
      */
-    public static function create($driver, array $params = array())
+    public static function create($driver, array $params = [])
     {
         //@TODO: Fix this.
         /* Check for any imtest driver instances and kill them.
@@ -71,7 +72,7 @@ class Horde_Core_Factory_ImspAuth
                 }
             }
         }
-        $signature = serialize(array($driver, $params));
+        $signature = serialize([$driver, $params]);
         if (!isset(self::$_instances[$signature])) {
             self::$_instances[$signature] = self::_factory($driver, $params);
         }
@@ -88,7 +89,7 @@ class Horde_Core_Factory_ImspAuth
      * @return mixed  The created Horde_Imsp_Auth subclass.
      * @throws Horde_Exception
      */
-    protected static function _factory($driver, array $params = array())
+    protected static function _factory($driver, array $params = [])
     {
         $driver = basename($driver);
         $class = 'Horde_Imsp_Auth_' . $driver;

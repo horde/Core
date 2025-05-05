@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
  *
@@ -63,17 +64,17 @@ class Horde_Core_Topbar
 
         $current = $registry->getApp();
         $isAdmin = $registry->isAdmin();
-        $menu = array();
+        $menu = [];
 
-        foreach ($registry->listApps(array('active', 'admin', 'noadmin', 'heading', 'link', 'notoolbar', 'topbar'), true, null) as $app => $params) {
+        foreach ($registry->listApps(['active', 'admin', 'noadmin', 'heading', 'link', 'notoolbar', 'topbar'], true, null) as $app => $params) {
             /* Check if the current user has permisson to see this application,
              * and if the application is active. Headings are visible to
              * everyone (but get filtered out later if they have no
              * children). Administrators always see all applications except
              * those marked 'inactive'. */
             if (($app != 'horde') &&
-                 (in_array($params['status'], array('heading', 'link')) ||
-                  (in_array($params['status'], array('active', 'admin', 'noadmin', 'topbar')) &&
+                 (in_array($params['status'], ['heading', 'link']) ||
+                  (in_array($params['status'], ['active', 'admin', 'noadmin', 'topbar']) &&
                   !($isAdmin && ($params['status'] == 'noadmin')) &&
                   !(!$isAdmin && ($params['status'] == 'admin')) &&
                   $registry->hasPermission((!empty($params['app']) ? $params['app'] : $app), Horde_Perms::SHOW)))) {
@@ -82,7 +83,7 @@ class Horde_Core_Topbar
         }
 
         do {
-            $children = array();
+            $children = [];
             foreach ($menu as $params) {
                 if (isset($params['menu_parent'])) {
                     $children[$params['menu_parent']] = true;
@@ -108,172 +109,170 @@ class Horde_Core_Topbar
                 if ($isAdmin ||
                     $perms->hasPermission('horde:administration:' . $method, $registry->getAuth(), Horde_Perms::SHOW)) {
                     ++$admin_item_count;
-                    $menu['administration_' . $method] = array(
+                    $menu['administration_' . $method] = [
                         'icon' => $val['icon'],
                         'menu_parent' => 'administration',
                         'name' => Horde::stripAccessKey($val['name']),
                         'status' => 'active',
                         'url' => Horde::url($registry->applicationWebPath($val['link'], 'horde')),
-                    );
+                    ];
                 }
             }
-        } catch (Horde_Exception $e) {}
-
-        if ($admin_item_count) {
-            $menu['administration'] = array(
-                'name' => Horde_Core_Translation::t("Administration"),
-                'status' => 'heading',
-                'menu_parent' => 'settings',
-            );
+        } catch (Horde_Exception $e) {
         }
 
-        $menu['settings'] = array(
+        if ($admin_item_count) {
+            $menu['administration'] = [
+                'name' => Horde_Core_Translation::t('Administration'),
+                'status' => 'heading',
+                'menu_parent' => 'settings',
+            ];
+        }
+
+        $menu['settings'] = [
             'class' => 'horde-settings horde-icon-settings',
             'name' => '',
             'noarrow' => true,
-            'status' => 'active'
-        );
+            'status' => 'active',
+        ];
 
         /* Add preferences. */
         if ($registry->showService('prefs') &&
             !($prefs instanceof Horde_Prefs_Session)) {
-            $menu['prefs'] = array(
+            $menu['prefs'] = [
                 'icon' => Horde_Themes::img('prefs.png'),
                 'menu_parent' => 'settings',
-                'name' => Horde_Core_Translation::t("Preferences"),
+                'name' => Horde_Core_Translation::t('Preferences'),
                 'status' => 'active',
-                'url' => $registry->getServiceLink('prefs', $current)
-            );
+                'url' => $registry->getServiceLink('prefs', $current),
+            ];
 
             /* Get a list of configurable applications. */
             $prefs_apps = $registry->listApps(
-                array('active', $isAdmin ? 'admin' : 'noadmin'),
+                ['active', $isAdmin ? 'admin' : 'noadmin'],
                 true,
                 Horde_Perms::READ
             );
 
             if (!empty($prefs_apps['horde'])) {
-                $menu['prefs_' . 'horde'] = array(
+                $menu['prefs_' . 'horde'] = [
                     'icon' => $registry->get('icon', 'horde'),
                     'menu_parent' => 'prefs',
-                    'name' => Horde_Core_Translation::t("Global Preferences"),
+                    'name' => Horde_Core_Translation::t('Global Preferences'),
                     'status' => 'active',
-                    'url' => $registry->getServiceLink('prefs', 'horde')
-                );
+                    'url' => $registry->getServiceLink('prefs', 'horde'),
+                ];
                 unset($prefs_apps['horde']);
             }
 
-            uasort($prefs_apps, array($this, '_sortByName'));
+            uasort($prefs_apps, [$this, '_sortByName']);
             foreach ($prefs_apps as $app => $params) {
-                $menu['prefs_' . $app] = array(
+                $menu['prefs_' . $app] = [
                     'icon' => $registry->get('icon', $app),
                     'menu_parent' => 'prefs',
                     'name' => $params['name'],
                     'status' => 'active',
-                    'url' => $registry->getServiceLink('prefs', $app)
-                );
+                    'url' => $registry->getServiceLink('prefs', $app),
+                ];
             }
         }
 
         /* Add notification log. */
-        $menu['growlerlog'] = array(
+        $menu['growlerlog'] = [
             'icon' => 'info.png',
             'menu_parent' => 'settings',
-            'name' => Horde_Core_Translation::t("Toggle Alerts Log"),
+            'name' => Horde_Core_Translation::t('Toggle Alerts Log'),
             'status' => 'active',
-            'url' => 'javascript:void(HordeCore.Growler.toggleLog());'
-        );
+            'url' => 'javascript:void(HordeCore.Growler.toggleLog());',
+        ];
 
         /* Add problem link. */
         if ($registry->showService('problem') &&
             ($problem_link = $registry->getServiceLink('problem', $current))) {
-            $menu['problem_' . $current] = array(
+            $menu['problem_' . $current] = [
                 'icon' => 'problem.png',
                 'menu_parent' => 'settings',
-                'name' => Horde_Core_Translation::t("Problem"),
+                'name' => Horde_Core_Translation::t('Problem'),
                 'status' => 'active',
-                'url' => $problem_link
-            );
+                'url' => $problem_link,
+            ];
         }
 
         /* Add help link. */
         if ($registry->showService('help') &&
             ($help_link = $registry->getServiceLink('help', $current))) {
-            $menu['help_' . $current] = array(
+            $menu['help_' . $current] = [
                 'icon' => 'help_index.png',
                 'menu_parent' => 'settings',
-                'name' => Horde_Core_Translation::t("Help"),
-                'onclick' => Horde::popupJs($help_link, array('urlencode' => true)) . 'return false;',
+                'name' => Horde_Core_Translation::t('Help'),
+                'onclick' => Horde::popupJs($help_link, ['urlencode' => true]) . 'return false;',
                 'status' => 'active',
                 'target' => 'help',
-                'url' => $help_link
-            );
+                'url' => $help_link,
+            ];
         }
 
         foreach ($menu as $app => $params) {
             switch ($params['status']) {
-            case 'topbar':
-                try {
-                    $registry->callAppMethod(
-                        $params['app'],
-                        'topbarCreate', array(
-                            'args' => array(
-                                $this->_tree,
-                                empty($params['menu_parent']) ? null : $params['menu_parent'],
-                                isset($params['topbar_params']) ? $params['topbar_params'] : array()
-                            )
-                        )
-                    );
-                } catch (Horde_Exception_PushApp $e) {
-                    // Ignore
-                } catch (Horde_Exception $e) {
-                    Horde::log($e, 'ERR');
-                }
-                break;
+                case 'topbar':
+                    try {
+                        $registry->callAppMethod(
+                            $params['app'],
+                            'topbarCreate',
+                            [
+                                'args' => [
+                                    $this->_tree,
+                                    empty($params['menu_parent']) ? null : $params['menu_parent'],
+                                    $params['topbar_params'] ?? [],
+                                ],
+                            ]
+                        );
+                    } catch (Horde_Exception_PushApp $e) {
+                        // Ignore
+                    } catch (Horde_Exception $e) {
+                        Horde::log($e, 'ERR');
+                    }
+                    break;
 
-            default:
-                /* Need to run the name through Horde's gettext since the
-                 * user's locale may not have been loaded when registry.php was
-                 * parsed, and the translations of the application names are
-                 * not in the Core package. */
-                $name = strlen($params['name']) ? _($params['name']) : '';
+                default:
+                    /* Need to run the name through Horde's gettext since the
+                     * user's locale may not have been loaded when registry.php was
+                     * parsed, and the translations of the application names are
+                     * not in the Core package. */
+                    $name = strlen($params['name']) ? _($params['name']) : '';
 
-                /* Headings have no webroot; they're just containers for other
-                 * menu items. */
-                if (isset($params['url'])) {
-                    $url = $params['url'];
-                } elseif (($params['status'] == 'heading') ||
-                          !isset($params['webroot'])) {
-                    $url = '';
-                } else {
-                    $url = Horde::url($registry->getInitialPage($app), false, array('app' => $app));
-                }
+                    /* Headings have no webroot; they're just containers for other
+                     * menu items. */
+                    if (isset($params['url'])) {
+                        $url = $params['url'];
+                    } elseif (($params['status'] == 'heading') ||
+                              !isset($params['webroot'])) {
+                        $url = '';
+                    } else {
+                        $url = Horde::url($registry->getInitialPage($app), false, ['app' => $app]);
+                    }
 
-                $this->_tree->addNode(array(
-                    'id' => $app,
-                    'parent' => empty($params['menu_parent']) ? null : $params['menu_parent'],
-                    'label' => $name,
-                    'expanded' => false,
-                    'params' => array(
-                        'icon' => strval((isset($params['icon'])
-                                          ? $params['icon']
-                                          : $registry->get('icon', $app))),
-                        'class' => isset($params['class'])
-                            ? $params['class']
-                            : ($app == $current
-                               ? 'horde-point-center-active'
-                               : 'horde-point-center'),
-                        'noarrow' => !empty($params['noarrow']),
-                        'onclick' => isset($params['onclick'])
-                            ? $params['onclick']
-                            : null,
-                        'target' => isset($params['target'])
-                            ? $params['target']
-                            : null,
-                        'url' => $url,
-                        'active' => ($app == $current),
-                    )
-                ));
+                    $this->_tree->addNode([
+                        'id' => $app,
+                        'parent' => empty($params['menu_parent']) ? null : $params['menu_parent'],
+                        'label' => $name,
+                        'expanded' => false,
+                        'params' => [
+                            'icon' => strval(($params['icon']
+                                              ?? $registry->get('icon', $app))),
+                            'class' => $params['class']
+                                ?? ($app == $current
+                                   ? 'horde-point-center-active'
+                                   : 'horde-point-center'),
+                            'noarrow' => !empty($params['noarrow']),
+                            'onclick' => $params['onclick']
+                                ?? null,
+                            'target' => $params['target']
+                                ?? null,
+                            'url' => $url,
+                            'active' => ($app == $current),
+                        ],
+                    ]);
             }
         }
 

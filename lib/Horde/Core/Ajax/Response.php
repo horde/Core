@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A data object that represents JSON response data.
  *
