@@ -143,7 +143,8 @@ class Horde_ErrorHandler
                     $priority = Horde_Log::NOTICE;
                     break;
 
-                case E_STRICT:
+                // Former E_STRICT, kept for backwards compatibility.
+                case 2048:
                     $options['notracelog'] = true;
                     $priority = Horde_Log::DEBUG;
                     break;
