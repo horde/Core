@@ -68,6 +68,7 @@
         "horde/template": "^3",
         "horde/token": "^3",
         "horde/text_filter": "^3",
+        "php81_bc/strftime": "^0.7",
         "horde/translation": "^3",
         "horde/url": "^3",
         "horde/util": "^3",
