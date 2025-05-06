@@ -26,7 +26,7 @@
             "role": "developer"
         }
     ],
-    "time": "2025-05-05",
+    "time": "2025-05-06",
     "repositories": [],
     "require": {
         "horde/horde-installer-plugin": "^2",
@@ -68,12 +68,12 @@
         "horde/template": "^3",
         "horde/token": "^3",
         "horde/text_filter": "^3",
-        "php81_bc/strftime": "^0.7",
         "horde/translation": "^3",
         "horde/url": "^3",
         "horde/util": "^3",
         "horde/view": "^3",
         "pear/pear": "*",
+        "php81_bc/strftime": "^0.7",
         "ext-session": "*"
     },
     "require-dev": {
@@ -105,8 +105,6 @@
         }
     },
     "config": {
-        "allow-plugins": {
-            "horde/horde-installer-plugin": true
-        }
+        "allow-plugins": []
     }
 }

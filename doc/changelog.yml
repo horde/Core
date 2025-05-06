@@ -1,4 +1,16 @@
 ---
+3.0.0-alpha18:
+  api: 3.0.0-alpha1
+  state:
+    release: true
+    api: true
+  date: 2025-05-06
+  license:
+    identifier: LGPL-2.1-only
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    fix: Replace deprecated constant SID with still supported session_id()
+    fix: Deprecated E_STRICT in switch statement
 3.0.0-alpha17:
   api: 3.0.0-alpha1
   state:
