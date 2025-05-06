@@ -78,11 +78,17 @@ class Horde_Core_Db_Migration
               break third party solutions using the horde framework.
               Would be more fun to deduce from the package lock file
             */
-            $vendorDir = dirname(__FILE__, 7);
+            $horde_dir = $GLOBALS['registry']->get('deployment', 'horde');
+            if (is_file(dirname($horde_dir, 2) . '/vendor/autoload.php')) {
+                $vendorDir = dirname($horde_dir, 2) . '/vendor';
+            } else {
+                // If Horde/Core is only symlinked to the vendor dir, this breaks
+                $vendorDir = dirname(__FILE__, 7);
+            }
             // Loop over all vendors/packages in vendor dir
             $vendorIterator = new DirectoryIterator("$vendorDir/");
             foreach ($vendorIterator as $vendor) {
-                if (!is_dir("$vendorDir/$vendor/")) {
+                if (!is_dir("$vendorDir/$vendor/") || !is_readable("$vendorDir/$vendor/")) {
                     continue;
                 }
                 $packageIterator = new DirectoryIterator("$vendorDir/$vendor/");
