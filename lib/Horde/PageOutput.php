@@ -650,6 +650,7 @@ class Horde_PageOutput
         if ($this->ajax || $this->growler) {
             $this->addScriptFile(new Horde_Script_File_JsFramework('hordecore.js', 'horde'));
 
+            $session_id = session_id();
             /* Configuration used in core javascript files. */
             $js_conf = array_filter([
                 /* URLs */
@@ -659,7 +660,7 @@ class Horde_PageOutput
                 'URI_SNOOZE' => strval(Horde::url($registry->get('webroot', 'horde') . '/services/snooze.php', true, -1)),
 
                 /* Other constants */
-                'SID' => SID,
+                'SID' => $session_id ? 'name=' . $session_id : '',
                 'TOKEN' => $session->getToken(),
 
                 /* Other config. */
