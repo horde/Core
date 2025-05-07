@@ -939,7 +939,7 @@ function %s()
                     '<input %s type="text" name="%s[n][r]" value="%s" />',
                     $this->_genID($varname . '_n_r'),
                     htmlspecialchars($var->getVarName()),
-                    $var_array['n']['r']
+                    is_array($var_array) ? $var_array['n']['r'] : ''
                 );
             }
             $html .= ' </td>';
