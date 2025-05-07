@@ -506,7 +506,9 @@ class Horde_Config
                 continue;
             }
             $name = $node->getAttribute('name');
-            $desc = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($node->getAttribute('desc'), 'linkurls');
+            // Don't pass Null or Integer to a Text Filter
+            $desc = (string)$node->getAttribute('desc');
+            $desc = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($desc, 'linkurls');
             $required = !($node->getAttribute('required') == 'false');
             $quote = !($node->getAttribute('quote') == 'false');
 
@@ -538,7 +540,7 @@ class Horde_Config
                     break;
 
                 case 'configswitch':
-                    $values = $this->_getSwitchValues($node, $ctx);
+                    $values = $this->_getSwitchValues($node, $ctx) ?? '';
                     [$default, $isDefault] = $quote
                         ? $this->__default($curctx, $this->_getNodeOnlyText($node))
                         : $this->__defaultRaw($curctx, $this->_getNodeOnlyText($node));
