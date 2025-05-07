@@ -59,6 +59,7 @@ class Horde_Core_Factory_Logger extends Horde_Core_Factory_Injector
                 }
 
                 try {
+                    // TODO: In some cases we arrive at the logger factory and are unable to autoload this Handler class.
                     $handler = new Horde_Log_Handler_Stream($conf['log']['name'], $append, $formatter);
                 } catch (Horde_Log_Exception $e) {
                     $this->error = $e;
