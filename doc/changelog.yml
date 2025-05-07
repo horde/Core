@@ -1,4 +1,15 @@
 ---
+3.0.0-alpha20:
+  api: 3.0.0-alpha1
+  state:
+    release: true
+    api: true
+  date: 2025-05-07
+  license:
+    identifier: LGPL-2.1-only
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    fix: Prefs was both in require and require-dev
 3.0.0-alpha19:
   api: 3.0.0-alpha1
   state:
