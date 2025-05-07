@@ -10,6 +10,13 @@ class Horde_Core_Factory_Group extends Horde_Core_Factory_Injector
     {
         $driver = Horde_String::ucfirst($GLOBALS['conf']['group']['driver']);
         $params = Horde::getDriverConfig('group', $driver);
+        // Safeguard against empty driver config.
+        if (empty($driver)) {
+            $driver = 'Mock';
+            if (empty($params)) {
+                $params = [];
+            }
+        }
         if (!empty($GLOBALS['conf']['group']['cache'])) {
             $params['cache'] = $injector->getInstance('Horde_Cache');
         }
