@@ -76,8 +76,12 @@ class Horde_Core_Factory_Vfs extends Horde_Core_Factory_Base
         }
 
         $vfs = ($name == 'horde' || $conf[$name]['type'] == 'horde')
-            ? $conf['vfs']
+            ? ($conf['vfs'] ?? ['type' => 'none'])
             : $conf[$name];
+        // If no VFS config is present, set type to "none". The default conf.php.dist comes with out any entry for vfs.
+        if (empty($vfs['type'])) {
+            $vfs['type'] = 'none';
+        }
 
         switch (Horde_String::lower($vfs['type'])) {
             case 'none':
