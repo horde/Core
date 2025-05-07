@@ -57,6 +57,14 @@ class Horde_Core_Factory_Base
      */
     protected function _getDriverName($driver, $base)
     {
+        /**
+         * Safeguard against incomplete application config
+         */
+        if (empty($driver)) 
+        {
+            $driver = 'Auto';
+        }
+        
         /* Intelligent loading... if we see at least one separator character
          * in the driver name, guess that this is a full classname so try that
          * option first. */
