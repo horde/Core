@@ -79,7 +79,6 @@
     "require-dev": {
         "horde/test": "^3",
         "horde/tree": "^3",
-        "horde/prefs": "^3",
         "horde/routes": "^3",
         "horde/vfs": "^3"
     },
@@ -105,6 +104,6 @@
         }
     },
     "config": {
-        "allow-plugins": []
+        "allow-plugins": {}
     }
 }
