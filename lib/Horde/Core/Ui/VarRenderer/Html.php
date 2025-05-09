@@ -37,7 +37,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
 
     protected function _renderVarInput_number($form, &$var, &$vars)
     {
-        $value = $var->getValue($vars);
+        $value = (string)$var->getValue($vars);
         if ($var->type->getProperty('fraction')) {
             $value = sprintf('%01.' . $var->type->getProperty('fraction') . 'f', $value);
         }
@@ -1768,7 +1768,7 @@ function obrowserCallback(name, oid)
     {
         $result = '';
         $i = 0;
-        foreach ($values as $value => $display) {
+        foreach ((array)$values as $value => $display) {
             $checked = (!is_null($checkedValue) && $value == $checkedValue) ? ' checked="checked"' : '';
             $result .= sprintf(
                 '<input id="%s%s" type="radio" class="checkbox" name="%s" value="%s"%s%s /><label for="%s%s">&nbsp;%s</label><br />',
