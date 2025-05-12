@@ -115,7 +115,7 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
 
         $pushed = $registry->pushApp($app);
 
-        if (!class_exists($name)) {
+        if (!class_exists($name) && !class_exists(ucfirst($name))) {
             if ($pushed) {
                 $registry->popApp($app);
             }
