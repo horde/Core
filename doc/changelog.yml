@@ -1,4 +1,20 @@
 ---
+3.0.0-alpha21:
+  api: 3.0.0-alpha1
+  state:
+    release: true
+    api: true
+  date: 2025-05-13
+  license:
+    identifier: LGPL-2.1-only
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    fix: ErrorHandler - Guard against error_get_last empty
+    fix: VarRenderer/Html don't use Form\Type\Date in static call
+    fix: Check if Horde Autoloader is actually present before registering it
+    fix: Make portal blocks loading when they are stored in prefs with legacy lowercase class names
+    fix: needs to enforce string conversion on untrusted input to htmlspecialchars
+    fix: Guard against array access on null
 3.0.0-alpha20:
   api: 3.0.0-alpha1
   state:

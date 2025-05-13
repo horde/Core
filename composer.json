@@ -26,10 +26,10 @@
             "role": "developer"
         }
     ],
-    "time": "2025-05-07",
+    "time": "2025-05-13",
     "repositories": [],
     "require": {
-        "horde/horde-installer-plugin": "^2",
+        "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || ^2",
         "php": "^7.4 || ^8",
         "horde/alarm": "^3 || dev-FRAMEWORK_6_0",
         "horde/auth": "^3 || dev-FRAMEWORK_6_0",
@@ -77,10 +77,10 @@
         "ext-session": "*"
     },
     "require-dev": {
-        "horde/test": "^3",
-        "horde/tree": "^3",
-        "horde/routes": "^3",
-        "horde/vfs": "^3"
+        "horde/test": "^3 || dev-FRAMEWORK_6_0",
+        "horde/tree": "^3 || dev-FRAMEWORK_6_0",
+        "horde/routes": "^3 || dev-FRAMEWORK_6_0",
+        "horde/vfs": "^3 || dev-FRAMEWORK_6_0"
     },
     "suggest": {
         "pear/text_captcha": "*",
