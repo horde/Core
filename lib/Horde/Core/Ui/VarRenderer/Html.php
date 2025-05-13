@@ -1519,7 +1519,7 @@ function obrowserCallback(name, oid)
         }
 
         if (!$var->type->emptyDateArray($value)) {
-            $html .= Horde_Form_Type_date::getAgo($value);
+            $html .= (new Horde_Form_Type_date)->getAgo($value);
         }
         return $html;
     }
