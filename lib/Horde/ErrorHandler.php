@@ -164,8 +164,9 @@ class Horde_ErrorHandler
      */
     public static function catchFatalError()
     {
-        $error = error_get_last();
-        if ($error['type'] == E_ERROR) {
+	$error = error_get_last();
+
+        if (is_array($error) && $error['type'] == E_ERROR) {
             self::fatal(new ErrorException(
                 $error['message'],
                 0,
