@@ -52,14 +52,26 @@ class Horde_Registry_Loadconfig
         global $conf, $registry;
 
         $flist = [];
-
+        /* Load defaults from the vendor dir */
+        $appConstant = strtoupper($app) . '_BASE';
+        if (defined($appConstant)) {
+            $filename = constant($appConstant) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . $conf_file;
+            if (is_file($filename)) {
+                $flist[] = $filename;
+            }
+        }
         /* Load global configuration file. */
-        $conf_dir = (($app == 'horde') && defined('HORDE_BASE'))
-            ? HORDE_BASE . '/config/'
-            : $registry->get('fileroot', $app) . '/config/';
-        $flist[] = $conf_dir . $conf_file;
-
-        $pinfo = pathinfo($conf_file);
+        if (defined('HORDE_CONFIG_BASE')) {
+            $conf_dir = HORDE_CONFIG_BASE . DIRECTORY_SEPARATOR . $app . DIRECTORY_SEPARATOR;
+        } else {
+            $conf_dir = (($app == 'horde') && defined('HORDE_BASE'))
+                ? HORDE_BASE . '/config/'
+                : $registry->get('fileroot', $app) . '/config/';
+        }
+        $pathname = $conf_dir . $conf_file;
+        if (is_file($filename)) {
+            $flist[] = $pathname;
+        }
 
         /* Load global configuration stanzas in '.d' directory. */
         $dir = $conf_dir . $pinfo['filename'] . '.d';
