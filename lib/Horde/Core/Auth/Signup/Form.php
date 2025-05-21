@@ -78,7 +78,7 @@ class Horde_Core_Auth_Signup_Form extends Horde_Form
      */
     public function getInfo($vars, &$info)
     {
-        parent::getInfo($vars, $info);
+        $info = parent::getInfo($vars, $info);
 
         if (!isset($info['user_name']) && isset($info['extra']['user_name'])) {
             $info['user_name'] = $info['extra']['user_name'];
@@ -87,6 +87,7 @@ class Horde_Core_Auth_Signup_Form extends Horde_Form
         if (!isset($info['password']) && isset($info['extra']['password'])) {
             $info['password'] = $info['extra']['password'];
         }
+        return $info;
     }
 
     /**

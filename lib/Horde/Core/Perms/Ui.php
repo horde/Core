@@ -242,8 +242,8 @@ class Horde_Core_Perms_Ui
             return false;
         }
 
-        $this->_form->getInfo($this->_vars, $info);
-        return true;
+        $info = $this->_form->getInfo($this->_vars, $info);
+        return $info;
     }
 
     /**
@@ -255,7 +255,6 @@ class Horde_Core_Perms_Ui
     {
         /* Initialise form if required. */
         $this->_formInit();
-
         $this->_form->setButtons(Horde_Core_Translation::t('Update'), true);
         $this->_vars->set('perm_id', $this->_perms->getPermissionId($permission));
         $this->_form->addHidden('', 'perm_id', 'text', false);
@@ -444,9 +443,7 @@ class Horde_Core_Perms_Ui
         if (!$this->_form->validate($this->_vars)) {
             return false;
         }
-
-        $this->_form->getInfo($this->_vars, $info);
-
+        $info = $this->_form->getInfo($this->_vars, $info);
         if ($this->_type == 'matrix') {
             /* Collapse the array for default/guest/creator. */
             $info['deflt'] = $info['deflt'][0]
@@ -480,7 +477,7 @@ class Horde_Core_Perms_Ui
         $info['default'] = $info['deflt'];
         unset($info['deflt']);
 
-        return true;
+        return $info;
     }
 
     /**
@@ -514,8 +511,7 @@ class Horde_Core_Perms_Ui
 
         if ($form_submit == Horde_Core_Translation::t('Delete')) {
             if ($this->_form->validate($this->_vars)) {
-                $this->_form->getInfo($this->_vars, $info);
-                return true;
+                return $this->_form->getInfo($this->_vars, $info);
             }
         } elseif (!empty($form_submit)) {
             return false;
