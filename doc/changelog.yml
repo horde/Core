@@ -1,4 +1,17 @@
 ---
+3.0.0-alpha22:
+  api: 3.0.0-alpha1
+  state:
+    release: true
+    api: true
+  date: 2025-05-21
+  license:
+    identifier: LGPL-2.1-only
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    fix: Make Perms UI compatible with newer horde/forms
+    feat: Stub of the application scanner.
+    feat: Support new horde/horde-installer-plugin constant HORDE_CONFIG_BASE pointing to var/config/ dir. This is backward compatible and does not break when used with older installer plugin.
 3.0.0-alpha21:
   api: 3.0.0-alpha1
   state:
