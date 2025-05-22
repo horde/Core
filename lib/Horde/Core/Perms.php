@@ -231,10 +231,10 @@ class Horde_Core_Perms
 
                 foreach ($app_perms as $key => $val) {
                     $ptr = &$perms['tree'][$app];
-
                     foreach (explode(':', $key) as $kval) {
                         if (!isset($ptr[$kval])) {
-                            $ptr[$kval] = false;
+                            // This used to be set to false and then implicitly converted to array by the next line
+                            $ptr[$kval] = [];
                         }
                         $ptr = &$ptr[$kval];
                     }
