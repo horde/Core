@@ -1,4 +1,17 @@
 ---
+3.0.0-alpha23:
+  api: 3.0.0-alpha1
+  state:
+    release: alpha
+    api: alpha
+  date: 2025-05-22
+  license:
+    identifier: LGPL-2.1-only
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    fix: Automatic conversion of false to array is deprecated lib/Horde/Core/Perms.php
+    fix: Implicitly defined property in Identity Prefs
+    fix: Hoist pathinfo request to make sure the variable pinfo is available in all paths of loadconfig
 3.0.0-alpha22:
   api: 3.0.0-alpha1
   state:
