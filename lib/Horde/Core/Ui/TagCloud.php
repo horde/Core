@@ -20,7 +20,9 @@ class Horde_Core_Ui_TagCloud
      * @var integer
      */
     public $basefontsize;
-
+    public $minfontsize;
+    public $maxfontsize;
+    public $total;
     /**
      * @var integer
      */
