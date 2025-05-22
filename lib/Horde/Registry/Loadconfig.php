@@ -52,6 +52,7 @@ class Horde_Registry_Loadconfig
         global $conf, $registry;
 
         $flist = [];
+        $pinfo = pathinfo($conf_file);
         /* Load defaults from the vendor dir */
         $appConstant = strtoupper($app) . '_BASE';
         if (defined($appConstant)) {
