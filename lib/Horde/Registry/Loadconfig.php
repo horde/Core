@@ -70,7 +70,7 @@ class Horde_Registry_Loadconfig
                 : $registry->get('fileroot', $app) . '/config/';
         }
         $pathname = $conf_dir . $conf_file;
-        if (is_file($filename)) {
+        if (is_file($pathname)) {
             $flist[] = $pathname;
         }
 
