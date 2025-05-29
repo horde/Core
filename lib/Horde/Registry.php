@@ -855,8 +855,8 @@ class Horde_Registry implements Horde_Shutdown_Task
          */
         $classname = Horde_String::ucfirst($app) . '_' . $cname;
         $path = $path . '/' . $cname . '.php';
-        if (class_exists($classname, false)) {
-            // TODO: Does this mess with some things expected from core.php?
+        // Implied attempt to trigger a previously setup autoloader
+        if (class_exists($classname, true)) {
         } elseif (file_exists($path)) {
             include_once $path;
         } else {
