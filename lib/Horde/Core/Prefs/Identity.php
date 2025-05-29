@@ -30,7 +30,6 @@ class Horde_Core_Prefs_Identity extends Horde_Prefs_Identity
 
     /** Expiration (in seconds) of a confirmation request. */
     public const EXPIRE_SECS = 86400;
-    protected array $_names = [];
 
     /**
      * Sends a message to an email address supposed to be added to the
