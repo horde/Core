@@ -87,8 +87,7 @@ class Horde_Registry_Hordeconfig implements ArrayAccess, Countable, IteratorAggr
 
     /**
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         $this->_load($offset);
         return isset($this->_config[$offset]);
@@ -104,8 +103,7 @@ class Horde_Registry_Hordeconfig implements ArrayAccess, Countable, IteratorAggr
             ?? null;
     }
 
-    #[\ReturnTypeWillChange]
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->_load($offset);
         $this->_config[$offset] = $value;
@@ -113,8 +111,7 @@ class Horde_Registry_Hordeconfig implements ArrayAccess, Countable, IteratorAggr
 
     /**
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         $this->_load($offset);
         unset($this->_config[$offset]);
@@ -124,8 +121,7 @@ class Horde_Registry_Hordeconfig implements ArrayAccess, Countable, IteratorAggr
 
     /**
      */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         /* Return non-zero to ensure a count() calls returns true. */
         return 1;
