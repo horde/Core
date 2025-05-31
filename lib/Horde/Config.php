@@ -157,7 +157,11 @@ class Horde_Config
      */
     public function configFile()
     {
-        $path = $GLOBALS['registry']->get('fileroot', $this->_app) . '/config';
+        if (defined('HORDE_CONFIG_BASE')) {
+            $path = HORDE_CONFIG_BASE;
+        } else {
+            $path = $GLOBALS['registry']->get('fileroot', $this->_app) . '/config';
+        }
         $configFile = $path . '/conf.php';
         if (is_link($configFile)) {
             $configFile = readlink($configFile);
@@ -302,7 +306,11 @@ class Horde_Config
     public function writePHPConfig($formvars, &$php = null)
     {
         $php = $this->generatePHPConfig($formvars);
-        $path = $GLOBALS['registry']->get('fileroot', $this->_app) . '/config';
+        if (defined('HORDE_CONFIG_BASE')) {
+            $path = HORDE_CONFIG_BASE;
+        } else {
+            $path = $GLOBALS['registry']->get('fileroot', $this->_app) . '/config';
+        }
         $configFile = $this->configFile();
         if (file_exists($configFile)) {
             if (@copy($configFile, $path . '/conf.bak.php')) {
