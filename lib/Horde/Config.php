@@ -158,7 +158,7 @@ class Horde_Config
     public function configFile()
     {
         if (defined('HORDE_CONFIG_BASE')) {
-            $path = HORDE_CONFIG_BASE . DIR_SEPARATOR . $this->_app;
+            $path = HORDE_CONFIG_BASE . DIRECTORY_SEPARATOR . $this->_app;
         } else {
             $path = $GLOBALS['registry']->get('fileroot', $this->_app) . '/config';
         }
@@ -307,7 +307,7 @@ class Horde_Config
     {
         $php = $this->generatePHPConfig($formvars);
         if (defined('HORDE_CONFIG_BASE')) {
-            $path = HORDE_CONFIG_BASE . DIR_SEPARATOR . $this->_app;
+            $path = HORDE_CONFIG_BASE . DIRECTORY_SEPARATOR . $this->_app;
         } else {
             $path = $GLOBALS['registry']->get('fileroot', $this->_app) . '/config';
         }
