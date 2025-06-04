@@ -1,4 +1,16 @@
 ---
+3.0.0-alpha24:
+  api: 3.0.0-alpha1
+  state:
+    release: alpha
+    api: alpha
+  date: 2025-06-04
+  license:
+    identifier: LGPL-2.1-only
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    fix: Horde_Registry_Hordeconfig upgrade ReturnTypeWillChange to actual PHP8 return types
+    feat: Write config file and backup file to var/config if defined
 3.0.0-alpha23:
   api: 3.0.0-alpha1
   state:
