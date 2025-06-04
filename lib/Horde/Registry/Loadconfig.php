@@ -56,10 +56,7 @@ class Horde_Registry_Loadconfig
         /* Load defaults from the vendor dir */
         $appConstant = strtoupper($app) . '_BASE';
         if (defined($appConstant)) {
-            $filename = constant($appConstant) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . $conf_file;
-            if (is_file($filename)) {
-                $flist[] = $filename;
-            }
+            $flist[] = constant($appConstant) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . $conf_file;
         }
         /* Load global configuration file. */
         if (defined('HORDE_CONFIG_BASE')) {
@@ -69,10 +66,7 @@ class Horde_Registry_Loadconfig
                 ? HORDE_BASE . '/config/'
                 : $registry->get('fileroot', $app) . '/config/';
         }
-        $pathname = $conf_dir . $conf_file;
-        if (is_file($pathname)) {
-            $flist[] = $pathname;
-        }
+        $flist[] = $conf_dir . $conf_file;
 
         /* Load global configuration stanzas in '.d' directory. */
         $dir = $conf_dir . $pinfo['filename'] . '.d';
@@ -88,9 +82,9 @@ class Horde_Registry_Loadconfig
 
         $k = 0;
         for ($v = reset($flist); $v; $v = next($flist)) {
-            if (file_exists($v)) {
+            if (is_file($v)) {
                 Horde::startBuffer();
-                $success = include $v;
+                $success = include_once $v;
                 $this->output .= Horde::endBuffer();
 
                 if (!$success) {
