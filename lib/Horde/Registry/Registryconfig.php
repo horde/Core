@@ -132,8 +132,12 @@ class Horde_Registry_Registryconfig
 
             if (!file_exists($app['fileroot']) ||
                 (!$reg_ob->isTest() &&
+                 // If a config XML file exists but no conf.php file exists in either $app/config/ or var/config/$app
                  file_exists($app['fileroot'] . '/config/conf.xml') &&
-                 !file_exists($app['fileroot'] . '/config/conf.php'))) {
+                 (!file_exists($app['fileroot'] . '/config/conf.php') &&
+                 //
+                 !(defined('HORDE_CONFIG_BASE') && file_exists(HORDE_CONFIG_BASE . DIRECTORY_SEPARATOR . $appName . DIRECTORY_SEPARATOR . 'conf.php'))
+                 ))) {
                 $app['status'] = 'inactive';
                 Horde::log('Setting ' . $appName . ' inactive because the fileroot does not exist or the application is not configured yet.', 'DEBUG');
             }
