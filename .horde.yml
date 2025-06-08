@@ -6,7 +6,7 @@ description: >-
   A library that provides the core functionality of the Horde Application
   Framework.
 list: dev
-type: library
+type: horde-library
 homepage: https://www.horde.org/libraries/Horde_Core
 authors:
   -
