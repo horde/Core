@@ -1,7 +1,10 @@
 <?php
+
 namespace Horde\Core;
+
 use Stringable;
 use Horde\Composer\ComposerRootProject;
+
 // Scan a filesystem layout to identify installed Horde applications, themes and libraries
 class HordeInstallationScanner
 {
@@ -13,7 +16,7 @@ class HordeInstallationScanner
     ) {
         $this->baseDir = (string) $baseDir;
         if (class_exists('\Composer\InstalledVersions')) {
-            
+
             foreach (\Composer\InstalledVersions::getInstalledPackagesByType('horde-application') as $package) {
                 $this->hordeApplications[] = new HordeApplicationMeta(
                     \Composer\InstalledVersions::getInstallPath($package)

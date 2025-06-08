@@ -1,5 +1,7 @@
 <?php
+
 namespace Horde\Core;
+
 use Horde\Composer\ComposerJsonFile;
 use Horde\HordeYmlFile\HordeYmlFile;
 
@@ -8,8 +10,8 @@ use Horde\HordeYmlFile\HordeYmlFile;
  * - a horde format schema file
  * - a js/ dir which needs to be installed into the webroot
  */
-class HordeLibraryMeta {
-
+class HordeLibraryMeta
+{
     public readonly bool $hasDbMigration;
     public readonly bool $hasJsDir;
     public readonly bool $hasBinDir;
