@@ -1,7 +1,6 @@
 {
     "name": "horde/core",
     "description": "Core Horde Framework library",
-    "type": "horde-library",
     "homepage": "https://www.horde.org/libraries/Horde_Core",
     "license": "LGPL-2.1-only",
     "authors": [
@@ -26,7 +25,7 @@
             "role": "developer"
         }
     ],
-    "time": "2025-06-04",
+    "time": "2025-06-08",
     "repositories": [],
     "require": {
         "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || ^3 || ^2",

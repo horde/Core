@@ -1,4 +1,19 @@
 ---
+3.0.0-alpha25:
+  api: 3.0.0-alpha1
+  state:
+    release: alpha
+    api: alpha
+  date: 2025-06-08
+  license:
+    identifier: LGPL-2.1-only
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    fix(metadata): Core is a horde-library as it exposes js files to webroot
+    style: Whitespace fixes
+    feat: Partial modern implementation of registry loader
+    feat: Update French translation of Horde_Core (#22)
+    fix: It is sufficient to find conf.php in EITHER var/config/ or vendor/horde//config to prevent deactivating the app
 3.0.0-alpha24:
   api: 3.0.0-alpha1
   state:
