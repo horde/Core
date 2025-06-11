@@ -1,0 +1,1269 @@
+# Chinese translations for Horde_Core module.
+# Copyright 2010-2017 Horde LLC (http://www.horde.org/)
+# This file is distributed under the same license as the Horde_Core module.
+# Automatically generated, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Horde_Core\n"
+"Report-Msgid-Bugs-To: dev@lists.horde.org\n"
+"POT-Creation-Date: 2025-06-11 17:55+0200\n"
+"PO-Revision-Date: 2010-10-13 01:27+0200\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: i18n@lists.horde.org\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: lib/Horde.php:1152
+#, php-format
+msgid " (Accesskey %s)"
+msgstr " (快捷鍵 %s)"
+
+#: lib/Horde/Registry.php:1361 lib/Horde/Registry.php:2112
+#, php-format
+msgid "\"%s\" is not configured in the Horde Registry."
+msgstr "\"%s\" 尚未在 HORDE 的註冊檔(Registry)中設定."
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:125
+#, php-format
+msgid "%d contact was successfully added to your address book."
+msgid_plural "%d contacts were successfully added to your address book."
+msgstr[0] "已成功的將 %d 個聯絡人新增至你的通訊錄中."
+
+#: lib/Horde/Core/Auth/Application.php:685
+#, php-format
+msgid "%d day until your password expires."
+msgid_plural "%d days until your password expires."
+msgstr[0] "最近一次密碼變更於 %d 天前."
+
+#: lib/Horde/Registry.php:1562
+#, fuzzy, php-format
+msgid "%s is not activated."
+msgstr "%s 未通過 %s 的授權."
+
+#: lib/Horde/Core/Perms/Ui.php:353 lib/Horde/Core/Perms/Ui.php:413
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:934
+msgid "-- select --"
+msgstr "-- 選擇 --"
+
+#: lib/Horde/Core/Notification/Event/Status.php:74 lib/Horde/PageOutput.php:684
+msgid "1 day"
+msgstr "1 日"
+
+#: lib/Horde/Core/Notification/Event/Status.php:72 lib/Horde/PageOutput.php:682
+msgid "1 hour"
+msgstr "1 小時"
+
+#: lib/Horde/Core/Notification/Event/Status.php:71 lib/Horde/PageOutput.php:681
+msgid "15 minutes"
+msgstr "15 分鐘"
+
+#: lib/Horde/Core/Notification/Event/Status.php:70 lib/Horde/PageOutput.php:680
+msgid "5 minutes"
+msgstr "15 分鐘"
+
+#: lib/Horde/Core/Notification/Event/Status.php:73 lib/Horde/PageOutput.php:683
+msgid "6 hours"
+msgstr "6 小時"
+
+#: lib/Horde/Core/Ui/Pager.php:75
+msgid "<Previous"
+msgstr "<上一頁"
+
+#: lib/Horde/ErrorHandler.php:196
+msgid "A fatal error has occurred"
+msgstr "發生了一個嚴重的錯誤"
+
+#: lib/Horde/Core/Prefs/Identity.php:90
+#, php-format
+msgid ""
+"A message has been sent to \"%s\" to verify that this is really your "
+"address. The new email address is activated as soon as you confirm this "
+"message."
+msgstr ""
+"系統已寄發一封信件給 \"%s\" 以便確認該郵件住址確實是你. 新的郵件住址將隨你確"
+"認此訊息時一並啟用."
+
+#: lib/Horde/Core/Auth/Signup/Base.php:106
+#, php-format
+msgid ""
+"A new account for the user \"%s\" has been requested through the signup form."
+msgstr ""
+
+#: lib/Horde/Core/Script/Package/Popup.php:26
+msgid ""
+"A popup window could not be opened. Your browser may be blocking popups."
+msgstr ""
+
+#: lib/Horde/Core/Auth/Signup/Base.php:114
+#, fuzzy, php-format
+msgid "Account signup request for \"%s\""
+msgstr "你確定要刪除 \"%s\" 的註冊申請嗎?"
+
+#: lib/Horde/Core/Perms/Ui.php:203 lib/Horde/Core/Ui/VarRenderer/Html.php:709
+msgid "Add"
+msgstr "新增"
+
+#: lib/Horde/Core/Perms/Ui.php:136
+msgid "Add Child Permission"
+msgstr "新增子權限"
+
+#: lib/Horde/Core/Perms/Ui.php:103
+msgid "Add New Permission"
+msgstr "新增權限"
+
+#: lib/Horde/Core/Perms/Ui.php:80
+msgid "Add Permission"
+msgstr "新增權限"
+
+#: lib/Horde/Core/Perms/Ui.php:202
+#, php-format
+msgid "Add a child permission to \"%s\""
+msgstr "新增次權限至\"%s\""
+
+#: lib/Horde/Core/Prefs/Ui/Widgets.php:97
+#, fuzzy
+msgid "Add source"
+msgstr "新增使用者"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:437
+msgid "Add to address book:"
+msgstr "新增到的通訊錄:"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:453
+msgid "Add to my address book"
+msgstr "新增到我的通訊錄"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:243
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:307
+msgid "Address"
+msgstr "地址"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:439
+msgid "Address Book"
+msgstr "通訊錄"
+
+#: lib/Horde/Registry.php:360
+msgid ""
+"Admin authentication requested, but no admin users defined in configuration."
+msgstr ""
+
+#: lib/Horde/Core/Topbar.php:126
+msgid "Administration"
+msgstr "管理"
+
+#: lib/Horde/Core/Notification/Event/Status.php:90
+msgid "Alarm"
+msgstr "警示"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:158
+msgid "Alias"
+msgstr "郵件別名"
+
+#: lib/Horde/Core/Perms/Ui.php:268
+msgid "All Authenticated Users"
+msgstr "所有通過驗證的使用者"
+
+#: lib/Horde/Core/Perms.php:123 lib/Horde/Core/Perms/Ui.php:108
+msgid "All Permissions"
+msgstr "所有權限"
+
+#: lib/Horde/Core/Prefs/Ui.php:325 lib/Horde/Core/Prefs/Ui.php:338
+msgid "An illegal value was specified."
+msgstr "一個無效的值被使用."
+
+#: lib/Horde/Core/Smartmobile/View/Helper.php:55
+msgid "Applications"
+msgstr ""
+
+#: lib/Horde/Core/Auth/Signup/Base.php:108
+msgid "Approve the account:"
+msgstr ""
+
+#: lib/Horde/Core/Ui/JsCalendar.php:132
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:498
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:558
+msgid "April"
+msgstr "四月"
+
+#: lib/Horde/Core/Ui/JsCalendar.php:136
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:502
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:562
+msgid "August"
+msgstr "八月"
+
+#: lib/Horde/Core/Prefs/Ui/Widgets.php:203
+#, fuzzy
+msgid "Available address books:"
+msgstr "新增到的通訊錄:"
+
+#: lib/Horde/Core/Smartmobile/View/Helper.php:47 lib/Horde/PageOutput.php:611
+msgid "Back"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:166
+msgid "Birthday"
+msgstr "生日"
+
+#: lib/Horde/Core/Block/Collection.php:409
+#, php-format
+msgid "Block \"%s\" of application \"%s\" not found."
+msgstr ""
+
+#: lib/Horde/Core/ActiveSync/Driver.php:157
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:602
+msgid "Calendar"
+msgstr "行事曆"
+
+#: lib/Horde/Core/Ajax/Imple/InPlaceEditor.php:57
+#: lib/Horde/Core/Script/Package/Dialog.php:26
+msgid "Cancel"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:338
+msgid "Cell Phone"
+msgstr "行動電話"
+
+#: lib/Horde/Core/Auth/Signup/Form.php:48
+#: lib/Horde/Core/Auth/Signup/Form.php:68
+msgid "Choose a password"
+msgstr "選擇密碼"
+
+#: lib/Horde/Core/Auth/Signup/Form.php:45
+#: lib/Horde/Core/Auth/Signup/Form.php:67
+msgid "Choose a username"
+msgstr "選擇一個使用者名稱"
+
+#: lib/Horde/Core/Prefs/Ui/Widgets.php:197
+msgid "Choose the order of address books to search when expanding addresses."
+msgstr ""
+
+#: lib/Horde/PageOutput.php:690
+msgid "Clear All"
+msgstr ""
+
+#: lib/Horde/Core/Ajax/Imple/InPlaceEditor.php:58
+msgid "Click to add caption..."
+msgstr ""
+
+#: lib/Horde/PageOutput.php:612
+msgid "Close"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:650
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:655
+msgid "Color Picker"
+msgstr "調色盤"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:395
+msgid "Company"
+msgstr "公司"
+
+#: lib/Horde/Core/Prefs/Identity.php:75
+msgid "Confirm new email address"
+msgstr "確認新電子郵件住址"
+
+#: lib/Horde/Core/ActiveSync/Driver.php:158
+msgid "Contacts"
+msgstr ""
+
+#: lib/Horde/Config.php:319
+#, php-format
+msgid "Could not save the backup configuration file %s."
+msgstr ""
+
+#: lib/Horde/Core/Perms/Ui.php:299
+msgid "Creator Permissions"
+msgstr "建立者"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:569
+msgid "DD"
+msgstr "日"
+
+#: lib/Horde/Core/Ui/JsCalendar.php:140
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:506
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:566
+msgid "December"
+msgstr "十二月"
+
+#: lib/Horde/Core/Perms/Ui.php:494 lib/Horde/Core/Perms/Ui.php:512
+msgid "Delete"
+msgstr "刪除"
+
+#: lib/Horde/Core/Perms/Ui.php:84 lib/Horde/Core/Perms/Ui.php:144
+msgid "Delete Permission"
+msgstr "刪除權限"
+
+#: lib/Horde/Core/Perms/Ui.php:493
+#, php-format
+msgid "Delete permissions for \"%s\""
+msgstr "刪除\"%s\"的權限"
+
+#: lib/Horde/Core/Perms/Ui.php:496
+#, php-format
+msgid "Delete permissions for \"%s\" and any sub-permissions?"
+msgstr "確定要刪除\"%s\"的權限以及次權限?"
+
+#: lib/Horde/Core/Auth/Signup/Base.php:110
+msgid "Deny the account:"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:397
+msgid "Department"
+msgstr "部門"
+
+#: lib/Horde/Core/Alarm/Handler/Desktop.php:102
+msgid "Desktop notification (with certain browsers)"
+msgstr ""
+
+#: lib/Horde/ErrorHandler.php:231
+#, fuzzy
+msgid "Details"
+msgstr "細節"
+
+#: lib/Horde/ErrorHandler.php:200
+msgid "Details have been logged for the administrator."
+msgstr "細節請參考系統管理登錄."
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1313
+#, php-format
+msgid "Dial %s"
+msgstr "撥打 %s"
+
+#: lib/Horde/Core/Notification/Event/Status.php:69
+msgid "Dismiss"
+msgstr "關閉"
+
+#: lib/Horde/Core/Perms/Ui.php:494
+msgid "Do not delete"
+msgstr "不刪除"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:222
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:286
+#, fuzzy
+msgid "Domestic Address"
+msgstr "住家地址"
+
+#: lib/Horde/Core/ActiveSync/Driver.php:3499
+msgid "Drafts"
+msgstr ""
+
+#: lib/Horde/Core/Block/Layout.php:115 lib/Horde/Core/Block/Layout.php:117
+msgid "Edit"
+msgstr ""
+
+#: lib/Horde/Core/Perms/Ui.php:83 lib/Horde/Core/Perms/Ui.php:142
+msgid "Edit Permission"
+msgstr "編輯權限"
+
+#: lib/Horde/Core/Perms/Ui.php:432
+#, php-format
+msgid "Edit permissions for \"%s\""
+msgstr "編輯\"%s\"的權限"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:378
+msgid "Email"
+msgstr "電子郵件"
+
+#: lib/Horde/Core/Prefs/Identity.php:110
+#, fuzzy
+msgid "Email address to confirm not found."
+msgstr "找不到電子郵件通知住址."
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:362
+msgid "Emoticons"
+msgstr "表情符號"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1106
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1119
+msgid "Enter the letters below:"
+msgstr "輸入以下文字:"
+
+#: lib/Horde/Core/Block/Layout/View.php:123
+#: lib/Horde/Core/Notification/Event/Status.php:95
+msgid "Error"
+msgstr "錯誤"
+
+#: lib/Horde/PageOutput.php:674
+msgid "Error when communicating with the server."
+msgstr ""
+
+#: lib/Horde/Core/Block/Layout/Manager.php:543
+msgid "Expand"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:324
+msgid "Fax"
+msgstr "傳真"
+
+#: lib/Horde/Core/Ui/JsCalendar.php:130
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:496
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:556
+msgid "February"
+msgstr "二月"
+
+#: lib/Horde/PageOutput.php:613
+msgid "Filter items..."
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:296
+msgid "Fix ratio"
+msgstr "固定比例"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:267
+msgid "Flip"
+msgstr "上下顛倒"
+
+#: lib/Horde/Core/ActiveSync/Mail.php:460
+msgid "Forwarded Message"
+msgstr ""
+
+#: lib/Horde/Core/Ui/JsCalendar.php:98
+msgid "Fr"
+msgstr "星期五"
+
+#: lib/Horde/Core/Ui/JsCalendar.php:116
+msgid "Friday"
+msgstr ""
+
+#: lib/Horde/Core/Prefs/Ui.php:683 lib/Horde/Core/Topbar.php:161
+msgid "Global Preferences"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1434
+msgid "Google Maps"
+msgstr "Google 地圖"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:273
+msgid "Grayscale"
+msgstr "灰階"
+
+#: lib/Horde/Core/Perms/Ui.php:373
+msgid "Groups"
+msgstr "群組"
+
+#: lib/Horde/Core/Perms/Ui.php:286
+msgid "Guest Permissions"
+msgstr "來賓"
+
+#: lib/Horde/Core/Topbar.php:207 lib/Horde/Help.php:254 lib/Horde/Help.php:255
+msgid "Help"
+msgstr "說明"
+
+#: lib/Horde/Help.php:59
+#, fuzzy
+msgid "Help file not found."
+msgstr "找不到 \"%s\" 共享驅動程式."
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:214
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:278
+msgid "Home Address"
+msgstr "住家地址"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:328
+msgid "Home Phone"
+msgstr "住家電話"
+
+#: lib/Horde/Core/ActiveSync/Driver.php:3494
+msgid "Inbox"
+msgstr ""
+
+#: lib/Horde/Core/Perms/Ui.php:312
+msgid "Individual Users"
+msgstr "個別使用者"
+
+#: lib/Horde/Core/Alarm/Handler/Notify.php:72
+msgid "Inline"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:226
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:290
+#, fuzzy
+msgid "International Address"
+msgstr "變更電子郵件住址"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:852
+#: lib/Horde/Core/Ui/VarRenderer/TablesetHtml.php:27
+msgid "Invert selection"
+msgstr "回復選擇"
+
+#: lib/Horde/Core/Ui/JsCalendar.php:129
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:495
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:555
+msgid "January"
+msgstr "一月"
+
+#: lib/Horde/Core/Ui/JsCalendar.php:135
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:501
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:561
+msgid "July"
+msgstr "七月"
+
+#: lib/Horde/Core/Ui/JsCalendar.php:134
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:500
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:560
+msgid "June"
+msgstr "六月"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:305
+msgid "Keep original?"
+msgstr "保留原樣?"
+
+#: lib/Horde/Core/Smartmobile/View/Helper.php:68
+msgid "Log out"
+msgstr "登出"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:494
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:554
+msgid "MM"
+msgstr "月"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1382
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1409
+msgid "MapQuest map"
+msgstr "MapQuest-地圖"
+
+#: lib/Horde/Core/Ui/JsCalendar.php:131
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:497
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:557
+msgid "March"
+msgstr "三月"
+
+#: lib/Horde/Core/Ui/JsCalendar.php:133
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:499
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:559
+msgid "May"
+msgstr "五月"
+
+#: lib/Horde/Core/Notification/Event/Status.php:100
+msgid "Message"
+msgstr "郵件"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:270
+msgid "Mirror"
+msgstr "映射"
+
+#: lib/Horde/Core/Ui/JsCalendar.php:94
+msgid "Mo"
+msgstr "星期一"
+
+#: lib/Horde/Core/Ui/JsCalendar.php:112
+msgid "Monday"
+msgstr "星期一"
+
+#: lib/Horde/Core/Block/Layout/Manager.php:577
+#, fuzzy
+msgid "Move Down"
+msgstr "下移"
+
+#: lib/Horde/Core/Block/Layout/Manager.php:581
+#, fuzzy
+msgid "Move Left"
+msgstr "逆時針 90 度旋轉"
+
+#: lib/Horde/Core/Block/Layout/Manager.php:585
+#, fuzzy
+msgid "Move Right"
+msgstr "順時針 90 度旋轉"
+
+#: lib/Horde/Core/Block/Layout/Manager.php:573
+#, fuzzy
+msgid "Move Up"
+msgstr "上移"
+
+#: lib/Horde/Core/Prefs/Ui/Widgets.php:102
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:683
+msgid "Move down"
+msgstr "下移"
+
+#: lib/Horde/Core/Prefs/Ui/Widgets.php:101
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:682
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:683
+msgid "Move up"
+msgstr "上移"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1351
+msgid "Multimap UK map"
+msgstr "Multimap-英國-地圖"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:154
+msgid "Name"
+msgstr "名稱"
+
+#: lib/Horde/Core/Ui/Pager.php:117
+msgid "Next>"
+msgstr "下一頁>"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1201
+msgid "No"
+msgstr "否"
+
+#: lib/Horde/PageOutput.php:692
+msgid "No Alerts"
+msgstr ""
+
+#: lib/Horde/Core/Factory/Twitter.php:18
+msgid "No OAuth Key or Secret found for the Twitter API"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:619
+msgid "No Sound"
+msgstr "靜音"
+
+#: lib/Horde/Core/Prefs/Ui/Widgets.php:236
+#, fuzzy
+msgid "No address book selected."
+msgstr "新增到的通訊錄:"
+
+#: lib/Horde/Core/Perms/Ui.php:211
+msgid "No children can be added to this permission."
+msgstr "無法在目前權限中增加次權限."
+
+#: lib/Horde.php:498
+#, php-format
+msgid "No configuration information specified for %s."
+msgstr "沒有指定的 %s 設定資訊."
+
+#: lib/Horde/Core/ActiveSync/Mail.php:675
+msgid "No message body text"
+msgstr ""
+
+#: lib/Horde/Core/Ajax/Application/Handler/Email.php:41
+#, fuzzy
+msgid "No valid email address found"
+msgstr "\"%s\" 並不是一個有效的電子郵件位址."
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1209
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1219
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1230
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1247
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1264
+msgid "No values"
+msgstr "空白值"
+
+#: lib/Horde/Registry.php:303
+msgid "Not an admin"
+msgstr ""
+
+#: lib/Horde/Core/ActiveSync/Driver.php:160
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:404
+msgid "Notes"
+msgstr "備忘錄"
+
+#: lib/Horde/Core/Ui/JsCalendar.php:139
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:505
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:565
+msgid "November"
+msgstr "十一月"
+
+#: lib/Horde/Core/Script/Package/Dialog.php:27
+msgid "OK"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1086
+msgid "Object"
+msgstr "物件"
+
+#: lib/Horde/Core/Ui/JsCalendar.php:138
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:504
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:564
+msgid "October"
+msgstr "十月"
+
+#: lib/Horde/Core/Ajax/Imple/InPlaceEditor.php:59
+msgid "Ok"
+msgstr ""
+
+#: lib/Horde/Core/ActiveSync/Connector.php:986
+#: lib/Horde/Core/ActiveSync/Connector.php:993
+msgid "Out Of Office"
+msgstr ""
+
+#: lib/Horde/Core/ActiveSync/Driver.php:3504
+msgid "Outbox"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:234
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:298
+#, fuzzy
+msgid "Parcel Address"
+msgstr "電子郵件住址"
+
+#: lib/Horde/Core/Perms/Ui.php:211
+msgid "Permission"
+msgstr "權限"
+
+#: lib/Horde/Registry.php:375
+#, fuzzy
+msgid "Permission denied."
+msgstr "權限"
+
+#: lib/Horde/Core/Perms/Ui.php:216 lib/Horde/Core/Perms/Ui.php:226
+msgid "Permissions"
+msgstr "權限"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:343
+msgid "Phone"
+msgstr "電話"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:177
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:187
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:193
+#, fuzzy
+msgid "Photo"
+msgstr "藝廊"
+
+#: lib/Horde/Core/Alarm/Handler/Notify.php:92
+msgid "Play a sound?"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:230
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:294
+#, fuzzy
+msgid "Postal Address"
+msgstr "電子郵件住址"
+
+#: lib/Horde/Core/Topbar.php:145
+msgid "Preferences"
+msgstr ""
+
+#: lib/Horde/Core/Prefs/Ui.php:686
+#, fuzzy, php-format
+msgid "Preferences for %s"
+msgstr "%s的圖示"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:238
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:302
+#, fuzzy
+msgid "Preferred Address"
+msgstr "資訊位址"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1666
+msgid "Preview"
+msgstr "預覽"
+
+#: lib/Horde/Core/Topbar.php:195
+msgid "Problem"
+msgstr "問題"
+
+#: lib/Horde/Core/Block/Layout.php:128
+msgid "Really delete this block?"
+msgstr ""
+
+#: lib/Horde/Core/Block/Layout.php:124 lib/Horde/Core/Block/Layout.php:130
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:235
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:712
+msgid "Remove"
+msgstr "移除"
+
+#: lib/Horde/Core/Prefs/Ui/Widgets.php:98
+#, fuzzy
+msgid "Remove source"
+msgstr "移除使用者"
+
+#: lib/Horde.php:510
+#, php-format
+msgid "Required \"%s\" not specified in %s configuration."
+msgstr "%2$s 的設定必須指定 \"%1$s\""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:255
+msgid "Reset"
+msgstr "重設"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:389
+msgid "Role"
+msgstr "角色"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:261
+msgid "Rotate 180"
+msgstr "旋轉 180 度"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:258
+msgid "Rotate Left"
+msgstr "逆時針 90 度旋轉"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:264
+msgid "Rotate Right"
+msgstr "順時針 90 度旋轉"
+
+#: lib/Horde/Core/Ui/JsCalendar.php:99
+msgid "Sa"
+msgstr "星期六"
+
+#: lib/Horde/Core/Ui/JsCalendar.php:117
+msgid "Saturday"
+msgstr ""
+
+#: lib/Horde/Registry.php:246
+msgid "Script must be run from the command line"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:602
+msgid "Select a date"
+msgstr "選擇一個日期"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:850
+#: lib/Horde/Core/Ui/VarRenderer/TablesetHtml.php:25
+msgid "Select all"
+msgstr "選擇所有"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1086
+msgid "Select an object"
+msgstr "選擇一個物件"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:851
+#: lib/Horde/Core/Ui/VarRenderer/TablesetHtml.php:26
+msgid "Select none"
+msgstr "不選擇"
+
+#: lib/Horde/Core/Prefs/Ui.php:866
+msgid "Select the identity you want to change:"
+msgstr "選擇欲變更的身份識別:"
+
+#: lib/Horde/PageOutput.php:679
+#, fuzzy
+msgid "Select..."
+msgstr "選擇所有"
+
+#: lib/Horde/Core/Prefs/Ui/Widgets.php:198
+#, fuzzy
+msgid "Selected address books:"
+msgstr "新增到的通訊錄:"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1329
+msgid "Send SMS"
+msgstr "傳送簡訊"
+
+#: lib/Horde/Core/ActiveSync/Driver.php:3489
+msgid "Sent"
+msgstr ""
+
+#: lib/Horde/Core/Ui/JsCalendar.php:137
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:503
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:563
+msgid "September"
+msgstr "九月"
+
+#: lib/Horde/Core/Block/Layout/Manager.php:548
+msgid "Shrink"
+msgstr ""
+
+#: lib/Horde/Core/Auth/Signup/Form.php:32
+msgid "Sign up"
+msgstr "註冊"
+
+#: lib/Horde/Core/Auth/Signup/Form.php:30
+msgid "Sign up for an account"
+msgstr ""
+
+#: lib/Horde/Core/Notification/Event/Status.php:77
+msgid "Snooze..."
+msgstr "打盹..."
+
+#: lib/Horde/Core/Ui/JsCalendar.php:93
+msgid "Su"
+msgstr "星期天"
+
+#: lib/Horde/Core/Notification/Event/Status.php:105
+msgid "Success"
+msgstr "成功"
+
+#: lib/Horde/Config.php:317
+#, php-format
+msgid "Successfully saved the backup configuration file %s."
+msgstr ""
+
+#: lib/Horde/Config.php:327
+#, php-format
+msgid "Successfully wrote %s"
+msgstr ""
+
+#: lib/Horde/Core/Ui/JsCalendar.php:111
+msgid "Sunday"
+msgstr "星期天"
+
+#: lib/Horde/Core/ActiveSync/Driver.php:159
+msgid "Tasks"
+msgstr ""
+
+#: lib/Horde/Core/Ui/JsCalendar.php:97
+msgid "Th"
+msgstr "星期四"
+
+#: lib/Horde/PageOutput.php:686
+msgid "The alarm was dismissed."
+msgstr ""
+
+#: lib/Horde/PageOutput.php:675
+#, fuzzy
+msgid "The connection to the server has been restored."
+msgstr "身份識別 %s 已被刪除."
+
+#: lib/Horde/Core/Prefs/Ui.php:1001
+msgid "The e-mail field cannot be empty."
+msgstr ""
+
+#: lib/Horde/Core/Prefs/Identity.php:146
+#, php-format
+msgid ""
+"The email address %s has been added to your identities. You can close this "
+"window now."
+msgstr "電子郵件地址 %s 已加入你到你的身分識別中. 你現在可以關閉此視窗."
+
+#: lib/Horde.php:399
+msgid "The encryption features require a secure web connection."
+msgstr "需要一個經過加密的網路連結."
+
+#: lib/Horde.php:512
+#, php-format
+msgid "The file %s should contain a %s setting."
+msgstr "檔案 %s 應該包含一個 %s 設定."
+
+#: lib/Horde.php:500
+#, php-format
+msgid "The file %s should contain some %s settings."
+msgstr "檔案 %s 應該包含一些 %s 設定."
+
+#: lib/Horde/Registry.php:2802
+#, php-format
+msgid "The following applications encountered errors removing user data: %s"
+msgstr ""
+
+#: lib/Horde/ErrorHandler.php:232
+#, fuzzy
+msgid ""
+"The full error message is logged in Horde's log file, and is shown below "
+"only to administrators. Non-administrative users will not see error details."
+msgstr "已登錄完整的錯誤資訊,該訊息僅提供系統管理員參考."
+
+#: lib/Horde/Core/Prefs/Ui.php:956
+#, php-format
+msgid "The identity \"%s\" has been deleted."
+msgstr "身份識別 %s 已被刪除."
+
+#: lib/Horde/Core/Prefs/Ui.php:1008
+msgid "The new from address can't be verified, try again later: "
+msgstr "新的寄件人地址未被確認, 請稍後再試: "
+
+#: lib/Horde/Core/Factory/Prefs.php:280
+#, php-format
+msgid ""
+"The preference \"%s\" could not be saved because its data exceeds the "
+"maximum allowable size"
+msgstr ""
+
+#: lib/Horde/Core/Factory/Prefs.php:210
+msgid ""
+"The preferences backend is currently unavailable and your preferences have "
+"not been loaded. You may continue to use the system with default preferences."
+msgstr ""
+
+#: lib/Horde/Core/Prefs/Ui.php:473
+#, fuzzy
+msgid "There are no preferences available for this application."
+msgstr "無可用的選項."
+
+#: lib/Horde/PageOutput.php:676
+msgid ""
+"There has been no contact with the server for several minutes. The server "
+"may be temporarily unavailable or network problems may be interrupting your "
+"session. You will not see any updates until the connection is restored."
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:118
+msgid "There was an error importing the contact data:"
+msgstr "匯入聯絡人資料時發生錯誤:"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:104
+msgid "There was an error reading the contact data."
+msgstr "讀取聯絡人資料時發生錯誤."
+
+#: lib/Horde/Core/Prefs/Ui.php:387
+msgid "There were errors encountered while updating your preferences."
+msgstr ""
+
+#: lib/Horde/PageOutput.php:691
+msgid "This is the notification log."
+msgstr ""
+
+#: lib/Horde/Registry.php:555
+msgid "This system is currently deactivated."
+msgstr "此系統目前是停用的狀態."
+
+#: lib/Horde/Core/Prefs/Ui.php:350
+msgid "This value must be a number."
+msgstr "必須是一個數字."
+
+#: lib/Horde/Core/Prefs/Ui.php:352
+#, fuzzy
+msgid "This value must be non-zero."
+msgstr "此數值最少必須是 1."
+
+#: lib/Horde/Core/Ui/JsCalendar.php:115
+msgid "Thursday"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:383
+msgid "Title"
+msgstr "標題"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:819
+msgid ""
+"To select multiple items, hold down the Control (PC) or Command (Mac) key "
+"while clicking."
+msgstr ""
+"如果要複選,請在點選滑鼠的同時按 Control鍵(個人電腦) 或 Command鍵(蘋果電腦)."
+
+#: lib/Horde/Core/Topbar.php:184
+msgid "Toggle Alerts Log"
+msgstr ""
+
+#: lib/Horde/Core/ActiveSync/Driver.php:3484
+msgid "Trash"
+msgstr ""
+
+#: lib/Horde/Core/Ui/JsCalendar.php:95
+msgid "Tu"
+msgstr "星期二"
+
+#: lib/Horde/Core/Ui/JsCalendar.php:113
+msgid "Tuesday"
+msgstr ""
+
+#: lib/Horde/Core/Auth/Signup/Form.php:48
+#: lib/Horde/Core/Auth/Signup/Form.php:68
+#, fuzzy
+msgid "Type your password twice to confirm"
+msgstr "再次輸入你的密碼以確認無誤"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:411
+msgid "URL"
+msgstr "網址"
+
+#: lib/Horde/Core/Perms/Ui.php:258
+msgid "Update"
+msgstr "變更"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:225
+msgid "Upload"
+msgstr "上傳"
+
+#: lib/Horde/Core/Auth/Signup/Sql.php:101
+#, fuzzy, php-format
+msgid "User \"%s\" does not exist."
+msgstr "目錄 \"%s\" 不存在"
+
+#: lib/Horde/Core/Prefs/Ui.php:658
+#, fuzzy
+msgid "User Preferences"
+msgstr "顯示差異"
+
+#: lib/Horde/Core/Auth/Signup/Base.php:147
+#, php-format
+msgid "Username \"%s\" already exists."
+msgstr "使用者名稱 \"%s\" 已存在."
+
+#: lib/Horde/Core/Notification/Event/Status.php:110
+msgid "Warning"
+msgstr "警告"
+
+#: lib/Horde/Core/Ui/JsCalendar.php:96
+msgid "We"
+msgstr "星期三"
+
+#: lib/Horde/Core/Factory/Weather.php:17
+msgid "Weather support not configured."
+msgstr ""
+
+#: lib/Horde/Core/Ui/JsCalendar.php:114
+msgid "Wednesday"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1358
+msgid "Whereis Australia map"
+msgstr "Whereis-澳洲-地圖"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:218
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:282
+msgid "Work Address"
+msgstr "辦公室地址"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:333
+msgid "Work Phone"
+msgstr "辦公室電話"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:507
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:573
+msgid "YYYY"
+msgstr "年"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:1201
+msgid "Yes"
+msgstr "是"
+
+#: lib/Horde/Core/Block/Layout/Manager.php:229
+#, php-format
+msgid "You are not allowed to create more than %d block."
+msgid_plural "You are not allowed to create more than %d blocks."
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/Horde/Registry.php:2755
+msgid "You are not allowed to remove user data."
+msgstr ""
+
+#: lib/Horde/Core/Auth/Application.php:770
+msgid ""
+"You are using an old, unsupported version of Internet Explorer. You need at "
+"least Internet Explorer 8. If you already run IE8 or higher, disable the "
+"Compatibility View. Minimal view will be used until you upgrade your browser."
+msgstr ""
+
+#: lib/Horde/PageOutput.php:677
+#, php-format
+msgid "You can snooze it for %s or %s dismiss %s it entirely"
+msgstr ""
+
+#: lib/Horde/Core/ActiveSync/Driver.php:3086
+msgid ""
+"You do not have an email address configured in your Personal Information "
+"Preferences."
+msgstr ""
+
+#: lib/Horde/Core/Prefs/Identity.php:64
+#, php-format
+msgid ""
+"You have requested to add the email address \"%s\" to the list of your "
+"personal email addresses.\n"
+"\n"
+"Go to the following link to confirm that this is really your address:\n"
+"%s\n"
+"\n"
+"If you don't know what this message means, you can delete it."
+msgstr ""
+"你曾經要求將 \"%s\" 加入為你的電子郵件地址之一.\n"
+"\n"
+"請點選下列網址以確定該地址確屬於你所擁有:\n"
+"%s\n"
+"\n"
+"如果你不清楚此郵件的意義, 你可以刪除此信."
+
+#: lib/Horde/Core/Factory/Vfs.php:75
+msgid "You must configure a VFS backend."
+msgstr "你必須先規劃一個虛擬檔案系統(VFS)伺服端."
+
+#: lib/Horde/Core/Prefs/Ui/Widgets.php:401
+#, php-format
+msgid "You must provide a setting for \"%s\"."
+msgstr "你必須提供 \"%s\" 的一組設定."
+
+#: lib/Horde/Core/Auth/Application.php:737
+msgid "Your browser does not support javascript. Using minimal view instead."
+msgstr ""
+
+#: lib/Horde/Core/Auth/Application.php:745
+msgid ""
+"Your browser does not support the dynamic view. Using basic view instead."
+msgstr ""
+
+#: lib/Horde/Core/Auth/Application.php:748
+#: lib/Horde/Core/Auth/Application.php:756
+msgid ""
+"Your browser does not support the dynamic view. Using minimal view instead."
+msgstr ""
+
+#: lib/Horde/Core/Prefs/Ui.php:972
+msgid "Your default identity has been changed."
+msgstr "閣下預設的身份識別已變更."
+
+#: lib/Horde/Core/Prefs/Ui.php:865
+msgid "Your default identity:"
+msgstr "閣下預設的身份識別:"
+
+#: lib/Horde/Core/Prefs/Ui.php:397
+#, fuzzy
+msgid "Your preferences have been updated for the duration of this session."
+msgstr "你在登入期間的選項已被更新."
+
+#: lib/Horde/Core/Prefs/Ui.php:399
+#, fuzzy
+msgid "Your preferences have been updated."
+msgstr "你的選項已更新."
+
+#: lib/Horde/Core/Text/Filter/Highlightquotes.php:53
+msgid "[Hide Quoted Text]"
+msgstr "[隱藏引述]"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:148
+msgid "[No Label]"
+msgstr ""
+
+#: lib/Horde/Core/Text/Filter/Highlightquotes.php:52
+#, fuzzy, php-format
+msgid "[Show Quoted Text - %d lines]"
+msgstr "[顯示引述 - %d 行]"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:288
+msgid "h:"
+msgstr "時:"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:445
+msgid "hh"
+msgstr "時"
+
+#: lib/Horde/ErrorHandler.php:249
+#, php-format
+msgid "in %s:%d"
+msgstr ""
+
+#: lib/Horde/PageOutput.php:614
+#, fuzzy
+msgid "loading"
+msgstr "上傳"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:458
+msgid "mm"
+msgstr "分"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:477
+msgid "ss"
+msgstr "秒"
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:100
+msgid "vCard"
+msgstr "vCard"
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:278
+msgid "w:"
+msgstr "星期:"
+
+#, php-format
+#~ msgid "%s Sign Up"
+#~ msgstr "%s 註冊"
+
+#~ msgid "Log in"
+#~ msgstr "登入"
+
+#~ msgid "The History system is disabled."
+#~ msgstr "歷史系統已停用."
+
+#~ msgid "There are no email addresses to confirm."
+#~ msgstr "目前沒有任何電子郵件地址等待確認."
+
+#~ msgid "Yahoo! map"
+#~ msgstr "Yahoo ! 地圖"
+
+#~ msgid "You are not authenticated."
+#~ msgstr "你的身份尚未被驗證."
+
+#~ msgid "_Home"
+#~ msgstr "家_H"
+
+#~ msgid "_Log in"
+#~ msgstr "登入_L"
+
+#~ msgid "_Log out"
+#~ msgstr "登出_L"
