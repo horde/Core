@@ -1,4 +1,15 @@
 ---
+3.0.0-alpha26:
+  api: 3.0.0-alpha1
+  state:
+    release: alpha
+    api: alpha
+  date: 2025-06-23
+  license:
+    identifier: LGPL-2.1-only
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    chore(composer.json): Rebuild composer.json - core must be a horde-library so its js gets linked properly.
 3.0.0-alpha25:
   api: 3.0.0-alpha1
   state:
