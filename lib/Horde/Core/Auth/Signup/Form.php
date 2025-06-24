@@ -76,7 +76,7 @@ class Horde_Core_Auth_Signup_Form extends Horde_Form
      * @param array $info      Array to be filled with the submitted field
      *                         values.
      */
-    public function getInfo($vars, &$info)
+    public function getInfo($vars, $info)
     {
         $info = parent::getInfo($vars, $info);
 
