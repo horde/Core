@@ -24,7 +24,7 @@ class Horde_Core_Cli extends Horde_Cli
      * @param array $field           A part of the parsed configuration tree as
      *                               returned from Horde_Config.
      */
-    public function question($vars, $prefix, $name, $field)
+    public function question($vars, $prefix, $name, $field, bool $existingAsDefault = false)
     {
         if (!isset($field['desc'])) {
             // This is a <configsection>.
@@ -35,7 +35,11 @@ class Horde_Core_Cli extends Horde_Cli
         }
 
         $question = $field['desc'];
+        $existing = $vars->get($prefix . '__' . $name);
         $default = $field['default'];
+        if ($existingAsDefault && $existing !== null) {
+            $default = $existing;
+        }
         $values = null;
         if (isset($field['switch'])) {
             $values = [];
@@ -60,6 +64,9 @@ class Horde_Core_Cli extends Horde_Cli
         while (true) {
             if ($name == 'password') {
                 $value = $this->passwordPrompt($question);
+                if (!$value) {
+                    $value = $default;
+                }
             } else {
                 $value = $this->prompt($question, $values, $default);
             }
@@ -73,7 +80,7 @@ class Horde_Core_Cli extends Horde_Cli
         if (isset($field['switch']) &&
             !empty($field['switch'][$value]['fields'])) {
             foreach ($field['switch'][$value]['fields'] as $sub => $sub_field) {
-                $this->question($vars, $prefix, $sub, $sub_field);
+                $this->question($vars, $prefix, $sub, $sub_field, $existingAsDefault);
             }
         }
 
