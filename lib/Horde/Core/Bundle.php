@@ -74,7 +74,7 @@ abstract class Horde_Core_Bundle
 
         $sql_config = $this->_config->configSQL('');
         $vars = new Horde_Variables();
-        new Horde_Config_Form($vars, 'horde', true);
+        $form = new Horde_Config_Form($vars, 'horde', true);
         $this->_cli->question(
             $vars,
             'sql',
