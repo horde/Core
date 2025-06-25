@@ -25,7 +25,7 @@ class Horde_Core_Auth_Signup_Form extends Horde_Form
      *
      * @var params Horde_Variables  TODO
      */
-    public function __construct(&$vars)
+    public function __construct($vars)
     {
         parent::__construct($vars, Horde_Core_Translation::t('Sign up for an account'));
 
@@ -76,7 +76,7 @@ class Horde_Core_Auth_Signup_Form extends Horde_Form
      * @param array $info      Array to be filled with the submitted field
      *                         values.
      */
-    public function getInfo($vars, $info)
+    public function getInfo($vars = null, $info = [])
     {
         $info = parent::getInfo($vars, $info);
 
