@@ -1278,7 +1278,7 @@ function obrowserCallback(name, oid)
         $image = $var->getValue($vars);
 
         /* Check if existing image data is being loaded. */
-        $var->type->loadImageData($image);
+        $image = $var->type->loadImageData($image);
 
         if (empty($image['img'])) {
             return '';
