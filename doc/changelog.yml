@@ -1,4 +1,17 @@
 ---
+3.0.0-beta2:
+  api: 3.0.0-alpha1
+  state:
+    release: beta
+    api: alpha
+  date: 2025-07-02
+  license:
+    identifier: LGPL-2.1-only
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    fix: Use return value of _renderVarDisplay_image https://github.com/horde/turba/issues/16 horde/turba#16
+    fix: Adjust signatures in Horde_Core_Auth_Signup_Form class
+    fix: Signup Form: getInfo() no longer writes back to second parameter. Use return value.
 3.0.0-beta1:
   api: 3.0.0-alpha1
   state:
