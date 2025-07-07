@@ -580,11 +580,11 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
                 $dates['year'][$i] = $i;
             }
         }
-
         // TODO: use NLS to get the order right for the Rest Of The
         // World.
         $html = '';
         $date_parts = ['month', 'day', 'year'];
+        $html .= '<input type="date">';
         foreach ($date_parts as $part) {
             $html .= sprintf(
                 '<select name="%s" id="%s"%s>%s</select>',
@@ -1534,7 +1534,7 @@ function obrowserCallback(name, oid)
 
     protected function _renderVarDisplay_invalid($form, &$var, &$vars)
     {
-        return '<span class="form-error">' . htmlspecialchars((string) $var->type->message) . '</span>';
+        return '<span class="form-error">' . htmlspecialchars((string) $var->type->getMessage()) . '</span>';
     }
 
     protected function _renderVarDisplay_link($form, &$var, &$vars)
