@@ -1408,8 +1408,8 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     $message = $this->_connector->calendar_export($id, [
                         'protocolversion' => $this->_version,
                         'truncation' => empty($collection['truncation']) ? Horde_ActiveSync::TRUNCATION_9 : $collection['truncation'],
-                        'bodyprefs' => $collection['bodyprefs'],
-                        'mimesupport' => $collection['mimesupport']], $folder_id);
+                        'bodyprefs' => !empty($collection['bodyprefs']) ? $collection['bodyprefs'] : [],
+                        'mimesupport' => !empty($collection['mimesupport']) ? $collection['mimesupport'] : 0], $folder_id);
 
                     // Nokia MfE requires the optional UID element.
                     if (!$message->getUid()) {
@@ -1459,8 +1459,8 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     $message = $this->_connector->contacts_export($id, [
                         'protocolversion' => $this->_version,
                         'truncation' => empty($collection['truncation']) ? Horde_ActiveSync::TRUNCATION_9 : $collection['truncation'],
-                        'bodyprefs' => $collection['bodyprefs'],
-                        'mimesupport' => $collection['mimesupport'],
+                        'bodyprefs' => !empty($collection['bodyprefs']) ? $collection['bodyprefs'] : [],
+                        'mimesupport' => !empty($collection['mimesupport']) ? $collection['mimesupport'] : 0,
                         'device' => $this->_device]);
                 } catch (Horde_Exception_NotFound $e) {
                     $this->_logger->err($e->getMessage());
@@ -1477,9 +1477,9 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 try {
                     $message = $this->_connector->tasks_export($id, [
                         'protocolversion' => $this->_version,
-                        'truncation' => $collection['truncation'],
-                        'bodyprefs' => $collection['bodyprefs'],
-                        'mimesupport' => $collection['mimesupport']]);
+                        'truncation' => empty($collection['truncation']) ? Horde_ActiveSync::TRUNCATION_9 : $collection['truncation'],
+                        'bodyprefs' => !empty($collection['bodyprefs']) ? $collection['bodyprefs'] : [],
+                        'mimesupport' => !empty($collection['mimesupport']) ? $collection['mimesupport'] : 0]);
                 } catch (Horde_Exception_NotFound $e) {
                     $this->_logger->err($e->getMessage());
                     $this->_endBuffer();
@@ -1495,9 +1495,9 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 try {
                     $message = $this->_connector->notes_export($id, [
                         'protocolversion' => $this->_version,
-                        'truncation' => $collection['truncation'],
-                        'bodyprefs' => $collection['bodyprefs'],
-                        'mimesupport' => $collection['mimesupport']]);
+                        'truncation' => empty($collection['truncation']) ? Horde_ActiveSync::TRUNCATION_9 : $collection['truncation'],
+                        'bodyprefs' => !empty($collection['bodyprefs']) ? $collection['bodyprefs'] : [],
+                        'mimesupport' => !empty($collection['mimesupport']) ? $collection['mimesupport'] : 0]);
                 } catch (Horde_Exception_NotFound $e) {
                     $this->_logger->err($e->getMessage());
                     $this->_endBuffer();
@@ -1520,11 +1520,11 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                             'truncation' => !empty($collection['truncation'])
                                 ? $collection['truncation']
                                 : (!empty($collection['mimetruncation']) ? $collection['mimetruncation'] : false),
-                            'bodyprefs'  => $collection['bodyprefs'],
+                            'bodyprefs'  => !empty($collection['bodyprefs']) ? $collection['bodyprefs'] : [],
                             'bodypartprefs' => !empty($collection['bodypartprefs'])
                                 ? $collection['bodypartprefs']
                                 : false,
-                            'mimesupport' => $collection['mimesupport'],
+                            'mimesupport' => !empty($collection['mimesupport']) ? $collection['mimesupport'] : 0,
                         ]
                     );
                 } catch (Horde_ActiveSync_Exception $e) {
@@ -1532,12 +1532,12 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     $context = 'Protocol Version: ' . $this->_version . "\r\n"
                         . 'Truncation: ' . (!empty($collection['truncation'])
                             ? $collection['truncation']
-                            : (!empty($collection['mimetruncation']) ? $collection['mimetruncation'] : 'false')). "\r\n"
-                        . 'BodyPrefs: ' . print_r($collection['bodyprefs'], true) . "\r\n"
+                            : (!empty($collection['mimetruncation']) ? $collection['mimetruncation'] : 'false')) . "\r\n"
+                        . 'BodyPrefs: ' . print_r(!empty($collection['bodyprefs']) ? $collection['bodyprefs'] : [], true) . "\r\n"
                         . 'BodyPartPrefs: ' . (!empty($collection['bodypartprefs'])
                             ? print_r($collection['bodypartprefs'], true)
                             : 'false') . "\r\n"
-                        . 'MimeSupport: ' . $collection['mimesupport'];
+                        . 'MimeSupport: ' . (!empty($collection['mimesupport']) ? $collection['mimesupport'] : 0);
 
                     $this->_logger->err($context);
 
