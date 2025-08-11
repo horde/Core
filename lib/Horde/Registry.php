@@ -2097,6 +2097,10 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     public function getInitialPage($app = null)
     {
+        if (empty($app)) {
+            $app = $this->getApp();
+        }
+
         try {
             if (($url = $this->callAppMethod($app, 'getInitialPage')) !== null) {
                 return $url;
@@ -2110,7 +2114,7 @@ class Horde_Registry implements Horde_Shutdown_Task
 
         throw new Horde_Exception(sprintf(
             Horde_Core_Translation::t('"%s" is not configured in the Horde Registry.'),
-            is_null($app) ? $this->getApp() : $app
+            $app
         ));
     }
 
