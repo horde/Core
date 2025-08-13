@@ -183,7 +183,7 @@ class Horde
             $url->add(
                 '_h',
                 Horde_Url::uriB64Encode(
-                    hash_hmac('sha1', $url . '=', $conf['secret_key'], true)
+                    hash_hmac('sha1', $url, $conf['secret_key'], true)
                 )
             );
             return $url;
@@ -283,8 +283,8 @@ class Horde
 
         if ($queryString instanceof Horde_Url) {
             $queryString->setRaw(true)->add(['_t' => $now, '_h' => '']);
-            $parse_url = parse_url($queryString);
-            $queryString->add('_h', Horde_Url::uriB64Encode(hash_hmac('sha1', $parse_url['query'] . '=', $GLOBALS['conf']['secret_key'], true)));
+            $query = parse_url($queryString, PHP_URL_QUERY);
+            $queryString->add('_h', Horde_Url::uriB64Encode(hash_hmac('sha1', $query, $GLOBALS['conf']['secret_key'], true)));
             return $queryString;
         }
 
