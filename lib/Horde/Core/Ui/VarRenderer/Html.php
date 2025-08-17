@@ -584,7 +584,6 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
         // World.
         $html = '';
         $date_parts = ['month', 'day', 'year'];
-        $html .= '<input type="date">';
         foreach ($date_parts as $part) {
             $html .= sprintf(
                 '<select name="%s" id="%s"%s>%s</select>',
