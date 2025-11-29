@@ -58,15 +58,24 @@ class Horde_Core_Ui_VarRenderer
         if (is_array($driver)) {
             $app = $driver[0];
             $driver = $driver[1];
+        } else {
+            $app = '';
         }
 
         $driver = Horde_String::ucfirst(basename($driver));
-        if (!empty($app)) {
+        $class = (empty($app) ? 'Horde_Core' : $app) .  '_Ui_VarRenderer_' . $driver;
+
+        $ok = class_exists($class);
+
+        // TODO: Eliminate after renaming Horde_Ui_VarRenderer_* classes in other apps to {app}_Ui_VarRenderer_*
+        if (!$ok && !empty($app)) {
+            // fallback to legacy method (manual load)
+            $class = __CLASS__ . '_' . $driver;
             include_once $GLOBALS['registry']->get('fileroot', $app) . '/lib/Ui/VarRenderer/' . $driver . '.php';
+            $ok = class_exists($class);
         }
 
-        $class = __CLASS__ . '_' . $driver;
-        if (!class_exists($class)) {
+        if (!$ok) {
             throw new LogicException('Class definition of ' . $class . ' not found.');
         }
 
