@@ -169,7 +169,7 @@ class Horde_Help
                         break;
 
                     case 'href':
-                        $out .= Horde::link(Horde::url($GLOBALS['registry']->get('webroot', $child->getAttribute('app') . '/' . $child->getAttribute('url'))), null, '', '_blank') . $child->textContent . '</a>';
+                        $out .= Horde::link(Horde::url($GLOBALS['registry']->get('webroot', $child->getAttribute('app')) . '/' . $child->getAttribute('url')), null, '', '_blank') . $child->textContent . '</a>';
                         break;
 
                     case 'b':
