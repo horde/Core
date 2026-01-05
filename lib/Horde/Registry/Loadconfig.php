@@ -53,26 +53,22 @@ class Horde_Registry_Loadconfig
 
         $flist = [];
         $pinfo = pathinfo($conf_file);
+
         /* Load defaults from the vendor dir */
         $appConstant = strtoupper($app) . '_BASE';
         if (defined($appConstant)) {
-            $filename = constant($appConstant) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . $conf_file;
-            if (is_file($filename)) {
-                $flist[] = $filename;
-            }
+            $flist[] = constant($appConstant) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . $conf_file;
         }
+
         /* Load global configuration file. */
         if (defined('HORDE_CONFIG_BASE')) {
             $conf_dir = HORDE_CONFIG_BASE . DIRECTORY_SEPARATOR . $app . DIRECTORY_SEPARATOR;
         } else {
-            $conf_dir = (($app == 'horde') && defined('HORDE_BASE'))
-                ? HORDE_BASE . '/config/'
-                : $registry->get('fileroot', $app) . '/config/';
+            $conf_dir = ($app == 'horde' && defined('HORDE_BASE')
+                ? HORDE_BASE
+                : $registry->get('fileroot', $app)) . '/config/';
         }
-        $pathname = $conf_dir . $conf_file;
-        if (is_file($pathname)) {
-            $flist[] = $pathname;
-        }
+        $flist[] = $conf_dir . $conf_file;
 
         /* Load global configuration stanzas in '.d' directory. */
         $dir = $conf_dir . $pinfo['filename'] . '.d';
@@ -83,28 +79,33 @@ class Horde_Registry_Loadconfig
         /* Load local version of configuration file. */
         $flist[] = $conf_dir . $pinfo['filename'] . '.local.' . $pinfo['extension'];
 
-        $end = count($flist) - 1;
+        $vhosts = true;
         $load = 0;
 
-        $k = 0;
-        for ($v = reset($flist); $v; $v = next($flist)) {
-            if (file_exists($v)) {
-                Horde::startBuffer();
-                $success = include $v;
-                $this->output .= Horde::endBuffer();
+        $checked = [];
+        while (($v = array_shift($flist))) {
+            $v = realpath($v);
+            if ($v !== false && !in_array($v, $checked, true)) {
+                $checked[] = $v;
+                if (is_file($v)) {
+                    Horde::startBuffer();
+                    $success = include $v;
+                    $this->output .= Horde::endBuffer();
 
-                if (!$success) {
-                    throw new Horde_Exception(sprintf('Failed to import configuration file "%s".', $v));
+                    if (!$success) {
+                        throw new Horde_Exception(sprintf('Failed to import configuration file "%s".', $v));
+                    }
+
+                    ++$load;
                 }
-
-                ++$load;
             }
 
-            if (($k++ === $end) && !empty($conf['vhosts'])) {
+            if ($vhosts && !$flist && ($conf['vhosts'] ?? false)) {
                 /* Load vhost configuration file. The vhost conf.php is not
                  * determined until here because, if this is Horde, the vhost
                  * configuration variable is not available until this
                  * point. */
+                $vhosts = false;
                 $flist[] = $conf_dir . $pinfo['filename'] . '-' . $conf['server']['name'] . '.' . $pinfo['extension'];
             }
         }
