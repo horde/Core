@@ -3678,17 +3678,17 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             }
 
             $entry = [
-                Horde_ActiveSync::GAL_ALIAS => !empty($row['alias']) ? $row['alias'] : '',
-                Horde_ActiveSync::GAL_DISPLAYNAME => $row['name'],
-                Horde_ActiveSync::GAL_EMAILADDRESS => !empty($row['email']) ? $row['email'] : '',
-                Horde_ActiveSync::GAL_FIRSTNAME => $row['firstname'],
-                Horde_ActiveSync::GAL_LASTNAME => $row['lastname'],
-                Horde_ActiveSync::GAL_COMPANY => !empty($row['company']) ? $row['company'] : '',
-                Horde_ActiveSync::GAL_HOMEPHONE => !empty($row['homePhone']) ? $row['homePhone'] : '',
-                Horde_ActiveSync::GAL_PHONE => !empty($row['workPhone']) ? $row['workPhone'] : '',
-                Horde_ActiveSync::GAL_MOBILEPHONE => !empty($row['cellPhone']) ? $row['cellPhone'] : '',
-                Horde_ActiveSync::GAL_TITLE => !empty($row['title']) ? $row['title'] : '',
-                Horde_ActiveSync::GAL_OFFICE => !empty($row['office']) ? $row['office'] : '',
+                Horde_ActiveSync::GAL_ALIAS        => $row['alias']      ?? '',
+                Horde_ActiveSync::GAL_DISPLAYNAME  => $row['name']       ?? '',
+                Horde_ActiveSync::GAL_EMAILADDRESS => $row['email']      ?? '',
+                Horde_ActiveSync::GAL_FIRSTNAME    => $row['firstname']  ?? '',
+                Horde_ActiveSync::GAL_LASTNAME     => $row['lastname']   ?? '',
+                Horde_ActiveSync::GAL_COMPANY      => $row['company']    ?? '',
+                Horde_ActiveSync::GAL_HOMEPHONE    => $row['homePhone']  ?? '',
+                Horde_ActiveSync::GAL_PHONE        => $row['workPhone']  ?? '',
+                Horde_ActiveSync::GAL_MOBILEPHONE  => $row['cellPhone']  ?? '',
+                Horde_ActiveSync::GAL_TITLE        => $row['title']      ?? '',
+                Horde_ActiveSync::GAL_OFFICE       => $row['office']     ?? '',
             ];
             if (!empty($query[Horde_ActiveSync_Request_Search::SEARCH_PICTURE])) {
                 $picture = Horde_ActiveSync::messageFactory('GalPicture');
