@@ -542,8 +542,7 @@ class Horde
     public static function url($uri, $full = false, $opts = [])
     {
         if (is_array($opts)) {
-            $append_session = $opts['append_session']
-                ?? 0;
+            $append_session = $opts['append_session'] ?? 0;
             if (!empty($opts['force_ssl'])) {
                 $full = true;
             }
@@ -552,17 +551,14 @@ class Horde
             $opts = [];
         }
 
-        $puri = parse_url($uri);
-        /* @todo Fix for PHP < 5.3.6 */
-        if (isset($puri['fragment']) && !isset($puri['path'])) {
-            $pos = strpos(
-                $uri,
-                '/',
-                strpos($uri, $puri['host']) + strlen($puri['host'])
-            );
-            $puri['path'] = substr($uri, $pos, strpos($uri, '#', $pos) - $pos);
+        $puri = parse_url($uri) ?: [];
+
+        /* Normalize missing components */
+        foreach (['host', 'path'] as $key) {
+            if (!isset($puri[$key])) {
+                $puri[$key] = '';
+            }
         }
-        /* End fix */
 
         $url = '';
         $schemeRegexp = '|^([a-zA-Z][a-zA-Z0-9+.-]{0,19})://|';
@@ -577,10 +573,10 @@ class Horde
         if ($full &&
             !isset($puri['scheme']) &&
             !preg_match($schemeRegexp, $webroot)) {
+
             /* Store connection parameters in local variables. */
             $server_name = $GLOBALS['conf']['server']['name'];
-            $server_port = $GLOBALS['conf']['server']['port']
-                ?? '';
+            $server_port = $GLOBALS['conf']['server']['port'] ?? '';
 
             $protocol = 'http';
             switch ($GLOBALS['conf']['use_ssl']) {
@@ -604,38 +600,45 @@ class Horde
 
             /* If using a non-standard port, add to the URL. */
             if (!empty($server_port) &&
-                ((($protocol == 'http') && ($server_port != 80)) ||
-                 (($protocol == 'https') && ($server_port != 443)))) {
+                ($protocol === 'http' && $server_port != 80 ||
+                 $protocol === 'https' && $server_port != 443)) {
                 $server_name .= ':' . $server_port;
             }
 
             $url = $protocol . '://' . $server_name;
-        } elseif (isset($puri['scheme'])) {
-            $url = $puri['scheme'] . '://' . $puri['host'];
 
-            /* If using a non-standard port, add to the URL. */
-            if (isset($puri['port']) &&
-                ((($puri['scheme'] == 'http') && ($puri['port'] != 80)) ||
-                 (($puri['scheme'] == 'https') && ($puri['port'] != 443)))) {
-                $url .= ':' . $puri['port'];
+        } elseif (isset($puri['scheme'])) {
+
+            $url = $puri['scheme'] . ':';
+            if ($puri['host'] !== '') {
+                $url .= '//' . $puri['host'];
+
+                /* If using a non-standard port, add to the URL. */
+                if (isset($puri['port']) &&
+                    ($puri['scheme'] === 'http' && $puri['port'] != 80 ||
+                     $puri['scheme'] === 'https' && $puri['port'] != 443)) {
+                    $url .= ':' . $puri['port'];
+                }
             }
         }
 
-        if (isset($puri['path']) &&
-            (substr($puri['path'], 0, 1) == '/') &&
-            (!preg_match($schemeRegexp, $webroot) ||
-             (preg_match($schemeRegexp, $webroot) && isset($puri['scheme'])))) {
+        if (substr($puri['path'], 0, 1) === '/' &&
+            (!preg_match($schemeRegexp, $webroot) || isset($puri['scheme']))) {
+
             $url .= $puri['path'];
-        } elseif (isset($puri['path']) && preg_match($schemeRegexp, $webroot)) {
-            if (substr($puri['path'], 0, 1) == '/') {
+
+        } elseif ($puri['path'] !== '' && preg_match($schemeRegexp, $webroot)) {
+
+            if (substr($puri['path'], 0, 1) === '/') {
                 $pwebroot = parse_url($webroot);
                 $url = $pwebroot['scheme'] . '://' . $pwebroot['host']
                     . $puri['path'];
             } else {
                 $url = $webroot . '/' . $puri['path'];
             }
+
         } else {
-            $url .= '/' . ($webroot ? $webroot . '/' : '') . ($puri['path'] ?? '');
+            $url .= '/' . ($webroot ? $webroot . '/' : '') . $puri['path'];
         }
 
         if (isset($puri['query'])) {
@@ -648,8 +651,8 @@ class Horde
         $ob = new Horde_Url($url, $full);
 
         if (empty($GLOBALS['conf']['session']['use_only_cookies']) &&
-            (($append_session == 1) ||
-             (($append_session == 0) && !isset($_COOKIE[session_name()])))) {
+            ($append_session == 1 ||
+             $append_session == 0 && !isset($_COOKIE[session_name()]))) {
             $ob->add(session_name(), session_id());
         }
 
