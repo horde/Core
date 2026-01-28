@@ -21,9 +21,7 @@ HordeMap.Ocm = Class.create(
             'streets': new OpenLayers.Layer.OSM(
                 'OpenCycleMap',
                 [
-                    'http://a.tile.openstreetmap.org/${z}/${x}/${y}.png',
-                    'http://b.tile.openstreetmap.org/${z}/${x}/${y}.png',
-                    'http://c.tile.openstreetmap.org/${z}/${x}/${y}.png'
+                    'http://tile.openstreetmap.org/${z}/${x}/${y}.png'
                 ],
                 { 'minZoomLevel': 1, 'numZoomLevels': 18 }
             )
