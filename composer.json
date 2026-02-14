@@ -74,7 +74,8 @@
         "horde/view": "^3 || dev-FRAMEWORK_6_0",
         "pear/pear": "*",
         "php81_bc/strftime": "^0.7",
-        "ext-session": "*"
+        "ext-session": "*",
+        "psr/http-factory": "^1"
     },
     "require-dev": {
         "horde/test": "^3 || dev-FRAMEWORK_6_0",
