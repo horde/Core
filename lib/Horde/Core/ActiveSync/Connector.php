@@ -541,7 +541,7 @@ class Horde_Core_ActiveSync_Connector
         }
         $returnFields = ['name', 'email', 'alias', 'smimePublicKey'];
         if (!empty($opts['pictures'])) {
-            $returnFields[$source]['photo'];
+            $returnFields[] = 'photo';
         }
 
         $options = [
