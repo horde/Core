@@ -3700,13 +3700,16 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 } elseif (!empty($query[Horde_ActiveSync_Request_Search::SEARCH_MAXPICTURES]) &&
                           $picture_count > $query[Horde_ActiveSync_Request_Search::SEARCH_MAXPICTURES]) {
                     $picture->status = Horde_ActiveSync_Status::PICTURE_LIMIT_REACHED;
-                } elseif (!empty($query[Horde_ActiveSync_Request_Search::SEARCH_MAXSIZE]) &&
-                          strlen($row['photo']) > $query[Horde_ActiveSync_Request_Search::SEARCH_MAXSIZE]) {
-                    $picture->status = Horde_ActiveSync_Status::PICTURE_TOO_LARGE;
                 } else {
-                    $picture->data = base64_encode($row['photo']['load']['data']);
-                    $picture->status = Horde_ActiveSync_Status::PICTURE_SUCCESS;
-                    ++$picture_count;
+                    $data = $row['photo']['load']['data'];
+                    if (!empty($query[Horde_ActiveSync_Request_Search::SEARCH_MAXSIZE]) &&
+                        strlen($data) > $query[Horde_ActiveSync_Request_Search::SEARCH_MAXSIZE]) {
+                        $picture->status = Horde_ActiveSync_Status::PICTURE_TOO_LARGE;
+                    } else {
+                        $picture->data = base64_encode($data);
+                        $picture->status = Horde_ActiveSync_Status::PICTURE_SUCCESS;
+                        ++$picture_count;
+                    }
                 }
                 $entry[Horde_ActiveSync::GAL_PICTURE] = $picture;
             }
