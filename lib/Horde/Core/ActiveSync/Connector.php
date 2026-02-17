@@ -539,9 +539,9 @@ class Horde_Core_ActiveSync_Connector
         foreach ($sources as $source) {
             $fields[$source] = ['email'];
         }
-        $returnFields = ['name', 'email', 'alias', 'smimePublicKey'];
+        $returnFields = ['name', 'email', 'alias', 'smimePublicKey', 'source'];
         if (!empty($opts['pictures'])) {
-            $returnFields[$source]['photo'];
+            $returnFields[] = 'photo';
         }
 
         $options = [
