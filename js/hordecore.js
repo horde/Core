@@ -64,8 +64,10 @@ var HordeCore = {
         if (t.request.opts) {
             this.endLoading(t.request.opts.loading);
         }
-        this.notify(this.text.ajax_error, 'horde.error');
-        document.fire('HordeCore:ajaxFailure', [ t, o ]);
+        if (!t.request.aborted) {
+          this.notify(this.text.ajax_error, 'horde.error');
+          document.fire('HordeCore:ajaxFailure', [ t, o ]);
+        }
     },
 
     // opts: (Object) ajaxopts, callback, loading, uri

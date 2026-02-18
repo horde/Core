@@ -1635,9 +1635,7 @@ var Try = {
 var Ajax = {
   getTransport: function() {
     return Try.these(
-      function() {return new XMLHttpRequest()},
-      function() {return new ActiveXObject('Msxml2.XMLHTTP')},
-      function() {return new ActiveXObject('Microsoft.XMLHTTP')}
+      function() { return new XMLHttpRequest() }
     ) || false;
   },
 
@@ -1697,7 +1695,7 @@ Ajax.Base = Class.create({
   }
 });
 Ajax.Request = Class.create(Ajax.Base, {
-  _complete: false,
+  aborted: false,
 
   initialize: function($super, url, options) {
     $super(options);
@@ -1734,6 +1732,10 @@ Ajax.Request = Class.create(Ajax.Base, {
       if (this.options.asynchronous) this.respondToReadyState.bind(this).defer(1);
 
       this.transport.onreadystatechange = this.onStateChange.bind(this);
+
+      this.transport.onabort = this.onAbort.bind(this);
+      this.transport.onloadend = this.onLoadEnd.bind(this);
+
       this.setRequestHeaders();
 
       this.body = this.method == 'post' ? (this.options.postBody || params) : null;
@@ -1751,8 +1753,16 @@ Ajax.Request = Class.create(Ajax.Base, {
 
   onStateChange: function() {
     var readyState = this.transport.readyState;
-    if (readyState > 1 && !((readyState == 4) && this._complete))
-      this.respondToReadyState(this.transport.readyState);
+    if (readyState > 1 && readyState < 4)
+      this.respondToReadyState(readyState);
+  },
+
+  onAbort: function() {
+    this.aborted = true;
+  },
+
+  onLoadEnd: function() {
+    this.respondToReadyState(4);
   },
 
   setRequestHeaders: function() {
@@ -1791,6 +1801,9 @@ Ajax.Request = Class.create(Ajax.Base, {
   },
 
   success: function() {
+    if (this.aborted)
+      return false;
+
     var status = this.getStatus();
     return !status || (status >= 200 && status < 300) || status == 304;
   },
@@ -1806,8 +1819,9 @@ Ajax.Request = Class.create(Ajax.Base, {
     var state = Ajax.Request.Events[readyState], response = new Ajax.Response(this);
 
     if (state == 'Complete') {
+      this.transport.onreadystatechange = Prototype.emptyFunction;
+
       try {
-        this._complete = true;
         (this.options['on' + response.status]
          || this.options['on' + (this.success() ? 'Success' : 'Failure')]
          || Prototype.emptyFunction)(response, response.headerJSON);
@@ -1829,9 +1843,6 @@ Ajax.Request = Class.create(Ajax.Base, {
       this.dispatchException(e);
     }
 
-    if (state == 'Complete') {
-      this.transport.onreadystatechange = Prototype.emptyFunction;
-    }
   },
 
   isSameOrigin: function() {
