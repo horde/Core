@@ -51,7 +51,7 @@ class NlsconfigTest extends TestCase
         );
     }
 
-    public function providerForTestGet()
+    public static function providerForTestGet()
     {
         return [
             'languages' => [
