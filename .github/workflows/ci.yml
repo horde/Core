@@ -60,6 +60,11 @@ jobs:
           # Enable dev stability
           composer config minimum-stability dev
 
+          # Force latest versions for selected packages
+          BRANCH_NAME=$COMPOSER_ROOT_VERSION
+          composer require --no-install horde/url:$BRANCH_NAME
+          composer require --no-install --dev horde/test:$BRANCH_NAME
+
           # Install project dependencies
           composer install --no-interaction --prefer-dist
 
