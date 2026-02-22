@@ -480,8 +480,8 @@ class Horde_Registry implements Horde_Shutdown_Task
         $GLOBALS['registry'] = $this;
         $injector->setInstance(__CLASS__, $this);
 
-	/* Setup autoloader instance. */
-	if (!empty($GLOBALS['__autoloader'])) {
+        /* Setup autoloader instance. */
+        if (!empty($GLOBALS['__autoloader'])) {
             $injector->setInstance('Horde_Autoloader', $GLOBALS['__autoloader']);
         }
         /* Import and global Horde's configuration values. */
@@ -1843,6 +1843,144 @@ class Horde_Registry implements Horde_Shutdown_Task
         }
 
         $prefs = $injector->getInstance('Horde_Core_Factory_Prefs')->create($app, $opts);
+    }
+
+    private function loadConfigInternal(string $conf_file, string $app)
+    {
+        global $conf;
+
+        $flist = [];
+        $pinfo = pathinfo($conf_file);
+
+        // Load defaults from the vendor dir.
+        $appConstant = strtoupper($app) . '_BASE';
+        if (defined($appConstant)) {
+            $flist[] = constant($appConstant) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . $conf_file;
+        }
+
+        // Load global configuration file.
+        if (defined('HORDE_CONFIG_BASE')) {
+            $conf_dir = HORDE_CONFIG_BASE . DIRECTORY_SEPARATOR . $app . DIRECTORY_SEPARATOR;
+        } else {
+            $conf_dir = ($app == 'horde' && defined('HORDE_BASE')
+                ? HORDE_BASE
+                : $this->get('fileroot', $app)) . '/config/';
+        }
+        $flist[] = $conf_dir . $conf_file;
+
+        // Load global configuration stanzas in '.d' directory.
+        $dir = $conf_dir . $pinfo['filename'] . '.d';
+        if (is_dir($dir) && ($conf_d = glob($dir . '/*.php')) !== false) {
+            $flist = array_merge($flist, $conf_d);
+        }
+
+        // Load local version of configuration file.
+        $flist[] = $conf_dir . $pinfo['filename'] . '.local.' . $pinfo['extension'];
+
+        // Use closure to load variables in isolated environment
+        $load_vars = function ($file_path) {
+            // Allow the included file to modify global $conf directly
+            global $conf;
+
+            // Include the file within this isolated function scope
+            if (@include($file_path) === false) {
+                return null;
+            }
+
+            unset($file_path, $conf);
+
+            return get_defined_vars();
+        };
+
+        $vhosts = true;
+        $load = 0;
+
+        $checked = [];
+
+        $all_vars = [];
+        while (($v = array_shift($flist))) {
+            $v = realpath($v);
+            if ($v !== false && !in_array($v, $checked, true)) {
+                $checked[] = $v;
+                if (is_file($v)) {
+                    $loaded = $load_vars($v);
+                    if (is_null($loaded)) {
+                        throw new Horde_Exception(sprintf('Failed to import configuration file "%s".', $v));
+                    }
+
+                    $all_vars = array_merge($all_vars, $loaded);
+                    ++$load;
+                }
+            }
+
+            if ($vhosts && !$flist && ($conf['vhosts'] ?? false)) {
+                /* Load vhost configuration file. The vhost conf.php is not
+                 * determined until here because, if this is Horde, the vhost
+                 * configuration variable is not available until this
+                 * point. */
+                $vhosts = false;
+                $flist[] = $conf_dir . $pinfo['filename'] . '-' . $conf['server']['name'] . '.' . $pinfo['extension'];
+            }
+        }
+
+        // Return an error if no version of the config file exists.
+        if (!$load) {
+            throw new Horde_Exception(sprintf('Failed to import configuration file "%s".', $conf_dir . $conf_file));
+        }
+
+        Horde::log(
+            'Load config file (' . $conf_file . '; app: ' . $app . ')',
+            'DEBUG'
+        );
+
+        return $all_vars;
+    }
+
+    private static function getVariables($all_vars, $vars)
+    {
+        if (!is_null($vars)) {
+            if (!is_array($vars)) {
+                $vars = [$vars];
+            }
+
+            $all_vars = array_intersect_key($all_vars, array_flip($vars));
+        }
+
+        return $all_vars;
+    }
+
+    /**
+     * Load a configuration file from a Horde application's config directory.
+
+     * @param string $conf_file  Configuration file name.
+     * @param mixed  $vars       List of config variables to load.
+     * @param string $app        Application.
+     *
+     * @throws Horde_Exception
+     */
+    public function loadConfig($conf_file, $vars = null, $app = null)
+    {
+        if (is_null($app)) {
+            $app = $this->getApp();
+        }
+
+        return self::getVariables($this->loadConfigInternal($conf_file, $app), $vars);
+    }
+
+    // if we really need to cache (probably not)
+    public function loadConfigCached($conf_file, $vars = null, $app = null)
+    {
+        if (is_null($app)) {
+            $app = $this->getApp();
+        }
+
+        $cached = $this->_cache['cfile'][$app][$conf_file] ?? null;
+        if ($cached === null) {
+            $cached = $this->loadConfigInternal($conf_file, $app);
+            $this->_cache['cfile'][$app][$conf_file] = $cached;
+        }
+
+        return self::getVariables($cached, $vars);
     }
 
     /**
