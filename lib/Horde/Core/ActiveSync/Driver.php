@@ -1408,8 +1408,8 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     $message = $this->_connector->calendar_export($id, [
                         'protocolversion' => $this->_version,
                         'truncation' => empty($collection['truncation']) ? Horde_ActiveSync::TRUNCATION_9 : $collection['truncation'],
-                        'bodyprefs' => !empty($collection['bodyprefs']) ? $collection['bodyprefs'] : [],
-                        'mimesupport' => !empty($collection['mimesupport']) ? $collection['mimesupport'] : 0], $folder_id);
+                        'bodyprefs' => $collection['bodyprefs'] ?? [],
+                        'mimesupport' => $collection['mimesupport'] ?? 0], $folder_id);
 
                     // Nokia MfE requires the optional UID element.
                     if (!$message->getUid()) {
@@ -1459,8 +1459,8 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     $message = $this->_connector->contacts_export($id, [
                         'protocolversion' => $this->_version,
                         'truncation' => empty($collection['truncation']) ? Horde_ActiveSync::TRUNCATION_9 : $collection['truncation'],
-                        'bodyprefs' => !empty($collection['bodyprefs']) ? $collection['bodyprefs'] : [],
-                        'mimesupport' => !empty($collection['mimesupport']) ? $collection['mimesupport'] : 0,
+                        'bodyprefs' => $collection['bodyprefs'] ?? [],
+                        'mimesupport' => $collection['mimesupport'] ?? 0,
                         'device' => $this->_device]);
                 } catch (Horde_Exception_NotFound $e) {
                     $this->_logger->err($e->getMessage());
@@ -1477,9 +1477,9 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 try {
                     $message = $this->_connector->tasks_export($id, [
                         'protocolversion' => $this->_version,
-                        'truncation' => empty($collection['truncation']) ? Horde_ActiveSync::TRUNCATION_9 : $collection['truncation'],
-                        'bodyprefs' => !empty($collection['bodyprefs']) ? $collection['bodyprefs'] : [],
-                        'mimesupport' => !empty($collection['mimesupport']) ? $collection['mimesupport'] : 0]);
+                        'truncation' => $collection['truncation'] ?? Horde_ActiveSync::TRUNCATION_9,
+                        'bodyprefs' => $collection['bodyprefs'] ?? [],
+                        'mimesupport' => $collection['mimesupport'] ?? 0]);
                 } catch (Horde_Exception_NotFound $e) {
                     $this->_logger->err($e->getMessage());
                     $this->_endBuffer();
@@ -1517,14 +1517,10 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                         [$id],
                         [
                             'protocolversion' => $this->_version,
-                            'truncation' => !empty($collection['truncation'])
-                                ? $collection['truncation']
-                                : (!empty($collection['mimetruncation']) ? $collection['mimetruncation'] : false),
-                            'bodyprefs'  => !empty($collection['bodyprefs']) ? $collection['bodyprefs'] : [],
-                            'bodypartprefs' => !empty($collection['bodypartprefs'])
-                                ? $collection['bodypartprefs']
-                                : false,
-                            'mimesupport' => !empty($collection['mimesupport']) ? $collection['mimesupport'] : 0,
+                            'truncation' => $collection['truncation'] ?? $collection['mimetruncation'] ?? false),
+                            'bodyprefs'  => $collection['bodyprefs'] ?? [],
+                            'bodypartprefs' => $collection['bodypartprefs'] ?? false,
+                            'mimesupport' => $collection['mimesupport'] ?? : 0,
                         ]
                     );
                 } catch (Horde_ActiveSync_Exception $e) {
