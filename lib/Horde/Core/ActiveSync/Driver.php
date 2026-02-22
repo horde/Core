@@ -1495,9 +1495,9 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 try {
                     $message = $this->_connector->notes_export($id, [
                         'protocolversion' => $this->_version,
-                        'truncation' => empty($collection['truncation']) ? Horde_ActiveSync::TRUNCATION_9 : $collection['truncation'],
-                        'bodyprefs' => !empty($collection['bodyprefs']) ? $collection['bodyprefs'] : [],
-                        'mimesupport' => !empty($collection['mimesupport']) ? $collection['mimesupport'] : 0]);
+                        'truncation' => $collection['truncation'] ?? Horde_ActiveSync::TRUNCATION_9,
+                        'bodyprefs' => $collection['bodyprefs'] ?? [],
+                        'mimesupport' => $collection['mimesupport'] ?? 0]);
                 } catch (Horde_Exception_NotFound $e) {
                     $this->_logger->err($e->getMessage());
                     $this->_endBuffer();
@@ -1526,14 +1526,12 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 } catch (Horde_ActiveSync_Exception $e) {
                     $this->_logger->err($e->getMessage());
                     $context = 'Protocol Version: ' . $this->_version . "\r\n"
-                        . 'Truncation: ' . (!empty($collection['truncation'])
-                            ? $collection['truncation']
-                            : (!empty($collection['mimetruncation']) ? $collection['mimetruncation'] : 'false')) . "\r\n"
-                        . 'BodyPrefs: ' . print_r(!empty($collection['bodyprefs']) ? $collection['bodyprefs'] : [], true) . "\r\n"
+                        . 'Truncation: ' . $collection['truncation'] ?? $collection['mimetruncation'] ?? 'false' . "\r\n"
+                        . 'BodyPrefs: ' . print_r($collection['bodyprefs'] ?? [], true) . "\r\n"
                         . 'BodyPartPrefs: ' . (!empty($collection['bodypartprefs'])
                             ? print_r($collection['bodypartprefs'], true)
                             : 'false') . "\r\n"
-                        . 'MimeSupport: ' . (!empty($collection['mimesupport']) ? $collection['mimesupport'] : 0);
+                        . 'MimeSupport: ' . ($collection['mimesupport'] ?? 0);
 
                     $this->_logger->err($context);
 
