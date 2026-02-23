@@ -66,7 +66,7 @@ class Horde_Core_Factory_HashTable extends Horde_Core_Factory_Injector
                 $redis_params = [];
 
                 $common = array_filter([
-                    'password' => !empty($params['password']) ? $params['password'] : null,
+                    'password' => $params['password'] ?? null,
                     'persistent' => !empty($params['persistent']),
                     'database' => !empty($params['database']) ? $params['database'] : null,
                 ]);
