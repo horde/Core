@@ -1517,7 +1517,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                         [$id],
                         [
                             'protocolversion' => $this->_version,
-                            'truncation' => $collection['truncation'] ?? $collection['mimetruncation'] ?? false),
+                            'truncation' => $collection['truncation'] ?? $collection['mimetruncation'] ?? false,
                             'bodyprefs'  => $collection['bodyprefs'] ?? [],
                             'bodypartprefs' => $collection['bodypartprefs'] ?? false,
                             'mimesupport' => $collection['mimesupport'] ?? : 0,
