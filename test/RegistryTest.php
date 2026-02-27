@@ -28,13 +28,16 @@ use Horde_Registry_Hordeconfig;
  */
 class RegistryTest extends TestCase
 {
-    protected $_tmpdir;
+    protected string $_tmpdir = '';
 
     public function tearDown(): void
     {
-        if (is_dir($this->_tmpdir)) {
-            rmdir($this->_tmpdir);
-            rmdir(dirname($this->_tmpdir));
+        if ($this->_tmpdir != '') {
+            if (is_dir($this->_tmpdir)) {
+                rmdir($this->_tmpdir);
+                rmdir(dirname($this->_tmpdir));
+            }
+            $this->_tmpdir = '';
         }
     }
 
