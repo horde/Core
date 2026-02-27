@@ -42,6 +42,7 @@ trait SetUpTrait
     protected RequestHandlerInterface $defaultPayloadHandler;
     protected ?ServerRequest $recentlyHandledRequest;
     protected RampageRequestHandler $handler;
+    protected Horde_Auth_Base $authDriver;
 
     protected function setUp(): void
     {
