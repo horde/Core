@@ -455,6 +455,8 @@ class Horde_Registry implements Horde_Shutdown_Task
             'Text_LanguageDetect' => 'Horde_Core_Factory_LanguageDetect',
             Horde\Core\Middleware\AuthHttpBasic::class => Horde\Core\Factory\AuthHttpBasicFactory::class,
             Horde\Log\Logger::class => Horde\Core\Factory\LoggerFactory::class,
+            'Horde\\Horde\\Service\\JwtService' => 'Horde\\Horde\\Factory\\JwtServiceFactory',
+            'Horde\\Horde\\Service\\AuthenticationService' => 'Horde\\Horde\\Factory\\AuthenticationServiceFactory',
         ];
 
         /* Define implementations. */
