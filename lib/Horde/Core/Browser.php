@@ -18,7 +18,7 @@ class Horde_Core_Browser extends Horde_Browser
 {
     /**
      */
-    public function match($userAgent = null, $accept = null)
+    public function match($userAgent = null, $accept = null): void
     {
         parent::match($userAgent, $accept);
 
