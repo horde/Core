@@ -4,6 +4,7 @@ namespace Horde\Core;
 
 use Horde\Core\Middleware\AppFinder;
 use Horde\Core\Middleware\AppRouter;
+use Horde\Horde\Middleware\JwtSession;
 use Horde\Http\RequestFactory;
 use Horde\Http\UriFactory;
 use Horde\Http\ResponseFactory;
@@ -37,6 +38,9 @@ class RampageBootstrap
         $request = $requestBuilder->withGlobalVariables()->build();
         $injector = new Horde_Injector_TopLevel();
         $middlewares = [
+            // JWT Session middleware - runs BEFORE HordeCoreMiddleware
+            // Sets custom session ID from JWT refresh token if present
+            new JwtSession(),
             // TODO: Unconditionally setup the output compressor, it should act only upon an attribute
             // TODO: Unconditionally setup the error handler
             // Setup the horde init middleware. It will add more middleware to the stack
