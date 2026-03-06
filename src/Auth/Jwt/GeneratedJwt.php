@@ -21,11 +21,25 @@ class GeneratedJwt
     /**
      * @param string $token The JWT token string
      * @param int $expiresAt Unix timestamp when the JWT expires
+     * @param array $claims The JWT claims (for easy access to jti, sub, etc.)
      */
     public function __construct(
         public readonly string $token,
-        public readonly int $expiresAt
+        public readonly int $expiresAt,
+        public readonly array $claims = []
     ) {}
+
+    /**
+     * Get a specific claim value
+     *
+     * @param string $name Claim name (e.g., 'jti', 'sub', 'iss')
+     * @param mixed $default Default value if claim doesn't exist
+     * @return mixed
+     */
+    public function getClaim(string $name, mixed $default = null): mixed
+    {
+        return $this->claims[$name] ?? $default;
+    }
 
     /**
      * Check if the JWT is expired

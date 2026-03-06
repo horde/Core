@@ -77,7 +77,7 @@ class Hs256Generator
         // Construct JWT
         $jwt = "{$signatureBase}.{$signature}";
 
-        return new GeneratedJwt($jwt, $finalExpiresAt);
+        return new GeneratedJwt($jwt, $finalExpiresAt, $payload);
     }
 
     /**
