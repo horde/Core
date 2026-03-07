@@ -620,7 +620,7 @@ class Horde_PageOutput
                 $this->addInlineJsVars([
                     'HordeMobile.conf' => [
                         'ajax_url' => $registry->getServiceLink('ajax', $registry->getApp())->url,
-                        'logout_url' => strval($registry->getServiceLink('logout')),
+                        'logout_url' => $registry->get('webroot', 'horde') . '/auth/logout',
                         'sid' => SID,
                         'token' => $session->getToken(),
                     ],
