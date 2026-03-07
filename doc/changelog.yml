@@ -1,4 +1,74 @@
 ---
+3.0.0-beta3:
+  api: 3.0.0-beta3
+  state:
+    release: beta
+    api: beta
+  date: 2026-03-07
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    feat(responsive): add modern PSR-4 assets and view components
+    feat(auth): add JWT session binding support to Core
+    feat(auth): register JWT and Authentication service factories
+    Update HashTable.php
+    fix: Deprecated strlen(null) in Redis Hashtable on PHP 8.1+
+    feat(auth): add HS256 JWT generation and verification
+    feat(auth): add JWT generation support to Core
+    fix(core): add void return type to Browser::match()
+    Merge pull request #53 from amulet1/fix_deprecations
+    fix: Adjust code to avoid passing null value to is_dir()
+    fix: Add missing declaration of $authDriver property
+    Merge pull request #52 from amulet1/patch-1
+    (fix) Remove superfluous ':' in Driver.php
+    Merge pull request #51 from amulet1/patch-1
+    fix: Remove superfluous ')'
+    Merge pull request #30 from horde/TDannhauer-patch-ActiveSyncDriver1
+    Fix truncation and bodypartprefs logging
+    Update Driver.php
+    Refactor ActiveSync Driver to use null coalescing
+    Merge pull request #43 from CommanderRoot/update_openstreetmap_tile_url
+    Merge pull request #48 from amulet1/improve_ci
+    ci: Use latest dev-versions of horde/url and horde/test for unit tests
+    Merge pull request #47 from amulet1/fix_nlsconfig_test
+    fix: Correct Data Provider signature for Nlsconfigtest
+    Merge pull request #46 from amulet1/fix_js_xhr_abort
+    fix: Do not report 'Error when communicating with server' and similar errors triggered by user (browser) actions
+    Merge pull request #45 from amulet1/activesync_fix
+    fix: Correct maximum photo size check in _searchGal()
+    fix: Add missing 'source' field (expected by Horde_Core_ActiveSync_Driver::resolveRecipient)
+    fix: Correct broken code to support photos in resolveRecipient()
+    fix: Correct maximum photo size check
+    Merge pull request #40 from amulet1/amulet1-ci-fixes2
+    Merge pull request #39 from amulet1/fix_loadconfig
+    Use preferred tile.openstreetmap.org URL
+    fix: Prevent duplicate configuration file includes
+    Merge pull request #42 from amulet1/fix_host_undefined
+    fix: Redesign Horde::url() to fix undefined array key errors
+    Merge pull request #41 from amulet1/fix_activesync_undefined
+    fix: Use null coalescing operator in Horde_Core_ActiveSync_Driver to avoid undefined array key errors
+    fix: Adjust phpunit.xml.dist to initialize autoloader using test/bootstrap.php
+    fix: Add psr/http-factory to composer.json
+    fix: Redesign ci.yml to work again  * Replace unsupported ubuntu-20-04 with ubuntu-22.04  * Drop support for PHP 7.4 and 8.0  * Add support for PHP 8.1, 8.2, 8.3, 8.4  * Remove unused ssh keys  * Allow horde/horde-installer-plugin  * Other improvements
+    Merge pull request #38 from amulet1/fix_help_href
+    fix: Generate correct URLs for `href` tags in Horde_Help
+    Merge pull request #37 from amulet1/fix-signurl
+    fix: Add '=' after '_h' for Horde_Url objects in signUrl()/signQueryString()
+    Merge pull request #36 from amulet1/fix_SID
+    fix: Use session name when setting SID parameter
+    Merge pull request #29 from amulet1/autoload-fixes
+    Merge pull request #35 from jcdelepine/FRAMEWORK_6_0
+    meta:  correct Last-Translator email address
+    Merge pull request #31 from amulet1/fix-double-declaration
+    Merge pull request #32 from amulet1/fix_18cabbb
+    fix: Unbreak monthdateyear field rendering
+    Merge pull request #28 from amulet1/fix_signing
+    fix: Set $app if not supplied in getInitialPage()
+    Update Driver.php
+    fix: Add support for autoloading of *_Ui_VarRenderer_* classes
+    fix: Remove extraneous '=' in signUrl() and signQueryString()
+    fix: Rendering invalid form types requires getter for message.
 3.0.0-beta2:
   api: 3.0.0-alpha1
   state:
