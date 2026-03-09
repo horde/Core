@@ -51,8 +51,8 @@ class ResponsiveAssets
     /**
      * Get list of responsive CSS URLs to load
      *
-     * Returns URLs in cascade order:
-     * 1. Horde base theme CSS
+     * Returns URLs in cascade order with fallback to default theme:
+     * 1. Horde base theme CSS (selected theme, falls back to default)
      * 2. Application theme CSS (if exists and app != horde)
      *
      * @param string|null $theme Theme name (null = use preference)
@@ -68,14 +68,22 @@ class ResponsiveAssets
         $cssFiles = ['responsive.css'];
 
         foreach ($cssFiles as $file) {
-            // Check Horde base theme
+            // Check Horde base theme - with fallback to default
             if ($this->cssFileExists($file, $theme, 'horde')) {
                 $urls[] = $this->buildCssUrl($file, $theme, 'horde');
+            } elseif ($theme !== 'default' && $this->cssFileExists($file, 'default', 'horde')) {
+                // Fallback to default theme
+                $urls[] = $this->buildCssUrl($file, 'default', 'horde');
             }
 
-            // Check app-specific theme (if not horde)
-            if ($app !== 'horde' && $this->cssFileExists($file, $theme, $app)) {
-                $urls[] = $this->buildCssUrl($file, $theme, $app);
+            // Check app-specific theme (if not horde) - with fallback to default
+            if ($app !== 'horde') {
+                if ($this->cssFileExists($file, $theme, $app)) {
+                    $urls[] = $this->buildCssUrl($file, $theme, $app);
+                } elseif ($theme !== 'default' && $this->cssFileExists($file, 'default', $app)) {
+                    // Fallback to default theme
+                    $urls[] = $this->buildCssUrl($file, 'default', $app);
+                }
             }
         }
 
@@ -85,7 +93,7 @@ class ResponsiveAssets
     /**
      * Get list of responsive JavaScript URLs to load
      *
-     * Returns URLs in cascade order:
+     * Returns URLs in cascade order with fallback to default theme:
      * 1. Horde base JS
      * 2. Application JS (if exists and app != horde)
      *
