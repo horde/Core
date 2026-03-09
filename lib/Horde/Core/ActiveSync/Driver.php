@@ -148,9 +148,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             $this->_imap = $this->_params['imap'];
             unset($this->_params['imap']);
         }
-        if (!empty($this->_params['cache'])) {
-            $this->_cache = $this->_params['cache'];
-        }
+        $this->_cache = $this->_params['cache'] ?? null;
 
         // Build the displaymap
         $this->_displayMap = [
@@ -2228,20 +2226,24 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             case 'gal':
                 return $this->_searchGal($query);
             case 'mailbox':
-                if (!empty($this->_cache)) {
-                    $clear_cache = !empty($query['rebuildresults']);
-                    unset($query['rebuildresults']);
+                $results = null;
+                if ($this->_cache) {
                     $cache_key = $GLOBALS['registry']->getAuth() . ':HCASD:' . hash('md5', serialize($query));
-                    if ($clear_cache) {
-                        $this->_cache->expire($cache_key);
+                    if ($this->_cache->exists($cache_key, 0)) {
+                        if (empty($query['rebuildresults'])) {
+                            $results = json_decode($this->_cache->get($cache_key, 0), true);
+                        } else {
+                            $this->_cache->expire($cache_key);
+                        }
                     }
                 }
-                if (!empty($this->_cache) && $this->_cache->exists($cache_key, 0)) {
-                    $results = json_decode($this->_cache->get($cache_key, 0), true);
-                } else {
+
+                unset($query['rebuildresults']);
+
+                if ($results === null) {
                     try {
                         $results = $this->_searchMailbox($query);
-                        if (!empty($this->_cache)) {
+                        if ($this->_cache) {
                             $this->_cache->set($cache_key, json_encode($results));
                         }
                     } catch (Horde_ActiveSync_Exception $e) {
