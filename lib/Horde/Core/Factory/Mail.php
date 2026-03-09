@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright 2013-2026 Horde LLC (http://www.horde.org/)
  *
@@ -101,13 +100,42 @@ class Horde_Core_Factory_Mail extends Horde_Core_Factory_Base
          * running from CLI with 'user_admin' registry flag, which sets
          * the authentication name but not the credentials. */
         if (strcasecmp($transport, 'smtp') === 0) {
-            if ($registry->isAuthenticated()
-                && strlen((string) ($auth = $registry->getAuth()))) {
-                if (!empty($params['username_auth'])) {
-                    $params['username'] = $auth;
-                }
-                if (!empty($params['password_auth'])) {
-                    $params['password'] = $registry->getAuthCredential('password');
+            if ($registry->isAuthenticated() &&
+                strlen((string) ($auth = $registry->getAuth()))) {
+                /* Try to get SMTP credentials via hook (e.g. for XOAUTH2 support). */
+                try {
+                    $hooks = $this->_injector->getInstance('Horde_Core_Hooks');
+                    $smtp_creds = $hooks->callHook('smtp_credentials', 'horde', [$auth]);
+
+                    // Hook returned XOAUTH2 credentials
+                    if (isset($smtp_creds['xoauth2_token'])) {
+                        $params['xoauth2_token'] = $smtp_creds['xoauth2_token'];
+                        if (isset($smtp_creds['username'])) {
+                            $params['username'] = $smtp_creds['username'];
+                        }
+                        // Don't set password when using XOAUTH2
+                    } else {
+                        // Hook returned regular credentials
+                        if (isset($smtp_creds['username'])) {
+                            $params['username'] = $smtp_creds['username'];
+                        } elseif (!empty($params['username_auth'])) {
+                            $params['username'] = $auth;
+                        }
+
+                        if (isset($smtp_creds['password'])) {
+                            $params['password'] = $smtp_creds['password'];
+                        } elseif (!empty($params['password_auth'])) {
+                            $params['password'] = $registry->getAuthCredential('password');
+                        }
+                    }
+                } catch (Horde_Exception_HookNotSet $e) {
+                    // No hook defined, use default username/password
+                    if (!empty($params['username_auth'])) {
+                        $params['username'] = $auth;
+                    }
+                    if (!empty($params['password_auth'])) {
+                        $params['password'] = $registry->getAuthCredential('password');
+                    }
                 }
             }
 
