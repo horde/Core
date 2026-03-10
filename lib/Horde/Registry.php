@@ -2567,8 +2567,6 @@ class Horde_Registry implements Horde_Shutdown_Task
         global $injector;
 
         $out = new stdClass();
-
-        $dns = $injector->getInstance('Net_DNS2_Resolver');
         $old_error = error_reporting(0);
 
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
@@ -2582,6 +2580,20 @@ class Horde_Registry implements Horde_Shutdown_Task
             }
             $out->proxy = false;
         }
+
+        // Check registry setting for DNS resolution
+        // Default to false (disabled) for performance
+        $resolve = !empty($this->applications['horde']['resolve_hostnames']);
+
+        if (!$resolve && !isset($out->host)) {
+            // Performance mode: Skip DNS resolution, use IP as hostname
+            $out->host = $out->addr;
+            error_reporting($old_error);
+            return $out;
+        }
+
+        // Legacy mode: Perform DNS resolution
+        $dns = $injector->getInstance('Net_DNS2_Resolver');
 
         if ($dns && !isset($out->host)) {
             $out->host = $out->addr;
