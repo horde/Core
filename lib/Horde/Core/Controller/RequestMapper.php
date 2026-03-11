@@ -12,6 +12,8 @@
  * @package  Core
  */
 
+use Horde\Routes\Mapper;
+
 /**
  * The Horde_Core_Controller_RequestMapper class provides
  * logic to identify which app is supposed to handle the request.
@@ -42,11 +44,11 @@
 class Horde_Core_Controller_RequestMapper
 {
     /**
-     * @var Horde_Routes_Mapper $mapper
+     * @var Mapper $mapper
      */
     protected $_mapper;
 
-    public function __construct(Horde_Routes_Mapper $mapper)
+    public function __construct(Mapper $mapper)
     {
         $this->_mapper = $mapper;
     }

@@ -437,6 +437,7 @@ class Horde_Registry implements Horde_Shutdown_Task
             'Horde_Perms' => 'Horde_Core_Factory_Perms',
             'Horde_Queue_Storage' => 'Horde_Core_Factory_QueueStorage',
             'Horde_Routes_Mapper' => 'Horde_Core_Factory_Mapper',
+            Horde\Routes\Mapper::class => 'Horde_Core_Factory_Mapper',
             'Horde_Routes_Matcher' => 'Horde_Core_Factory_Matcher',
             'Horde_Secret' => 'Horde_Core_Factory_Secret',
             'Horde_Secret_Cbc' => 'Horde_Core_Factory_Secret_Cbc',
