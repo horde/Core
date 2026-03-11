@@ -1224,7 +1224,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                         if ($ping_res) {
                             $changes['add'] = [1];
                         }
-                    } catch (Horde_ActiveSync_Exeption_StaleState $e) {
+                    } catch (Horde_ActiveSync_Exception_StaleState $e) {
                         $this->_endBuffer();
                         throw $e;
                     } catch (Horde_ActiveSync_Exception_FolderGone $e) {
@@ -1485,7 +1485,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 } catch (Horde_Exception $e) {
                     $this->_logger->err($e->getMessage());
                     $this->_endBuffer();
-                    throw new Horde_ActiveSync_Exception($e->getMessage);
+                    throw new Horde_ActiveSync_Exception($e->getMessage());
                 }
                 break;
 
@@ -1503,7 +1503,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 } catch (Horde_Exception $e) {
                     $this->_logger->err($e->getMessage());
                     $this->_endBuffer();
-                    throw new Horde_ActiveSync_Exception($e->getMessage);
+                    throw new Horde_ActiveSync_Exception($e->getMessage());
                 }
                 break;
 
@@ -2200,67 +2200,75 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     }
 
     /**
-     * Returns array of items which contain contact information
+     * Returns search results for the given search parameters.
      *
-     * @param string $type   The search type; ['gal'|'mailbox']
-     * @param array $query   The search query. An array containing:
-     *  - query:          (array) The search query. Contains at least:
-     *                    'query' and 'range'. The rest depends on the type of
-     *                    search being performed.
-     *                    DEFAULT: none, REQUIRED
-     *  - range:          (string)   A range limiter.
-     *                     DEFAULT: none (No range used).
-     *  - rebuildresults: (boolean)  If true, invalidate any cached search.
-     *                    DEFAULT: Use cached search results if available.
-     *  - deeptraversal:  (boolean) If true, traverse sub folders.
-     *                    @todo NOT IMPLEMENTED YET.
+     * @param Horde_ActiveSync_Search_Params $params  The search parameters.
      *
-     * @return array|null  An array of search results or null on error.
+     * @return Horde_ActiveSync_Search_Results  The search results.
+     *
+     * @todo $params->deepTraversal is NOT YET SUPPORTED.
      */
-    public function getSearchResults($type, array $query)
+    public function getSearchResults(Horde_ActiveSync_Search_Params $params): Horde_ActiveSync_Search_Results
     {
-        $type = Horde_String::lower($type);
+        $type = Horde_String::lower($params->type);
+        $rows = null;
 
-        $results = null;
         if ($this->_cache) {
-            $cache_key = 'HCASD:' . $type . ':' . $GLOBALS['registry']->getAuth() . ':' . hash('md5', serialize($query));
+            $cache_key = 'HCASD:' . $type . ':' . $GLOBALS['registry']->getAuth() . ':' . hash('md5', serialize([$params->query, $params->deepTraversal, $params->options]));
             if ($this->_cache->exists($cache_key, 0)) {
-                if (empty($query['rebuildresults'])) {
-                    $results = json_decode($this->_cache->get($cache_key, 0), true);
-                } else {
+                if ($params->rebuildResults) {
                     $this->_cache->expire($cache_key);
+                } else {
+                    $rows = json_decode($this->_cache->get($cache_key, 0), true);
                 }
             }
         }
 
-        if ($results === null) {
+        if ($rows === null) {
+            ob_start();
             try {
                 switch ($type) {
                 case 'gal':
-                    $results = $this->_searchGal($query);
+                    $rows = $this->_searchGal($params->query, $params->options, $params->deepTraversal);
                     break;
                 case 'mailbox':
-                    $results = $this->_searchMailbox($query);
+                    $rows = $this->_searchMailbox($params->query, $params->options, $params->deepTraversal);
                     break;
                 case 'documentlibrary':
-                    foreach ($query['query'][0] as $q) {
+                    foreach ($params->query[0] as $q) {
                         if (!empty($q['DocumentLibrary:LinkId'])) {
-                            $results = $this->_connector->files_browse($q['DocumentLibrary:LinkId']);
+                            $rows = $this->_connector->files_browse($q['DocumentLibrary:LinkId']);
                         }
                     }
                     break;
                 }
             } catch (Horde_ActiveSync_Exception $e) {
                 $this->_logger->err($e->getMessage());
-                $results = null;
+                $rows = null;
             }
 
-            if ($results !== null && $this->_cache) {
-                $this->_cache->set($cache_key, json_encode($results));
+            $this->_endBuffer();
+
+            if ($rows !== null && $this->_cache) {
+                $this->_cache->set($cache_key, json_encode($rows));
             }
         }
 
-        return $results;
+
+        if ($rows === null) {
+            $total = 0;
+        } else {
+            $total = count($rows);
+            if ($params->limit > 0) {
+                $rows = array_slice($rows, $params->start, $params->limit);
+            }
+        }
+
+        return new Horde_ActiveSync_Search_Results(
+            total: $total,
+            rows: $rows,
+            status: 0 /* not yet used */
+        );
     }
 
     /**
@@ -2301,13 +2309,13 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
 
         ob_start();
         $mailer = new Horde_Core_ActiveSync_Mail($this->_imap, $this->_user, $this->_version);
-        $raw_message = !empty($message)
+        $raw_message = $message
             ? new Horde_ActiveSync_Rfc822($message->mime)
             : new Horde_ActiveSync_Rfc822($rfc822);
         $mailer->setRawMessage($raw_message);
 
         // Replace the entire original MIME part? Save in sent?
-        if (!empty($message)) {
+        if ($message) {
             $mailer->replacemime = $message->replacemime;
             $save = $message->saveinsent;
         }
@@ -2325,8 +2333,8 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 // In EAS 16.0, forwardees are passed as forwardee objects in
                 // the forwardees property.
                 if ($forward === true) {
-                    if (!empty($message) && !empty($message->forwardees)) {
-                        $fowardees = $message->forwardees;
+                    if ($message && !empty($message->forwardees)) {
+                        $forwardees = $message->forwardees;
                     } else {
                         $forwardees = [];
                     }
@@ -3014,10 +3022,8 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         }
 
         // Update the vCal so the response will be reflected when imported.
-        $ident = $injector
-            ->getInstance('Horde_Core_Factory_Identity')
-            ->create($this->_user);
-        $cn = $ident->getValue('fullname');
+        $ident = $injector->getInstance('Horde_Core_Factory_Identity')->create($this->_user);
+        //$cn = $ident->getValue('fullname');
         $email = $ident->getValue('from_addr');
         switch ($response['response']) {
             case Horde_ActiveSync_Request_MeetingResponse::RESPONSE_ACCEPTED:
@@ -3057,6 +3063,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             }
             // Start building the iTip response email.
             try {
+                //FIXME: not used
                 $organizer = parse_url($vEvent->getAttribute('ORGANIZER'));
                 $organizer = $organizer['path'];
             } catch (Horde_Icalendar_Exception $e) {
@@ -3064,8 +3071,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 throw new Horde_ActiveSync_Exception($e);
             }
 
-            $ident = $injector->getInstance('Horde_Core_Factory_Identity')
-                ->create($event->creator);
+            $ident = $injector->getInstance('Horde_Core_Factory_Identity')->create($vEvent->creator);
             if (!$ident->getValue('from_addr')) {
                 throw new Horde_ActiveSync_Exception(_('You do not have an email address configured in your Personal Information Preferences.'));
             }
@@ -3282,7 +3288,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      * Helper to build a folder object for non-email folders.
      *
      * @param string $id      The folder's server id.
-     * @param stirng $parent  The folder's parent id.
+     * @param string $parent  The folder's parent id.
      * @param integer $type   The folder type.
      * @param string $name    The folder description.
      *
@@ -3586,43 +3592,47 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     /**
      * Perform a search of the email store.
      *
-     * @param array $query  A query array. @see self::getSearchResults()
+     * @param array $query          A query array. @see self::getSearchResults()
+     * @param array $options        The search options (currently ignored).
+     * @param bool  $deepTraversal  If true, traverse sub folders (currently ignored) 
      *
-     * @return array  The results array. @see self::getSearchResults()
+     * @return array|null           An array of search results or null on error 
+     *
+     * @see self::getSearchResults()
      */
-    protected function _searchMailbox(array $query)
+    protected function _searchMailbox(array $query, array $options, bool $deepTraversal): ?array
     {
-        return $this->_imap->queryMailbox($query);
+        return $this->_imap->queryMailbox($query, $options, $deepTraversal);
     }
 
     /**
      * Perform a search of the Global Address Book.
      *
-     * @param array $query  A query array. @see self::getSearchResults()
+     * @param array $query          A query array. @see self::getSearchResults()
+     * @param array $options        The search options (partially supported).
+     * @param bool  $deepTraversal  If true, traverse sub folders (currently ignored) 
      *
-     * @return array  The results array. @see self::getSearchResults()
+     * @return array|null           An array of search results or null on error 
+     *
+     * @see self::getSearchResults()
      */
-    protected function _searchGal(array $query)
+    protected function _searchGal(array $query, array $options, bool $deepTraversal): ?array
     {
-        ob_start();
-        $return = [];
-
         // If no perms to the GAL, return zero results.
         $perms = $GLOBALS['injector']->getInstance('Horde_Perms');
         if ($perms->exists('horde:activesync:no_gal') &&
             $perms->getPermissions('horde:activesync:no_gal', $this->_user)) {
-            return $return;
+            return null;
         }
 
         try {
             $rows = $this->_connector->contacts_search(
-                $query['query'],
-                [ 'pictures' => !empty($query[Horde_ActiveSync_Request_Search::SEARCH_PICTURE]) ]
+                $query,
+                [ 'pictures' => !empty($options[Horde_ActiveSync_Request_Search::SEARCH_PICTURE]) ]
             );
         } catch (Horde_ActiveSync_Exception $e) {
             $this->_logger->err($e);
-            $this->_endBuffer();
-            return $return;
+            return null;
         }
 
         $rows = array_pop($rows) ?? [];
@@ -3630,6 +3640,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         $this->_logger->meta(sprintf('Horde_Core_ActiveSync_Driver::_searchGal() found %d matches.', count($rows)));
 
         $picture_count = 0;
+        $return = [];
         foreach ($rows as $row) {
             // Explicitly disallow returning contact groups since EAS clients
             // only expect a SINGLE email address to be returned. Returning
@@ -3653,17 +3664,18 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 Horde_ActiveSync::GAL_TITLE        => $row['title']      ?? '',
                 Horde_ActiveSync::GAL_OFFICE       => $row['office']     ?? '',
             ];
-            if (!empty($query[Horde_ActiveSync_Request_Search::SEARCH_PICTURE])) {
+
+            if (!empty($options[Horde_ActiveSync_Request_Search::SEARCH_PICTURE])) {
                 $picture = Horde_ActiveSync::messageFactory('GalPicture');
                 if (empty($row['photo'])) {
                     $picture->status = Horde_ActiveSync_Status::NO_PICTURE;
-                } elseif (!empty($query[Horde_ActiveSync_Request_Search::SEARCH_MAXPICTURES]) &&
-                          $picture_count > $query[Horde_ActiveSync_Request_Search::SEARCH_MAXPICTURES]) {
+                } elseif (!empty($options[Horde_ActiveSync_Request_Search::SEARCH_MAXPICTURES]) &&
+                          $picture_count > $options[Horde_ActiveSync_Request_Search::SEARCH_MAXPICTURES]) {
                     $picture->status = Horde_ActiveSync_Status::PICTURE_LIMIT_REACHED;
                 } else {
                     $data = $row['photo']['load']['data'];
-                    if (!empty($query[Horde_ActiveSync_Request_Search::SEARCH_MAXSIZE]) &&
-                        strlen($data) > $query[Horde_ActiveSync_Request_Search::SEARCH_MAXSIZE]) {
+                    if (!empty($options[Horde_ActiveSync_Request_Search::SEARCH_MAXSIZE]) &&
+                        strlen($data) > $options[Horde_ActiveSync_Request_Search::SEARCH_MAXSIZE]) {
                         $picture->status = Horde_ActiveSync_Status::PICTURE_TOO_LARGE;
                     } else {
                         $picture->data = base64_encode($data);
@@ -3675,7 +3687,6 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             }
             $return[] = $entry;
         }
-        $this->_endBuffer();
 
         return $return;
     }
