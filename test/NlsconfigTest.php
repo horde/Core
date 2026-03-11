@@ -69,12 +69,14 @@ class NlsconfigTest extends TestCase
     }
 
     /**
-     * @dataProvider providerForTestGet
+     * @todo Implement test for accessing language/alias/charset data via __get()
      */
-    public function testGet($key, $expected)
+    public function testGet()
     {
-        $nls = new Horde_Registry_Nlsconfig();
-        $this->markTestIncomplete();
+        $this->markTestIncomplete(
+            'Test for Nlsconfig::__get() not yet implemented. ' .
+            'Should test accessing $nls->languages, $nls->aliases, and $nls->charsets.'
+        );
     }
 
     public function testValidLang()
