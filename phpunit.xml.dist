@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd"
-         bootstrap="test/bootstrap.php"
-         cacheDirectory=".phpunit.cache/code-coverage"
-         cacheResultFile=".phpunit.cache/test-results"
-         executionOrder="depends,defects"
-         beStrictAboutOutputDuringTests="true"
-         failOnRisky="true"
-         failOnWarning="true">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/13.0/phpunit.xsd" bootstrap="test/bootstrap.php" cacheDirectory=".phpunit.cache/code-coverage" executionOrder="depends,defects" beStrictAboutOutputDuringTests="true" failOnRisky="true" failOnWarning="true">
   <testsuites>
     <testsuite name="horde/core">
       <directory>test</directory>
     </testsuite>
   </testsuites>
-  <coverage>
+  <source>
     <include>
       <directory suffix=".php">lib</directory>
       <directory suffix=".php">src</directory>
     </include>
-  </coverage>
+  </source>
 </phpunit>

@@ -39,9 +39,13 @@ class State
      */
     public function __construct(?array $conf = null)
     {
-        $this->conf = $conf ?? $GLOBALS['conf'] ?? null;
-        // If we still have no array, give up.
-        if (empty($this->conf)) {
+        // If explicitly passed (even if empty array), use it
+        // Otherwise fall back to $GLOBALS['conf']
+        if ($conf !== null) {
+            $this->conf = $conf;
+        } elseif (isset($GLOBALS['conf'])) {
+            $this->conf = $GLOBALS['conf'];
+        } else {
             throw new \Horde_Exception(
                 'Config neither passed nor available from global'
             );

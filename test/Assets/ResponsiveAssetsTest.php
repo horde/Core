@@ -54,8 +54,9 @@ class ResponsiveAssetsTest extends TestCase
 
         // Setup filesystem mock - file exists
         $this->filesystemMock->method('fileExists')
-            ->with('/horde/themes/default/responsive.css')
-            ->willReturn(true);
+            ->willReturnCallback(function($path) {
+                return $path === '/horde/themes/default/responsive.css';
+            });
 
         // Create assets helper
         $assets = new ResponsiveAssets($this->registryMock, $this->filesystemMock);
@@ -170,8 +171,9 @@ class ResponsiveAssetsTest extends TestCase
 
         // File exists
         $this->filesystemMock->method('fileExists')
-            ->with('/horde/js/login-form.js')
-            ->willReturn(true);
+            ->willReturnCallback(function($path) {
+                return $path === '/horde/js/login-form.js';
+            });
 
         $assets = new ResponsiveAssets($this->registryMock, $this->filesystemMock);
         $urls = $assets->getJsUrls(['login-form.js'], 'horde');
@@ -271,8 +273,9 @@ class ResponsiveAssetsTest extends TestCase
         // Mock preferences
         $prefsMock = $this->createMock(\Horde_Prefs::class);
         $prefsMock->method('getValue')
-            ->with('theme')
-            ->willReturn('dark');
+            ->willReturnCallback(function($key) {
+                return $key === 'theme' ? 'dark' : null;
+            });
 
         $GLOBALS['prefs'] = $prefsMock;
 
