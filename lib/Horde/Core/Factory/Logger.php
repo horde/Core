@@ -21,30 +21,40 @@ class Horde_Core_Factory_Logger extends Horde_Core_Factory_Injector
     protected static $_queue;
 
     /**
+     * Logger configuration service
+     *
+     * @var \Horde\Core\Config\LoggerConfig
+     */
+    private $config;
+
+    /**
      */
     public function create(Horde_Injector $injector)
     {
-        global $conf;
+        // Get LoggerConfig service (autowired by injector)
+        if ($this->config === null) {
+            $this->config = $injector->getInstance('Horde\\Core\\Config\\LoggerConfig');
+        }
 
         $this->error = null;
 
-        /* Default handler. */
-        if (empty($conf['log']['enabled'])) {
+        /* Default handler if logging is disabled. */
+        if (!$this->config->isEnabled()) {
             return new Horde_Core_Log_Logger(new Horde_Log_Handler_Null());
         }
 
-        switch ($conf['log']['type']) {
+        switch ($this->config->getType()) {
             case 'file':
             case 'stream':
-                $append = ($conf['log']['type'] == 'file')
-                    ? ($conf['log']['params']['append'] ? 'a+' : 'w+')
+                $append = ($this->config->getType() === 'file')
+                    ? $this->config->getAppendMode()
                     : null;
-                $format = $conf['log']['params']['format']
-                    ?? 'default';
 
-                switch ($format) {
+                switch ($this->config->getFormat()) {
                     case 'custom':
-                        $formatter = new Horde_Log_Formatter_Simple(['format' => $conf['log']['params']['template']]);
+                        $formatter = ($this->config->getTemplate() !== null)
+                            ? new Horde_Log_Formatter_Simple(['format' => $this->config->getTemplate()])
+                            : null;
                         break;
 
                     case 'default':
@@ -59,14 +69,13 @@ class Horde_Core_Factory_Logger extends Horde_Core_Factory_Injector
                 }
 
                 try {
-                    // TODO: In some cases we arrive at the logger factory and are unable to autoload this Handler class.
-                    $handler = new Horde_Log_Handler_Stream($conf['log']['name'], $append, $formatter);
+                    $handler = new Horde_Log_Handler_Stream($this->config->getName(), $append, $formatter);
                 } catch (Horde_Log_Exception $e) {
                     $this->error = $e;
                     return new Horde_Core_Log_Logger(new Horde_Log_Handler_Null());
                 }
                 try {
-                    $handler->setOption('ident', $conf['log']['ident']);
+                    $handler->setOption('ident', $this->config->getIdent());
                 } catch (Horde_Log_Exception $e) {
                 }
                 break;
@@ -74,11 +83,13 @@ class Horde_Core_Factory_Logger extends Horde_Core_Factory_Injector
             case 'syslog':
                 try {
                     $handler = new Horde_Log_Handler_Syslog();
-                    if (!empty($conf['log']['name'])) {
-                        $handler->setOption('facility', $conf['log']['name']);
+                    $facility = $this->config->getFacility();
+                    if ($facility !== null) {
+                        $handler->setOption('facility', $facility);
                     }
-                    if (!empty($conf['log']['ident'])) {
-                        $handler->setOption('ident', $conf['log']['ident']);
+                    $ident = $this->config->getIdent();
+                    if (!empty($ident)) {
+                        $handler->setOption('ident', $ident);
                     }
                 } catch (Horde_Log_Exception $e) {
                     $this->error = $e;
@@ -92,19 +103,7 @@ class Horde_Core_Factory_Logger extends Horde_Core_Factory_Injector
                 return new Horde_Core_Log_Logger(new Horde_Log_Handler_Null());
         }
 
-        switch ($conf['log']['priority']) {
-            case 'WARNING':
-                // Bug #12109
-                $priority = 'WARN';
-                break;
-
-            default:
-                $priority = defined('Horde_Log::' . $conf['log']['priority'])
-                    ? $conf['log']['priority']
-                    : 'NOTICE';
-                break;
-        }
-        $handler->addFilter(constant('Horde_Log::' . $priority));
+        $handler->addFilter($this->config->getPriorityValue());
 
         try {
             /* Horde_Core_Log_Logger contains code to format the log

@@ -12,7 +12,7 @@ namespace Horde\Core\Factory;
 use Horde_Core_Factory_Injector;
 use Horde\Log\Logger;
 use Horde\Log\LogException;
-use Horde\Core\Config\State;
+use Horde\Core\Config\LoggerConfig;
 use Horde\Injector\Injector;
 use Horde\Log\LogHandler;
 use Horde\Log\LogLevels;
@@ -23,7 +23,7 @@ use Horde\Log\LogLevels;
  */
 class LoggerFactory extends Horde_Core_Factory_Injector
 {
-    private State $conf;
+    private LoggerConfig $config;
     private LogLevels $levels;
     private Logger $logger;
 
@@ -38,26 +38,23 @@ class LoggerFactory extends Horde_Core_Factory_Injector
     /**
      * Constructor
      *
-     *
-     * @param State $config The conf.php values for the global log handler
-     *
+     * @param LoggerConfig $config Logger configuration service
+     * @param LogHandlerFactory $handlerFactory Handler factory
      */
-    public function __construct(State $config, LogHandlerFactory $handlerFactory)
+    public function __construct(LoggerConfig $config, LogHandlerFactory $handlerFactory)
     {
-        $this->conf = $config;
+        $this->config = $config;
         $this->handlerFactory = $handlerFactory;
     }
 
     /**
      * Create default logger
      *
-     * This creates a logger with
+     * This creates a logger with:
      * - one handler based on the horde config or no handler,
-     * - canonic log levels,
+     * - canonical log levels,
      * - the PSR-3 formatter and depending on options, another formatter,
      * - a handler-level filter by loglevel
-     *
-     * TODO: Mechanism to add specialised handlers without a configuration mess.
      *
      * @param Injector $injector
      * @return Logger
@@ -65,9 +62,7 @@ class LoggerFactory extends Horde_Core_Factory_Injector
      */
     public function create(Injector $injector): Logger
     {
-        $conf = $this->conf->toArray();
         $this->levels = LogLevels::initWithCanonicalLevels();
-        //
         $handlers = $this->predefinedHandlers();
         $handlers[] = $this->handlerFactory->create($injector);
         return new Logger($handlers, $this->levels);

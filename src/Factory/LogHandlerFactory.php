@@ -11,7 +11,7 @@ namespace Horde\Core\Factory;
 
 use Horde_Core_Factory_Injector;
 use Horde\Log\Logger;
-use Horde\Core\Config\State;
+use Horde\Core\Config\LoggerConfig;
 use Horde\Injector\Injector;
 use Horde\Log\Filter\MaximumLevelFilter;
 use Horde\Log\Formatter\Psr3Formatter;
@@ -32,29 +32,25 @@ use Horde\Log\LogException;
  */
 class LogHandlerFactory extends Horde_Core_Factory_Injector
 {
-    private State $conf;
+    private LoggerConfig $config;
 
     /**
      * Constructor
      *
-     *
-     * @param State $config The conf.php values for the global log handler
-     *
+     * @param LoggerConfig $config Logger configuration service
      */
-    public function __construct(State $config)
+    public function __construct(LoggerConfig $config)
     {
-        $this->conf = $config;
+        $this->config = $config;
     }
 
     /**
      * Create default LogHandler
      *
-     * This creates a LogHandler with
-     *   configuration from conf.php
+     * This creates a LogHandler with configuration from conf.php via
+     * LoggerConfig service:
      * - the PSR-3 formatter and depending on options, another formatter,
      * - a handler-level filter by loglevel as the config suggests
-     *
-     * TODO: Mechanism to add and expose custom handlers
      *
      * @param Injector $injector
      * @return LogHandler
@@ -62,23 +58,20 @@ class LogHandlerFactory extends Horde_Core_Factory_Injector
      */
     public function create(Injector $injector): LogHandler
     {
-        $conf = $this->conf->toArray();
         $formatters = [new Psr3Formatter()];
 
-        switch ($conf['log']['type']) {
+        switch ($this->config->getType()) {
             case 'file':
             case 'stream':
-                // TODO: Default context?
-
-                $append = ($conf['log']['type'] == 'file')
-                    ? ($conf['log']['params']['append'] ? 'a+' : 'w+')
+                $append = ($this->config->getType() === 'file')
+                    ? $this->config->getAppendMode()
                     : null;
-                $format = $conf['log']['params']['format']
-                    ?? 'default';
 
-                switch ($format) {
+                switch ($this->config->getFormat()) {
                     case 'custom':
-                        $formatters[] = new SimpleFormatter(['format' => $conf['log']['params']['template']]);
+                        if ($this->config->getTemplate() !== null) {
+                            $formatters[] = new SimpleFormatter(['format' => $this->config->getTemplate()]);
+                        }
                         break;
 
                     case 'default':
@@ -92,18 +85,19 @@ class LogHandlerFactory extends Horde_Core_Factory_Injector
                 }
 
                 $options = new Options();
-                $options->ident = (string) $conf['log']['ident'] ?? '';
-                // Let's not try and catch. Let it fail, the caller should care
-                $handler = new StreamHandler($conf['log']['name'], $append, $options, $formatters);
+                $options->ident = $this->config->getIdent();
+                $handler = new StreamHandler($this->config->getName(), $append, $options, $formatters);
                 break;
 
             case 'syslog':
                 $options = new SyslogOptions();
-                if (!empty($conf['log']['name'] && is_numeric($conf['log']['name']))) {
-                    $options->facility = (int) $conf['log']['name'];
+                $facility = $this->config->getFacility();
+                if ($facility !== null) {
+                    $options->facility = $facility;
                 }
-                if (!empty($conf['log']['ident'])) {
-                    $options->ident = (string) $conf['log']['ident'];
+                $ident = $this->config->getIdent();
+                if (!empty($ident)) {
+                    $options->ident = $ident;
                 }
                 $handler = new SyslogHandler($options, $formatters, []);
                 break;
@@ -114,19 +108,7 @@ class LogHandlerFactory extends Horde_Core_Factory_Injector
                 return new NullHandler();
         }
 
-        switch ($conf['log']['priority']) {
-            case 'WARNING':
-                // Bug #12109
-                $priority = 'WARN';
-                break;
-
-            default:
-                $priority = defined('Horde_Log::' . $conf['log']['priority'])
-                    ? $conf['log']['priority']
-                    : 'NOTICE';
-                break;
-        }
-        $handler->addFilter(new MaximumLevelFilter(constant('Horde_Log::' . $priority)));
+        $handler->addFilter(new MaximumLevelFilter($this->config->getPriorityValue()));
         return $handler;
     }
 
