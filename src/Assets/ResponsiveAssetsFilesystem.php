@@ -16,7 +16,6 @@ namespace Horde\Core\Assets;
  *
  * @category Horde
  * @package  Core
- * @author   Claude Code Assistant
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
 interface ResponsiveAssetsFilesystem

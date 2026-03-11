@@ -19,7 +19,6 @@ use Horde_Registry;
  *
  * @category Horde
  * @package  Core
- * @author   Claude Code Assistant
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
 class ResponsiveAssets
@@ -51,9 +50,11 @@ class ResponsiveAssets
     /**
      * Get list of responsive CSS URLs to load
      *
-     * Returns URLs in cascade order with fallback to default theme:
-     * 1. Horde base theme CSS (selected theme, falls back to default)
-     * 2. Application theme CSS (if exists and app != horde)
+     * Returns URLs in cascade order:
+     * 1. Horde default theme CSS (always)
+     * 2. Horde selected theme CSS (if different from default and exists)
+     * 3. Application default theme CSS (if exists and app != horde)
+     * 4. Application selected theme CSS (if different from default and exists)
      *
      * @param string|null $theme Theme name (null = use preference)
      * @param string|null $app Application name (null = current app)
@@ -68,22 +69,24 @@ class ResponsiveAssets
         $cssFiles = ['responsive.css'];
 
         foreach ($cssFiles as $file) {
-            // Check Horde base theme - with fallback to default
-            if ($this->cssFileExists($file, $theme, 'horde')) {
-                $urls[] = $this->buildCssUrl($file, $theme, 'horde');
-            } elseif ($theme !== 'default' && $this->cssFileExists($file, 'default', 'horde')) {
-                // Fallback to default theme
+            // 1. Horde default theme (always load)
+            if ($this->cssFileExists($file, 'default', 'horde')) {
                 $urls[] = $this->buildCssUrl($file, 'default', 'horde');
             }
 
-            // Check app-specific theme (if not horde) - with fallback to default
-            if ($app !== 'horde') {
-                if ($this->cssFileExists($file, $theme, $app)) {
-                    $urls[] = $this->buildCssUrl($file, $theme, $app);
-                } elseif ($theme !== 'default' && $this->cssFileExists($file, 'default', $app)) {
-                    // Fallback to default theme
-                    $urls[] = $this->buildCssUrl($file, 'default', $app);
-                }
+            // 2. Horde selected theme (cascade over default if different)
+            if ($theme !== 'default' && $this->cssFileExists($file, $theme, 'horde')) {
+                $urls[] = $this->buildCssUrl($file, $theme, 'horde');
+            }
+
+            // 3. App default theme (if app != horde)
+            if ($app !== 'horde' && $this->cssFileExists($file, 'default', $app)) {
+                $urls[] = $this->buildCssUrl($file, 'default', $app);
+            }
+
+            // 4. App selected theme (cascade over app default if different)
+            if ($app !== 'horde' && $theme !== 'default' && $this->cssFileExists($file, $theme, $app)) {
+                $urls[] = $this->buildCssUrl($file, $theme, $app);
             }
         }
 
