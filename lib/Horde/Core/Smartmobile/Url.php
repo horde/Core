@@ -79,7 +79,7 @@ class Horde_Core_Smartmobile_Url extends Horde_Url
     public function toString($raw = false, $full = true)
     {
         if ($this->toStringCallback || !strlen($this->anchor)) {
-            $baseUrl = $this->_baseUrl->copy();
+            $baseUrl = clone $this->_baseUrl;
             $baseUrl->parameters = array_merge(
                 $baseUrl->parameters,
                 $this->parameters
