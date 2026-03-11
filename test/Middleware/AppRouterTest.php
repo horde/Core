@@ -24,7 +24,7 @@ use Horde\Http\StreamFactory;
 use Horde\Test\TestCase;
 use Horde_Injector;
 use Horde_Registry;
-use Horde_Routes_Mapper;
+use Horde\Routes\Mapper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -53,7 +53,7 @@ class AppRouterTest extends TestCase
     private ResponseFactory $responseFactory;
     private StreamFactory $streamFactory;
     private Horde_Registry $registry;
-    private Horde_Routes_Mapper $router;
+    private Mapper $router;
     private Horde_Injector $injector;
     private AppRouter $appRouter;
     private RampageRequestHandler $handler;
@@ -68,7 +68,7 @@ class AppRouterTest extends TestCase
         $this->registry = $this->createMock(Horde_Registry::class);
 
         // Real router
-        $this->router = new Horde_Routes_Mapper();
+        $this->router = new Mapper();
 
         // Mock injector - configured per test
         $this->injector = $this->createMock(Horde_Injector::class);

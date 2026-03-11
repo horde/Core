@@ -16,7 +16,8 @@ use Horde_Registry;
 use Horde_Application;
 use Horde_Controller;
 use Horde_Injector;
-use Horde_Routes_Mapper as Router;
+use Horde\Routes\Mapper;
+use Horde\Routes\Matcher;
 use Horde_String;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Horde\Exception\HordeException;
@@ -40,14 +41,14 @@ use Horde\Exception\HordeException;
  */
 class AppRouter extends RampageRequestHandler implements MiddlewareInterface, RequestHandlerInterface
 {
-    private Router $router;
+    private Mapper $mapper;
     private Horde_Registry $registry;
     private Horde_Injector $injector;
 
-    public function __construct(Horde_Registry $registry, Router $router, Horde_Injector $injector)
+    public function __construct(Horde_Registry $registry, Mapper $mapper, Horde_Injector $injector)
     {
         $this->registry = $registry;
-        $this->router = $router;
+        $this->mapper = $mapper;
         $this->injector = $injector;
     }
 
@@ -92,21 +93,22 @@ class AppRouter extends RampageRequestHandler implements MiddlewareInterface, Re
 
         // Application routes are relative only to the application. Let the
         // mapper know where they start.
-        $this->router->prefix = $prefix;
+        $this->mapper->prefix = $prefix;
 
         // Load application routes.
         // Cannot rename mapper as long as we support the existing routes definitions
-        $mapper = $router = $this->router;
-        $router->environ = ['REQUEST_METHOD' => $request->getMethod()];
+        $mapper = $router = $this->mapper;
         include $routeFile;
         if (file_exists($fileroot . '/config/routes.local.php')) {
             include $fileroot . '/config/routes.local.php';
         }
-        // Match
+
+        // Match using PSR-7 Matcher (auto-populates environ from request)
         // @TODO Cache routes
-        $path = $request->getUri()->getPath();
-        $path = strtok($path, '?');
-        $match = $this->router->match($path);
+        $matcher = new Matcher($this->mapper, $request);
+        $matchDict = $matcher->getMatchDict();
+        // Unwrap Horde_Support_Array to plain array for compatibility
+        $match = iterator_to_array($matchDict);
         $request = $request->withAttribute('route', $match);
 
         // compatibility: if unset stack and HordeAuthType is 'NONE' set empty stack

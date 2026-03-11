@@ -18,6 +18,7 @@ use Horde\Http\RequestFactory;
 use Horde\Http\UriFactory;
 use Horde\Http\StreamFactory;
 use Horde\Http\ResponseFactory;
+use Horde\Routes\Mapper;
 
 /**
  * HordeCoreMiddleware
@@ -62,7 +63,7 @@ class HordeCore implements MiddlewareInterface
         // Detect correct app
         $handler->addMiddleware(new AppFinder($registry, new ResponseFactory(), new StreamFactory()));
         // Find route inside detected app
-        $handler->addMiddleware(new AppRouter($registry, $injector->get('Horde_Routes_Mapper'), $injector));
+        $handler->addMiddleware(new AppRouter($registry, $injector->get(Mapper::class), $injector));
 
         $request = $request->withAttribute('registry', $registry);
         return $handler->handle($request);
