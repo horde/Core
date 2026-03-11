@@ -6,7 +6,6 @@ use Horde\Test\TestCase;
 
 use Horde_Core_Smartmobile_Url as SmartmobileUrl;
 use Horde_Url;
-use InvalidArgumentException;
 
 /**
  * @author     Jan Schneider <jan@horde.org>
@@ -17,10 +16,12 @@ use InvalidArgumentException;
  */
 class SmartmobileUrlTest extends TestCase
 {
-    public function testInvalidParamter()
+    public function testStringParameter()
     {
-        $this->expectException(InvalidArgumentException::class);
-        new SmartmobileUrl('test');
+        // String parameters now work for convenience (no need to wrap in Horde_Url)
+        $url = new SmartmobileUrl('test');
+        $url->add(['foo' => 1, 'bar' => 2]);
+        $this->assertEquals('test?foo=1&amp;bar=2', (string)$url);
     }
 
     public function testWithoutAnchor()
