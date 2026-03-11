@@ -23,29 +23,36 @@
  * @category Horde
  * @package  Core
  */
-class Horde_Core_Smartmobile_Url extends Horde_Url
+class Horde_Core_Smartmobile_Url extends \Horde\Url\Url
 {
     /**
      * The URL used as the base for the smartmobile anchor.
      *
-     * @var Horde_Url
+     * @var \Horde\Url\Url
      */
     protected $_baseUrl;
 
     /**
      * Constructor.
      *
-     * @param Horde_Url $url   The basic URL.
-     * @param boolean $raw     Whether to output the URL in the raw URL format
-     *                         or HTML-encoded.
+     * @param \Horde\Url\Url|Horde_Url|string|null $url  The basic URL.
+     * @param bool|null $raw                              Whether to output the URL in raw format or HTML-encoded.
      */
-    public function __construct($url = null, $raw = null)
+    public function __construct(\Horde\Url\Url|Horde_Url|string|null $url = null, ?bool $raw = null)
     {
-        if (is_null($url)) {
-            $url = new Horde_Url();
-        }
-        if (!($url instanceof Horde_Url)) {
-            throw new InvalidArgumentException('First argument to Horde_Core_Smartmobile_Url constructor must be a Horde_Url object');
+        if ($url === null) {
+            $url = new \Horde\Url\Url();
+        } elseif ($url instanceof Horde_Url) {
+            // Extract the modern instance from the legacy wrapper
+            $url = new \Horde\Url\Url((string)$url, $raw);
+            // Copy parameters from the wrapper
+            foreach ((array)$url->parameters as $key => $value) {
+                $url->add($key, $value);
+            }
+        } elseif (is_string($url)) {
+            $url = new \Horde\Url\Url($url, $raw);
+        } elseif (!($url instanceof \Horde\Url\Url)) {
+            throw new InvalidArgumentException('First argument must be a URL object or string');
         }
 
         $query = '';
@@ -70,13 +77,12 @@ class Horde_Core_Smartmobile_Url extends Horde_Url
     /**
      * Creates the full URL string.
      *
-     * @param boolean $raw   Whether to output the URL in the raw URL format
-     *                       or HTML-encoded.
-     * @param boolean $full  Output the full URL?
+     * @param bool $raw   Whether to output the URL in the raw URL format or HTML-encoded.
+     * @param bool $full  Output the full URL?
      *
      * @return string  The string representation of this object.
      */
-    public function toString($raw = false, $full = true)
+    public function toString(bool $raw = false, bool $full = true): string
     {
         if ($this->toStringCallback || !strlen($this->anchor)) {
             $baseUrl = clone $this->_baseUrl;
@@ -105,7 +111,14 @@ class Horde_Core_Smartmobile_Url extends Horde_Url
             $url .= '?' . http_build_query($params, '', $raw ? '&' : '&amp;');
         }
 
-        return strval($url);
+        return $url;
     }
 
+    /**
+     * Magic __toString method for PHP 8+ compatibility
+     */
+    public function __toString(): string
+    {
+        return $this->toString($this->raw ?? false);
+    }
 }
