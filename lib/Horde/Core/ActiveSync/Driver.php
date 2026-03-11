@@ -1405,7 +1405,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 try {
                     $message = $this->_connector->calendar_export($id, [
                         'protocolversion' => $this->_version,
-                        'truncation' => empty($collection['truncation']) ? Horde_ActiveSync::TRUNCATION_9 : $collection['truncation'],
+                        'truncation' => $collection['truncation'] ?? Horde_ActiveSync::TRUNCATION_9,
                         'bodyprefs' => $collection['bodyprefs'] ?? [],
                         'mimesupport' => $collection['mimesupport'] ?? 0], $folder_id);
 
@@ -1456,7 +1456,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 try {
                     $message = $this->_connector->contacts_export($id, [
                         'protocolversion' => $this->_version,
-                        'truncation' => empty($collection['truncation']) ? Horde_ActiveSync::TRUNCATION_9 : $collection['truncation'],
+                        'truncation' => $collection['truncation'] ?? Horde_ActiveSync::TRUNCATION_9,
                         'bodyprefs' => $collection['bodyprefs'] ?? [],
                         'mimesupport' => $collection['mimesupport'] ?? 0,
                         'device' => $this->_device]);
@@ -2215,65 +2215,52 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      *  - deeptraversal:  (boolean) If true, traverse sub folders.
      *                    @todo NOT IMPLEMENTED YET.
      *
-     * @return array  An array containing:
-     *  - rows:   An array of search results, limited by $query['range'].
-     *  - status: The search store status code.
-     *  - total:  The total number of matches (not limited by $query['range']
+     * @return array|null  An array of search results or null on error.
      */
     public function getSearchResults($type, array $query)
     {
-        switch (Horde_String::lower($type)) {
-            case 'gal':
-                return $this->_searchGal($query);
-            case 'mailbox':
-                $results = null;
-                if ($this->_cache) {
-                    $cache_key = $GLOBALS['registry']->getAuth() . ':HCASD:' . hash('md5', serialize($query));
-                    if ($this->_cache->exists($cache_key, 0)) {
-                        if (empty($query['rebuildresults'])) {
-                            $results = json_decode($this->_cache->get($cache_key, 0), true);
-                        } else {
-                            $this->_cache->expire($cache_key);
-                        }
-                    }
-                }
+        $type = Horde_String::lower($type);
 
-                unset($query['rebuildresults']);
-
-                if ($results === null) {
-                    try {
-                        $results = $this->_searchMailbox($query);
-                        if ($this->_cache) {
-                            $this->_cache->set($cache_key, json_encode($results));
-                        }
-                    } catch (Horde_ActiveSync_Exception $e) {
-                        $this->_logger->err($e->getMessage());
-                        $results = [];
-                    }
+        $results = null;
+        if ($this->_cache) {
+            $cache_key = 'HCASD:' . $type . ':' . $GLOBALS['registry']->getAuth() . ':' . hash('md5', serialize($query));
+            if ($this->_cache->exists($cache_key, 0)) {
+                if (empty($query['rebuildresults'])) {
+                    $results = json_decode($this->_cache->get($cache_key, 0), true);
+                } else {
+                    $this->_cache->expire($cache_key);
                 }
-
-                $count = count($results);
-                if (!empty($query['range'])) {
-                    $range = explode('-', $query['range']);
-                    $results = array_slice($results, $range[0], $range[1] - $range[0] + 1);
-                }
-                return [
-                    'rows' => $results,
-                    'total' => $count,
-                    'status' => Horde_ActiveSync_Request_Search::STORE_STATUS_SUCCESS];
-
-            case 'documentlibrary':
-                foreach ($query['query'][0] as $q) {
-                    if (!empty($q['DocumentLibrary:LinkId'])) {
-                        $results = $this->_connector->files_browse($q['DocumentLibrary:LinkId']);
-                    }
-                }
-                return [
-                    'rows' => $results,
-                    'total' => count($results),
-                    'status' => Horde_ActiveSync_Request_Search::STORE_STATUS_SUCCESS,
-                ];
+            }
         }
+
+        if ($results === null) {
+            try {
+                switch ($type) {
+                case 'gal':
+                    $results = $this->_searchGal($query);
+                    break;
+                case 'mailbox':
+                    $results = $this->_searchMailbox($query);
+                    break;
+                case 'documentlibrary':
+                    foreach ($query['query'][0] as $q) {
+                        if (!empty($q['DocumentLibrary:LinkId'])) {
+                            $results = $this->_connector->files_browse($q['DocumentLibrary:LinkId']);
+                        }
+                    }
+                    break;
+                }
+            } catch (Horde_ActiveSync_Exception $e) {
+                $this->_logger->err($e->getMessage());
+                $results = null;
+            }
+
+            if ($results !== null && $this->_cache) {
+                $this->_cache->set($cache_key, json_encode($results));
+            }
+        }
+
+        return $results;
     }
 
     /**
@@ -3618,11 +3605,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     protected function _searchGal(array $query)
     {
         ob_start();
-        $return = [
-            'rows' => [],
-            'status' => Horde_ActiveSync_Request_Search::STORE_STATUS_SUCCESS,
-            'total' => 0,
-        ];
+        $return = [];
 
         // If no perms to the GAL, return zero results.
         $perms = $GLOBALS['injector']->getInstance('Horde_Perms');
@@ -3632,9 +3615,9 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         }
 
         try {
-            $results = $this->_connector->contacts_search(
+            $rows = $this->_connector->contacts_search(
                 $query['query'],
-                ['pictures' => !empty($query[Horde_ActiveSync_Request_Search::SEARCH_PICTURE])]
+                [ 'pictures' => !empty($query[Horde_ActiveSync_Request_Search::SEARCH_PICTURE]) ]
             );
         } catch (Horde_ActiveSync_Exception $e) {
             $this->_logger->err($e);
@@ -3642,26 +3625,9 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             return $return;
         }
 
-        // Honor range, and don't bother if no results
-        $results = array_pop($results);
-        $count = !empty($results) ? count($results) : 0;
-        if (!$count) {
-            $this->_endBuffer();
-            return $return;
-        }
-        $return['total'] = $count;
-        $this->_logger->meta(
-            sprintf(
-                'Horde_Core_ActiveSync_Driver::_searchGal() found %d matches.',
-                $count
-            )
-        );
+        $rows = array_pop($rows) ?? [];
 
-        if (!empty($query['range'])) {
-            preg_match('/(.*)\-(.*)/', $query['range'], $matches);
-            $return_count = $matches[2] - $matches[1];
-            $rows = array_slice($results, $matches[1], $return_count + 1, true);
-        }
+        $this->_logger->meta(sprintf('Horde_Core_ActiveSync_Driver::_searchGal() found %d matches.', count($rows)));
 
         $picture_count = 0;
         foreach ($rows as $row) {
@@ -3670,7 +3636,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             // multiple email addresses, or the group syntax will cause most
             // clients to silently throw out all but the first email address in
             // the list, or will completely fail to send the message altogether.
-            if (!empty($row['__type']) && ($row['__type'] != 'Object')) {
+            if (($row['__type'] ?? '') !== 'Object') {
                 continue;
             }
 
@@ -3707,7 +3673,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 }
                 $entry[Horde_ActiveSync::GAL_PICTURE] = $picture;
             }
-            $return['rows'][] = $entry;
+            $return[] = $entry;
         }
         $this->_endBuffer();
 
