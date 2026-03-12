@@ -24,7 +24,9 @@ use Horde\Core\Assets\ResponsiveAssets;
 use Horde\Core\View\ResponsiveTemplateView;
 use Horde\Core\View\ResponsiveTopbar;
 use Horde_Registry;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 
 /**
@@ -108,6 +110,26 @@ trait ResponsiveControllerTrait
     abstract protected function getUriFactory(): UriFactoryInterface;
 
     /**
+     * Get PSR-7 response factory instance
+     *
+     * Must be implemented by the using controller.
+     * Controller should provide factory via constructor injection.
+     *
+     * @return ResponseFactoryInterface Response factory instance
+     */
+    abstract protected function getResponseFactory(): ResponseFactoryInterface;
+
+    /**
+     * Get PSR-7 stream factory instance
+     *
+     * Must be implemented by the using controller.
+     * Controller should provide factory via constructor injection.
+     *
+     * @return StreamFactoryInterface Stream factory instance
+     */
+    abstract protected function getStreamFactory(): StreamFactoryInterface;
+
+    /**
      * Render template with topbar and assets
      *
      * Automatically includes:
@@ -127,7 +149,7 @@ trait ResponsiveControllerTrait
         array $extraJsFiles = []
     ): ResponseInterface {
         $registry = $this->getRegistry();
-        $injector = $registry->getInjector();
+        $responseFactory = $this->getResponseFactory();
 
         // Create helpers
         $responsiveAssets = new ResponsiveAssets($registry);
@@ -162,7 +184,6 @@ trait ResponsiveControllerTrait
         $view = new ResponsiveTemplateView($templatePath, $data);
 
         // Create response
-        $responseFactory = $injector->getInstance('Psr\Http\Message\ResponseFactoryInterface');
         $response = $responseFactory->createResponse(200)
             ->withHeader('Content-Type', 'text/html; charset=UTF-8');
         $response->getBody()->write($view->render());
@@ -215,14 +236,12 @@ trait ResponsiveControllerTrait
     ): ResponseInterface {
         global $notification;
 
-        $registry = $this->getRegistry();
-        $injector = $registry->getInjector();
+        $responseFactory = $this->getResponseFactory();
 
         if ($message) {
             $notification->push($message, $messageType);
         }
 
-        $responseFactory = $injector->getInstance('Psr\Http\Message\ResponseFactoryInterface');
         return $responseFactory->createResponse(302)
             ->withHeader('Location', $url);
     }
@@ -243,11 +262,8 @@ trait ResponsiveControllerTrait
         string $filename,
         string $mimeType = 'application/octet-stream'
     ): ResponseInterface {
-        $registry = $this->getRegistry();
-        $injector = $registry->getInjector();
-
-        $streamFactory = $injector->getInstance('Psr\Http\Message\StreamFactoryInterface');
-        $responseFactory = $injector->getInstance('Psr\Http\Message\ResponseFactoryInterface');
+        $streamFactory = $this->getStreamFactory();
+        $responseFactory = $this->getResponseFactory();
 
         return $responseFactory->createResponse(200)
             ->withHeader('Content-Type', $mimeType . '; charset=UTF-8')
@@ -267,13 +283,10 @@ trait ResponsiveControllerTrait
      */
     protected function jsonResponse(array $data, int $status = 200): ResponseInterface
     {
-        $registry = $this->getRegistry();
-        $injector = $registry->getInjector();
+        $streamFactory = $this->getStreamFactory();
+        $responseFactory = $this->getResponseFactory();
 
         $json = json_encode($data, JSON_THROW_ON_ERROR);
-
-        $streamFactory = $injector->getInstance('Psr\Http\Message\StreamFactoryInterface');
-        $responseFactory = $injector->getInstance('Psr\Http\Message\ResponseFactoryInterface');
 
         return $responseFactory->createResponse($status)
             ->withHeader('Content-Type', 'application/json; charset=UTF-8')
