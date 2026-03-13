@@ -26,7 +26,7 @@
             "role": "developer"
         }
     ],
-    "time": "2026-03-07",
+    "time": "2026-03-12",
     "repositories": [],
     "require": {
         "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || ^3 || ^2",
@@ -72,7 +72,6 @@
         "horde/url": "^3 || dev-FRAMEWORK_6_0",
         "horde/util": "^3 || dev-FRAMEWORK_6_0",
         "horde/view": "^3 || dev-FRAMEWORK_6_0",
-        "pear/pear": "*",
         "php81_bc/strftime": "^0.7",
         "ext-session": "*"
     },
@@ -83,6 +82,7 @@
         "horde/vfs": "^3 || dev-FRAMEWORK_6_0"
     },
     "suggest": {
+        "mikepultz/netdns2": "For DNS resolver functionality (replaces pear/net_dns2)",
         "pear/text_captcha": "*",
         "pear/text_figlet": "*",
         "ext-dom": "*",
@@ -104,14 +104,11 @@
         }
     },
     "config": {
-        "allow-plugins": {
-            "horde/horde-installer-plugin": true
-        }
+        "allow-plugins": {}
     },
     "extra": {
         "branch-alias": {
             "dev-FRAMEWORK_6_0": "3.x-dev"
         }
-    },
-    "minimum-stability": "dev"
+    }
 }

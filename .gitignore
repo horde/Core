@@ -51,3 +51,7 @@ run-tests.log
 /phpstan.neon
 # PHPStan cache directory
 /.phpstan.cache/
+
+# Added by horde-components QC --fix-qc-issues
+# Local PHP configuration files
+**/*.local.php

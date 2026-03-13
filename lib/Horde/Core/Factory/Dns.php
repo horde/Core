@@ -1,5 +1,8 @@
 <?php
 
+use NetDNS2\Resolver;
+use NetDNS2\Exception as DnsException;
+
 /**
  * @category Horde
  * @package  Core
@@ -8,7 +11,7 @@ class Horde_Core_Factory_Dns extends Horde_Core_Factory_Injector
 {
     public function create(Horde_Injector $injector)
     {
-        if (!class_exists('Net_DNS2_Resolver')) {
+        if (!class_exists('NetDNS2\Resolver')) {
             return null;
         }
 
@@ -22,12 +25,12 @@ class Horde_Core_Factory_Dns extends Horde_Core_Factory_Injector
             $config = [];
         }
 
-        $resolver = new Net_DNS2_Resolver($config);
+        $resolver = new Resolver($config);
 
         if (is_readable('/etc/resolv.conf')) {
             try {
                 $resolver->setServers('/etc/resolv.conf');
-            } catch (Net_DNS2_Exception $e) {
+            } catch (DnsException $e) {
             }
         }
 

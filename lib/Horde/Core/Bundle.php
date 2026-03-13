@@ -24,19 +24,11 @@ abstract class Horde_Core_Bundle
     protected $_config;
 
     /**
-     * Path to the PEAR configuration file.
-     *
-     * @var string
-     */
-    protected $_pearconf;
-
-    /**
      * Constructor.
      */
-    public function __construct(Horde_Core_Cli $cli, $pearconf = null)
+    public function __construct(Horde_Core_Cli $cli)
     {
         $this->_cli = $cli;
-        $this->_pearconf = $pearconf;
     }
 
     /**
@@ -95,7 +87,7 @@ abstract class Horde_Core_Bundle
         $this->_cli->writeln();
         echo 'Creating and updating database tables...';
 
-        $migration = new Horde_Core_Db_Migration(null, $this->_pearconf);
+        $migration = new Horde_Core_Db_Migration();
 
         // Try twice to work around unresolved migration dependencies.
         for ($i = 0; $i < 2; $i++) {
