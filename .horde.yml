@@ -34,7 +34,7 @@ authors:
     active: false
     role: developer
 version:
-  release: 3.0.0-beta3
+  release: 3.0.0-beta4
   api: 3.0.0alpha1
 state:
   release: beta
@@ -87,7 +87,6 @@ dependencies:
       horde/url: ^3
       horde/util: ^3
       horde/view: ^3
-      pear/pear: '*'
       php81_bc/strftime: ^0.7
     ext:
       session: '*'

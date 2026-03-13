@@ -47,9 +47,8 @@ class Horde_Core_Db_Migration
      * directories and builds lists of migrateable modules and directories.
      *
      * @param string $basedir   Base directory of all Git checkouts.
-     * @param string $pearconf  Path to a PEAR configuration file.
      */
-    public function __construct($basedir = null, $pearconf = null)
+    public function __construct($basedir = null)
     {
         // Loop through all applications.
         foreach ($GLOBALS['registry']->listAllApps() as $app) {
@@ -60,11 +59,6 @@ class Horde_Core_Db_Migration
                 $this->dirs[] = realpath($dir);
             }
         }
-
-        // Silence PEAR errors.
-        $old_error_reporting = error_reporting();
-        error_reporting($old_error_reporting & ~E_DEPRECATED);
-        $pear = new PEAR_Config($pearconf);
 
         // Detect and handle the Composer use case
         if (class_exists('Composer\Autoload\ClassLoader', false)) {
@@ -134,27 +128,6 @@ class Horde_Core_Db_Migration
                 $this->dirs[] = realpath($dir);
             }
         }
-
-        // Loop through installed PEAR packages.
-        $registry = $pear->getRegistry();
-        foreach (glob($pear->get('data_dir') . '/*/migration') as $dir) {
-            $package = $registry->getPackage(
-                basename(dirname($dir)),
-                'pear.horde.org'
-            );
-            if ($package == false) {
-                Horde::log("Ignoring package in directory $dir", Horde_Log::WARN);
-                continue;
-            }
-
-            $app = $package->getName();
-            if (!in_array($app, $this->apps)) {
-                $this->apps[] = $app;
-                $this->_lower[] = Horde_String::lower($app);
-                $this->dirs[] = realpath($dir);
-            }
-        }
-        error_reporting($old_error_reporting);
     }
 
     /**
