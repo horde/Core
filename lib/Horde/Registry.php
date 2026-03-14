@@ -458,6 +458,9 @@ class Horde_Registry implements Horde_Shutdown_Task
             Horde\Log\Logger::class => Horde\Core\Factory\LoggerFactory::class,
             'Horde\\Horde\\Service\\JwtService' => 'Horde\\Horde\\Factory\\JwtServiceFactory',
             'Horde\\Horde\\Service\\AuthenticationService' => 'Horde\\Horde\\Factory\\AuthenticationServiceFactory',
+            'Horde\\Core\\Config\\ConfigLoader' => 'Horde\\Core\\Factory\\ConfigLoaderFactory',
+            'Horde\\Core\\Service\\HordeDbService' => 'Horde\\Horde\\Factory\\DbServiceFactory',
+            'Horde\\Core\\Auth\\AuthService' => 'Horde\\Horde\\Factory\\AuthServiceFactory',
         ];
 
         /* Define implementations. */
