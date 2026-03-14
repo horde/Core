@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Responsive Controller Trait
  *
@@ -176,7 +177,7 @@ trait ResponsiveControllerTrait
         $data['escape'] = [$view, 'escape'];
 
         // Add URL builder helper for templates (PSR-7 Uri pattern)
-        $data['url'] = function(string $path, array $params = []) {
+        $data['url'] = function (string $path, array $params = []) {
             return $this->buildUrl($path, $params);
         };
 

@@ -21,6 +21,11 @@ use Horde\Routes\Matcher;
 use Horde_String;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Horde\Exception\HordeException;
+use Horde\Core\Config\ConfigLoader;
+use Horde\Core\Config\BackendConfigLoader;
+use Horde\Core\Config\PrefsConfigLoader;
+use Horde\Core\Config\RegistryConfigLoader;
+use Horde\Core\Config\Vhost;
 
 /**
  * AppRouter middleware
@@ -65,6 +70,49 @@ class AppRouter extends RampageRequestHandler implements MiddlewareInterface, Re
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        // Setup ConfigLoader in DI container if not already present
+        if (!$this->injector->has(ConfigLoader::class)) {
+            if (!defined('HORDE_CONFIG_BASE')) {
+                throw new Exception('HORDE_CONFIG_BASE not defined');
+            }
+            $this->injector->setInstance(
+                ConfigLoader::class,
+                new ConfigLoader(HORDE_CONFIG_BASE, new Vhost())  // Auto-detect vhost
+            );
+        }
+
+        // Setup BackendConfigLoader in DI container if not already present
+        if (!$this->injector->has(BackendConfigLoader::class)) {
+            if (!defined('HORDE_CONFIG_BASE')) {
+                throw new Exception('HORDE_CONFIG_BASE not defined');
+            }
+            // Vendor base = composer vendor/horde/ directory
+            $vendorBase = dirname(__DIR__, 4) . '/vendor/horde';
+            $this->injector->setInstance(
+                BackendConfigLoader::class,
+                new BackendConfigLoader(HORDE_CONFIG_BASE, $vendorBase, new Vhost())  // Auto-detect vhost
+            );
+        }
+
+        // Setup PrefsConfigLoader in DI container if not already present
+        if (!$this->injector->has(PrefsConfigLoader::class)) {
+            $vendorBase = dirname(__DIR__, 4) . '/vendor/horde';
+            $this->injector->setInstance(
+                PrefsConfigLoader::class,
+                new PrefsConfigLoader(HORDE_CONFIG_BASE, $vendorBase, new Vhost())  // Auto-detect vhost
+            );
+        }
+
+        // Setup RegistryConfigLoader in DI container if not already present
+        if (!$this->injector->has(RegistryConfigLoader::class)) {
+            // Vendor base = horde base app directory
+            $vendorBase = dirname(__DIR__, 4) . '/vendor/horde/horde';
+            $this->injector->setInstance(
+                RegistryConfigLoader::class,
+                new RegistryConfigLoader(HORDE_CONFIG_BASE, $vendorBase, new Vhost())  // Auto-detect vhost
+            );
+        }
+
         $app = $request->getAttribute('app');
         $prefix = $request->getAttribute('routerPrefix');
         if (is_null($prefix)) {
@@ -119,9 +167,28 @@ class AppRouter extends RampageRequestHandler implements MiddlewareInterface, Re
         // Empty array means NO more middleware besides controller
         // unset stack means DEFAULT middleware stack
         $stack = $match['stack'] ?? $defaultStack;
+
+        // DEBUG - Use web-writable var directory
+        $varDir = dirname($fileroot, 2) . '/var';
+        if (!is_dir($varDir)) {
+            $varDir = '/tmp';
+        }
+        $debugLog = $varDir . '/approuter-debug.log';
+        file_put_contents($debugLog, "=== AppRouter Debug ===\n", FILE_APPEND);
+        file_put_contents($debugLog, 'Time: ' . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
+        file_put_contents($debugLog, 'Route: ' . ($match['name'] ?? 'UNNAMED') . "\n", FILE_APPEND);
+        file_put_contents($debugLog, 'Controller: ' . ($match['controller'] ?? 'NONE') . "\n", FILE_APPEND);
+        file_put_contents($debugLog, 'HordeAuthType: ' . ($match['HordeAuthType'] ?? 'NOT SET') . "\n", FILE_APPEND);
+        file_put_contents($debugLog, 'stack isset: ' . (isset($match['stack']) ? 'YES' : 'NO') . "\n", FILE_APPEND);
+        file_put_contents($debugLog, 'stack value: ' . json_encode($match['stack'] ?? 'NOT SET') . "\n", FILE_APPEND);
+        file_put_contents($debugLog, 'Using stack: ' . json_encode($stack) . "\n", FILE_APPEND);
+        file_put_contents($debugLog, 'Stack count: ' . count($stack) . "\n", FILE_APPEND);
+
         foreach ($stack as $middleware) {
+            file_put_contents($debugLog, 'Adding middleware: ' . $middleware . "\n", FILE_APPEND);
             $handler->addMiddleware($this->injector->get($middleware));
         }
+        file_put_contents($debugLog, "=== End AppRouter Debug ===\n\n", FILE_APPEND);
 
         // Controller is a single DI key for either a HandlerInterface, MiddlewareInterface or a Horde_Controller
         $controllerName = $match['controller'] ?? '';
