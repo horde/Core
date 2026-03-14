@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Responsive Topbar Renderer
  *

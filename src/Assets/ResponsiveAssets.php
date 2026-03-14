@@ -63,8 +63,8 @@ class ResponsiveAssets
     public function getCssUrls(?string $theme = null, ?string $app = null): array
     {
         $urls = [];
-        $theme = $theme ?? $this->getThemePreference();
-        $app = $app ?? $this->registry->getApp();
+        $theme ??= $this->getThemePreference();
+        $app ??= $this->registry->getApp();
 
         $cssFiles = ['responsive.css'];
 
@@ -107,7 +107,7 @@ class ResponsiveAssets
     public function getJsUrls(array $jsFiles = [], ?string $app = null): array
     {
         $urls = [];
-        $app = $app ?? $this->registry->getApp();
+        $app ??= $this->registry->getApp();
 
         foreach ($jsFiles as $file) {
             // Check Horde base JS

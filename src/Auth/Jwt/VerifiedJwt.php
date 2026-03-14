@@ -25,7 +25,8 @@ class VerifiedJwt
     public function __construct(
         public readonly string $token,
         public readonly array $claims
-    ) {}
+    ) {
+    }
 
     /**
      * Get a specific claim value

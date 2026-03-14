@@ -25,7 +25,8 @@ class PrivateKey
      */
     private function __construct(
         public readonly string $content
-    ) {}
+    ) {
+    }
 
     /**
      * Create from PEM string content
