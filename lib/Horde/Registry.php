@@ -460,6 +460,7 @@ class Horde_Registry implements Horde_Shutdown_Task
             'Horde\\Horde\\Service\\AuthenticationService' => 'Horde\\Horde\\Factory\\AuthenticationServiceFactory',
             'Horde\\Core\\Config\\ConfigLoader' => 'Horde\\Core\\Factory\\ConfigLoaderFactory',
             'Horde\\Core\\Service\\HordeDbService' => 'Horde\\Horde\\Factory\\DbServiceFactory',
+            'Horde\\Core\\Service\\PrefsService' => 'Horde\\Core\\Factory\\PrefsServiceFactory',
             'Horde\\Core\\Auth\\AuthService' => 'Horde\\Horde\\Factory\\AuthServiceFactory',
         ];
 
