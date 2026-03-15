@@ -4,28 +4,11 @@
   state:
     release: beta
     api: beta
-  date: 2026-03-12
+  date: 2026-03-15
   license:
     identifier: LGPL-2.1-only
     uri: https://spdx.org/licenses/LGPL-2.1-only.html
-  notes: |-
-    fix(controller): inject PSR-7 factories instead of using service locator
-    feat(controller): ResponsiveControllerTrait and PSR-7 URI use
-    fix(activesync): update getSearchResults() to use Search_Params/Results objects and fix several bugs
-    fix(smartmobile): use clone instead of copy() to preserve base URL
-    refactor(activesync): unify search caching, flatten result structure (#57)
-    fix composer.json plugin settings
-    refactor(routes): migrate to modern PSR-4 Horde\Routes\Mapper
-    test(rampage): add routing unit and integration tests
-    fix(config): allow empty config array in State constructor
-    feat(smartmobile): accept string URLs for convenience
-    refactor(smartmobile): extend modern Horde\Url\Url directly
-    feat(registry): add resolve_hostnames setting to skip DNS lookups
-    fix(smartmobile): use clone instead of copy() to preserve base URL
-    feat: Move logger configuration to a single place for both PSR-3 and traditional logger. Allows step by step migration without breaking changes.
-    fix: responsive assets should be loaded from default theme if the user selected theme doesn't have them. Degrade to a sane default.
-    Merge pull request #55 from amulet1/activesync_search_mailbox
-    refactor(ActiveSync): clean up cache handling in getSearchResults
+  notes: Release version 3.0.0-beta4
 3.0.0-beta3:
   api: 3.0.0-beta3
   state:

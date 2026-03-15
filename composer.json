@@ -26,7 +26,7 @@
             "role": "developer"
         }
     ],
-    "time": "2026-03-12",
+    "time": "2026-03-15",
     "repositories": [],
     "require": {
         "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || ^3 || ^2",
@@ -73,8 +73,7 @@
         "horde/util": "^3 || dev-FRAMEWORK_6_0",
         "horde/view": "^3 || dev-FRAMEWORK_6_0",
         "php81_bc/strftime": "^0.7",
-        "ext-session": "*",
-        "horde/ldap": "^3.0@dev"
+        "ext-session": "*"
     },
     "require-dev": {
         "horde/test": "^3 || dev-FRAMEWORK_6_0",
@@ -83,8 +82,6 @@
         "horde/vfs": "^3 || dev-FRAMEWORK_6_0"
     },
     "suggest": {
-        "horde/ldap": "For LDAP connection support",
-        "mikepultz/netdns2": "For DNS resolver functionality (replaces pear/net_dns2)",
         "pear/text_captcha": "*",
         "pear/text_figlet": "*",
         "ext-dom": "*",
@@ -114,6 +111,5 @@
         "branch-alias": {
             "dev-FRAMEWORK_6_0": "3.x-dev"
         }
-    },
-    "minimum-stability": "dev"
+    }
 }
