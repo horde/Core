@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2016-2021 Horde LLC (http://www.horde.org/)
  *
@@ -19,7 +20,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
-
 use Horde\Core\Middleware\DemandSessionToken;
 use Horde\Http\RequestFactory;
 use Horde\Http\StreamFactory;

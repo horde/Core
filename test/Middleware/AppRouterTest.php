@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2026 Horde LLC (http://www.horde.org/)
  *
@@ -81,7 +82,7 @@ class AppRouterTest extends TestCase
      */
     private function createTestMiddleware(string $name): MiddlewareInterface
     {
-        return new class($name) implements MiddlewareInterface {
+        return new class ($name) implements MiddlewareInterface {
             public function __construct(private string $name)
             {
             }
@@ -107,10 +108,12 @@ class AppRouterTest extends TestCase
         mkdir($tempDir . '/config');
         $routesFile = $tempDir . '/config/routes.php';
 
-        file_put_contents($routesFile, <<<'PHP'
-<?php
-$mapper->connect('test-route', '/test', ['controller' => 'TestController']);
-PHP
+        file_put_contents(
+            $routesFile,
+            <<<'PHP'
+                <?php
+                $mapper->connect('test-route', '/test', ['controller' => 'TestController']);
+                PHP
         );
 
         // Setup registry mock
@@ -185,10 +188,12 @@ PHP
         $routesFile = $tempDir . '/config/routes.php';
 
         // Route without explicit stack = default stack
-        file_put_contents($routesFile, <<<'PHP'
-<?php
-$mapper->connect('default-stack', '/default', ['controller' => 'DefaultController']);
-PHP
+        file_put_contents(
+            $routesFile,
+            <<<'PHP'
+                <?php
+                $mapper->connect('default-stack', '/default', ['controller' => 'DefaultController']);
+                PHP
         );
 
         $this->registry->method('get')
@@ -260,13 +265,15 @@ PHP
         $routesFile = $tempDir . '/config/routes.php';
 
         // Explicit empty stack = NO middleware
-        file_put_contents($routesFile, <<<'PHP'
-<?php
-$mapper->connect('no-middleware', '/public', [
-    'controller' => 'PublicController',
-    'stack' => []
-]);
-PHP
+        file_put_contents(
+            $routesFile,
+            <<<'PHP'
+                <?php
+                $mapper->connect('no-middleware', '/public', [
+                    'controller' => 'PublicController',
+                    'stack' => []
+                ]);
+                PHP
         );
 
         $this->registry->method('get')
@@ -334,13 +341,15 @@ PHP
         $routesFile = $tempDir . '/config/routes.php';
 
         // HordeAuthType=NONE implies empty stack
-        file_put_contents($routesFile, <<<'PHP'
-<?php
-$mapper->connect('auth-none', '/login', [
-    'controller' => 'LoginController',
-    'HordeAuthType' => 'NONE'
-]);
-PHP
+        file_put_contents(
+            $routesFile,
+            <<<'PHP'
+                <?php
+                $mapper->connect('auth-none', '/login', [
+                    'controller' => 'LoginController',
+                    'HordeAuthType' => 'NONE'
+                ]);
+                PHP
         );
 
         $this->registry->method('get')
@@ -446,13 +455,15 @@ PHP
         mkdir($tempDir . '/config');
         $routesFile = $tempDir . '/config/routes.php';
 
-        file_put_contents($routesFile, <<<'PHP'
-<?php
-$mapper->connect('test-params', '/item/:id', [
-    'controller' => 'ItemController',
-    'stack' => []
-]);
-PHP
+        file_put_contents(
+            $routesFile,
+            <<<'PHP'
+                <?php
+                $mapper->connect('test-params', '/item/:id', [
+                    'controller' => 'ItemController',
+                    'stack' => []
+                ]);
+                PHP
         );
 
         $this->registry->method('get')

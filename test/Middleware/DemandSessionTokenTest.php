@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2016-2021 Horde LLC (http://www.horde.org/)
  *
@@ -13,9 +14,7 @@
 namespace Horde\Core\Test\Middleware;
 
 use Horde\Core\Middleware\DemandSessionToken;
-
 use Horde\Test\TestCase;
-
 use Horde_Session;
 use Horde_Exception;
 

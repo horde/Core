@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2011-2017 Horde LLC (http://www.horde.org/)
  *
@@ -13,7 +14,6 @@
 namespace Horde\Core\Test;
 
 use PHPUnit\Framework\TestCase;
-
 use Horde\Core\Test\Stub\Registryconfig as RegistryconfigStub;
 use Horde_Registry_Hordeconfig_Merged;
 use Horde_Registry_Hordeconfig;
@@ -44,7 +44,7 @@ class RegistryTest extends TestCase
     public function testDetectWebroot()
     {
         $this->_tmpdir = sys_get_temp_dir() . '/' . uniqid() . '/horde';
-        mkdir($this->_tmpdir, 0777, true);
+        mkdir($this->_tmpdir, 0o777, true);
         $config = new RegistryconfigStub();
 
         $_SERVER['SCRIPT_URL'] = '/horde/foo/bar';

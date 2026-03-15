@@ -458,6 +458,16 @@ class Horde_Registry implements Horde_Shutdown_Task
             Horde\Log\Logger::class => Horde\Core\Factory\LoggerFactory::class,
             'Horde\\Horde\\Service\\JwtService' => 'Horde\\Horde\\Factory\\JwtServiceFactory',
             'Horde\\Horde\\Service\\AuthenticationService' => 'Horde\\Horde\\Factory\\AuthenticationServiceFactory',
+            'Horde\\Core\\Config\\ConfigLoader' => 'Horde\\Core\\Factory\\ConfigLoaderFactory',
+            'Horde\\Core\\Service\\HordeDbService' => 'Horde\\Core\\Factory\\DbServiceFactory',
+            'Horde\\Core\\Service\\PrefsService' => 'Horde\\Core\\Factory\\PrefsServiceFactory',
+            'Horde\\Core\\Service\\IdentityService' => 'Horde\\Core\\Factory\\IdentityServiceFactory',
+            'Horde\\Core\\Service\\GroupService' => 'Horde\\Core\\Factory\\GroupServiceFactory',
+            'Horde\\Core\\Config\\RegistryConfigLoader' => 'Horde\\Core\\Factory\\RegistryConfigLoaderFactory',
+            'Horde\\Core\\Service\\ApplicationService' => 'Horde\\Core\\Factory\\ApplicationServiceFactory',
+            'Horde\\Core\\Auth\\AuthService' => 'Horde\\Core\\Factory\\AuthServiceFactory',
+            'Horde\\Core\\Service\\HordeLdapService' => 'Horde\\Core\\Factory\\HordeLdapServiceFactory',
+            'Horde\\Core\\Service\\PermissionService' => 'Horde\\Core\\Factory\\PermissionServiceFactory',
         ];
 
         /* Define implementations. */

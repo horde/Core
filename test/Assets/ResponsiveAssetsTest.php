@@ -38,7 +38,7 @@ class ResponsiveAssetsTest extends TestCase
     {
         // Setup registry mock
         $this->registryMock->method('get')
-            ->willReturnCallback(function($key, $app) {
+            ->willReturnCallback(function ($key, $app) {
                 if ($key === 'themesfs' && $app === 'horde') {
                     return '/horde/themes';
                 }
@@ -53,7 +53,7 @@ class ResponsiveAssetsTest extends TestCase
 
         // Setup filesystem mock - file exists
         $this->filesystemMock->method('fileExists')
-            ->willReturnCallback(function($path) {
+            ->willReturnCallback(function ($path) {
                 return $path === '/horde/themes/default/responsive.css';
             });
 
@@ -73,7 +73,7 @@ class ResponsiveAssetsTest extends TestCase
     {
         // Setup: Both horde and kronolith have responsive.css
         $this->registryMock->method('get')
-            ->willReturnCallback(function($key, $app) {
+            ->willReturnCallback(function ($key, $app) {
                 if ($key === 'themesfs') {
                     return $app === 'horde' ? '/horde/themes' : '/kronolith/themes';
                 }
@@ -88,7 +88,7 @@ class ResponsiveAssetsTest extends TestCase
 
         // Both files exist
         $this->filesystemMock->method('fileExists')
-            ->willReturnCallback(function($path) {
+            ->willReturnCallback(function ($path) {
                 return str_contains($path, 'responsive.css');
             });
 
@@ -124,7 +124,7 @@ class ResponsiveAssetsTest extends TestCase
     {
         // Setup: Only app file exists, not horde base
         $this->registryMock->method('get')
-            ->willReturnCallback(function($key, $app) {
+            ->willReturnCallback(function ($key, $app) {
                 if ($key === 'themesfs') {
                     return $app === 'horde' ? '/horde/themes' : '/kronolith/themes';
                 }
@@ -139,7 +139,7 @@ class ResponsiveAssetsTest extends TestCase
 
         // Only kronolith file exists
         $this->filesystemMock->method('fileExists')
-            ->willReturnCallback(function($path) {
+            ->willReturnCallback(function ($path) {
                 return str_contains($path, '/kronolith/');
             });
 
@@ -155,7 +155,7 @@ class ResponsiveAssetsTest extends TestCase
     {
         // Setup registry mock
         $this->registryMock->method('get')
-            ->willReturnCallback(function($key, $app) {
+            ->willReturnCallback(function ($key, $app) {
                 if ($key === 'jsfs' && $app === 'horde') {
                     return '/horde/js';
                 }
@@ -170,7 +170,7 @@ class ResponsiveAssetsTest extends TestCase
 
         // File exists
         $this->filesystemMock->method('fileExists')
-            ->willReturnCallback(function($path) {
+            ->willReturnCallback(function ($path) {
                 return $path === '/horde/js/login-form.js';
             });
 
@@ -187,7 +187,7 @@ class ResponsiveAssetsTest extends TestCase
     {
         // Setup: Both horde and kronolith have calendar.js
         $this->registryMock->method('get')
-            ->willReturnCallback(function($key, $app) {
+            ->willReturnCallback(function ($key, $app) {
                 if ($key === 'jsfs') {
                     return $app === 'horde' ? '/horde/js' : '/kronolith/js';
                 }
@@ -217,7 +217,7 @@ class ResponsiveAssetsTest extends TestCase
     {
         // Setup
         $this->registryMock->method('get')
-            ->willReturnCallback(function($key, $app) {
+            ->willReturnCallback(function ($key, $app) {
                 if ($key === 'jsfs') {
                     return '/horde/js';
                 }
@@ -272,7 +272,7 @@ class ResponsiveAssetsTest extends TestCase
         // Mock preferences
         $prefsMock = $this->createMock(\Horde_Prefs::class);
         $prefsMock->method('getValue')
-            ->willReturnCallback(function($key) {
+            ->willReturnCallback(function ($key) {
                 return $key === 'theme' ? 'dark' : null;
             });
 

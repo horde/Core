@@ -29,8 +29,8 @@ class BackendConfigLoaderTest extends TestCase
         $this->vendorDir = $this->tempDir . '/vendor/horde';
         $this->configDir = $this->tempDir . '/config';
 
-        mkdir($this->vendorDir . '/passwd/config', 0755, true);
-        mkdir($this->configDir . '/passwd', 0755, true);
+        mkdir($this->vendorDir . '/passwd/config', 0o755, true);
+        mkdir($this->configDir . '/passwd', 0o755, true);
 
         $this->loader = new BackendConfigLoader($this->configDir, $this->vendorDir);
     }
@@ -59,19 +59,21 @@ class BackendConfigLoaderTest extends TestCase
     {
         // Create vendor defaults
         $vendorFile = $this->vendorDir . '/passwd/config/backends.php';
-        file_put_contents($vendorFile, <<<'PHP'
-<?php
-$backends['hordesql'] = [
-    'disabled' => true,
-    'name' => 'Horde SQL',
-    'driver' => 'Sql',
-];
-$backends['ldap'] = [
-    'disabled' => true,
-    'name' => 'LDAP',
-    'driver' => 'Ldap',
-];
-PHP
+        file_put_contents(
+            $vendorFile,
+            <<<'PHP'
+                <?php
+                $backends['hordesql'] = [
+                    'disabled' => true,
+                    'name' => 'Horde SQL',
+                    'driver' => 'Sql',
+                ];
+                $backends['ldap'] = [
+                    'disabled' => true,
+                    'name' => 'LDAP',
+                    'driver' => 'Ldap',
+                ];
+                PHP
         );
 
         $state = $this->loader->load('passwd');
@@ -85,26 +87,30 @@ PHP
     {
         // Vendor defaults
         $vendorFile = $this->vendorDir . '/passwd/config/backends.php';
-        file_put_contents($vendorFile, <<<'PHP'
-<?php
-$backends['hordesql'] = [
-    'disabled' => true,
-    'name' => 'Horde SQL',
-    'driver' => 'Sql',
-    'params' => ['table' => 'default_table'],
-];
-PHP
+        file_put_contents(
+            $vendorFile,
+            <<<'PHP'
+                <?php
+                $backends['hordesql'] = [
+                    'disabled' => true,
+                    'name' => 'Horde SQL',
+                    'driver' => 'Sql',
+                    'params' => ['table' => 'default_table'],
+                ];
+                PHP
         );
 
         // Local override
         $localFile = $this->configDir . '/passwd/backends.local.php';
-        file_put_contents($localFile, <<<'PHP'
-<?php
-$backends['hordesql'] = [
-    'disabled' => false,
-    'params' => ['table' => 'custom_table'],
-];
-PHP
+        file_put_contents(
+            $localFile,
+            <<<'PHP'
+                <?php
+                $backends['hordesql'] = [
+                    'disabled' => false,
+                    'params' => ['table' => 'custom_table'],
+                ];
+                PHP
         );
 
         $state = $this->loader->load('passwd');
@@ -122,38 +128,44 @@ PHP
     {
         // Vendor defaults
         $vendorFile = $this->vendorDir . '/passwd/config/backends.php';
-        file_put_contents($vendorFile, <<<'PHP'
-<?php
-$backends['hordesql'] = [
-    'disabled' => true,
-    'name' => 'Horde SQL',
-];
-PHP
+        file_put_contents(
+            $vendorFile,
+            <<<'PHP'
+                <?php
+                $backends['hordesql'] = [
+                    'disabled' => true,
+                    'name' => 'Horde SQL',
+                ];
+                PHP
         );
 
         // Create snippets directory
-        mkdir($this->configDir . '/passwd/backends.d', 0755, true);
+        mkdir($this->configDir . '/passwd/backends.d', 0o755, true);
 
         // Snippet 1
         $snippet1 = $this->configDir . '/passwd/backends.d/01-ldap.php';
-        file_put_contents($snippet1, <<<'PHP'
-<?php
-$backends['ldap'] = [
-    'disabled' => false,
-    'name' => 'LDAP Server',
-];
-PHP
+        file_put_contents(
+            $snippet1,
+            <<<'PHP'
+                <?php
+                $backends['ldap'] = [
+                    'disabled' => false,
+                    'name' => 'LDAP Server',
+                ];
+                PHP
         );
 
         // Snippet 2
         $snippet2 = $this->configDir . '/passwd/backends.d/02-poppassd.php';
-        file_put_contents($snippet2, <<<'PHP'
-<?php
-$backends['poppassd'] = [
-    'disabled' => false,
-    'name' => 'Poppassd',
-];
-PHP
+        file_put_contents(
+            $snippet2,
+            <<<'PHP'
+                <?php
+                $backends['poppassd'] = [
+                    'disabled' => false,
+                    'name' => 'Poppassd',
+                ];
+                PHP
         );
 
         $state = $this->loader->load('passwd');
@@ -167,12 +179,14 @@ PHP
     {
         // Vendor defaults
         $vendorFile = $this->vendorDir . '/passwd/config/backends.php';
-        file_put_contents($vendorFile, <<<'PHP'
-<?php
-$backends['hordesql'] = [
-    'name' => 'Horde SQL',
-];
-PHP
+        file_put_contents(
+            $vendorFile,
+            <<<'PHP'
+                <?php
+                $backends['hordesql'] = [
+                    'name' => 'Horde SQL',
+                ];
+                PHP
         );
 
         // First load
@@ -188,12 +202,14 @@ PHP
     {
         // Vendor defaults
         $vendorFile = $this->vendorDir . '/passwd/config/backends.php';
-        file_put_contents($vendorFile, <<<'PHP'
-<?php
-$backends['hordesql'] = [
-    'name' => 'Horde SQL',
-];
-PHP
+        file_put_contents(
+            $vendorFile,
+            <<<'PHP'
+                <?php
+                $backends['hordesql'] = [
+                    'name' => 'Horde SQL',
+                ];
+                PHP
         );
 
         // First load
@@ -211,21 +227,25 @@ PHP
     public function testLoadLayerVendor(): void
     {
         $vendorFile = $this->vendorDir . '/passwd/config/backends.php';
-        file_put_contents($vendorFile, <<<'PHP'
-<?php
-$backends['hordesql'] = [
-    'name' => 'Vendor SQL',
-];
-PHP
+        file_put_contents(
+            $vendorFile,
+            <<<'PHP'
+                <?php
+                $backends['hordesql'] = [
+                    'name' => 'Vendor SQL',
+                ];
+                PHP
         );
 
         $localFile = $this->configDir . '/passwd/backends.local.php';
-        file_put_contents($localFile, <<<'PHP'
-<?php
-$backends['hordesql'] = [
-    'name' => 'Local SQL',
-];
-PHP
+        file_put_contents(
+            $localFile,
+            <<<'PHP'
+                <?php
+                $backends['hordesql'] = [
+                    'name' => 'Local SQL',
+                ];
+                PHP
         );
 
         $vendorLayer = $this->loader->loadLayer('passwd', 'vendor');
@@ -236,21 +256,25 @@ PHP
     public function testLoadLayerLocal(): void
     {
         $vendorFile = $this->vendorDir . '/passwd/config/backends.php';
-        file_put_contents($vendorFile, <<<'PHP'
-<?php
-$backends['hordesql'] = [
-    'name' => 'Vendor SQL',
-];
-PHP
+        file_put_contents(
+            $vendorFile,
+            <<<'PHP'
+                <?php
+                $backends['hordesql'] = [
+                    'name' => 'Vendor SQL',
+                ];
+                PHP
         );
 
         $localFile = $this->configDir . '/passwd/backends.local.php';
-        file_put_contents($localFile, <<<'PHP'
-<?php
-$backends['hordesql'] = [
-    'name' => 'Local SQL',
-];
-PHP
+        file_put_contents(
+            $localFile,
+            <<<'PHP'
+                <?php
+                $backends['hordesql'] = [
+                    'name' => 'Local SQL',
+                ];
+                PHP
         );
 
         $localLayer = $this->loader->loadLayer('passwd', 'local');
@@ -261,20 +285,22 @@ PHP
     public function testDisabledFiltering(): void
     {
         $vendorFile = $this->vendorDir . '/passwd/config/backends.php';
-        file_put_contents($vendorFile, <<<'PHP'
-<?php
-$backends['enabled_backend'] = [
-    'disabled' => false,
-    'name' => 'Enabled',
-];
-$backends['disabled_backend'] = [
-    'disabled' => true,
-    'name' => 'Disabled',
-];
-$backends['no_flag_backend'] = [
-    'name' => 'No Flag',
-];
-PHP
+        file_put_contents(
+            $vendorFile,
+            <<<'PHP'
+                <?php
+                $backends['enabled_backend'] = [
+                    'disabled' => false,
+                    'name' => 'Enabled',
+                ];
+                $backends['disabled_backend'] = [
+                    'disabled' => true,
+                    'name' => 'Disabled',
+                ];
+                $backends['no_flag_backend'] = [
+                    'name' => 'No Flag',
+                ];
+                PHP
         );
 
         $state = $this->loader->load('passwd');
@@ -296,24 +322,28 @@ PHP
     {
         // Setup passwd app (already exists from setUp)
         $passwdFile = $this->vendorDir . '/passwd/config/backends.php';
-        file_put_contents($passwdFile, <<<'PHP'
-<?php
-$backends['passwd_backend'] = [
-    'name' => 'Passwd Backend',
-];
-PHP
+        file_put_contents(
+            $passwdFile,
+            <<<'PHP'
+                <?php
+                $backends['passwd_backend'] = [
+                    'name' => 'Passwd Backend',
+                ];
+                PHP
         );
 
         // Setup imp app
-        mkdir($this->vendorDir . '/imp/config', 0755, true);
-        mkdir($this->configDir . '/imp', 0755, true);
+        mkdir($this->vendorDir . '/imp/config', 0o755, true);
+        mkdir($this->configDir . '/imp', 0o755, true);
         $impFile = $this->vendorDir . '/imp/config/backends.php';
-        file_put_contents($impFile, <<<'PHP'
-<?php
-$backends['imp_backend'] = [
-    'name' => 'IMP Backend',
-];
-PHP
+        file_put_contents(
+            $impFile,
+            <<<'PHP'
+                <?php
+                $backends['imp_backend'] = [
+                    'name' => 'IMP Backend',
+                ];
+                PHP
         );
 
         $passwdState = $this->loader->load('passwd');

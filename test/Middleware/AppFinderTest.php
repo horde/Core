@@ -18,7 +18,6 @@ use Horde\Core\Middleware\AppFinder;
 use Horde\Http\ResponseFactory;
 use Horde\Http\StreamFactory;
 use Horde\Test\TestCase;
-
 use Horde_Registry;
 
 class AppFinderTest extends TestCase

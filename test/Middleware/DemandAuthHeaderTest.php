@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2016-2021 Horde LLC (http://www.horde.org/)
  *
@@ -15,7 +16,6 @@ namespace Horde\Core\Test\Middleware;
 use Horde_Test_Case as HordeTestCase;
 use Horde_Session;
 use Horde_Exception;
-
 use Horde\Core\Middleware\DemandAuthHeader;
 
 class DemandAuthHeaderTest extends HordeTestCase
