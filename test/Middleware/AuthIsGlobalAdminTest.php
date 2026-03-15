@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2016-2021 Horde LLC (http://www.horde.org/)
  *
@@ -10,27 +11,25 @@
  * @package  Core
  */
 
- namespace Horde\Core\Test\Middleware;
+namespace Horde\Core\Test\Middleware;
 
- use Horde\Core\Middleware\AuthIsGlobalAdmin;
+use Horde\Core\Middleware\AuthIsGlobalAdmin;
+use Horde\Test\TestCase;
+use Horde_Session;
+use Horde_Exception;
+use Horde_Registry;
 
- use Horde\Test\TestCase;
+class AuthIsGlobalAdminTest extends TestCase
+{
+    use SetUpTrait;
 
- use Horde_Session;
- use Horde_Exception;
- use Horde_Registry;
+    protected function getMiddleware()
+    {
+        return new AuthIsGlobalAdmin($this->registry);
+    }
 
- class AuthIsGlobalAdminTest extends TestCase
- {
-     use SetUpTrait;
-
-     protected function getMiddleware()
-     {
-         return new AuthIsGlobalAdmin($this->registry);
-     }
-     
-     public function testIsAdmin()
-     {
+    public function testIsAdmin()
+    {
         $username = 'testuser01';
         $middleware = $this->getMiddleware();
         $this->registry->method('isAuthenticated')->willReturn(true);
@@ -44,10 +43,10 @@
 
         $this->assertTrue($authAdminUser); // tests if $authAdminUser is set to true -> Admin
         $this->assertEquals(200, $response->getStatusCode());
-     }
+    }
 
-     public function testIsNotAdmin()
-     {
+    public function testIsNotAdmin()
+    {
         $username = 'testuser01';
         $middleware = $this->getMiddleware();
         $this->registry->method('isAuthenticated')->willReturn(true);
@@ -59,24 +58,24 @@
         $authAdminUser = $this->recentlyHandledRequest->getAttribute('HORDE_GLOBAL_ADMIN');
         // assert that $authAdminUser has the correct Value
 
-        $this->assertNull($authAdminUser); // asserTrue/False before, resulted in failing to assert that null is false 
+        $this->assertNull($authAdminUser); // asserTrue/False before, resulted in failing to assert that null is false
         $this->assertEquals(200, $response->getStatusCode());
-     }
+    }
 
-     public function testUserIsNotAuthenticated()
-     {
-         $username = 'testuser01';
-         $middleware = $this->getMiddleware();
-         $this->registry->method('isAuthenticated')->willReturn(false);
-         $this->registry->method('getAuth')->willReturn($username);
-         $this->registry->method('isAdmin')->willReturn(true);
-         $request = $this->requestFactory->createServerRequest('GET', '/test');
-         $response = $middleware->process($request, $this->handler);
+    public function testUserIsNotAuthenticated()
+    {
+        $username = 'testuser01';
+        $middleware = $this->getMiddleware();
+        $this->registry->method('isAuthenticated')->willReturn(false);
+        $this->registry->method('getAuth')->willReturn($username);
+        $this->registry->method('isAdmin')->willReturn(true);
+        $request = $this->requestFactory->createServerRequest('GET', '/test');
+        $response = $middleware->process($request, $this->handler);
 
-         $authAdminUser = $this->recentlyHandledRequest->getAttribute('HORDE_GLOBAL_ADMIN');
-         // assert that $authAdminUser has the correct Value
+        $authAdminUser = $this->recentlyHandledRequest->getAttribute('HORDE_GLOBAL_ADMIN');
+        // assert that $authAdminUser has the correct Value
 
-         $this->assertNull($authAdminUser);
-         $this->assertEquals(200, $response->getStatusCode());
-     }
- }
+        $this->assertNull($authAdminUser);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+}

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2016-2021 Horde LLC (http://www.horde.org/)
  *
@@ -14,7 +15,6 @@ namespace Horde\Core\Test\Middleware;
 
 use Horde\Test\TestCase;
 use Horde\Core\Middleware\DemandAuthenticatedUser;
-
 use Horde_Session;
 use Horde_Exception;
 

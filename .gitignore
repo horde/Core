@@ -26,7 +26,8 @@ run-tests.log
 /test/*/*/*/*.exp
 /test/*/*/*/*.log
 /test/*/*/*/*.out
-
+## composer plugin's var/config tree shall not be committed.
+/var 
 /vendor
 /composer.lock
 /web

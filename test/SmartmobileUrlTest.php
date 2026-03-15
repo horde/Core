@@ -3,7 +3,6 @@
 namespace Horde\Core\Test;
 
 use Horde\Test\TestCase;
-
 use Horde_Core_Smartmobile_Url as SmartmobileUrl;
 use Horde_Url;
 

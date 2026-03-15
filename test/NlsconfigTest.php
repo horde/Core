@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2016-2017 Horde LLC (http://www.horde.org/)
  *
@@ -13,7 +14,6 @@
 namespace Horde\Core\Test;
 
 use Horde\Test\TestCase;
-
 use Horde_Session;
 use Horde_Support_Stub;
 use Horde_Test_Stub_Registry;

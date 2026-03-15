@@ -19,8 +19,8 @@ class MockIMPMailbox
     public function __get($property)
     {
         switch ($property) {
-        case 'value':
-            return $this->_name;
+            case 'value':
+                return $this->_name;
         }
     }
 }

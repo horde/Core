@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
  *
@@ -13,17 +14,16 @@ namespace Horde\Core\Test;
 use Horde\Test\TestCase;
 use Horde\Core\Mock\MockConnector;
 use Horde\Core\Mock\MockIMPMailbox;
-
 use Horde_Date;
 
- /**
- * Unit tests for ActiveSync functionality in Core.
- *
- * @author  Michael J Rubinsky <mrubinsk@horde.org>
- * @category   Horde
- * @package    Core
- * @subpackage UnitTests
- */
+/**
+* Unit tests for ActiveSync functionality in Core.
+*
+* @author  Michael J Rubinsky <mrubinsk@horde.org>
+* @category   Horde
+* @package    Core
+* @subpackage UnitTests
+*/
 class ActiveSyncTests extends TestCase
 {
     protected $_auth;
@@ -52,7 +52,7 @@ class ActiveSyncTests extends TestCase
                 'd' => '.',
                 'label' => 'Drafts',
                 'level' => 0,
-                'ob' =>$this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
             'INBOX.Saved Emails' => [
                 'a' => 8,
@@ -115,7 +115,7 @@ class ActiveSyncTests extends TestCase
                 'd' => '.',
                 'label' => 'Sent',
                 'level' => 0,
-                'ob' =>$this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
+                'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
             'INBOX.Spam' => [
                 'a' => 8,
@@ -148,7 +148,7 @@ class ActiveSyncTests extends TestCase
             'user.benjamin.Saved Emails' => [
                 'a' => 8,
                 'd' => '.',
-                'label' =>'user.benjamin.Saved Emails',
+                'label' => 'user.benjamin.Saved Emails',
                 'level' => 2,
                 'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
 
@@ -230,11 +230,11 @@ class ActiveSyncTests extends TestCase
             'INBOX' => [
                 'a' => 40,
                 'd' => '/',
-                'label' =>'Inbox',
+                'label' => 'Inbox',
                 'level' => 0,
                 'ob' => $this->getMockSkipConstructor('Horde_Imap_Client_Mailbox'), ],
             'sent-mail' => [
-                'a'=> 8,
+                'a' => 8,
                 'd' => '/',
                 'label' => 'Sent',
                 'level' => 0,
@@ -319,18 +319,18 @@ class ActiveSyncTests extends TestCase
 
             $have[$f->_serverid] = true;
             switch ($f->_serverid) {
-            case 'INBOX.Drafts':
-                $this->assertEquals(3, $f->type);
-                break;
-            case 'INBOX':
-                $this->assertEquals(2, $f->type);
-                break;
-            case 'INBOX.Sent':
-                $this->assertEquals(5, $f->type);
-                break;
-            case 'INBOX.Spam':
-                $this->assertEquals(12, $f->type);
-                break;
+                case 'INBOX.Drafts':
+                    $this->assertEquals(3, $f->type);
+                    break;
+                case 'INBOX':
+                    $this->assertEquals(2, $f->type);
+                    break;
+                case 'INBOX.Sent':
+                    $this->assertEquals(5, $f->type);
+                    break;
+                case 'INBOX.Spam':
+                    $this->assertEquals(12, $f->type);
+                    break;
             }
         }
 
@@ -362,15 +362,15 @@ class ActiveSyncTests extends TestCase
         foreach ($folders as $f) {
             $have[$f->_serverid] = true;
             switch ($f->_serverid) {
-            case 'INBOX':
-                $this->assertEquals(2, $f->type);
-                break;
-            case 'Sent':
-                $this->assertEquals(5, $f->type);
-                break;
-            case 'Trash':
-                $this->assertEquals(4, $f->type);
-                break;
+                case 'INBOX':
+                    $this->assertEquals(2, $f->type);
+                    break;
+                case 'Sent':
+                    $this->assertEquals(5, $f->type);
+                    break;
+                case 'Trash':
+                    $this->assertEquals(4, $f->type);
+                    break;
             }
         }
 
@@ -413,18 +413,18 @@ class ActiveSyncTests extends TestCase
 
             $have[$f->_serverid] = true;
             switch ($f->_serverid) {
-            case 'Draft':
-                $this->assertEquals(3, $f->type);
-                break;
-            case 'INBOX':
-                $this->assertEquals(2, $f->type);
-                break;
-            case 'sent-mail':
-                $this->assertEquals(5, $f->type);
-                break;
-            case 'spam_folder':
-                $this->assertEquals(12, $f->type);
-                break;
+                case 'Draft':
+                    $this->assertEquals(3, $f->type);
+                    break;
+                case 'INBOX':
+                    $this->assertEquals(2, $f->type);
+                    break;
+                case 'sent-mail':
+                    $this->assertEquals(5, $f->type);
+                    break;
+                case 'spam_folder':
+                    $this->assertEquals(12, $f->type);
+                    break;
             }
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Test the Kolab_Server factory.
  *

@@ -130,7 +130,7 @@ class VhostTest extends TestCase
     public function testDefaultConstructorValue(): void
     {
         // Test that default parameter works
-        $loader = function(Vhost|string $vhost = 'localhost') {
+        $loader = function (Vhost|string $vhost = 'localhost') {
             return Vhost::from($vhost);
         };
 

@@ -53,7 +53,7 @@ class ResponsiveTemplateViewTest extends TestCase
 
         // Create view with data
         $view = new ResponsiveTemplateView($this->tempTemplate, [
-            'message' => 'Hello World'
+            'message' => 'Hello World',
         ]);
 
         // Render
@@ -68,7 +68,7 @@ class ResponsiveTemplateViewTest extends TestCase
 
         $view = new ResponsiveTemplateView($this->tempTemplate, [
             'greeting' => 'Hello',
-            'name' => 'Horde'
+            'name' => 'Horde',
         ]);
 
         $output = $view->render();
@@ -78,17 +78,17 @@ class ResponsiveTemplateViewTest extends TestCase
     public function testRenderWithHtmlTemplate(): void
     {
         $template = <<<'HTML'
-<!DOCTYPE html>
-<html>
-<head><title><?php echo $title; ?></title></head>
-<body><h1><?php echo $heading; ?></h1></body>
-</html>
-HTML;
+            <!DOCTYPE html>
+            <html>
+            <head><title><?php echo $title; ?></title></head>
+            <body><h1><?php echo $heading; ?></h1></body>
+            </html>
+            HTML;
         file_put_contents($this->tempTemplate, $template);
 
         $view = new ResponsiveTemplateView($this->tempTemplate, [
             'title' => 'Test Page',
-            'heading' => 'Welcome'
+            'heading' => 'Welcome',
         ]);
 
         $output = $view->render();
@@ -101,7 +101,7 @@ HTML;
         file_put_contents($this->tempTemplate, '<?= $this->property ?>');
 
         $view = new ResponsiveTemplateView($this->tempTemplate, [
-            'property' => 'value123'
+            'property' => 'value123',
         ]);
 
         $output = $view->render();
@@ -123,7 +123,7 @@ HTML;
         file_put_contents($this->tempTemplate, '<?php echo isset($this->exists) ? "yes" : "no"; ?>');
 
         $view = new ResponsiveTemplateView($this->tempTemplate, [
-            'exists' => 'value'
+            'exists' => 'value',
         ]);
 
         $output = $view->render();
@@ -156,7 +156,7 @@ HTML;
         $data = [
             'name' => 'Test',
             'value' => 123,
-            'array' => [1, 2, 3]
+            'array' => [1, 2, 3],
         ];
 
         file_put_contents($this->tempTemplate, '<?php echo "test"; ?>');
@@ -170,7 +170,7 @@ HTML;
         file_put_contents($this->tempTemplate, '<?= $this->escape($html) ?>');
 
         $view = new ResponsiveTemplateView($this->tempTemplate, [
-            'html' => '<script>alert("xss")</script>'
+            'html' => '<script>alert("xss")</script>',
         ]);
 
         $output = $view->render();
@@ -203,7 +203,7 @@ HTML;
         file_put_contents($this->tempTemplate, '<div data-value="<?= $this->escapeAttr($attr) ?>"></div>');
 
         $view = new ResponsiveTemplateView($this->tempTemplate, [
-            'attr' => 'value"onclick="alert(1)'
+            'attr' => 'value"onclick="alert(1)',
         ]);
 
         $output = $view->render();
@@ -217,7 +217,7 @@ HTML;
         file_put_contents($this->tempTemplate, '<a href="<?= $this->escapeUrl($url) ?>">Link</a>');
 
         $view = new ResponsiveTemplateView($this->tempTemplate, [
-            'url' => 'http://example.com?foo=bar&baz=qux'
+            'url' => 'http://example.com?foo=bar&baz=qux',
         ]);
 
         $output = $view->render();
@@ -242,12 +242,12 @@ HTML;
     public function testRenderCapturesAllOutput(): void
     {
         $template = <<<'PHP'
-<?php
-echo "Line 1\n";
-echo "Line 2\n";
-echo "Line 3";
-?>
-PHP;
+            <?php
+            echo "Line 1\n";
+            echo "Line 2\n";
+            echo "Line 3";
+            ?>
+            PHP;
         file_put_contents($this->tempTemplate, $template);
 
         $view = new ResponsiveTemplateView($this->tempTemplate, []);
@@ -261,14 +261,14 @@ PHP;
     public function testRenderWithLoop(): void
     {
         $template = <<<'PHP'
-<?php foreach ($items as $item): ?>
-<li><?= $this->escape($item) ?></li>
-<?php endforeach; ?>
-PHP;
+            <?php foreach ($items as $item): ?>
+            <li><?= $this->escape($item) ?></li>
+            <?php endforeach; ?>
+            PHP;
         file_put_contents($this->tempTemplate, $template);
 
         $view = new ResponsiveTemplateView($this->tempTemplate, [
-            'items' => ['Item 1', 'Item 2', 'Item 3']
+            'items' => ['Item 1', 'Item 2', 'Item 3'],
         ]);
 
         $output = $view->render();
@@ -280,16 +280,16 @@ PHP;
     public function testRenderWithConditional(): void
     {
         $template = <<<'PHP'
-<?php if ($show): ?>
-<p>Visible</p>
-<?php else: ?>
-<p>Hidden</p>
-<?php endif; ?>
-PHP;
+            <?php if ($show): ?>
+            <p>Visible</p>
+            <?php else: ?>
+            <p>Hidden</p>
+            <?php endif; ?>
+            PHP;
         file_put_contents($this->tempTemplate, $template);
 
         $view = new ResponsiveTemplateView($this->tempTemplate, [
-            'show' => true
+            'show' => true,
         ]);
 
         $output = $view->render();

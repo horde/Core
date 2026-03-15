@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2026 Horde LLC (http://www.horde.org/)
  *
@@ -96,13 +97,15 @@ class RampageIntegrationTest extends TestCase
     public function testFullRequestWithDefaultMiddleware(): void
     {
         // Create routes file with default middleware
-        file_put_contents($this->tempAppDir . '/config/routes.php', <<<'PHP'
-<?php
-// Route without explicit stack = uses default middleware
-$mapper->connect('protected-api', '/api/protected', [
-    'controller' => 'ProtectedApiController'
-]);
-PHP
+        file_put_contents(
+            $this->tempAppDir . '/config/routes.php',
+            <<<'PHP'
+                <?php
+                // Route without explicit stack = uses default middleware
+                $mapper->connect('protected-api', '/api/protected', [
+                    'controller' => 'ProtectedApiController'
+                ]);
+                PHP
         );
 
         // Mock registry
@@ -142,7 +145,7 @@ PHP
                 $body = $this->streamFactory->createStream(json_encode([
                     'status' => 'success',
                     'data' => 'Protected data',
-                    'middlewares' => $middlewaresExecuted
+                    'middlewares' => $middlewaresExecuted,
                 ]));
 
                 return $this->responseFactory->createResponse(200)
@@ -211,14 +214,16 @@ PHP
     public function testFullRequestBypassingDefaultMiddleware(): void
     {
         // Create routes file with empty stack
-        file_put_contents($this->tempAppDir . '/config/routes.php', <<<'PHP'
-<?php
-// Route with empty stack = NO default middleware
-$mapper->connect('public-api', '/api/public', [
-    'controller' => 'PublicApiController',
-    'stack' => []  // Explicitly bypass default middleware
-]);
-PHP
+        file_put_contents(
+            $this->tempAppDir . '/config/routes.php',
+            <<<'PHP'
+                <?php
+                // Route with empty stack = NO default middleware
+                $mapper->connect('public-api', '/api/public', [
+                    'controller' => 'PublicApiController',
+                    'stack' => []  // Explicitly bypass default middleware
+                ]);
+                PHP
         );
 
         // Mock registry
@@ -253,7 +258,7 @@ PHP
                 $body = $this->streamFactory->createStream(json_encode([
                     'status' => 'success',
                     'data' => 'Public data - no auth required',
-                    'middlewares' => $middlewaresExecuted
+                    'middlewares' => $middlewaresExecuted,
                 ]));
 
                 return $this->responseFactory->createResponse(200)
@@ -314,7 +319,7 @@ PHP
      */
     private function createTrackingMiddleware(string $name, array &$tracker): object
     {
-        return new class($name, $tracker) implements \Psr\Http\Server\MiddlewareInterface {
+        return new class ($name, $tracker) implements \Psr\Http\Server\MiddlewareInterface {
             public function __construct(
                 private string $name,
                 private array &$tracker
