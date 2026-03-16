@@ -143,34 +143,45 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      */
     public function __construct(array $params = [])
     {
-        parent::__construct($params);
-        if (empty($this->_params['connector']) ||
-            !($this->_params['connector'] instanceof Horde_Core_ActiveSync_Connector)) {
+        $connector = self::extractArrayValue($params, 'connector');
+        if ($connector instanceof Horde_Core_ActiveSync_Connector) {
+            $this->_connector = $connector;
+        } else {
             throw new InvalidArgumentException('Missing required connector object.');
         }
 
-        if (empty($this->_params['auth']) ||
-            !($this->_params['auth'] instanceof Horde_Auth_Base)) {
+        $auth = self::extractArrayValue($params, 'auth');
+        if ($auth instanceof Horde_Auth_Base) {
+            $this->_auth = $auth;
+        } else {
             throw new InvalidArgumentException('Missing required Auth object');
         }
 
-        $this->_connector = $params['connector'];
-        $this->_auth = $params['auth'];
-        unset($this->_params['connector']);
-        unset($this->_params['auth']);
-        if (!empty($this->_params['imap'])) {
-            $this->_imap = $this->_params['imap'];
-            unset($this->_params['imap']);
-        }
-        $this->_cache = $this->_params['cache'] ?? null;
+        $this->_imap = self::extractArrayValue($params, 'imap');
 
-        // Build the displaymap
+        $this->_cache = self::extractArrayValue($params, 'cache');
+
+        // Build the displaymap (@todo: make it static)
         $this->_displayMap = [
             self::APPOINTMENTS_FOLDER_UID => Horde_ActiveSync_Translation::t('Calendar'),
             self::CONTACTS_FOLDER_UID     => Horde_ActiveSync_Translation::t('Contacts'),
             self::TASKS_FOLDER_UID        => Horde_ActiveSync_Translation::t('Tasks'),
             self::NOTES_FOLDER_UID        => Horde_ActiveSync_Translation::t('Notes'),
         ];
+
+        parent::__construct($params);
+    }
+
+    private static function extractArrayValue(array &$array, string $key)
+    {
+        if (isset($array[$key])) {
+            $value = $array[$key];
+            unset($array[$key]);
+        } else {
+            $value = null;
+        }
+
+        return $value;
     }
 
     /**
