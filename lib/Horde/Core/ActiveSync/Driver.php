@@ -3433,13 +3433,13 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
       */
     protected function _getMailFolders()
     {
-        if (empty($this->_mailFolders)) {
+        if ($this->_mailFolders === null) {
             if (empty($this->_imap)) {
-                $this->_mailFolders = [$this->_buildDummyFolder(self::SPECIAL_INBOX)];
-                $this->_mailFolders[] = $this->_buildDummyFolder(self::SPECIAL_TRASH);
-                $this->_mailFolders[] = $this->_buildDummyFolder(self::SPECIAL_SENT);
-                $this->_mailFolders[] = $this->_buildDummyFolder(self::SPECIAL_DRAFTS);
-                $this->_mailFolders[] = $this->_buildDummyFolder(self::SPECIAL_OUTBOX);
+                $folders = [];
+                $folders[] = $this->_buildDummyFolder(self::SPECIAL_INBOX);
+                $folders[] = $this->_buildDummyFolder(self::SPECIAL_TRASH);
+                $folders[] = $this->_buildDummyFolder(self::SPECIAL_SENT);
+                $folders[] = $this->_buildDummyFolder(self::SPECIAL_DRAFTS);
             } else {
                 $this->_logger->meta('Polling Horde_Core_ActiveSync_Driver::_getMailFolders()');
                 $folders = [];
@@ -3466,23 +3466,18 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                                 $folders[] = $this->_getMailFolder((string)$id, $imap_folders, $folder);
                                 ++$cnt;
                             } catch (Horde_ActiveSync_Exception $e) {
-                                $this->_logger->err(
-                                    sprintf(
-                                        'Problem retrieving %s mail folder',
-                                        $id
-                                    )
-                                );
+                                $this->_logger->err(sprintf('Problem retrieving %s mail folder', $id));
                             }
                         }
                     }
                     ++$level;
                 }
-
-                // Fake Outbox for broken clients.
-                $folders[] = $this->_buildDummyFolder(self::SPECIAL_OUTBOX);
-
-                $this->_mailFolders = $folders;
             }
+
+            // Fake Outbox for broken clients.
+            $folders[] = $this->_buildDummyFolder(self::SPECIAL_OUTBOX);
+
+            $this->_mailFolders = $folders;
         }
 
         return $this->_mailFolders;
