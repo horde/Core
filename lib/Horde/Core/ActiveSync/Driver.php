@@ -53,6 +53,13 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     protected $_modCache;
 
     /**
+     * Local cache of mail folders polled from IMAP.
+     *
+     * @var array|null
+     */
+    protected $_mailFolders = null;
+
+    /**
      * Horde connector instance
      *
      * @var Horde_Core_ActiveSync_Connector
@@ -93,6 +100,13 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      * @var array
      */
     protected $_verbs = [];
+
+    /**
+     * Cache object for storing search results etc.
+     *
+     * @var Horde_Cache
+     */
+    protected $_cache;
 
     /**
      * Class => Id map
