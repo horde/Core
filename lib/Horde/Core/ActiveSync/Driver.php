@@ -2338,7 +2338,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         if ($forward || $reply) {
             $source = $message->source;
             if ($source->longid) {
-                [$folderid, $itemid] = explode(':', $source, 2);
+                [$folderid, $itemid] = explode(':', $source->longid, 2);
             } elseif ($forward === true || $reply === true) {
                 $folderid = $source->folderid;
                 $itemid = $source->itemid;
