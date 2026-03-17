@@ -93,6 +93,11 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
         $emptyrows = [];
 
         for ($row = 0; $row < $rows; $row++) {
+            // Skip null rows (sparse array)
+            if (!isset($this->_layout[$row]) || !is_array($this->_layout[$row])) {
+                continue;
+            }
+
             $cols = count($this->_layout[$row]);
             if (!isset($emptyrows[$row])) {
                 $emptyrows[$row] = true;
@@ -757,6 +762,11 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
     public function removeRowIfEmpty($row)
     {
         if (!$this->rowExists($row)) {
+            return true;
+        }
+
+        // Check if row is actually set (not just within bounds)
+        if (!isset($this->_layout[$row]) || !is_array($this->_layout[$row])) {
             return true;
         }
 
