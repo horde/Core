@@ -107,6 +107,7 @@
             "horde/horde-installer-plugin": true
         }
     },
+    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-FRAMEWORK_6_0": "3.x-dev"

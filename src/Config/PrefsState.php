@@ -94,6 +94,16 @@ class PrefsState
     }
 
     /**
+     * Get all preference definitions
+     *
+     * @return array All preference definitions indexed by name
+     */
+    public function getAllPrefs(): array
+    {
+        return $this->prefs;
+    }
+
+    /**
      * Get all prefs and groups as array (for legacy compatibility)
      *
      * @return array ['_prefs' => [...], 'prefGroups' => [...]]
