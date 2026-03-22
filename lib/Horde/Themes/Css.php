@@ -264,7 +264,7 @@ class Horde_Themes_Css
         $logger = null;
         try {
             $logger = $injector->get(Logger::class);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Logger not available, continue without logging
         }
 

@@ -53,7 +53,7 @@ class Horde_Themes_Css_Compress
             }
             try {
                 $files[] = new CssFile((string) $val['uri'], (string) $val['fs']);
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 // Skip unreadable files
                 if ($logger !== null) {
                     $logger->warning(
@@ -78,7 +78,7 @@ class Horde_Themes_Css_Compress
         if ($logger === null) {
             try {
                 $logger = $injector->get(Logger::class);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Logger not available, continue without logging
                 $logger = null;
             }
