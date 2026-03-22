@@ -13,11 +13,13 @@
  */
 
 use Horde\CssMinify\CssParserMinifier;
+use Horde\CssMinify\ImportCallback;
 use Horde\CssMinify\Input\CssFile;
 use Horde\CssMinify\Input\FileCollectionInput;
 use Horde\CssMinify\Settings;
 use Horde\CssMinify\UrlCallback;
-use Horde\CssMinify\ImportCallback;
+use Horde\Log\Logger;
+use Psr\Log\LoggerInterface;
 
 /**
  * Compresses CSS based on Horde configuration parameters.
@@ -36,10 +38,11 @@ class Horde_Themes_Css_Compress
      * to a string.
      *
      * @param array $css  See Horde_Themes_Css#getStylesheets().
+     * @param LoggerInterface|null $logger  Optional PSR-3 logger for error reporting.
      *
      * @return string  CSS data.
      */
-    public function compress($css)
+    public function compress($css, ?LoggerInterface $logger = null)
     {
         global $browser, $conf, $injector;
 
@@ -52,6 +55,12 @@ class Horde_Themes_Css_Compress
                 $files[] = new CssFile((string) $val['uri'], (string) $val['fs']);
             } catch (\InvalidArgumentException $e) {
                 // Skip unreadable files
+                if ($logger !== null) {
+                    $logger->warning(
+                        'Skipping unreadable CSS file: {file}',
+                        ['file' => $val['fs'] ?? 'unknown', 'exception' => $e->getMessage()]
+                    );
+                }
                 continue;
             }
         }
@@ -65,7 +74,15 @@ class Horde_Themes_Css_Compress
             $dataUrlCallback = new UrlCallback([$this, 'dataurlCallback']);
         }
 
-        $logger = $injector->getInstance('Horde_Log_Logger');
+        // Use provided logger or attempt to get from injector
+        if ($logger === null) {
+            try {
+                $logger = $injector->get(Logger::class);
+            } catch (\Exception $e) {
+                // Logger not available, continue without logging
+                $logger = null;
+            }
+        }
 
         $minifier = new CssParserMinifier(
             new FileCollectionInput(...$files),

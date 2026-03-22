@@ -12,6 +12,8 @@
  * @package   Core
  */
 
+use Horde\Log\Logger;
+
 /**
  * Horde_Cache backend for the CSS caching library.
  *
@@ -48,7 +50,16 @@ class Horde_Themes_Css_Cache_HordeCache extends Horde_Themes_Css_Cache
         // Do lifetime checking here, not on cache display page.
         if (!$cache->exists($sig, empty($this->_params['lifetime']) ? 0 : $this->_params['lifetime'])) {
             $compress = new Horde_Themes_Css_Compress();
-            $cache->set($sig, $compress->compress($css));
+
+            // Try to get PSR-3 logger for error reporting
+            $logger = null;
+            try {
+                $logger = $injector->get(Logger::class);
+            } catch (\Exception $e) {
+                // Logger not available, continue without logging
+            }
+
+            $cache->set($sig, $compress->compress($css, $logger));
         }
 
         return [
