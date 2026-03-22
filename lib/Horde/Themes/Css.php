@@ -14,6 +14,9 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+
+use Horde\Log\Logger;
+
 class Horde_Themes_Css
 {
     /**
@@ -253,8 +256,19 @@ class Horde_Themes_Css
      */
     public function loadCssFiles($files)
     {
+        global $injector;
+
         $compress = new Horde_Themes_Css_Compress();
-        return $compress->compress($files);
+
+        // Try to get PSR-3 logger for error reporting
+        $logger = null;
+        try {
+            $logger = $injector->get(Logger::class);
+        } catch (\Exception $e) {
+            // Logger not available, continue without logging
+        }
+
+        return $compress->compress($files, $logger);
     }
 
 }

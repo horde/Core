@@ -12,6 +12,8 @@
  * @package   Core
  */
 
+use Horde\Log\Logger;
+
 /**
  * Filesystem backend for the CSS caching library.
  *
@@ -28,7 +30,7 @@ class Horde_Themes_Css_Cache_File extends Horde_Themes_Css_Cache
      */
     public function process($css, $cacheid)
     {
-        global $registry;
+        global $registry, $injector;
 
         if (!empty($this->_params['filemtime'])) {
             foreach ($css as &$val) {
@@ -49,8 +51,17 @@ class Horde_Themes_Css_Cache_File extends Horde_Themes_Css_Cache
 
         if (!file_exists($path)) {
             $compress = new Horde_Themes_Css_Compress();
+
+            // Try to get PSR-3 logger for error reporting
+            $logger = null;
+            try {
+                $logger = $injector->get(Logger::class);
+            } catch (\Exception $e) {
+                // Logger not available, continue without logging
+            }
+
             $temp = Horde_Util::getTempFile('staticcss', true, $js_fs);
-            if (!file_put_contents($temp, $compress->compress($css), LOCK_EX) ||
+            if (!file_put_contents($temp, $compress->compress($css, $logger), LOCK_EX) ||
                 !chmod($temp, 0o777 & ~umask()) ||
                 !rename($temp, $path)) {
                 Horde::log('Could not write cached CSS file to disk.', 'EMERG');
