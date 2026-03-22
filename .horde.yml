@@ -55,7 +55,7 @@ dependencies:
       horde/compress: ^3
       horde/compress_fast: ^2
       horde/controller: ^3
-      horde/cssminify: ^2
+      horde/cssminify: ^2.0.0-beta2
       horde/data: ^3
       horde/date: ^3
       horde/exception: ^3

@@ -1,23 +1,30 @@
 <?php
 
 /**
- * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2014-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
  *
  * @category  Horde
- * @copyright 2014-2017 Horde LLC
+ * @copyright 2014-2026 Horde LLC
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
+
+use Horde\CssMinify\CssParserMinifier;
+use Horde\CssMinify\Input\CssFile;
+use Horde\CssMinify\Input\FileCollectionInput;
+use Horde\CssMinify\Settings;
+use Horde\CssMinify\UrlCallback;
+use Horde\CssMinify\ImportCallback;
 
 /**
  * Compresses CSS based on Horde configuration parameters.
  *
  * @author    Michael Slusarz <slusarz@horde.org>
  * @category  Horde
- * @copyright 2014-2017 Horde LLC
+ * @copyright 2014-2026 Horde LLC
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  * @since     2.12.0
@@ -38,16 +45,38 @@ class Horde_Themes_Css_Compress
 
         $files = [];
         foreach ($css as $val) {
-            $files[$val['uri']] = $val['fs'];
+            if (!isset($val['uri']) || !isset($val['fs'])) {
+                continue;
+            }
+            try {
+                $files[] = new CssFile((string) $val['uri'], (string) $val['fs']);
+            } catch (\InvalidArgumentException $e) {
+                // Skip unreadable files
+                continue;
+            }
         }
 
-        $parser = new Horde_CssMinify_CssParser($files, [
-            'dataurl' => (empty($conf['nobase64_img']) && $browser->hasFeature('dataurl')) ? [$this, 'dataurlCallback'] : null,
-            'import' => [$this, 'importCallback'],
-            'logger' => $injector->getInstance('Horde_Log_Logger'),
-        ]);
+        if (empty($files)) {
+            return '';
+        }
 
-        return $parser->minify();
+        $dataUrlCallback = null;
+        if (empty($conf['nobase64_img']) && $browser->hasFeature('dataurl')) {
+            $dataUrlCallback = new UrlCallback([$this, 'dataurlCallback']);
+        }
+
+        $logger = $injector->getInstance('Horde_Log_Logger');
+
+        $minifier = new CssParserMinifier(
+            new FileCollectionInput(...$files),
+            new Settings(
+                dataUrlCallback: $dataUrlCallback,
+                importCallback: new ImportCallback([$this, 'importCallback']),
+                logger: $logger
+            )
+        );
+
+        return $minifier->minify();
     }
 
     /**
