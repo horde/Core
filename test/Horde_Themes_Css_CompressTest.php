@@ -16,7 +16,7 @@ class Horde_Themes_Css_CompressTest extends PHPUnit\Framework\TestCase
 
         // Create fixtures directory if it doesn't exist
         if (!is_dir($this->fixturesPath)) {
-            mkdir($this->fixturesPath, 0777, true);
+            mkdir($this->fixturesPath, 0o777, true);
         }
 
         // Create test CSS file
@@ -58,7 +58,7 @@ class Horde_Themes_Css_CompressTest extends PHPUnit\Framework\TestCase
         $compress = new Horde_Themes_Css_Compress();
 
         $css = [
-            ['uri' => 'test.css', 'fs' => $this->fixturesPath . 'test.css']
+            ['uri' => 'test.css', 'fs' => $this->fixturesPath . 'test.css'],
         ];
 
         $result = $compress->compress($css);
@@ -73,7 +73,7 @@ class Horde_Themes_Css_CompressTest extends PHPUnit\Framework\TestCase
 
         $css = [
             ['uri' => 'test.css', 'fs' => $this->fixturesPath . 'test.css'],
-            ['uri' => 'shared.css', 'fs' => $this->fixturesPath . 'shared.css']
+            ['uri' => 'shared.css', 'fs' => $this->fixturesPath . 'shared.css'],
         ];
 
         $result = $compress->compress($css);
@@ -87,7 +87,7 @@ class Horde_Themes_Css_CompressTest extends PHPUnit\Framework\TestCase
         $compress = new Horde_Themes_Css_Compress();
 
         $css = [
-            ['uri' => 'missing.css', 'fs' => $this->fixturesPath . 'nonexistent.css']
+            ['uri' => 'missing.css', 'fs' => $this->fixturesPath . 'nonexistent.css'],
         ];
 
         // Should not throw, returns empty string
@@ -103,7 +103,7 @@ class Horde_Themes_Css_CompressTest extends PHPUnit\Framework\TestCase
         $css = [
             ['uri' => 'test.css'], // Missing 'fs'
             ['fs' => $this->fixturesPath . 'test.css'], // Missing 'uri'
-            [] // Missing both
+            [], // Missing both
         ];
 
         // Should not throw, skips invalid entries

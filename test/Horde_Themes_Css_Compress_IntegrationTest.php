@@ -63,7 +63,7 @@ class Horde_Themes_Css_Compress_IntegrationTest extends PHPUnit\Framework\TestCa
 
     public function testSettingsImmutability(): void
     {
-        $urlCallback = new \Horde\CssMinify\UrlCallback(fn($p) => $p);
+        $urlCallback = new \Horde\CssMinify\UrlCallback(fn ($p) => $p);
         $settings = new \Horde\CssMinify\Settings(dataUrlCallback: $urlCallback);
 
         // Properties are readonly

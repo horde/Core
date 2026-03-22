@@ -56,7 +56,7 @@ class Horde_Themes_Css_Cache_File extends Horde_Themes_Css_Cache
             $logger = null;
             try {
                 $logger = $injector->get(Logger::class);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Logger not available, continue without logging
             }
 
