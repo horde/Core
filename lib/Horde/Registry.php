@@ -491,8 +491,8 @@ class Horde_Registry implements Horde_Shutdown_Task
         $GLOBALS['registry'] = $this;
         $injector->setInstance(__CLASS__, $this);
 
-	/* Setup autoloader instance. */
-	if (!empty($GLOBALS['__autoloader'])) {
+        /* Setup autoloader instance. */
+        if (!empty($GLOBALS['__autoloader'])) {
             $injector->setInstance('Horde_Autoloader', $GLOBALS['__autoloader']);
         }
         /* Import and global Horde's configuration values. */

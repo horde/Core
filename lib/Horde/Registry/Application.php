@@ -225,7 +225,8 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      */
     public function backup(array $users = [])
     {
-        return new Backup\Users(new EmptyIterator(), function () {});
+        return new Backup\Users(new EmptyIterator(), function () {
+        });
     }
 
     /**

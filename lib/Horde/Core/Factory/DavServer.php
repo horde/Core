@@ -65,7 +65,9 @@ class Horde_Core_Factory_DavServer extends Horde_Core_Factory_Injector
         if (!empty($conf['dav_root'])) {
             $candidates = explode(';', $conf['dav_root']);
             // Ensure longer hits overrule shorter hits regardless of input order
-            usort($candidates, function ($a, $b) { return strlen($a) <=> strlen($b);});
+            usort($candidates, function ($a, $b) {
+                return strlen($a) <=> strlen($b);
+            });
             foreach ($candidates as $davBaseTest) {
                 if (!empty($_SERVER['REQUEST_URI']) && (strpos($_SERVER['REQUEST_URI'], $davBaseTest) === 0)) {
                     $davBaseUri = $davBaseTest;

@@ -139,7 +139,7 @@ class StrftimeDetectorTest extends TestCase
         $findings = $this->detector->scan($prefs, ['date_format', 'time_format']);
 
         $this->assertCount(2, $findings);
-        $prefNames = array_map(fn($f) => $f->pref, $findings);
+        $prefNames = array_map(fn ($f) => $f->pref, $findings);
         $this->assertContains('date_format', $prefNames);
         $this->assertContains('time_format', $prefNames);
         $this->assertNotContains('other_pref', $prefNames);
@@ -149,7 +149,7 @@ class StrftimeDetectorTest extends TestCase
     {
         $prefs = new PrefsState([
             'date_format' => [
-                'value' => fn() => '%Y-%m-%d',  // Closure
+                'value' => fn () => '%Y-%m-%d',  // Closure
             ],
         ]);
 
@@ -298,7 +298,7 @@ class StrftimeDetectorTest extends TestCase
 
         $this->assertCount(3, $findings);
 
-        $prefCounts = array_count_values(array_map(fn($f) => $f->pref, $findings));
+        $prefCounts = array_count_values(array_map(fn ($f) => $f->pref, $findings));
         $this->assertEquals(2, $prefCounts['date_format']);
         $this->assertEquals(1, $prefCounts['time_format']);
         $this->assertArrayNotHasKey('clean_pref', $prefCounts);

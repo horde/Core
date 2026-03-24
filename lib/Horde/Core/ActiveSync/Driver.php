@@ -2253,19 +2253,19 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             ob_start();
             try {
                 switch ($type) {
-                case 'gal':
-                    $rows = $this->_searchGal($params->query, $params->options, $params->deepTraversal);
-                    break;
-                case 'mailbox':
-                    $rows = $this->_searchMailbox($params->query, $params->options, $params->deepTraversal);
-                    break;
-                case 'documentlibrary':
-                    foreach ($params->query[0] as $q) {
-                        if (!empty($q['DocumentLibrary:LinkId'])) {
-                            $rows = $this->_connector->files_browse($q['DocumentLibrary:LinkId']);
+                    case 'gal':
+                        $rows = $this->_searchGal($params->query, $params->options, $params->deepTraversal);
+                        break;
+                    case 'mailbox':
+                        $rows = $this->_searchMailbox($params->query, $params->options, $params->deepTraversal);
+                        break;
+                    case 'documentlibrary':
+                        foreach ($params->query[0] as $q) {
+                            if (!empty($q['DocumentLibrary:LinkId'])) {
+                                $rows = $this->_connector->files_browse($q['DocumentLibrary:LinkId']);
+                            }
                         }
-                    }
-                    break;
+                        break;
                 }
             } catch (Horde_ActiveSync_Exception $e) {
                 $this->_logger->err($e->getMessage());
@@ -3614,9 +3614,9 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      *
      * @param array $query          A query array. @see self::getSearchResults()
      * @param array $options        The search options (currently ignored).
-     * @param bool  $deepTraversal  If true, traverse sub folders (currently ignored) 
+     * @param bool  $deepTraversal  If true, traverse sub folders (currently ignored)
      *
-     * @return array|null           An array of search results or null on error 
+     * @return array|null           An array of search results or null on error
      *
      * @see self::getSearchResults()
      */
@@ -3630,9 +3630,9 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      *
      * @param array $query          A query array. @see self::getSearchResults()
      * @param array $options        The search options (partially supported).
-     * @param bool  $deepTraversal  If true, traverse sub folders (currently ignored) 
+     * @param bool  $deepTraversal  If true, traverse sub folders (currently ignored)
      *
-     * @return array|null           An array of search results or null on error 
+     * @return array|null           An array of search results or null on error
      *
      * @see self::getSearchResults()
      */

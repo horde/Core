@@ -143,7 +143,7 @@ class Horde_ErrorHandler
                     $priority = Horde_Log::NOTICE;
                     break;
 
-                // Former E_STRICT, kept for backwards compatibility.
+                    // Former E_STRICT, kept for backwards compatibility.
                 case 2048:
                     $options['notracelog'] = true;
                     $priority = Horde_Log::DEBUG;
@@ -164,7 +164,7 @@ class Horde_ErrorHandler
      */
     public static function catchFatalError()
     {
-	$error = error_get_last();
+        $error = error_get_last();
 
         if (is_array($error) && $error['type'] == E_ERROR) {
             self::fatal(new ErrorException(

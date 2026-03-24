@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Example usage of StrftimeDetector
  *
@@ -30,13 +31,13 @@ try {
     if (empty($findings)) {
         echo "✅ No strftime patterns found\n";
     } else {
-        echo "⚠️  Found " . count($findings) . " strftime pattern(s):\n\n";
+        echo '⚠️  Found ' . count($findings) . " strftime pattern(s):\n\n";
         foreach ($findings as $finding) {
-            echo "  • " . $finding->format() . "\n";
+            echo '  • ' . $finding->format() . "\n";
         }
     }
 } catch (\Exception $e) {
-    echo "Error loading prefs: " . $e->getMessage() . "\n";
+    echo 'Error loading prefs: ' . $e->getMessage() . "\n";
 }
 
 // Example 2: Scan raw array
@@ -65,7 +66,7 @@ $prefsArray = [
 $detector = new StrftimeDetector();
 $findings = $detector->scanArray($prefsArray);
 
-echo "Found " . count($findings) . " strftime pattern(s):\n\n";
+echo 'Found ' . count($findings) . " strftime pattern(s):\n\n";
 foreach ($findings as $finding) {
     echo sprintf(
         "  • Pref: %s\n" .
@@ -86,12 +87,12 @@ echo "\n=== Example 3: Filter by confidence ===\n\n";
 
 $highConfidence = array_filter(
     $findings,
-    fn($f) => $f->confidence === StrftimeFinding::CONFIDENCE_HIGH
+    fn ($f) => $f->confidence === StrftimeFinding::CONFIDENCE_HIGH
 );
 
-echo "High confidence findings: " . count($highConfidence) . "\n";
+echo 'High confidence findings: ' . count($highConfidence) . "\n";
 foreach ($highConfidence as $finding) {
-    echo "  • " . $finding->format() . "\n";
+    echo '  • ' . $finding->format() . "\n";
 }
 
 // Example 4: JSON output
