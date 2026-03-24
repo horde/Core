@@ -1,4 +1,24 @@
 ---
+3.0.0-beta5:
+  api: 3.0.0-beta5
+  state:
+    release: beta
+    api: beta
+  date: 2026-03-24
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    style: php-cs-fixer
+    style: Apply php-cs-fixer style for PER-1
+    feat: Use modern PSR-3 logger to handle any issues
+    feat: Solve existing architecture violation using the new CssMinify API
+    fix(portalblocks): handle null/unset rows in sparse layout arrays
+    feat(prefs): add StrftimeDetector for deprecated pattern scanning
+    refactor: Redesign _getMailFolders()
+    refactor: Redesign constructor to extract injected objects before parent::__construct()
+    fix: explode() called on object instead of string in sendMail()
+    fix: Add deprecated dynamic properties $_cache and $_mailFolders (PHP 8.2)
 3.0.0-beta4:
   api: 3.0.0-beta4
   state:
