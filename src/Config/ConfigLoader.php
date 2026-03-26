@@ -100,6 +100,15 @@ class ConfigLoader
 
         foreach ($files as $filePath) {
             if (file_exists($filePath)) {
+                // Check readability before including
+                if (!is_readable($filePath)) {
+                    throw new RuntimeException(
+                        "Configuration file exists but is not readable: {$filePath}\n"
+                        . "Check file permissions. PHP process needs read access.\n"
+                        . "File permissions: " . substr(sprintf('%o', fileperms($filePath)), -4)
+                    );
+                }
+
                 // Include file in isolated scope
                 $loadedVars = $this->includeFile($filePath);
 
@@ -116,6 +125,15 @@ class ConfigLoader
             if ($vhostFilename) {
                 $vhostFile = $confDir . $vhostFilename;
                 if (file_exists($vhostFile)) {
+                    // Check readability before including
+                    if (!is_readable($vhostFile)) {
+                        throw new RuntimeException(
+                            "Configuration file exists but is not readable: {$vhostFile}\n"
+                            . "Check file permissions. PHP process needs read access.\n"
+                            . "File permissions: " . substr(sprintf('%o', fileperms($vhostFile)), -4)
+                        );
+                    }
+
                     $loadedVars = $this->includeFile($vhostFile);
                     if (isset($loadedVars['conf'])) {
                         $conf = array_replace_recursive($conf, $loadedVars['conf']);
