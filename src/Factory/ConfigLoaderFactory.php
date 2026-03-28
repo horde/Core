@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Horde\Core\Factory;
 
 use Horde\Core\Config\ConfigLoader;
+use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Vhost;
 use Horde_Injector;
 
@@ -40,6 +41,14 @@ class ConfigLoaderFactory
      */
     public function create(Horde_Injector $injector): ConfigLoader
     {
-        return new ConfigLoader(HORDE_CONFIG_BASE, new Vhost());
+        // Try to get metadata provider if available
+        $metadataProvider = null;
+        try {
+            $metadataProvider = $injector->getInstance(ConfigMetadataProvider::class);
+        } catch (\Exception $e) {
+            // Metadata provider not available, continue without it
+        }
+
+        return new ConfigLoader(HORDE_CONFIG_BASE, new Vhost(), $metadataProvider);
     }
 }

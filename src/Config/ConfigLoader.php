@@ -39,7 +39,8 @@ class ConfigLoader
 
     public function __construct(
         private string $configBase,  // HORDE_CONFIG_BASE value
-        private Vhost|string $vhost = 'localhost'
+        private Vhost|string $vhost = 'localhost',
+        private ?ConfigMetadataProvider $metadataProvider = null
     ) {
         $this->vhost = Vhost::from($this->vhost);
     }
@@ -49,15 +50,21 @@ class ConfigLoader
      *
      * @param string $app App name (e.g., 'horde', 'imp', 'turba')
      * @param string $file Config filename (default: 'conf.php')
-     * @return State Immutable config state
+     * @param bool $withMetadata Whether to return ConfigStateWithMetadata
+     * @return State|ConfigStateWithMetadata Immutable config state
      */
-    public function load(string $app, string $file = 'conf.php'): State
+    public function load(string $app, string $file = 'conf.php', bool $withMetadata = false): State
     {
-        $cacheKey = $app . ':' . $file;
+        $cacheKey = $app . ':' . $file . ':' . ($withMetadata ? 'meta' : 'plain');
 
         if (!isset($this->cache[$cacheKey])) {
             $config = $this->loadFiles($app, $file);
-            $this->cache[$cacheKey] = new State($config);
+
+            if ($withMetadata && $this->metadataProvider !== null) {
+                $this->cache[$cacheKey] = new ConfigStateWithMetadata($config, $this->metadataProvider);
+            } else {
+                $this->cache[$cacheKey] = new State($config);
+            }
         }
 
         return $this->cache[$cacheKey];

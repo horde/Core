@@ -12,6 +12,11 @@
  * @package   Core
  */
 
+use Horde\Core\Config\ConfigMetadataProvider;
+use Horde\Core\Config\Driver\DriverRepository;
+use Horde\Core\Factory\ConfigMetadataProviderFactory;
+use Horde\Core\Factory\DriverRepositoryFactory;
+
 /**
  * The registry provides a set of methods for communication between Horde
  * applications and keeping track of application configuration information.
@@ -459,6 +464,8 @@ class Horde_Registry implements Horde_Shutdown_Task
             'Horde\\Horde\\Service\\JwtService' => 'Horde\\Horde\\Factory\\JwtServiceFactory',
             'Horde\\Horde\\Service\\AuthenticationService' => 'Horde\\Horde\\Factory\\AuthenticationServiceFactory',
             'Horde\\Core\\Config\\ConfigLoader' => 'Horde\\Core\\Factory\\ConfigLoaderFactory',
+            DriverRepository::class => DriverRepositoryFactory::class,
+            ConfigMetadataProvider::class => ConfigMetadataProviderFactory::class,
             'Horde\\Core\\Service\\HordeDbService' => 'Horde\\Core\\Factory\\DbServiceFactory',
             'Horde\\Core\\Service\\PrefsService' => 'Horde\\Core\\Factory\\PrefsServiceFactory',
             'Horde\\Core\\Service\\IdentityService' => 'Horde\\Core\\Factory\\IdentityServiceFactory',
