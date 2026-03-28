@@ -242,17 +242,18 @@ class LdapPrefsService implements PrefsService
     }
 
     /**
-     * Check if user exists in LDAP
+     * Check if preference exists
      *
      * @param string $uid User ID
-     * @return bool True if user exists
+     * @param string $scope App name
+     * @param string $key Preference key
+     * @return bool True if preference exists
      */
-    public function exists(string $uid): bool
+    public function exists(string $uid, string $scope, string $key): bool
     {
         try {
-            $ldap = $this->ldapService->getAdapter();
-            $userDN = $this->findUserDN($ldap, $uid);
-            return $userDN !== null;
+            $value = $this->getValue($uid, $scope, $key);
+            return $value !== null;
         } catch (\Exception $e) {
             return false;
         }

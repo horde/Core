@@ -168,27 +168,35 @@ class AppRouter extends RampageRequestHandler implements MiddlewareInterface, Re
         // unset stack means DEFAULT middleware stack
         $stack = $match['stack'] ?? $defaultStack;
 
-        // DEBUG - Use web-writable var directory
-        $varDir = dirname($fileroot, 2) . '/var';
-        if (!is_dir($varDir)) {
-            $varDir = '/tmp';
+        // DEBUG - Only log if HORDE_DEBUG_ROUTER is set
+        if (getenv('HORDE_DEBUG_ROUTER')) {
+            // Use web-writable var directory
+            $varDir = dirname($fileroot, 2) . '/var';
+            if (!is_dir($varDir)) {
+                $varDir = '/tmp';
+            }
+            $debugLog = $varDir . '/approuter-debug.log';
+            file_put_contents($debugLog, "=== AppRouter Debug ===\n", FILE_APPEND);
+            file_put_contents($debugLog, 'Time: ' . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
+            file_put_contents($debugLog, 'Route: ' . ($match['name'] ?? 'UNNAMED') . "\n", FILE_APPEND);
+            file_put_contents($debugLog, 'Controller: ' . ($match['controller'] ?? 'NONE') . "\n", FILE_APPEND);
+            file_put_contents($debugLog, 'HordeAuthType: ' . ($match['HordeAuthType'] ?? 'NOT SET') . "\n", FILE_APPEND);
+            file_put_contents($debugLog, 'stack isset: ' . (isset($match['stack']) ? 'YES' : 'NO') . "\n", FILE_APPEND);
+            file_put_contents($debugLog, 'stack value: ' . json_encode($match['stack'] ?? 'NOT SET') . "\n", FILE_APPEND);
+            file_put_contents($debugLog, 'Using stack: ' . json_encode($stack) . "\n", FILE_APPEND);
+            file_put_contents($debugLog, 'Stack count: ' . count($stack) . "\n", FILE_APPEND);
         }
-        $debugLog = $varDir . '/approuter-debug.log';
-        file_put_contents($debugLog, "=== AppRouter Debug ===\n", FILE_APPEND);
-        file_put_contents($debugLog, 'Time: ' . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
-        file_put_contents($debugLog, 'Route: ' . ($match['name'] ?? 'UNNAMED') . "\n", FILE_APPEND);
-        file_put_contents($debugLog, 'Controller: ' . ($match['controller'] ?? 'NONE') . "\n", FILE_APPEND);
-        file_put_contents($debugLog, 'HordeAuthType: ' . ($match['HordeAuthType'] ?? 'NOT SET') . "\n", FILE_APPEND);
-        file_put_contents($debugLog, 'stack isset: ' . (isset($match['stack']) ? 'YES' : 'NO') . "\n", FILE_APPEND);
-        file_put_contents($debugLog, 'stack value: ' . json_encode($match['stack'] ?? 'NOT SET') . "\n", FILE_APPEND);
-        file_put_contents($debugLog, 'Using stack: ' . json_encode($stack) . "\n", FILE_APPEND);
-        file_put_contents($debugLog, 'Stack count: ' . count($stack) . "\n", FILE_APPEND);
 
         foreach ($stack as $middleware) {
-            file_put_contents($debugLog, 'Adding middleware: ' . $middleware . "\n", FILE_APPEND);
+            if (getenv('HORDE_DEBUG_ROUTER')) {
+                file_put_contents($debugLog, 'Adding middleware: ' . $middleware . "\n", FILE_APPEND);
+            }
             $handler->addMiddleware($this->injector->get($middleware));
         }
-        file_put_contents($debugLog, "=== End AppRouter Debug ===\n\n", FILE_APPEND);
+
+        if (getenv('HORDE_DEBUG_ROUTER')) {
+            file_put_contents($debugLog, "=== End AppRouter Debug ===\n\n", FILE_APPEND);
+        }
 
         // Controller is a single DI key for either a HandlerInterface, MiddlewareInterface or a Horde_Controller
         $controllerName = $match['controller'] ?? '';

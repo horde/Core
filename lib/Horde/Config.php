@@ -14,6 +14,10 @@
  * @category Horde
  * @package  Core
  */
+
+use Horde\Core\Config\ConfigMetadataProvider;
+use Horde\Core\Config\Legacy\LegacyConfigAdapter;
+
 class Horde_Config
 {
     /**
@@ -1167,6 +1171,87 @@ class Horde_Config
      */
     public function configSQL($ctx, $node = null, $switchname = 'driverconfig')
     {
+        // Try new metadata system first
+        if (isset($GLOBALS['injector'])) {
+            try {
+                $provider = $GLOBALS['injector']->getInstance(
+                    ConfigMetadataProvider::class
+                );
+                $adapter = new LegacyConfigAdapter(
+                    $provider->getRepository()
+                );
+
+                // Get driver metadata converted to legacy format
+                $drivers = $adapter->convertSqlDrivers($ctx, $node, $switchname);
+
+                // Build the custom_fields structure expected by legacy code
+                $custom_fields = [
+                    'required' => true,
+                    'desc' => 'What database backend should we use?',
+                    'default' => $this->_default(
+                        $ctx . '|phptype',
+                        $node ? $node->getAttribute('default') : ''
+                    ),
+                    'switch' => array_merge(
+                        [
+                            'false' => [
+                                'desc' => '[None]',
+                                'fields' => [],
+                            ],
+                        ],
+                        $drivers
+                    ),
+                ];
+
+                // If baseconfig, return just the driver switch
+                if (isset($node) && $node->getAttribute('baseconfig') == 'true') {
+                    return $custom_fields;
+                }
+
+                // Otherwise wrap in the horde/custom switch
+                [$default, $isDefault] = $this->__default(
+                    $ctx . '|' . (isset($node) ? $node->getAttribute('switchname') : $switchname),
+                    'horde'
+                );
+
+                $config = [
+                    'desc' => 'Driver configuration',
+                    'default' => $default,
+                    'is_default' => $isDefault,
+                    'switch' => [
+                        'horde' => [
+                            'desc' => 'Horde defaults',
+                            'fields' => [],
+                        ],
+                        'custom' => [
+                            'desc' => 'Custom parameters',
+                            'fields' => [
+                                'phptype' => $custom_fields,
+                            ],
+                        ],
+                    ],
+                ];
+
+                if (isset($node) && $node->hasChildNodes()) {
+                    $cur = [];
+                    $this->_parseLevel($cur, $node->childNodes, $ctx);
+                    $config['switch']['horde']['fields'] = array_merge(
+                        $config['switch']['horde']['fields'],
+                        $cur
+                    );
+                    $config['switch']['custom']['fields'] = array_merge(
+                        $config['switch']['custom']['fields'],
+                        $cur
+                    );
+                }
+
+                return $config;
+            } catch (\Exception $e) {
+                // Fall through to legacy implementation
+            }
+        }
+
+        // Legacy implementation below
         if ($node) {
             $xpath = new DOMXPath($node->ownerDocument);
         }
