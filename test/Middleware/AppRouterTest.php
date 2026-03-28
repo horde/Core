@@ -61,6 +61,11 @@ class AppRouterTest extends TestCase
 
     protected function setUp(): void
     {
+        // Define HORDE_CONFIG_BASE for tests that need ConfigLoader
+        if (!defined('HORDE_CONFIG_BASE')) {
+            define('HORDE_CONFIG_BASE', sys_get_temp_dir() . '/horde-test-config');
+        }
+
         $this->requestFactory = new RequestFactory();
         $this->responseFactory = new ResponseFactory();
         $this->streamFactory = new StreamFactory();
