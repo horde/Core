@@ -18,7 +18,15 @@ declare(strict_types=1);
 namespace Horde\Core\Factory;
 
 use Horde\Core\Config\Driver\DriverRepository;
+use Horde\Core\Config\Driver\HashTable\MemcacheDriver;
+use Horde\Core\Config\Driver\HashTable\RedisDriver;
+use Horde\Core\Config\Driver\Ldap\LdapDriver;
+use Horde\Core\Config\Driver\NoSql\MongoDBDriver;
+use Horde\Core\Config\Driver\Sql\MSSQLDriver;
 use Horde\Core\Config\Driver\Sql\MySQLDriver;
+use Horde\Core\Config\Driver\Sql\OracleDriver;
+use Horde\Core\Config\Driver\Sql\PostgreSQLDriver;
+use Horde\Core\Config\Driver\Sql\SQLiteDriver;
 use Horde_Injector;
 
 /**
@@ -47,6 +55,20 @@ class DriverRepositoryFactory
 
         // Register built-in SQL drivers
         $repository->register(new MySQLDriver());
+        $repository->register(new PostgreSQLDriver());
+        $repository->register(new SQLiteDriver());
+        $repository->register(new OracleDriver());
+        $repository->register(new MSSQLDriver());
+
+        // Register LDAP driver
+        $repository->register(new LdapDriver());
+
+        // Register NoSQL drivers (document stores)
+        $repository->register(new MongoDBDriver());
+
+        // Register HashTable drivers (distributed caching)
+        $repository->register(new MemcacheDriver());
+        $repository->register(new RedisDriver());
 
         // Future: Auto-discover drivers from applications
         // Future: Allow apps to register custom drivers via hooks
