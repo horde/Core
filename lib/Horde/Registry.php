@@ -488,6 +488,14 @@ class Horde_Registry implements Horde_Shutdown_Task
             $injector->bindImplementation($key, $val);
         }
 
+        /* Bind modern PSR-4 Variables class to use getDefaultVariables() */
+        $injector->bindClosure(
+            \Horde\Util\Variables::class,
+            function () {
+                return \Horde\Util\Variables::getDefaultVariables();
+            }
+        );
+
         $GLOBALS['registry'] = $this;
         $injector->setInstance(__CLASS__, $this);
 
