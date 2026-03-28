@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Config\Driver\Ldap;
 
+use Horde\Core\Config\Driver\DriverAvailability;
 use Horde\Core\Config\Driver\DriverInterface;
 use Horde\Core\Config\Metadata\ConditionalFields;
 use Horde\Core\Config\Metadata\FieldType;
@@ -140,4 +141,9 @@ class LdapDriver implements DriverInterface
 
         return new ValidationResult($errors);
     }
+    public function checkAvailability(): DriverAvailability
+    {
+        return DriverAvailability::available();
+    }
+
 }

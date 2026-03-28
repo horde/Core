@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Config\Driver\Auth;
 
+use Horde\Core\Config\Driver\DriverAvailability;
 use Horde\Core\Config\Driver\DriverInterface;
 use Horde\Core\Config\Metadata\FieldType;
 use Horde\Core\Config\Metadata\PropertyMetadata;
@@ -77,5 +78,17 @@ class PamAuthDriver implements DriverInterface
         }
 
         return new ValidationResult($errors);
+    }
+
+    public function checkAvailability(): DriverAvailability
+    {
+        // Check if PAM extension is loaded
+        if (!extension_loaded('pam')) {
+            return DriverAvailability::unavailable(
+                'PAM extension is not installed. Install the PHP PAM extension to use PAM authentication.'
+            );
+        }
+
+        return DriverAvailability::available();
     }
 }
