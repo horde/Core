@@ -12,6 +12,18 @@ class Horde_Themes_Css_CompressTest extends PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
+        // Mock global $browser
+        $GLOBALS['browser'] = $this->createMock(Horde_Browser::class);
+        $GLOBALS['browser']->method('hasFeature')->willReturn(false);
+
+        // Mock global $registry
+        $GLOBALS['registry'] = $this->createMock(Horde_Registry::class);
+
+        // Mock global $injector with a proper PSR-3 logger
+        $logger = $this->createMock(\Psr\Log\LoggerInterface::class);
+        $GLOBALS['injector'] = $this->createMock(Horde_Injector::class);
+        $GLOBALS['injector']->method('get')->willReturn($logger);
+
         $this->fixturesPath = __DIR__ . '/fixtures/';
 
         // Create fixtures directory if it doesn't exist
@@ -43,6 +55,9 @@ class Horde_Themes_Css_CompressTest extends PHPUnit\Framework\TestCase
 
     protected function tearDown(): void
     {
+        // Cleanup globals
+        unset($GLOBALS['browser'], $GLOBALS['registry'], $GLOBALS['injector']);
+
         // Cleanup fixtures
         $files = glob($this->fixturesPath . '*.css');
         foreach ($files as $file) {

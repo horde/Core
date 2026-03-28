@@ -110,6 +110,12 @@ class RampageIntegrationTest extends TestCase
 
         // Mock registry
         $registry = $this->createMock(Horde_Registry::class);
+        $registry->method('listApps')
+            ->willReturn([
+                'testapp' => [
+                    'webroot' => '/testapp',
+                ],
+            ]);
         $registry->method('get')
             ->willReturnCallback(function ($key, $app) {
                 if ($key === 'fileroot' && $app === 'testapp') {
@@ -121,7 +127,7 @@ class RampageIntegrationTest extends TestCase
                 return null;
             });
 
-        $registry->method('pushApp')
+        $registry->expects($this->once())->method('pushApp')
             ->with('testapp');
 
         // Mock injector
@@ -165,7 +171,7 @@ class RampageIntegrationTest extends TestCase
                 };
             });
 
-        $injector->method('getInstance')
+        $injector->expects($this->once())->method('getInstance')
             ->with('ProtectedApiController')
             ->willReturn($controller);
 
@@ -187,6 +193,7 @@ class RampageIntegrationTest extends TestCase
 
         // Create request
         $request = $this->requestFactory->createServerRequest('GET', 'http://example.com/testapp/api/protected');
+        $request = $request->withAttribute('registry', $registry);
 
         // Execute
         $response = $handler->handle($request);
@@ -228,6 +235,12 @@ class RampageIntegrationTest extends TestCase
 
         // Mock registry
         $registry = $this->createMock(Horde_Registry::class);
+        $registry->method('listApps')
+            ->willReturn([
+                'testapp' => [
+                    'webroot' => '/testapp',
+                ],
+            ]);
         $registry->method('get')
             ->willReturnCallback(function ($key, $app) {
                 if ($key === 'fileroot' && $app === 'testapp') {
@@ -239,7 +252,7 @@ class RampageIntegrationTest extends TestCase
                 return null;
             });
 
-        $registry->method('pushApp')
+        $registry->expects($this->once())->method('pushApp')
             ->with('testapp');
 
         // Mock injector
@@ -276,7 +289,7 @@ class RampageIntegrationTest extends TestCase
                 };
             });
 
-        $injector->method('getInstance')
+        $injector->expects($this->once())->method('getInstance')
             ->with('PublicApiController')
             ->willReturn($controller);
 
@@ -298,6 +311,7 @@ class RampageIntegrationTest extends TestCase
 
         // Create request
         $request = $this->requestFactory->createServerRequest('GET', 'http://example.com/testapp/api/public');
+        $request = $request->withAttribute('registry', $registry);
 
         // Execute
         $response = $handler->handle($request);
