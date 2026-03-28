@@ -154,7 +154,7 @@ class AppRouterTest extends TestCase
         $mockController->method('handle')
             ->willReturn($this->responseFactory->createResponse(200));
 
-        $this->injector->method('getInstance')
+        $this->injector->expects($this->once())->method('getInstance')
             ->with('TestController')
             ->willReturn($mockController);
 
@@ -201,7 +201,7 @@ class AppRouterTest extends TestCase
                 PHP
         );
 
-        $this->registry->method('get')
+        $this->registry->expects($this->once())->method('get')
             ->with('fileroot', 'testapp')
             ->willReturn($tempDir);
 
@@ -236,7 +236,7 @@ class AppRouterTest extends TestCase
                 return $this->responseFactory->createResponse(200);
             });
 
-        $this->injector->method('getInstance')
+        $this->injector->expects($this->once())->method('getInstance')
             ->with('DefaultController')
             ->willReturn($mockController);
 
@@ -281,7 +281,7 @@ class AppRouterTest extends TestCase
                 PHP
         );
 
-        $this->registry->method('get')
+        $this->registry->expects($this->once())->method('get')
             ->with('fileroot', 'testapp')
             ->willReturn($tempDir);
 
@@ -312,7 +312,7 @@ class AppRouterTest extends TestCase
                 return $this->responseFactory->createResponse(200);
             });
 
-        $this->injector->method('getInstance')
+        $this->injector->expects($this->once())->method('getInstance')
             ->with('PublicController')
             ->willReturn($mockController);
 
@@ -357,7 +357,7 @@ class AppRouterTest extends TestCase
                 PHP
         );
 
-        $this->registry->method('get')
+        $this->registry->expects($this->once())->method('get')
             ->with('fileroot', 'testapp')
             ->willReturn($tempDir);
 
@@ -387,7 +387,7 @@ class AppRouterTest extends TestCase
                 return $this->responseFactory->createResponse(200);
             });
 
-        $this->injector->method('getInstance')
+        $this->injector->expects($this->once())->method('getInstance')
             ->with('LoginController')
             ->willReturn($mockController);
 
@@ -471,7 +471,7 @@ class AppRouterTest extends TestCase
                 PHP
         );
 
-        $this->registry->method('get')
+        $this->registry->expects($this->once())->method('get')
             ->with('fileroot', 'testapp')
             ->willReturn($tempDir);
 
@@ -499,7 +499,7 @@ class AppRouterTest extends TestCase
                 return $this->responseFactory->createResponse(200);
             });
 
-        $this->injector->method('getInstance')
+        $this->injector->expects($this->once())->method('getInstance')
             ->with('ItemController')
             ->willReturn($mockController);
 

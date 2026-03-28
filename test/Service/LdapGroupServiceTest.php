@@ -80,20 +80,35 @@ class LdapGroupServiceTest extends TestCase
         $search = $this->createSearchMock();
 
         $entry1 = $this->createEntryMock();
-        $entry1->method('getValue')->willReturnMap([
-            ['cn', 'single', 'developers'],
-            ['memberUid', null, ['alice', 'bob']],
-            ['mail', 'single', 'dev@example.com'],
-        ]);
+        $entry1->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
+            if ($attr === 'cn' && $mode === 'single') {
+                return 'developers';
+            }
+            if ($attr === 'memberUid') {
+                return ['alice', 'bob'];
+            }
+            if ($attr === 'mail' && $mode === 'single') {
+                return 'dev@example.com';
+            }
+            return null;
+        });
 
         $entry2 = $this->createEntryMock();
-        $entry2->method('getValue')->willReturnMap([
-            ['cn', 'single', 'admins'],
-            ['memberUid', null, ['charlie']],
-            ['mail', 'single', null],
-        ]);
+        $entry2->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
+            if ($attr === 'cn' && $mode === 'single') {
+                return 'admins';
+            }
+            if ($attr === 'memberUid') {
+                return ['charlie'];
+            }
+            if ($attr === 'mail' && $mode === 'single') {
+                return null;
+            }
+            return null;
+        });
 
-        $search->expects($this->exactly(2))->method('valid')->willReturn(true, false);
+        $search->expects($this->exactly(3))->method('valid')
+            ->willReturnOnConsecutiveCalls(true, true, false);
         $search->expects($this->exactly(2))->method('current')->willReturn($entry1, $entry2);
         $search->expects($this->exactly(2))->method('next');
 
@@ -103,18 +118,23 @@ class LdapGroupServiceTest extends TestCase
 
         $result = $this->service->listAll();
 
-        $this->assertCount(2, $result->getGroups());
-        $this->assertEquals('developers', $result->getGroups()[0]->name);
-        $this->assertEquals(['alice', 'bob'], $result->getGroups()[0]->members);
+        $this->assertCount(2, $result->groups);
+        $this->assertEquals('developers', $result->groups[0]->name);
+        $this->assertEquals(['alice', 'bob'], $result->groups[0]->members);
     }
 
     public function testGetGroup(): void
     {
         $entry = $this->createEntryMock();
-        $entry->method('getValue')->willReturnMap([
-                ['memberUid', null, ['alice', 'bob']],
-                ['mail', 'single', 'dev@example.com'],
-            ]);
+        $entry->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
+            if ($attr === 'memberUid') {
+                return ['alice', 'bob'];
+            }
+            if ($attr === 'mail' && $mode === 'single') {
+                return 'dev@example.com';
+            }
+            return null;
+        });
 
         $this->ldapAdapter->expects($this->once())
             ->method('getEntry')
@@ -174,10 +194,15 @@ class LdapGroupServiceTest extends TestCase
     public function testExistsTrue(): void
     {
         $entry = $this->createEntryMock();
-        $entry->method('getValue')->willReturnMap([
-                ['memberUid', null, []],
-                ['mail', 'single', null],
-            ]);
+        $entry->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
+            if ($attr === 'memberUid') {
+                return [];
+            }
+            if ($attr === 'mail' && $mode === 'single') {
+                return null;
+            }
+            return null;
+        });
 
         $this->ldapAdapter->method('getEntry')->willReturn($entry);
 
@@ -236,10 +261,15 @@ class LdapGroupServiceTest extends TestCase
     public function testGetMembers(): void
     {
         $entry = $this->createEntryMock();
-        $entry->method('getValue')->willReturnMap([
-                ['memberUid', null, ['alice', 'bob']],
-                ['mail', 'single', null],
-            ]);
+        $entry->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
+            if ($attr === 'memberUid') {
+                return ['alice', 'bob'];
+            }
+            if ($attr === 'mail' && $mode === 'single') {
+                return null;
+            }
+            return null;
+        });
 
         $this->ldapAdapter->method('getEntry')->willReturn($entry);
 

@@ -67,9 +67,9 @@ class HordeLdapServiceFactoryTest extends TestCase
 
         $mockState = $this->createMock(State::class);
         $mockState->method('has')->willReturn(true);
-        $mockState->method('get')->with('ldap')->willReturn($config);
+        $mockState->expects($this->once())->method('get')->with('ldap')->willReturn($config);
 
-        $this->configLoader->method('load')->with('horde')->willReturn($mockState);
+        $this->configLoader->expects($this->once())->method('load')->with('horde')->willReturn($mockState);
 
         $service = $this->factory->create($this->injector, 'horde');
 
@@ -97,7 +97,7 @@ class HordeLdapServiceFactoryTest extends TestCase
             return $key === 'ldap.service.groups' ? $groupsConfig : $defaultConfig;
         });
 
-        $this->configLoader->method('load')->with('horde')->willReturn($mockState);
+        $this->configLoader->expects($this->once())->method('load')->with('horde')->willReturn($mockState);
 
         $service = $this->factory->create($this->injector, 'horde:groups');
 
@@ -114,9 +114,9 @@ class HordeLdapServiceFactoryTest extends TestCase
 
         $mockState = $this->createMock(State::class);
         $mockState->method('has')->willReturn(true);
-        $mockState->method('get')->with('ldap')->willReturn($config);
+        $mockState->method('get')->willReturn($config);
 
-        $this->configLoader->method('load')->with('horde')->willReturn($mockState);
+        $this->configLoader->expects($this->exactly(2))->method('load')->with('horde')->willReturn($mockState);
 
         $service1 = $this->factory->create($this->injector, 'horde');
         $service2 = $this->factory->create($this->injector, 'horde');
@@ -148,7 +148,7 @@ class HordeLdapServiceFactoryTest extends TestCase
             return $key === 'ldap.service.groups' ? $config2 : $config1;
         });
 
-        $this->configLoader->method('load')->with('horde')->willReturn($mockState);
+        $this->configLoader->expects($this->exactly(2))->method('load')->with('horde')->willReturn($mockState);
 
         $service1 = $this->factory->create($this->injector, 'horde');
         $service2 = $this->factory->create($this->injector, 'horde:groups');
@@ -165,7 +165,7 @@ class HordeLdapServiceFactoryTest extends TestCase
         $mockState = $this->createMock(State::class);
         $mockState->method('has')->willReturn(false);
 
-        $this->configLoader->method('load')->with('horde')->willReturn($mockState);
+        $this->configLoader->expects($this->once())->method('load')->with('horde')->willReturn($mockState);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('No LDAP configuration found');
