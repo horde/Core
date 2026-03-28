@@ -62,8 +62,6 @@ class LdapGroupServiceTest extends TestCase
         return $this->getMockBuilder(Horde_Ldap_Search::class)
             ->disableOriginalConstructor()
             ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->disallowMockingUnknownTypes()
             ->getMock();
     }
 
@@ -113,12 +111,10 @@ class LdapGroupServiceTest extends TestCase
     public function testGetGroup(): void
     {
         $entry = $this->createEntryMock();
-        $entry->method('getValue')->will(
-            $this->returnValueMap([
+        $entry->method('getValue')->willReturnMap([
                 ['memberUid', null, ['alice', 'bob']],
                 ['mail', 'single', 'dev@example.com'],
-            ])
-        );
+            ]);
 
         $this->ldapAdapter->expects($this->once())
             ->method('getEntry')
@@ -178,12 +174,10 @@ class LdapGroupServiceTest extends TestCase
     public function testExistsTrue(): void
     {
         $entry = $this->createEntryMock();
-        $entry->method('getValue')->will(
-            $this->returnValueMap([
+        $entry->method('getValue')->willReturnMap([
                 ['memberUid', null, []],
                 ['mail', 'single', null],
-            ])
-        );
+            ]);
 
         $this->ldapAdapter->method('getEntry')->willReturn($entry);
 
@@ -242,12 +236,10 @@ class LdapGroupServiceTest extends TestCase
     public function testGetMembers(): void
     {
         $entry = $this->createEntryMock();
-        $entry->method('getValue')->will(
-            $this->returnValueMap([
+        $entry->method('getValue')->willReturnMap([
                 ['memberUid', null, ['alice', 'bob']],
                 ['mail', 'single', null],
-            ])
-        );
+            ]);
 
         $this->ldapAdapter->method('getEntry')->willReturn($entry);
 
