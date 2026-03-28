@@ -1,5 +1,4 @@
 <?php
-
 /**
  * An abstract class representing a single block in the portal/block display.
  *
@@ -15,6 +14,8 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+use Horde\Util\Variables;
+
 abstract class Horde_Core_Block
 {
     /**
@@ -195,7 +196,7 @@ abstract class Horde_Core_Block
      *
      * @return string  The block's content.
      */
-    public function refreshContent($vars)
+    public function refreshContent(Variables|Horde_Variables|null $vars)
     {
         return $this->_call('_refreshContent', '', $vars);
     }
@@ -210,7 +211,7 @@ abstract class Horde_Core_Block
      *
      * @return string
      */
-    protected function _refreshContent($vars)
+    protected function _refreshContent(Variables|Horde_Variables|null $vars)
     {
         return '';
     }
