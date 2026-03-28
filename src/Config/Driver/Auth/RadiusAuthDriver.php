@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Config\Driver\Auth;
 
+use Horde\Core\Config\Driver\DriverAvailability;
 use Horde\Core\Config\Driver\DriverInterface;
 use Horde\Core\Config\Metadata\FieldType;
 use Horde\Core\Config\Metadata\PropertyMetadata;
@@ -128,5 +129,17 @@ class RadiusAuthDriver implements DriverInterface
         }
 
         return new ValidationResult($errors);
+    }
+
+    public function checkAvailability(): DriverAvailability
+    {
+        // Check if RADIUS extension is loaded
+        if (!extension_loaded('radius')) {
+            return DriverAvailability::unavailable(
+                'RADIUS extension is not installed. Install the PHP RADIUS extension (pecl install radius) to use RADIUS authentication.'
+            );
+        }
+
+        return DriverAvailability::available();
     }
 }

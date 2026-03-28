@@ -70,4 +70,15 @@ interface DriverInterface
      * @return ValidationResult Validation result
      */
     public function validate(array $config): ValidationResult;
+
+    /**
+     * Check if this driver is available for use.
+     *
+     * Returns availability status based on dependencies (extensions, binaries, etc).
+     * Drivers should check for required PHP extensions, system binaries, or other
+     * prerequisites needed for the driver to function.
+     *
+     * @return DriverAvailability Availability status with reason if unavailable
+     */
+    public function checkAvailability(): DriverAvailability;
 }
