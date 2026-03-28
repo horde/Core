@@ -1,4 +1,23 @@
 ---
+3.0.0-beta8:
+  api: 3.0.0-beta8
+  state:
+    release: beta
+    api: beta
+  date: 2026-03-28
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    feat: Driver Availability check method
+    feat: Auth driver metadata
+    feat: Metadata for SQL, LDAP, HashTable and NoSql backends.
+    test: More fixes to the test suite
+    test: Fix LdapGroupServiceTest issues.
+    test: various test suite fixes
+    test: New tests for the config metadata
+    feat: Driver config metadata system
+    feat: Add Horde\Util\Variables to the registry injector setup
 3.0.0-beta7:
   api: 3.0.0-beta7
   state:

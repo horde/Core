@@ -79,8 +79,7 @@
         "horde/test": "^3 || dev-FRAMEWORK_6_0",
         "horde/tree": "^3 || dev-FRAMEWORK_6_0",
         "horde/routes": "^3 || dev-FRAMEWORK_6_0",
-        "horde/vfs": "^3 || dev-FRAMEWORK_6_0",
-        "horde/ldap": "^3"
+        "horde/vfs": "^3 || dev-FRAMEWORK_6_0"
     },
     "suggest": {
         "pear/text_captcha": "*",
@@ -112,6 +111,5 @@
         "branch-alias": {
             "dev-FRAMEWORK_6_0": "3.x-dev"
         }
-    },
-    "minimum-stability": "dev"
+    }
 }
