@@ -17,6 +17,17 @@ declare(strict_types=1);
 
 namespace Horde\Core\Factory;
 
+use Horde\Core\Config\Driver\Auth\ApplicationAuthDriver;
+use Horde\Core\Config\Driver\Auth\AutoAuthDriver;
+use Horde\Core\Config\Driver\Auth\FtpAuthDriver;
+use Horde\Core\Config\Driver\Auth\HttpAuthDriver;
+use Horde\Core\Config\Driver\Auth\HttpRemoteAuthDriver;
+use Horde\Core\Config\Driver\Auth\ImapAuthDriver;
+use Horde\Core\Config\Driver\Auth\LdapAuthDriver;
+use Horde\Core\Config\Driver\Auth\PamAuthDriver;
+use Horde\Core\Config\Driver\Auth\RadiusAuthDriver;
+use Horde\Core\Config\Driver\Auth\ShibbolethAuthDriver;
+use Horde\Core\Config\Driver\Auth\SqlAuthDriver;
 use Horde\Core\Config\Driver\DriverRepository;
 use Horde\Core\Config\Driver\HashTable\MemcacheDriver;
 use Horde\Core\Config\Driver\HashTable\RedisDriver;
@@ -69,6 +80,19 @@ class DriverRepositoryFactory
         // Register HashTable drivers (distributed caching)
         $repository->register(new MemcacheDriver());
         $repository->register(new RedisDriver());
+
+        // Register Auth drivers (authentication backends)
+        $repository->register(new SqlAuthDriver());
+        $repository->register(new LdapAuthDriver());
+        $repository->register(new ImapAuthDriver());
+        $repository->register(new RadiusAuthDriver());
+        $repository->register(new ShibbolethAuthDriver());
+        $repository->register(new FtpAuthDriver());
+        $repository->register(new HttpAuthDriver());
+        $repository->register(new HttpRemoteAuthDriver());
+        $repository->register(new PamAuthDriver());
+        $repository->register(new ApplicationAuthDriver());
+        $repository->register(new AutoAuthDriver());
 
         // Future: Auto-discover drivers from applications
         // Future: Allow apps to register custom drivers via hooks
