@@ -28,6 +28,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 /**
  * Tests for LdapGroupService
  *
+ * @requires extension ldap
  * @category Horde
  * @package  Core
  * @author   Ralf Lang <ralf.lang@ralf-lang.de>
@@ -53,18 +54,41 @@ class LdapGroupServiceTest extends TestCase
         );
     }
 
+    /**
+     * Create a mock of Horde_Ldap_Search without calling constructor/destructor
+     */
+    private function createSearchMock(): Horde_Ldap_Search
+    {
+        return $this->getMockBuilder(Horde_Ldap_Search::class)
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->disableArgumentCloning()
+            ->disallowMockingUnknownTypes()
+            ->getMock();
+    }
+
+    /**
+     * Create a mock of Horde_Ldap_Entry without calling constructor
+     */
+    private function createEntryMock(): Horde_Ldap_Entry
+    {
+        return $this->getMockBuilder(Horde_Ldap_Entry::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
     public function testListAllGroups(): void
     {
-        $search = $this->createMock(Horde_Ldap_Search::class);
+        $search = $this->createSearchMock();
 
-        $entry1 = $this->createMock(Horde_Ldap_Entry::class);
+        $entry1 = $this->createEntryMock();
         $entry1->method('getValue')->willReturnMap([
             ['cn', 'single', 'developers'],
             ['memberUid', null, ['alice', 'bob']],
             ['mail', 'single', 'dev@example.com'],
         ]);
 
-        $entry2 = $this->createMock(Horde_Ldap_Entry::class);
+        $entry2 = $this->createEntryMock();
         $entry2->method('getValue')->willReturnMap([
             ['cn', 'single', 'admins'],
             ['memberUid', null, ['charlie']],
@@ -88,7 +112,7 @@ class LdapGroupServiceTest extends TestCase
 
     public function testGetGroup(): void
     {
-        $entry = $this->createMock(Horde_Ldap_Entry::class);
+        $entry = $this->createEntryMock();
         $entry->method('getValue')->will(
             $this->returnValueMap([
                 ['memberUid', null, ['alice', 'bob']],
@@ -110,6 +134,11 @@ class LdapGroupServiceTest extends TestCase
 
     public function testCreateGroup(): void
     {
+        // Mock search for generating next GID
+        $search = $this->createSearchMock();
+        $search->method('valid')->willReturn(false); // Empty result
+        $this->ldapAdapter->method('search')->willReturn($search);
+
         $this->ldapAdapter->expects($this->once())
             ->method('add')
             ->with($this->callback(function ($entry) {
@@ -123,7 +152,7 @@ class LdapGroupServiceTest extends TestCase
 
     public function testUpdateMembers(): void
     {
-        $entry = $this->createMock(Horde_Ldap_Entry::class);
+        $entry = $this->createEntryMock();
         $entry->expects($this->once())
             ->method('replace')
             ->with(['memberUid' => ['alice', 'bob', 'charlie']]);
@@ -148,7 +177,7 @@ class LdapGroupServiceTest extends TestCase
 
     public function testExistsTrue(): void
     {
-        $entry = $this->createMock(Horde_Ldap_Entry::class);
+        $entry = $this->createEntryMock();
         $entry->method('getValue')->will(
             $this->returnValueMap([
                 ['memberUid', null, []],
@@ -171,7 +200,7 @@ class LdapGroupServiceTest extends TestCase
 
     public function testAddMember(): void
     {
-        $entry = $this->createMock(Horde_Ldap_Entry::class);
+        $entry = $this->createEntryMock();
         $entry->method('getValue')->willReturn(['alice']);
         $entry->expects($this->once())
             ->method('replace')
@@ -186,7 +215,7 @@ class LdapGroupServiceTest extends TestCase
 
     public function testAddMemberAlreadyExists(): void
     {
-        $entry = $this->createMock(Horde_Ldap_Entry::class);
+        $entry = $this->createEntryMock();
         $entry->method('getValue')->willReturn(['alice', 'bob']);
         $entry->expects($this->never())->method('update');
 
@@ -197,7 +226,7 @@ class LdapGroupServiceTest extends TestCase
 
     public function testRemoveMember(): void
     {
-        $entry = $this->createMock(Horde_Ldap_Entry::class);
+        $entry = $this->createEntryMock();
         $entry->method('getValue')->willReturn(['alice', 'bob']);
         $entry->expects($this->once())
             ->method('replace')
@@ -212,7 +241,7 @@ class LdapGroupServiceTest extends TestCase
 
     public function testGetMembers(): void
     {
-        $entry = $this->createMock(Horde_Ldap_Entry::class);
+        $entry = $this->createEntryMock();
         $entry->method('getValue')->will(
             $this->returnValueMap([
                 ['memberUid', null, ['alice', 'bob']],
@@ -229,7 +258,7 @@ class LdapGroupServiceTest extends TestCase
 
     public function testAddMembers(): void
     {
-        $entry = $this->createMock(Horde_Ldap_Entry::class);
+        $entry = $this->createEntryMock();
         $entry->method('getValue')->willReturn(['alice']);
         $entry->expects($this->once())
             ->method('replace')
@@ -244,7 +273,7 @@ class LdapGroupServiceTest extends TestCase
 
     public function testRemoveMembers(): void
     {
-        $entry = $this->createMock(Horde_Ldap_Entry::class);
+        $entry = $this->createEntryMock();
         $entry->method('getValue')->willReturn(['alice', 'bob', 'charlie']);
         $entry->expects($this->once())
             ->method('replace')

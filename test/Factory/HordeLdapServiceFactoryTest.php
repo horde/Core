@@ -29,6 +29,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 /**
  * Tests for HordeLdapServiceFactory
  *
+ * @requires extension ldap
  * @category Horde
  * @package  Core
  * @author   Ralf Lang <ralf.lang@ralf-lang.de>

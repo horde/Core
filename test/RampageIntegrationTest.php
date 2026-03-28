@@ -28,7 +28,7 @@ use Horde\Http\UriFactory;
 use Horde\Test\TestCase;
 use Horde_Injector;
 use Horde_Registry;
-use Horde_Routes_Mapper;
+use Horde\Routes\Mapper;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -170,7 +170,7 @@ class RampageIntegrationTest extends TestCase
             ->willReturn($controller);
 
         // Create router
-        $router = new Horde_Routes_Mapper();
+        $router = new Mapper();
 
         // Create AppRouter
         $appRouter = new AppRouter($registry, $router, $injector);
@@ -281,7 +281,7 @@ class RampageIntegrationTest extends TestCase
             ->willReturn($controller);
 
         // Create router
-        $router = new Horde_Routes_Mapper();
+        $router = new Mapper();
 
         // Create AppRouter
         $appRouter = new AppRouter($registry, $router, $injector);
