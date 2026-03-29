@@ -1,4 +1,21 @@
 ---
+3.0.0-beta11:
+  api: 3.0.0-beta11
+  state:
+    release: beta
+    api: beta
+  date: 2026-03-29
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    test: Way more test coverage for config metadata system.
+    feat: add a feature switch for the metadata system
+    fix: Mismatch between driver implementation from downstream project and interface from feature branch :(
+    test: AppFinderTest and AppRouterTest remove the last phpunit notices.
+    test: RampageIntegrationTest mocks expect handle method
+    test: Fix mock related notices in Ldap-backed service tests
+    test: Reduce PHPUnit notices - Mocks have assertions or need to turn to stubs
 3.0.0-beta10:
   api: 3.0.0-beta10
   state:
