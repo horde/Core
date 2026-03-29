@@ -1,4 +1,17 @@
 ---
+3.0.0-beta10:
+  api: 3.0.0-beta10
+  state:
+    release: beta
+    api: beta
+  date: 2026-03-29
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    fix: Three null issues in Horde_Themes_Element
+    feat: Config should optionally prefer injector injection over injector global
+    style: Use named arguments with Log Handler factory.
 3.0.0-beta9:
   api: 3.0.0-beta9
   state:
