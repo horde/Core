@@ -168,9 +168,12 @@ class Horde_Themes_Element
     {
         global $registry;
 
+        $fileroot = $registry->get('fileroot', 'horde');
+        $webroot = $registry->get('webroot', 'horde');
+
         return new self('', [
             'data' => [
-                'fs' => realpath($registry->get('fileroot', 'horde')) . preg_replace('/^' . preg_quote($registry->get('webroot', 'horde'), '/') . '/', '', $uri),
+                'fs' => realpath($fileroot ?? '') . preg_replace('/^' . preg_quote($webroot ?? '', '/') . '/', '', $uri),
                 'uri' => $uri,
             ],
         ]);
