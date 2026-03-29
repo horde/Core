@@ -1,4 +1,18 @@
 ---
+3.0.0-beta9:
+  api: 3.0.0-beta9
+  state:
+    release: beta
+    api: beta
+  date: 2026-03-29
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    style: ws
+    feat: HordeYmlFile based version reader replaces PEARisms
+    fix: Guard against ltrim on non-string
+    feat: Group, Prefs and Alarm metadata providers
 3.0.0-beta8:
   api: 3.0.0-beta8
   state:
