@@ -75,7 +75,12 @@ class SQLiteDriver implements DriverInterface
                 description: 'Database file mode',
                 required: false,
                 default: '0600',
-                allowedValues: ['0600', '0640', '0660', '0644'],
+                options: [
+                    '0600' => '0600 (User only)',
+                    '0640' => '0640 (User + Group read)',
+                    '0660' => '0660 (User + Group)',
+                    '0644' => '0644 (World readable)',
+                ],
             ),
             new PropertyMetadata(
                 name: 'logqueries',

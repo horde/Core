@@ -74,10 +74,10 @@ class ImapAuthDriver implements DriverInterface
                 description: 'Encryption method to use',
                 required: false,
                 default: 'tls',
-                enumValues: [
-                    'none',
-                    'tls',
-                    'ssl',
+                options: [
+                    'none' => 'None',
+                    'tls' => 'TLS',
+                    'ssl' => 'SSL',
                 ],
             ),
         ];

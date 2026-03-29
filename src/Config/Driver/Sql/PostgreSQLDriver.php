@@ -109,7 +109,14 @@ class PostgreSQLDriver implements DriverInterface
                             description: 'SSL mode',
                             required: false,
                             default: 'require',
-                            allowedValues: ['disable', 'allow', 'prefer', 'require', 'verify-ca', 'verify-full'],
+                            options: [
+                                'disable' => 'Disable',
+                                'allow' => 'Allow',
+                                'prefer' => 'Prefer',
+                                'require' => 'Require',
+                                'verify-ca' => 'Verify CA',
+                                'verify-full' => 'Verify Full',
+                            ],
                         ),
                         new PropertyMetadata(
                             name: 'sslcert',

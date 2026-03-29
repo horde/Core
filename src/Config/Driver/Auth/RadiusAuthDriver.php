@@ -73,11 +73,11 @@ class RadiusAuthDriver implements DriverInterface
                 description: 'RADIUS authentication method',
                 required: false,
                 default: 'PAP',
-                enumValues: [
-                    'PAP',
-                    'CHAP_MD5',
-                    'MSCHAPv1',
-                    'MSCHAPv2',
+                options: [
+                    'PAP' => 'PAP',
+                    'CHAP_MD5' => 'CHAP MD5',
+                    'MSCHAPv1' => 'MS-CHAP v1',
+                    'MSCHAPv2' => 'MS-CHAP v2',
                 ],
             ),
             new PropertyMetadata(

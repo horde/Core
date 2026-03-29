@@ -186,6 +186,9 @@ class ConfigMetadataProvider
                         if ($caseField->default !== null) {
                             $legacyField['fields'][$case][$caseField->name]['default'] = $caseField->default;
                         }
+                        if (!empty($caseField->options)) {
+                            $legacyField['fields'][$case][$caseField->name]['values'] = $caseField->options;
+                        }
                     }
                 }
             }
