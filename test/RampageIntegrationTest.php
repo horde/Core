@@ -142,7 +142,7 @@ class RampageIntegrationTest extends TestCase
 
         // Mock controller
         $controller = $this->createMock(RequestHandlerInterface::class);
-        $controller->method('handle')
+        $controller->expects($this->once())->method('handle')
             ->willReturnCallback(function ($request) use (&$middlewaresExecuted) {
                 // Verify middlewares ran BEFORE controller
                 $this->assertContains('AuthHordeSession', $middlewaresExecuted);
@@ -263,7 +263,7 @@ class RampageIntegrationTest extends TestCase
 
         // Mock controller (NO middlewares should execute)
         $controller = $this->createMock(RequestHandlerInterface::class);
-        $controller->method('handle')
+        $controller->expects($this->once())->method('handle')
             ->willReturnCallback(function ($request) use (&$middlewaresExecuted) {
                 // Verify NO middlewares ran
                 $this->assertEmpty($middlewaresExecuted, 'No middlewares should execute with empty stack');
