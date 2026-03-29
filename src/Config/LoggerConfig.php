@@ -6,7 +6,7 @@
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
  *
- * @author   Ralf Lang <lang@b1-systems.de>
+ * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @category Horde
  * @license  http://www.horde.org/licenses/lgpl21 LGPL
  * @package  Core
@@ -22,7 +22,7 @@ namespace Horde\Core\Config;
  * to both legacy and modern logger factories. This ensures consistent
  * configuration interpretation across both implementations.
  *
- * @author   Ralf Lang <lang@b1-systems.de>
+ * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @category Horde
  * @license  http://www.horde.org/licenses/lgpl21 LGPL
  * @package  Core

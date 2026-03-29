@@ -17,6 +17,7 @@
 
 use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Legacy\LegacyConfigAdapter;
+use Horde\Injector\Injector;
 
 class Horde_Config
 {
@@ -110,13 +111,23 @@ class Horde_Config
     protected $_versionUrl = 'https://pear.horde.org/packages.json';
 
     /**
+     * Optional injector instance.
+     *
+     * @var Injector|null
+     */
+    protected ?Injector $_injector = null;
+
+    /**
      * Constructor.
      *
      * @param string $app  The name of the application to be configured.
+     * @param Injector|null $injector  Optional injector instance. If null,
+     *                                  falls back to $GLOBALS['injector'].
      */
-    public function __construct($app = 'horde')
+    public function __construct($app = 'horde', ?Injector $injector = null)
     {
         $this->_app = $app;
+        $this->_injector = $injector;
     }
 
     /**
@@ -1172,17 +1183,17 @@ class Horde_Config
     public function configSQL($ctx, $node = null, $switchname = 'driverconfig')
     {
         // Try new metadata system first
-        if (isset($GLOBALS['injector'])) {
+        $injector = $this->_injector ?? $GLOBALS['injector'] ?? null;
+        if ($injector) {
             try {
-                $provider = $GLOBALS['injector']->getInstance(
+                $provider = $injector->getInstance(
                     ConfigMetadataProvider::class
                 );
-                $adapter = new LegacyConfigAdapter(
-                    $provider->getRepository()
-                );
+                $adapter = new LegacyConfigAdapter($provider);
 
                 // Get driver metadata converted to legacy format
-                $drivers = $adapter->convertSqlDrivers($ctx, $node, $switchname);
+                $result = $adapter->toConfigSQL('sql');
+                $drivers = $result['switch'] ?? [];
 
                 // Build the custom_fields structure expected by legacy code
                 $custom_fields = [
