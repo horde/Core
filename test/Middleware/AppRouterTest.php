@@ -151,7 +151,7 @@ class AppRouterTest extends TestCase
 
         // Setup injector to return a mock controller
         $mockController = $this->createMock(RequestHandlerInterface::class);
-        $mockController->method('handle')
+        $mockController->expects($this->once())->method('handle')
             ->willReturn($this->responseFactory->createResponse(200));
 
         $this->injector->expects($this->once())->method('getInstance')
@@ -227,7 +227,7 @@ class AppRouterTest extends TestCase
 
         // Mock controller that tracks middleware execution
         $mockController = $this->createMock(RequestHandlerInterface::class);
-        $mockController->method('handle')
+        $mockController->expects($this->once())->method('handle')
             ->willReturnCallback(function ($request) {
                 $middlewares = $request->getAttribute('middlewares_executed', []);
                 // Verify default middlewares ran
@@ -304,7 +304,7 @@ class AppRouterTest extends TestCase
                 throw new \Exception("Injector: Unknown key: $key");
             });
         $mockController = $this->createMock(RequestHandlerInterface::class);
-        $mockController->method('handle')
+        $mockController->expects($this->once())->method('handle')
             ->willReturnCallback(function ($request) {
                 $middlewares = $request->getAttribute('middlewares_executed', []);
                 // Empty stack = no default middlewares
@@ -380,7 +380,7 @@ class AppRouterTest extends TestCase
             });
 
         $mockController = $this->createMock(RequestHandlerInterface::class);
-        $mockController->method('handle')
+        $mockController->expects($this->once())->method('handle')
             ->willReturnCallback(function ($request) {
                 $middlewares = $request->getAttribute('middlewares_executed', []);
                 $this->assertEmpty($middlewares, 'HordeAuthType=NONE should bypass middlewares');
@@ -418,6 +418,12 @@ class AppRouterTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage("Missing Attribute: 'app'");
 
+        // Injector.has() is called early to check for config loaders
+        $this->injector->expects($this->atLeastOnce())->method('has')->willReturn(true);
+
+        // Registry should not be called when attribute validation fails early
+        $this->registry->expects($this->never())->method($this->anything());
+
         $request = $this->requestFactory->createServerRequest('GET', 'http://example.com/test')
             ->withAttribute('routerPrefix', '/test');
 
@@ -437,6 +443,12 @@ class AppRouterTest extends TestCase
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage("Missing Attribute: 'routerPrefix'");
+
+        // Injector.has() is called early to check for config loaders
+        $this->injector->expects($this->atLeastOnce())->method('has')->willReturn(true);
+
+        // Registry should not be called when attribute validation fails early
+        $this->registry->expects($this->never())->method($this->anything());
 
         $request = $this->requestFactory->createServerRequest('GET', 'http://example.com/test')
             ->withAttribute('app', 'testapp');
@@ -490,7 +502,7 @@ class AppRouterTest extends TestCase
             });
 
         $mockController = $this->createMock(RequestHandlerInterface::class);
-        $mockController->method('handle')
+        $mockController->expects($this->once())->method('handle')
             ->willReturnCallback(function ($request) {
                 $route = $request->getAttribute('route');
                 $this->assertIsArray($route);

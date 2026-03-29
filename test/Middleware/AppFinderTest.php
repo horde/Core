@@ -56,8 +56,8 @@ class AppFinderTest extends TestCase
         $request = $request->withAttribute('registry', $registry);
 
 
-        $registry->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
+        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
             return $baseUrl . $app;
         });
 
@@ -82,8 +82,8 @@ class AppFinderTest extends TestCase
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
         $request = $request->withAttribute('registry', $registry);
 
-        $registry->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
+        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
             return $baseUrl . $app;
         });
 
@@ -106,8 +106,8 @@ class AppFinderTest extends TestCase
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
         $request = $request->withAttribute('registry', $registry);
 
-        $registry->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
+        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
             return $baseUrl . $app;
         });
 
@@ -134,10 +134,9 @@ class AppFinderTest extends TestCase
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
         $request = $request->withAttribute('registry', $registry);
 
-        $registry->method('listApps')->willReturn($list);
-        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
-            return $baseUrl . $app;
-        });
+        $registry->expects($this->once())->method('listApps')->willReturn($list);
+        // get() not called when list is empty - no apps to check
+        $registry->expects($this->never())->method('get');
 
         $middleware = $this->getMiddleware();
         $response = $middleware->process($request, $this->handler);
@@ -157,8 +156,8 @@ class AppFinderTest extends TestCase
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
         $request = $request->withAttribute('registry', $registry);
 
-        $registry->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
+        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
             return $baseUrl . $app;
         });
 
@@ -184,8 +183,8 @@ class AppFinderTest extends TestCase
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
         $request = $request->withAttribute('registry', $registry);
 
-        $registry->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrlWithHttp) {
+        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
+        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrlWithHttp) {
             return $baseUrlWithHttp . $app;
         });
 
@@ -209,8 +208,8 @@ class AppFinderTest extends TestCase
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
         $request = $request->withAttribute('registry', $registry);
 
-        $registry->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrlWithDifferentHost) {
+        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
+        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrlWithDifferentHost) {
             return $baseUrlWithDifferentHost . $app;
         });
 
@@ -233,8 +232,8 @@ class AppFinderTest extends TestCase
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
         $request = $request->withAttribute('registry', $registry);
 
-        $registry->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
+        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
             return $baseUrl . $app;
         });
 
@@ -253,8 +252,8 @@ class AppFinderTest extends TestCase
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
         $request = $request->withAttribute('registry', $registry);
 
-        $registry->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
+        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
             if ($app === 'bla') {
                 return $baseUrl . 'foo' . '/bla';
             } else {
@@ -279,8 +278,8 @@ class AppFinderTest extends TestCase
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
         $request = $request->withAttribute('registry', $registry);
 
-        $registry->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
+        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
             if ($app === 'bla') {
                 return $baseUrl;
             } else {
@@ -304,11 +303,11 @@ class AppFinderTest extends TestCase
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
         $request = $request->withAttribute('registry', $registry);
 
-        $registry->method('listApps')->willReturn([
+        $registry->expects($this->once())->method('listApps')->willReturn([
             'foobar' => [],
             'bar' => ['webroot_aliases' => [$baseUrl . '/barV2']],
         ]);
-        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
             return $baseUrl . $app;
         });
 
@@ -327,11 +326,11 @@ class AppFinderTest extends TestCase
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
         $request = $request->withAttribute('registry', $registry);
 
-        $registry->method('listApps')->willReturn([
+        $registry->expects($this->once())->method('listApps')->willReturn([
             'foobar' => [],
             'bar' => [],
         ]);
-        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
             return $baseUrl . $app;
         });
 
