@@ -1,4 +1,5 @@
 <?php
+
 /**
  * An abstract class representing a single block in the portal/block display.
  *
