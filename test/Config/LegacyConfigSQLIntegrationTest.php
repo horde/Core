@@ -34,6 +34,9 @@ class LegacyConfigSQLIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
+        // Enable metadata system feature switch
+        $GLOBALS['conf']['config']['use_metadata'] = true;
+
         // Set up dependency injection
         $this->injector = new Injector(new TopLevel());
         $this->repository = new DriverRepository();

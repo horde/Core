@@ -80,7 +80,7 @@ class AllDriversInstantiationTest extends TestCase
                         $failures[] = [
                             'class' => $class,
                             'error' => 'getFields() returned non-PropertyMetadata object',
-                            'type' => get_class($field)
+                            'type' => get_class($field),
                         ];
                     }
                 }
@@ -89,7 +89,7 @@ class AllDriversInstantiationTest extends TestCase
                     'class' => $class,
                     'error' => $e->getMessage(),
                     'file' => $e->getFile(),
-                    'line' => $e->getLine()
+                    'line' => $e->getLine(),
                 ];
             }
         }
@@ -125,7 +125,7 @@ class AllDriversInstantiationTest extends TestCase
             if (in_array($filename, [
                 'DriverInterface.php',
                 'DriverAvailability.php',
-                'DriverRepository.php'
+                'DriverRepository.php',
             ])) {
                 continue;
             }

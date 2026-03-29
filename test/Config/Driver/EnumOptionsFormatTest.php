@@ -19,6 +19,7 @@ namespace Horde\Core\Test\Config\Driver;
 use Horde\Core\Config\Driver\DriverInterface;
 use Horde\Core\Config\Metadata\FieldType;
 use Horde\Core\Config\Metadata\PropertyMetadata;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -47,9 +48,8 @@ class EnumOptionsFormatTest extends TestCase
 {
     /**
      * Test that all ENUM fields have properly formatted options arrays.
-     *
-     * @dataProvider allDriversProvider
      */
+    #[DataProvider('allDriversProvider')]
     public function testEnumFieldsHaveAssociativeOptionsArray(DriverInterface $driver): void
     {
         $violations = [];
@@ -66,7 +66,7 @@ class EnumOptionsFormatTest extends TestCase
                 $violations[] = [
                     'driver' => $driverClass,
                     'field' => $field->name,
-                    'error' => 'ENUM field has empty options array'
+                    'error' => 'ENUM field has empty options array',
                 ];
                 continue;
             }
@@ -82,7 +82,7 @@ class EnumOptionsFormatTest extends TestCase
                     'error' => 'ENUM field uses simple array instead of associative',
                     'current_values' => array_values($field->options),
                     'expected_format' => "['key' => 'Label', ...]",
-                    'hint' => 'Convert ["value1", "value2"] to ["value1" => "Label 1", "value2" => "Label 2"]'
+                    'hint' => 'Convert ["value1", "value2"] to ["value1" => "Label 1", "value2" => "Label 2"]',
                 ];
                 continue;
             }
@@ -95,7 +95,7 @@ class EnumOptionsFormatTest extends TestCase
                         'field' => $field->name,
                         'error' => 'ENUM option key is not a string',
                         'key' => $key,
-                        'key_type' => gettype($key)
+                        'key_type' => gettype($key),
                     ];
                 }
                 if (!is_string($label) && $label !== null) {
@@ -105,7 +105,7 @@ class EnumOptionsFormatTest extends TestCase
                         'error' => 'ENUM option label is not a string',
                         'key' => $key,
                         'label' => $label,
-                        'label_type' => gettype($label)
+                        'label_type' => gettype($label),
                     ];
                 }
             }
@@ -154,20 +154,34 @@ class EnumOptionsFormatTest extends TestCase
      */
     public static function allDriversProvider(): array
     {
-        $drivers = [];
-        $classes = self::discoverAllDriverClasses();
+        try {
+            $drivers = [];
+            $classes = self::discoverAllDriverClasses();
 
-        foreach ($classes as $class) {
-            try {
-                $driver = new $class();
-                $drivers[$class] = [$driver];
-            } catch (\Throwable $e) {
-                // Skip drivers that can't be instantiated
-                // (they'll be caught by AllDriversInstantiationTest)
+            foreach ($classes as $class) {
+                try {
+                    $driver = new $class();
+                    $drivers[$class] = [$driver];
+                } catch (\Throwable $e) {
+                    // Skip drivers that can't be instantiated
+                    // (they'll be caught by AllDriversInstantiationTest)
+                }
             }
-        }
 
-        return $drivers;
+            if (empty($drivers)) {
+                throw new \RuntimeException('No drivers discovered - check path');
+            }
+
+            return $drivers;
+        } catch (\Throwable $e) {
+            // If data provider fails, PHPUnit silently returns empty array
+            // Force a visible error by throwing
+            throw new \RuntimeException(
+                'Data provider failed: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                0,
+                $e
+            );
+        }
     }
 
     /**
@@ -194,7 +208,7 @@ class EnumOptionsFormatTest extends TestCase
             if (in_array($filename, [
                 'DriverInterface.php',
                 'DriverAvailability.php',
-                'DriverRepository.php'
+                'DriverRepository.php',
             ])) {
                 continue;
             }

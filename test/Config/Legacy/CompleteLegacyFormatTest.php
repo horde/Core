@@ -20,6 +20,7 @@ use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Driver\DriverRepository;
 use Horde\Core\Config\Metadata\FieldType;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
@@ -61,9 +62,8 @@ class CompleteLegacyFormatTest extends TestCase
 
     /**
      * Test legacy format conversion for all registered drivers.
-     *
-     * @dataProvider allDriversProvider
      */
+    #[DataProvider('allDriversProvider')]
     public function testLegacyFormatForDriver(string $type, string $name): void
     {
         $violations = [];
@@ -87,7 +87,7 @@ class CompleteLegacyFormatTest extends TestCase
             if (!isset($legacy[$field->name])) {
                 $violations[] = [
                     'field_path' => $fieldPath,
-                    'error' => 'Field missing in legacy format'
+                    'error' => 'Field missing in legacy format',
                 ];
                 continue;
             }
@@ -98,14 +98,14 @@ class CompleteLegacyFormatTest extends TestCase
             if (!isset($legacyField['desc'])) {
                 $violations[] = [
                     'field_path' => $fieldPath,
-                    'error' => "Missing 'desc' key in legacy format"
+                    'error' => "Missing 'desc' key in legacy format",
                 ];
             }
 
             if (!isset($legacyField['type'])) {
                 $violations[] = [
                     'field_path' => $fieldPath,
-                    'error' => "Missing 'type' key in legacy format"
+                    'error' => "Missing 'type' key in legacy format",
                 ];
             }
 
@@ -116,19 +116,19 @@ class CompleteLegacyFormatTest extends TestCase
                         'field_path' => $fieldPath,
                         'error' => "ENUM field missing 'values' key in legacy format",
                         'field_type' => 'ENUM',
-                        'has_options' => !empty($field->options)
+                        'has_options' => !empty($field->options),
                     ];
                 } else {
                     // Validate values are associative
                     if (!is_array($legacyField['values'])) {
                         $violations[] = [
                             'field_path' => $fieldPath,
-                            'error' => "ENUM 'values' is not an array"
+                            'error' => "ENUM 'values' is not an array",
                         ];
                     } elseif (array_keys($legacyField['values']) === range(0, count($legacyField['values']) - 1)) {
                         $violations[] = [
                             'field_path' => $fieldPath,
-                            'error' => "ENUM 'values' is simple array, should be associative"
+                            'error' => "ENUM 'values' is simple array, should be associative",
                         ];
                     }
                 }
@@ -139,7 +139,7 @@ class CompleteLegacyFormatTest extends TestCase
                 if (!isset($legacyField['fields'])) {
                     $violations[] = [
                         'field_path' => $fieldPath,
-                        'error' => "Field with conditionalFields missing 'fields' key in legacy format"
+                        'error' => "Field with conditionalFields missing 'fields' key in legacy format",
                     ];
                     continue;
                 }
@@ -148,7 +148,7 @@ class CompleteLegacyFormatTest extends TestCase
                     if (!isset($legacyField['fields'][$case])) {
                         $violations[] = [
                             'field_path' => $fieldPath,
-                            'error' => "Conditional case '{$case}' missing in legacy format"
+                            'error' => "Conditional case '{$case}' missing in legacy format",
                         ];
                         continue;
                     }
@@ -160,7 +160,7 @@ class CompleteLegacyFormatTest extends TestCase
                         if (!isset($legacyField['fields'][$case][$caseField->name])) {
                             $violations[] = [
                                 'field_path' => $casePath,
-                                'error' => 'Nested conditional field missing in legacy format'
+                                'error' => 'Nested conditional field missing in legacy format',
                             ];
                             continue;
                         }
@@ -175,7 +175,7 @@ class CompleteLegacyFormatTest extends TestCase
                                     'error' => "Nested ENUM field missing 'values' key in legacy format",
                                     'field_type' => 'ENUM (nested)',
                                     'has_options' => !empty($caseField->options),
-                                    'severity' => 'CRITICAL - This is the PostgreSQL sslmode bug!'
+                                    'severity' => 'CRITICAL - This is the PostgreSQL sslmode bug!',
                                 ];
                             }
                         }
@@ -253,7 +253,7 @@ class CompleteLegacyFormatTest extends TestCase
             if (in_array($filename, [
                 'DriverInterface.php',
                 'DriverAvailability.php',
-                'DriverRepository.php'
+                'DriverRepository.php',
             ])) {
                 continue;
             }

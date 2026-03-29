@@ -149,6 +149,9 @@ class PropertyMetadataParameterTest extends TestCase
         // Output parameter counts as a note
         fwrite(STDERR, "\nParameter usage across all drivers:\n");
         fwrite(STDERR, json_encode($parameterCounts, JSON_PRETTY_PRINT) . "\n");
+
+        // Add assertion to prevent risky test warning
+        $this->assertNotEmpty($parameterCounts, 'Should have found parameter usage in drivers');
     }
 
     /**
@@ -176,7 +179,7 @@ class PropertyMetadataParameterTest extends TestCase
             if (in_array($filename, [
                 'DriverInterface.php',
                 'DriverAvailability.php',
-                'DriverRepository.php'
+                'DriverRepository.php',
             ])) {
                 continue;
             }

@@ -19,6 +19,7 @@ namespace Horde\Core\Test\Config\Driver;
 use Horde\Core\Config\Metadata\FieldType;
 use Horde\Core\Config\Metadata\PropertyMetadata;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
@@ -42,9 +43,8 @@ class EnumValidationTest extends TestCase
 {
     /**
      * Test ENUM field validation with valid values.
-     *
-     * @dataProvider enumFieldsProvider
      */
+    #[DataProvider('enumFieldsProvider')]
     public function testEnumFieldAcceptsValidValue(
         string $driverClass,
         string $fieldName,
@@ -73,9 +73,8 @@ class EnumValidationTest extends TestCase
 
     /**
      * Test ENUM field validation with all valid values.
-     *
-     * @dataProvider enumFieldsProvider
      */
+    #[DataProvider('enumFieldsProvider')]
     public function testEnumFieldAcceptsAllValidValues(
         string $driverClass,
         string $fieldName,
@@ -102,9 +101,8 @@ class EnumValidationTest extends TestCase
 
     /**
      * Test ENUM field validation rejects invalid values.
-     *
-     * @dataProvider enumFieldsProvider
      */
+    #[DataProvider('enumFieldsProvider')]
     public function testEnumFieldRejectsInvalidValue(
         string $driverClass,
         string $fieldName,
@@ -128,9 +126,8 @@ class EnumValidationTest extends TestCase
 
     /**
      * Test ENUM validation error messages are informative.
-     *
-     * @dataProvider enumFieldsProvider
      */
+    #[DataProvider('enumFieldsProvider')]
     public function testEnumValidationErrorMessageIsInformative(
         string $driverClass,
         string $fieldName,
@@ -143,23 +140,23 @@ class EnumValidationTest extends TestCase
         if (!$result->isValid()) {
             $error = $result->getFirstError();
 
-            $this->assertNotEmpty($error, "Error message should not be empty");
+            $this->assertNotEmpty($error, 'Error message should not be empty');
 
             // Error should mention the field name
             $this->assertStringContainsString(
                 $fieldName,
                 $error,
-                "Error message should mention field name"
+                'Error message should mention field name'
             );
 
             // Error should indicate it's about valid options
             $this->assertStringContainsString(
                 'must be one of',
                 $error,
-                "Error message should list available options"
+                'Error message should list available options'
             );
         } else {
-            $this->fail("Validation should have failed for invalid value");
+            $this->fail('Validation should have failed for invalid value');
         }
     }
 
@@ -184,7 +181,7 @@ class EnumValidationTest extends TestCase
                         $enumFields[$key] = [
                             $class,
                             $field->name,
-                            $field
+                            $field,
                         ];
                     }
                 }
@@ -245,7 +242,7 @@ class EnumValidationTest extends TestCase
             if (in_array($filename, [
                 'DriverInterface.php',
                 'DriverAvailability.php',
-                'DriverRepository.php'
+                'DriverRepository.php',
             ])) {
                 continue;
             }
