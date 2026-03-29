@@ -17,6 +17,8 @@ declare(strict_types=1);
 
 namespace Horde\Core\Factory;
 
+use Horde\Core\Config\Driver\Alarms\NullAlarmsDriver;
+use Horde\Core\Config\Driver\Alarms\SqlAlarmsDriver;
 use Horde\Core\Config\Driver\Auth\ApplicationAuthDriver;
 use Horde\Core\Config\Driver\Auth\AutoAuthDriver;
 use Horde\Core\Config\Driver\Auth\FtpAuthDriver;
@@ -29,10 +31,20 @@ use Horde\Core\Config\Driver\Auth\RadiusAuthDriver;
 use Horde\Core\Config\Driver\Auth\ShibbolethAuthDriver;
 use Horde\Core\Config\Driver\Auth\SqlAuthDriver;
 use Horde\Core\Config\Driver\DriverRepository;
+use Horde\Core\Config\Driver\Group\LdapGroupDriver;
+use Horde\Core\Config\Driver\Group\MockGroupDriver;
+use Horde\Core\Config\Driver\Group\SqlGroupDriver;
 use Horde\Core\Config\Driver\HashTable\MemcacheDriver;
 use Horde\Core\Config\Driver\HashTable\RedisDriver;
 use Horde\Core\Config\Driver\Ldap\LdapDriver;
 use Horde\Core\Config\Driver\NoSql\MongoDBDriver;
+use Horde\Core\Config\Driver\Perms\NullPermsDriver;
+use Horde\Core\Config\Driver\Perms\SqlPermsDriver;
+use Horde\Core\Config\Driver\Prefs\FilePrefsDriver;
+use Horde\Core\Config\Driver\Prefs\LdapPrefsDriver;
+use Horde\Core\Config\Driver\Prefs\NoSqlPrefsDriver;
+use Horde\Core\Config\Driver\Prefs\SessionPrefsDriver;
+use Horde\Core\Config\Driver\Prefs\SqlPrefsDriver;
 use Horde\Core\Config\Driver\Sql\MSSQLDriver;
 use Horde\Core\Config\Driver\Sql\MySQLDriver;
 use Horde\Core\Config\Driver\Sql\OracleDriver;
@@ -55,7 +67,8 @@ class DriverRepositoryFactory
 {
     public function __construct(
         private readonly Horde_Injector $injector,
-    ) {}
+    ) {
+    }
 
     /**
      * Create and populate DriverRepository.
@@ -93,6 +106,26 @@ class DriverRepositoryFactory
         $repository->register(new PamAuthDriver());
         $repository->register(new ApplicationAuthDriver());
         $repository->register(new AutoAuthDriver());
+
+        // Register Prefs drivers (preference storage)
+        $repository->register(new SqlPrefsDriver());
+        $repository->register(new NoSqlPrefsDriver());
+        $repository->register(new LdapPrefsDriver());
+        $repository->register(new FilePrefsDriver());
+        $repository->register(new SessionPrefsDriver());
+
+        // Register Group drivers (group management)
+        $repository->register(new SqlGroupDriver());
+        $repository->register(new LdapGroupDriver());
+        $repository->register(new MockGroupDriver());
+
+        // Register Perms drivers (permissions)
+        $repository->register(new SqlPermsDriver());
+        $repository->register(new NullPermsDriver());
+
+        // Register Alarms drivers (alarm storage)
+        $repository->register(new SqlAlarmsDriver());
+        $repository->register(new NullAlarmsDriver());
 
         // Future: Auto-discover drivers from applications
         // Future: Allow apps to register custom drivers via hooks

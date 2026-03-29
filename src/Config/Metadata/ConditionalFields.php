@@ -38,7 +38,8 @@ class ConditionalFields implements JsonSerializable
      */
     public function __construct(
         private readonly array $cases = [],
-    ) {}
+    ) {
+    }
 
     /**
      * Get fields for a specific case value.
@@ -78,7 +79,7 @@ class ConditionalFields implements JsonSerializable
         $result = [];
         foreach ($this->cases as $caseValue => $fields) {
             $result[$caseValue] = array_map(
-                fn(PropertyMetadata $field) => $field->jsonSerialize(),
+                fn (PropertyMetadata $field) => $field->jsonSerialize(),
                 $fields
             );
         }

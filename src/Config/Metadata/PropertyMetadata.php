@@ -46,7 +46,8 @@ class PropertyMetadata implements JsonSerializable
         public readonly array $options = [],
         public readonly ?ConditionalFields $conditionalFields = null,
         public readonly array $validationRules = [],
-    ) {}
+    ) {
+    }
 
     /**
      * Validate a value against this property's metadata.

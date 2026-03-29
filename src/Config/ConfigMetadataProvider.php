@@ -40,7 +40,18 @@ class ConfigMetadataProvider
 {
     public function __construct(
         private readonly DriverRepository $repository,
-    ) {}
+    ) {
+    }
+
+    /**
+     * Get the driver repository.
+     *
+     * @return DriverRepository The driver repository
+     */
+    public function getRepository(): DriverRepository
+    {
+        return $this->repository;
+    }
 
     /**
      * Get list of available drivers for a type.

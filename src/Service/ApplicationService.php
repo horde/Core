@@ -18,6 +18,7 @@ namespace Horde\Core\Service;
 
 use Horde\Core\Config\RegistryConfigLoader;
 use Horde\Core\Config\RegistryState;
+use Horde\Core\Util\VersionReader;
 
 /**
  * Application introspection service
@@ -142,17 +143,10 @@ class ApplicationService
         }
 
         // Try to read from .horde.yml (primary source)
-        if (isset($data['fileroot']) && function_exists('yaml_parse_file')) {
-            $hordeYml = $data['fileroot'] . '/.horde.yml';
-            if (file_exists($hordeYml)) {
-                try {
-                    $yaml = yaml_parse_file($hordeYml);
-                    if (isset($yaml['version']['release'])) {
-                        return $yaml['version']['release'];
-                    }
-                } catch (\Exception $e) {
-                    // yaml_parse_file failed, fall through to unknown
-                }
+        if (isset($data['fileroot'])) {
+            $version = VersionReader::readVersionFromFileroot($data['fileroot']);
+            if ($version) {
+                return $version;
             }
         }
 

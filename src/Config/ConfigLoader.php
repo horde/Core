@@ -112,7 +112,7 @@ class ConfigLoader
                     throw new RuntimeException(
                         "Configuration file exists but is not readable: {$filePath}\n"
                         . "Check file permissions. PHP process needs read access.\n"
-                        . "File permissions: " . substr(sprintf('%o', fileperms($filePath)), -4)
+                        . 'File permissions: ' . substr(sprintf('%o', fileperms($filePath)), -4)
                     );
                 }
 
@@ -137,7 +137,7 @@ class ConfigLoader
                         throw new RuntimeException(
                             "Configuration file exists but is not readable: {$vhostFile}\n"
                             . "Check file permissions. PHP process needs read access.\n"
-                            . "File permissions: " . substr(sprintf('%o', fileperms($vhostFile)), -4)
+                            . 'File permissions: ' . substr(sprintf('%o', fileperms($vhostFile)), -4)
                         );
                     }
 
