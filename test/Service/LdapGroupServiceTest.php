@@ -44,34 +44,15 @@ class LdapGroupServiceTest extends TestCase
         $this->ldapService = $this->createStub(HordeLdapService::class);
     }
 
-    /**
-     * Create a stub of Horde_Ldap_Search without calling constructor/destructor
-     */
-    private function createSearchStub(): Horde_Ldap_Search
-    {
-        return $this->getMockBuilder(Horde_Ldap_Search::class)
-            ->disableOriginalConstructor()
-            ->disableOriginalClone()
-            ->getMock();
-    }
-
-    /**
-     * Create a stub of Horde_Ldap_Entry without calling constructor
-     */
-    private function createEntryStub(): Horde_Ldap_Entry
-    {
-        return $this->getMockBuilder(Horde_Ldap_Entry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
     public function testListAllGroups(): void
     {
         $ldapAdapter = $this->createMock(Horde_Ldap::class);
         $search = $this->createMock(Horde_Ldap_Search::class);
 
-        $entry1 = $this->createEntryStub();
-        $entry1->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
+        $entry1 = $this->getMockBuilder(Horde_Ldap_Entry::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entry1->expects($this->exactly(3))->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
             if ($attr === 'cn' && $mode === 'single') {
                 return 'developers';
             }
@@ -84,8 +65,10 @@ class LdapGroupServiceTest extends TestCase
             return null;
         });
 
-        $entry2 = $this->createEntryStub();
-        $entry2->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
+        $entry2 = $this->getMockBuilder(Horde_Ldap_Entry::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entry2->expects($this->exactly(3))->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
             if ($attr === 'cn' && $mode === 'single') {
                 return 'admins';
             }
@@ -120,8 +103,10 @@ class LdapGroupServiceTest extends TestCase
     public function testGetGroup(): void
     {
         $ldapAdapter = $this->createMock(Horde_Ldap::class);
-        $entry = $this->createEntryStub();
-        $entry->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
+        $entry = $this->getMockBuilder(Horde_Ldap_Entry::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entry->expects($this->exactly(2))->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
             if ($attr === 'memberUid') {
                 return ['alice', 'bob'];
             }
@@ -149,9 +134,12 @@ class LdapGroupServiceTest extends TestCase
     public function testCreateGroup(): void
     {
         $ldapAdapter = $this->createMock(Horde_Ldap::class);
-        // Stub search for generating next GID
-        $search = $this->createSearchStub();
-        $search->method('valid')->willReturn(false); // Empty result
+        // Mock search for generating next GID - verifies search is attempted
+        $search = $this->getMockBuilder(Horde_Ldap_Search::class)
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->getMock();
+        $search->expects($this->once())->method('valid')->willReturn(false); // Empty result
         $ldapAdapter->method('search')->willReturn($search);
 
         $ldapAdapter->expects($this->once())
@@ -204,8 +192,10 @@ class LdapGroupServiceTest extends TestCase
     public function testExistsTrue(): void
     {
         $ldapAdapter = $this->createStub(Horde_Ldap::class);
-        $entry = $this->createEntryStub();
-        $entry->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
+        $entry = $this->getMockBuilder(Horde_Ldap_Entry::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entry->expects($this->exactly(2))->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
             if ($attr === 'memberUid') {
                 return [];
             }
@@ -291,8 +281,10 @@ class LdapGroupServiceTest extends TestCase
     public function testGetMembers(): void
     {
         $ldapAdapter = $this->createStub(Horde_Ldap::class);
-        $entry = $this->createEntryStub();
-        $entry->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
+        $entry = $this->getMockBuilder(Horde_Ldap_Entry::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entry->expects($this->exactly(2))->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
             if ($attr === 'memberUid') {
                 return ['alice', 'bob'];
             }

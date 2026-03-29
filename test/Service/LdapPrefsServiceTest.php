@@ -44,27 +44,6 @@ class LdapPrefsServiceTest extends TestCase
         $this->ldapService = $this->createStub(HordeLdapService::class);
     }
 
-    /**
-     * Create a stub of Horde_Ldap_Search without calling constructor/destructor
-     */
-    private function createSearchStub(): Horde_Ldap_Search
-    {
-        return $this->getMockBuilder(Horde_Ldap_Search::class)
-            ->disableOriginalConstructor()
-            ->disableOriginalClone()
-            ->getMock();
-    }
-
-    /**
-     * Create a stub of Horde_Ldap_Entry without calling constructor
-     */
-    private function createEntryStub(): Horde_Ldap_Entry
-    {
-        return $this->getMockBuilder(Horde_Ldap_Entry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
     public function testGetValueFromHordePerson(): void
     {
         $ldapAdapter = $this->createStub(Horde_Ldap::class);
@@ -212,18 +191,23 @@ class LdapPrefsServiceTest extends TestCase
         $ldapAdapter = $this->createStub(Horde_Ldap::class);
         $ldapAdapter->method('findUserDN')->willReturn('uid=alice,ou=users,dc=example,dc=com');
 
-        $search = $this->createSearchStub();
-        $search->method('count')->willReturn(1);
+        $search = $this->getMockBuilder(Horde_Ldap_Search::class)
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->getMock();
+        $search->expects($this->once())->method('count')->willReturn(1);
 
-        $entry = $this->createEntryStub();
-        $entry->method('getValues')->willReturn([
+        $entry = $this->getMockBuilder(Horde_Ldap_Entry::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entry->expects($this->once())->method('getValues')->willReturn([
             'cn' => ['Alice'],
             'hordePrefhordeTheme' => ['silver'],
             'hordePrefhordeLanguage' => ['en_US'],
             'hordePrefimpLayout' => ['wide'],
         ]);
 
-        $search->method('shiftEntry')->willReturn($entry);
+        $search->expects($this->once())->method('shiftEntry')->willReturn($entry);
         $ldapAdapter->method('search')->willReturn($search);
 
         $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
@@ -243,15 +227,20 @@ class LdapPrefsServiceTest extends TestCase
         $ldapAdapter = $this->createStub(Horde_Ldap::class);
         $ldapAdapter->method('findUserDN')->willReturn('uid=alice,ou=users,dc=example,dc=com');
 
-        $search = $this->createSearchStub();
-        $search->method('count')->willReturn(1);
+        $search = $this->getMockBuilder(Horde_Ldap_Search::class)
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->getMock();
+        $search->expects($this->once())->method('count')->willReturn(1);
 
-        $entry = $this->createEntryStub();
-        $entry->method('getValues')->willReturn([
+        $entry = $this->getMockBuilder(Horde_Ldap_Entry::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entry->expects($this->once())->method('getValues')->willReturn([
             'cn' => ['Alice'],
         ]);
 
-        $search->method('shiftEntry')->willReturn($entry);
+        $search->expects($this->once())->method('shiftEntry')->willReturn($entry);
         $ldapAdapter->method('search')->willReturn($search);
 
         $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
@@ -267,12 +256,17 @@ class LdapPrefsServiceTest extends TestCase
         $ldapAdapter = $this->createStub(Horde_Ldap::class);
         $ldapAdapter->method('findUserDN')->willReturn('uid=alice,ou=users,dc=example,dc=com');
 
-        $search = $this->createSearchStub();
-        $search->method('count')->willReturn(1);
+        $search = $this->getMockBuilder(Horde_Ldap_Search::class)
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->getMock();
+        $search->expects($this->once())->method('count')->willReturn(1);
 
-        $entry = $this->createEntryStub();
-        $entry->method('getValue')->willReturn('silver');
-        $search->method('shiftEntry')->willReturn($entry);
+        $entry = $this->getMockBuilder(Horde_Ldap_Entry::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entry->expects($this->once())->method('getValue')->willReturn('silver');
+        $search->expects($this->once())->method('shiftEntry')->willReturn($entry);
 
         $ldapAdapter->method('search')->willReturn($search);
 
@@ -300,8 +294,11 @@ class LdapPrefsServiceTest extends TestCase
         $ldapAdapter = $this->createStub(Horde_Ldap::class);
         $ldapAdapter->method('findUserDN')->willReturn('uid=alice,ou=users,dc=example,dc=com');
 
-        $search = $this->createSearchStub();
-        $search->method('count')->willReturn(0);
+        $search = $this->getMockBuilder(Horde_Ldap_Search::class)
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->getMock();
+        $search->expects($this->once())->method('count')->willReturn(0);
         $ldapAdapter->method('search')->willReturn($search);
 
         $entry = $this->createMock(Horde_Ldap_Entry::class);
