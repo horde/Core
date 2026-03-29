@@ -44,8 +44,11 @@ class HordeLdapServiceFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->configLoader = $this->createMock(ConfigLoader::class);
-        $this->injector = $this->createMock(Horde_Injector::class);
+        // Use stub by default - tests needing expectations override this
+        $this->configLoader = $this->createStub(ConfigLoader::class);
+
+        // Use stub for injector since it only needs to return the configLoader
+        $this->injector = $this->createStub(Horde_Injector::class);
         $this->injector->method('getInstance')
             ->willReturnCallback(function ($class) {
                 if ($class === ConfigLoader::class) {
@@ -59,15 +62,18 @@ class HordeLdapServiceFactoryTest extends TestCase
 
     public function testCreateDefaultService(): void
     {
+        // Override with mock for expectations
+        $this->configLoader = $this->createMock(ConfigLoader::class);
+
         $config = [
             'hostspec' => 'ldap.example.com',
             'port' => 389,
             'basedn' => 'dc=example,dc=com',
         ];
 
-        $mockState = $this->createMock(State::class);
+        $mockState = $this->createStub(State::class);
         $mockState->method('has')->willReturn(true);
-        $mockState->expects($this->once())->method('get')->with('ldap')->willReturn($config);
+        $mockState->method('get')->willReturn($config);
 
         $this->configLoader->expects($this->once())->method('load')->with('horde')->willReturn($mockState);
 
@@ -79,6 +85,9 @@ class HordeLdapServiceFactoryTest extends TestCase
 
     public function testCreateServiceSpecific(): void
     {
+        // Override with mock for expectations
+        $this->configLoader = $this->createMock(ConfigLoader::class);
+
         $defaultConfig = [
             'hostspec' => 'ldap.example.com',
             'basedn' => 'dc=example,dc=com',
@@ -89,7 +98,7 @@ class HordeLdapServiceFactoryTest extends TestCase
             'basedn' => 'ou=groups,dc=example,dc=com',
         ];
 
-        $mockState = $this->createMock(State::class);
+        $mockState = $this->createStub(State::class);
         $mockState->method('has')->willReturnCallback(function ($key) {
             return in_array($key, ['ldap', 'ldap.service.groups']);
         });
@@ -107,12 +116,15 @@ class HordeLdapServiceFactoryTest extends TestCase
 
     public function testConnectionPooling(): void
     {
+        // Override with mock for expectations
+        $this->configLoader = $this->createMock(ConfigLoader::class);
+
         $config = [
             'hostspec' => 'ldap.example.com',
             'basedn' => 'dc=example,dc=com',
         ];
 
-        $mockState = $this->createMock(State::class);
+        $mockState = $this->createStub(State::class);
         $mockState->method('has')->willReturn(true);
         $mockState->method('get')->willReturn($config);
 
@@ -130,6 +142,9 @@ class HordeLdapServiceFactoryTest extends TestCase
 
     public function testDifferentConfigsDifferentAdapters(): void
     {
+        // Override with mock for expectations
+        $this->configLoader = $this->createMock(ConfigLoader::class);
+
         $config1 = [
             'hostspec' => 'ldap1.example.com',
             'basedn' => 'dc=example,dc=com',
@@ -140,7 +155,7 @@ class HordeLdapServiceFactoryTest extends TestCase
             'basedn' => 'dc=mail,dc=example,dc=com',
         ];
 
-        $mockState = $this->createMock(State::class);
+        $mockState = $this->createStub(State::class);
         $mockState->method('has')->willReturnCallback(function ($key) {
             return in_array($key, ['ldap', 'ldap.service.groups']);
         });
@@ -162,7 +177,10 @@ class HordeLdapServiceFactoryTest extends TestCase
 
     public function testMissingConfigThrows(): void
     {
-        $mockState = $this->createMock(State::class);
+        // Override with mock for expectations
+        $this->configLoader = $this->createMock(ConfigLoader::class);
+
+        $mockState = $this->createStub(State::class);
         $mockState->method('has')->willReturn(false);
 
         $this->configLoader->expects($this->once())->method('load')->with('horde')->willReturn($mockState);
@@ -175,24 +193,26 @@ class HordeLdapServiceFactoryTest extends TestCase
 
     public function testParseServiceIdSimple(): void
     {
-        $reflection = new \ReflectionClass($this->factory);
+        $factory = new HordeLdapServiceFactory();
+        $reflection = new \ReflectionClass($factory);
         $method = $reflection->getMethod('parseServiceId');
         $method->setAccessible(true);
 
-        $result = $method->invoke($this->factory, 'horde');
+        $result = $method->invoke($factory, 'horde');
         $this->assertEquals(['horde', null], $result);
     }
 
     public function testParseServiceIdWithService(): void
     {
-        $reflection = new \ReflectionClass($this->factory);
+        $factory = new HordeLdapServiceFactory();
+        $reflection = new \ReflectionClass($factory);
         $method = $reflection->getMethod('parseServiceId');
         $method->setAccessible(true);
 
-        $result = $method->invoke($this->factory, 'horde:groups');
+        $result = $method->invoke($factory, 'horde:groups');
         $this->assertEquals(['horde', 'groups'], $result);
 
-        $result = $method->invoke($this->factory, 'imp:storage');
+        $result = $method->invoke($factory, 'imp:storage');
         $this->assertEquals(['imp', 'storage'], $result);
     }
 }

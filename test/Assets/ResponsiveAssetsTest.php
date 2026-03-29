@@ -25,19 +25,19 @@ use Horde_Registry;
 #[CoversClass(ResponsiveAssets::class)]
 class ResponsiveAssetsTest extends TestCase
 {
-    private $registryMock;
-    private $filesystemMock;
+    private $registryStub;
+    private $filesystemStub;
 
     protected function setUp(): void
     {
-        $this->registryMock = $this->createMock(Horde_Registry::class);
-        $this->filesystemMock = $this->createMock(ResponsiveAssetsFilesystem::class);
+        $this->registryStub = $this->createStub(Horde_Registry::class);
+        $this->filesystemStub = $this->createStub(ResponsiveAssetsFilesystem::class);
     }
 
     public function testGetCssUrlsHordeOnly(): void
     {
-        // Setup registry mock
-        $this->registryMock->method('get')
+        // Setup registry stub
+        $this->registryStub->method('get')
             ->willReturnCallback(function ($key, $app) {
                 if ($key === 'themesfs' && $app === 'horde') {
                     return '/horde/themes';
@@ -48,17 +48,17 @@ class ResponsiveAssetsTest extends TestCase
                 return null;
             });
 
-        $this->registryMock->method('getApp')
+        $this->registryStub->method('getApp')
             ->willReturn('horde');
 
-        // Setup filesystem mock - file exists
-        $this->filesystemMock->method('fileExists')
+        // Setup filesystem stub - file exists
+        $this->filesystemStub->method('fileExists')
             ->willReturnCallback(function ($path) {
                 return $path === '/horde/themes/default/responsive.css';
             });
 
         // Create assets helper
-        $assets = new ResponsiveAssets($this->registryMock, $this->filesystemMock);
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
 
         // Get CSS URLs
         $urls = $assets->getCssUrls('default', 'horde');
@@ -72,7 +72,7 @@ class ResponsiveAssetsTest extends TestCase
     public function testGetCssUrlsWithAppCascade(): void
     {
         // Setup: Both horde and kronolith have responsive.css
-        $this->registryMock->method('get')
+        $this->registryStub->method('get')
             ->willReturnCallback(function ($key, $app) {
                 if ($key === 'themesfs') {
                     return $app === 'horde' ? '/horde/themes' : '/kronolith/themes';
@@ -83,16 +83,16 @@ class ResponsiveAssetsTest extends TestCase
                 return null;
             });
 
-        $this->registryMock->method('getApp')
+        $this->registryStub->method('getApp')
             ->willReturn('kronolith');
 
         // Both files exist
-        $this->filesystemMock->method('fileExists')
+        $this->filesystemStub->method('fileExists')
             ->willReturnCallback(function ($path) {
                 return str_contains($path, 'responsive.css');
             });
 
-        $assets = new ResponsiveAssets($this->registryMock, $this->filesystemMock);
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
         $urls = $assets->getCssUrls('default', 'kronolith');
 
         // Verify cascade order: horde first, app second
@@ -104,16 +104,16 @@ class ResponsiveAssetsTest extends TestCase
     public function testGetCssUrlsFileNotFound(): void
     {
         // Setup: File doesn't exist
-        $this->filesystemMock->method('fileExists')
+        $this->filesystemStub->method('fileExists')
             ->willReturn(false);
 
-        $this->registryMock->method('get')
+        $this->registryStub->method('get')
             ->willReturn('/horde/themes');
 
-        $this->registryMock->method('getApp')
+        $this->registryStub->method('getApp')
             ->willReturn('horde');
 
-        $assets = new ResponsiveAssets($this->registryMock, $this->filesystemMock);
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
         $urls = $assets->getCssUrls('default', 'horde');
 
         // No URLs returned when files don't exist
@@ -123,7 +123,7 @@ class ResponsiveAssetsTest extends TestCase
     public function testGetCssUrlsOnlyAppFileExists(): void
     {
         // Setup: Only app file exists, not horde base
-        $this->registryMock->method('get')
+        $this->registryStub->method('get')
             ->willReturnCallback(function ($key, $app) {
                 if ($key === 'themesfs') {
                     return $app === 'horde' ? '/horde/themes' : '/kronolith/themes';
@@ -134,16 +134,16 @@ class ResponsiveAssetsTest extends TestCase
                 return null;
             });
 
-        $this->registryMock->method('getApp')
+        $this->registryStub->method('getApp')
             ->willReturn('kronolith');
 
         // Only kronolith file exists
-        $this->filesystemMock->method('fileExists')
+        $this->filesystemStub->method('fileExists')
             ->willReturnCallback(function ($path) {
                 return str_contains($path, '/kronolith/');
             });
 
-        $assets = new ResponsiveAssets($this->registryMock, $this->filesystemMock);
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
         $urls = $assets->getCssUrls('default', 'kronolith');
 
         // Only app URL returned
@@ -154,7 +154,7 @@ class ResponsiveAssetsTest extends TestCase
     public function testGetJsUrlsHordeOnly(): void
     {
         // Setup registry mock
-        $this->registryMock->method('get')
+        $this->registryStub->method('get')
             ->willReturnCallback(function ($key, $app) {
                 if ($key === 'jsfs' && $app === 'horde') {
                     return '/horde/js';
@@ -165,16 +165,16 @@ class ResponsiveAssetsTest extends TestCase
                 return null;
             });
 
-        $this->registryMock->method('getApp')
+        $this->registryStub->method('getApp')
             ->willReturn('horde');
 
         // File exists
-        $this->filesystemMock->method('fileExists')
+        $this->filesystemStub->method('fileExists')
             ->willReturnCallback(function ($path) {
                 return $path === '/horde/js/login-form.js';
             });
 
-        $assets = new ResponsiveAssets($this->registryMock, $this->filesystemMock);
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
         $urls = $assets->getJsUrls(['login-form.js'], 'horde');
 
         // Verify
@@ -186,7 +186,7 @@ class ResponsiveAssetsTest extends TestCase
     public function testGetJsUrlsWithAppCascade(): void
     {
         // Setup: Both horde and kronolith have calendar.js
-        $this->registryMock->method('get')
+        $this->registryStub->method('get')
             ->willReturnCallback(function ($key, $app) {
                 if ($key === 'jsfs') {
                     return $app === 'horde' ? '/horde/js' : '/kronolith/js';
@@ -197,14 +197,14 @@ class ResponsiveAssetsTest extends TestCase
                 return null;
             });
 
-        $this->registryMock->method('getApp')
+        $this->registryStub->method('getApp')
             ->willReturn('kronolith');
 
         // Both files exist
-        $this->filesystemMock->method('fileExists')
+        $this->filesystemStub->method('fileExists')
             ->willReturn(true);
 
-        $assets = new ResponsiveAssets($this->registryMock, $this->filesystemMock);
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
         $urls = $assets->getJsUrls(['calendar.js'], 'kronolith');
 
         // Verify cascade: horde first, app second
@@ -216,7 +216,7 @@ class ResponsiveAssetsTest extends TestCase
     public function testGetJsUrlsMultipleFiles(): void
     {
         // Setup
-        $this->registryMock->method('get')
+        $this->registryStub->method('get')
             ->willReturnCallback(function ($key, $app) {
                 if ($key === 'jsfs') {
                     return '/horde/js';
@@ -227,14 +227,14 @@ class ResponsiveAssetsTest extends TestCase
                 return null;
             });
 
-        $this->registryMock->method('getApp')
+        $this->registryStub->method('getApp')
             ->willReturn('horde');
 
         // All files exist
-        $this->filesystemMock->method('fileExists')
+        $this->filesystemStub->method('fileExists')
             ->willReturn(true);
 
-        $assets = new ResponsiveAssets($this->registryMock, $this->filesystemMock);
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
         $urls = $assets->getJsUrls(['file1.js', 'file2.js', 'file3.js'], 'horde');
 
         // All URLs returned
@@ -246,10 +246,10 @@ class ResponsiveAssetsTest extends TestCase
 
     public function testGetJsUrlsEmptyArray(): void
     {
-        $this->registryMock->method('getApp')
+        $this->registryStub->method('getApp')
             ->willReturn('horde');
 
-        $assets = new ResponsiveAssets($this->registryMock, $this->filesystemMock);
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
         $urls = $assets->getJsUrls([], 'horde');
 
         // No JS files requested, empty array returned
@@ -261,7 +261,7 @@ class ResponsiveAssetsTest extends TestCase
         // No preferences set, should return 'default'
         $GLOBALS['prefs'] = null;
 
-        $assets = new ResponsiveAssets($this->registryMock, $this->filesystemMock);
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
         $theme = $assets->getTheme();
 
         $this->assertEquals('default', $theme);
@@ -269,16 +269,16 @@ class ResponsiveAssetsTest extends TestCase
 
     public function testGetThemeWithPreference(): void
     {
-        // Mock preferences
-        $prefsMock = $this->createMock(\Horde_Prefs::class);
-        $prefsMock->method('getValue')
+        // Stub preferences
+        $prefsStub = $this->createStub(\Horde_Prefs::class);
+        $prefsStub->method('getValue')
             ->willReturnCallback(function ($key) {
                 return $key === 'theme' ? 'dark' : null;
             });
 
-        $GLOBALS['prefs'] = $prefsMock;
+        $GLOBALS['prefs'] = $prefsStub;
 
-        $assets = new ResponsiveAssets($this->registryMock, $this->filesystemMock);
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
         $theme = $assets->getTheme();
 
         $this->assertEquals('dark', $theme);
@@ -290,13 +290,13 @@ class ResponsiveAssetsTest extends TestCase
     public function testCssFileExistsHandlesException(): void
     {
         // Registry throws exception
-        $this->registryMock->method('get')
+        $this->registryStub->method('get')
             ->willThrowException(new \Exception('Registry error'));
 
-        $this->registryMock->method('getApp')
+        $this->registryStub->method('getApp')
             ->willReturn('horde');
 
-        $assets = new ResponsiveAssets($this->registryMock, $this->filesystemMock);
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
         $urls = $assets->getCssUrls('default', 'horde');
 
         // Should gracefully handle exception and return empty array
@@ -306,13 +306,13 @@ class ResponsiveAssetsTest extends TestCase
     public function testJsFileExistsHandlesException(): void
     {
         // Registry throws exception
-        $this->registryMock->method('get')
+        $this->registryStub->method('get')
             ->willThrowException(new \Exception('Registry error'));
 
-        $this->registryMock->method('getApp')
+        $this->registryStub->method('getApp')
             ->willReturn('horde');
 
-        $assets = new ResponsiveAssets($this->registryMock, $this->filesystemMock);
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
         $urls = $assets->getJsUrls(['test.js'], 'horde');
 
         // Should gracefully handle exception and return empty array

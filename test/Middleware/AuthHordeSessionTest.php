@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016-2021 Horde LLC (http://www.horde.org/)
+ * Copyright 2016-2021 Horde LLC (http://www.horde.org/licenses/lgpl21.
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -21,7 +21,17 @@ use Horde_Registry;
 
 class AuthHordeSessionTest extends TestCase
 {
-    use SetUpTrait;
+    use SetUpTrait {
+        setUp as protected traitSetUp;
+    }
+
+    protected function setUp(): void
+    {
+        // Call trait setUp first
+        $this->traitSetUp();
+        // Then replace stub with mock for expectations
+        $this->registry = $this->createMock(Horde_Registry::class);
+    }
 
     protected function getMiddleware()
     {
@@ -32,35 +42,59 @@ class AuthHordeSessionTest extends TestCase
     {
         $username = 'testuser01';
         $middleware = $this->getMiddleware();
-        $this->registry->method('isAuthenticated')->willReturn(true);
-        $this->registry->method('getAuth')->willReturn($username);
+
+        // Mock expects isAuthenticated() to be called and return true
+        $this->registry->expects($this->once())
+            ->method('isAuthenticated')
+            ->willReturn(true);
+
+        // Mock expects getAuth() to be called and return username
+        $this->registry->expects($this->once())
+            ->method('getAuth')
+            ->willReturn($username);
+
         $request = $this->requestFactory->createServerRequest('GET', '/test');
         $response = $middleware->process($request, $this->handler);
 
+        // Verify attributes set on request passed to handler
         $authUser = $this->recentlyHandledRequest->getAttribute('HORDE_AUTHENTICATED_USER');
         $guestUser = $this->recentlyHandledRequest->getAttribute('HORDE_GUEST');
-        // assert that $authUser and $guestUser have the correct values
+
+        // Should set authenticated user attribute
         $this->assertEquals($username, $authUser);
+        // Should NOT set guest attribute
         $this->assertNull($guestUser);
 
+        // Should pass through to handler
         $this->assertEquals(200, $response->getStatusCode());
     }
 
     public function testIsNotAuthenticated()
     {
-        $username = 'testuser01';
         $middleware = $this->getMiddleware();
-        $this->registry->method('isAuthenticated')->willReturn(false);
-        $this->registry->method('getAuth')->willReturn($username);
+
+        // Mock expects isAuthenticated() to be called and return false
+        $this->registry->expects($this->once())
+            ->method('isAuthenticated')
+            ->willReturn(false);
+
+        // getAuth() should NOT be called when not authenticated
+        $this->registry->expects($this->never())
+            ->method('getAuth');
+
         $request = $this->requestFactory->createServerRequest('GET', '/test');
         $response = $middleware->process($request, $this->handler);
 
+        // Verify attributes set on request passed to handler
         $authUser = $this->recentlyHandledRequest->getAttribute('HORDE_AUTHENTICATED_USER');
         $guestUser = $this->recentlyHandledRequest->getAttribute('HORDE_GUEST');
-        // assert that $authUser and $guestUser have the correct values
-        $this->assertTrue($guestUser);
-        $this->assertNull($authUser);
 
+        // Should NOT set authenticated user
+        $this->assertNull($authUser);
+        // Should set guest flag
+        $this->assertTrue($guestUser);
+
+        // Should still pass through to handler
         $this->assertEquals(200, $response->getStatusCode());
     }
 }

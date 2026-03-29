@@ -15,8 +15,6 @@ namespace Horde\Core\Test\Middleware;
 
 use Horde\Test\TestCase;
 use Horde\Core\Middleware\DemandAuthenticatedUser;
-use Horde_Session;
-use Horde_Exception;
 
 class DemandAuthenticatedUserTest extends TestCase
 {
@@ -36,7 +34,11 @@ class DemandAuthenticatedUserTest extends TestCase
         $request = $this->requestFactory->createServerRequest('GET', '/test');
         $response = $middleware->process($request, $this->handler);
 
+        // Should return 401 Unauthorized
         $this->assertEquals(401, $response->getStatusCode());
+
+        // Handler should NOT be called
+        $this->assertNull($this->recentlyHandledRequest);
     }
 
     public function testAttributeExistsButEmpty()
@@ -47,7 +49,11 @@ class DemandAuthenticatedUserTest extends TestCase
             ->withAttribute('HORDE_AUTHENTICATED_USER', '');
         $response = $middleware->process($request, $this->handler);
 
+        // Should return 401 Unauthorized (empty string = not authenticated)
         $this->assertEquals(401, $response->getStatusCode());
+
+        // Handler should NOT be called
+        $this->assertNull($this->recentlyHandledRequest);
     }
 
     public function testAttributeExistsAndNotEmpty()
@@ -58,6 +64,12 @@ class DemandAuthenticatedUserTest extends TestCase
             ->withAttribute('HORDE_AUTHENTICATED_USER', 'testUser');
         $response = $middleware->process($request, $this->handler);
 
+        // Should pass through to handler
         $this->assertEquals($this->defaultPayloadResponse, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        // Verify request reached handler with correct attribute
+        $this->assertNotNull($this->recentlyHandledRequest);
+        $this->assertEquals('testUser', $this->recentlyHandledRequest->getAttribute('HORDE_AUTHENTICATED_USER'));
     }
 }

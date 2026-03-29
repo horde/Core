@@ -30,29 +30,23 @@ class RedirectToLoginTest extends TestCase
         );
     }
 
-    // not used currently because of problems with Horde::Url call of GLOBALS['registry']
-    /*public function testIsRedirectedToLogin()
+    public function testIsNotRedirectedWhenAuthenticated()
     {
         $middleware = $this->getMiddleware();
+
         $request = $this->requestFactory->createServerRequest('GET', '/test');
-        $response = $middleware->process($request, $this->handler);
-        $redirect = (string)Horde::Url($this->registry->getInitialPage('horde'), true);
-        $this->responseFactory->createResponse(302)->withHeader('Location', $redirect);
-
-        //var_dump($redirect);
-        //$this->redirect->method('Location')->willReturn($authUser);
-
-        $this->assertEquals('Location', $redirect);
-        $this->assertEquals(302, $response->getStatusCode());
-    }*/
-
-    public function testIsNotRedirectedToLogin()
-    {
-        $middleware = $this->getMiddleware();
-        $request = $this->requestFactory->createServerRequest('GET', '/test');
-        $request = $request->withAttribute('HORDE_AUTHENTICATED_USER', true);
+        $request = $request->withAttribute('HORDE_AUTHENTICATED_USER', 'testuser');
         $response = $middleware->process($request, $this->handler);
 
+        // Should pass through to handler
         $this->assertEquals(200, $response->getStatusCode());
+
+        // Verify request reached handler
+        $this->assertNotNull($this->recentlyHandledRequest);
+        $this->assertEquals('testuser', $this->recentlyHandledRequest->getAttribute('HORDE_AUTHENTICATED_USER'));
     }
+
+    // Note: Testing actual redirect and guest user behavior requires global $registry
+    // which is used by Horde::Url(). This creates a tight coupling that makes
+    // unit testing difficult. These scenarios are better covered by integration tests.
 }

@@ -12,16 +12,15 @@ class Horde_Themes_Css_CompressTest extends PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        // Mock global $browser
-        $GLOBALS['browser'] = $this->createMock(Horde_Browser::class);
+        // Use stubs for globals - they just need to exist, no expectations
+        $GLOBALS['browser'] = $this->createStub(Horde_Browser::class);
         $GLOBALS['browser']->method('hasFeature')->willReturn(false);
 
-        // Mock global $registry
-        $GLOBALS['registry'] = $this->createMock(Horde_Registry::class);
+        $GLOBALS['registry'] = $this->createStub(Horde_Registry::class);
 
-        // Mock global $injector with a proper PSR-3 logger
-        $logger = $this->createMock(\Psr\Log\LoggerInterface::class);
-        $GLOBALS['injector'] = $this->createMock(Horde_Injector::class);
+        // Use stubs for logger and injector
+        $logger = $this->createStub(\Psr\Log\LoggerInterface::class);
+        $GLOBALS['injector'] = $this->createStub(Horde_Injector::class);
         $GLOBALS['injector']->method('get')->willReturn($logger);
 
         $this->fixturesPath = __DIR__ . '/fixtures/';

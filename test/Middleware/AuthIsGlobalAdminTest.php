@@ -15,13 +15,19 @@ namespace Horde\Core\Test\Middleware;
 
 use Horde\Core\Middleware\AuthIsGlobalAdmin;
 use Horde\Test\TestCase;
-use Horde_Session;
-use Horde_Exception;
-use Horde_Registry;
 
 class AuthIsGlobalAdminTest extends TestCase
 {
-    use SetUpTrait;
+    use SetUpTrait {
+        setUp as protected traitSetUp;
+    }
+
+    protected function setUp(): void
+    {
+        $this->traitSetUp();
+        // Replace stub with mock since we need expectations
+        $this->registry = $this->createMock(\Horde_Registry::class);
+    }
 
     protected function getMiddleware()
     {
@@ -30,52 +36,94 @@ class AuthIsGlobalAdminTest extends TestCase
 
     public function testIsAdmin()
     {
-        $username = 'testuser01';
         $middleware = $this->getMiddleware();
-        $this->registry->method('isAuthenticated')->willReturn(true);
-        $this->registry->method('getAuth')->willReturn($username);
-        $this->registry->method('isAdmin')->willReturn(true); // will set true
+
+        // Mock expects both isAuthenticated() and isAdmin() to be called
+        $this->registry->expects($this->once())
+            ->method('isAuthenticated')
+            ->willReturn(true);
+
+        $this->registry->expects($this->once())
+            ->method('isAdmin')
+            ->willReturn(true);
+
         $request = $this->requestFactory->createServerRequest('GET', '/test');
         $response = $middleware->process($request, $this->handler);
 
+        // Verify HORDE_GLOBAL_ADMIN attribute is set to true
         $authAdminUser = $this->recentlyHandledRequest->getAttribute('HORDE_GLOBAL_ADMIN');
-        // assert that $authAdminUser has the correct Value
+        $this->assertTrue($authAdminUser);
 
-        $this->assertTrue($authAdminUser); // tests if $authAdminUser is set to true -> Admin
+        // Verify request passed through to handler
         $this->assertEquals(200, $response->getStatusCode());
+        $this->assertNotNull($this->recentlyHandledRequest);
     }
 
     public function testIsNotAdmin()
     {
-        $username = 'testuser01';
         $middleware = $this->getMiddleware();
-        $this->registry->method('isAuthenticated')->willReturn(true);
-        $this->registry->method('getAuth')->willReturn($username);
-        $this->registry->method('isAdmin')->willReturn(false); //will set false
+
+        // User is authenticated but not admin
+        $this->registry->expects($this->once())
+            ->method('isAuthenticated')
+            ->willReturn(true);
+
+        $this->registry->expects($this->once())
+            ->method('isAdmin')
+            ->willReturn(false);
+
         $request = $this->requestFactory->createServerRequest('GET', '/test');
         $response = $middleware->process($request, $this->handler);
 
+        // Verify HORDE_GLOBAL_ADMIN attribute is NOT set (null)
         $authAdminUser = $this->recentlyHandledRequest->getAttribute('HORDE_GLOBAL_ADMIN');
-        // assert that $authAdminUser has the correct Value
+        $this->assertNull($authAdminUser);
 
-        $this->assertNull($authAdminUser); // asserTrue/False before, resulted in failing to assert that null is false
+        // Verify request still passed through
         $this->assertEquals(200, $response->getStatusCode());
     }
 
     public function testUserIsNotAuthenticated()
     {
-        $username = 'testuser01';
         $middleware = $this->getMiddleware();
-        $this->registry->method('isAuthenticated')->willReturn(false);
-        $this->registry->method('getAuth')->willReturn($username);
-        $this->registry->method('isAdmin')->willReturn(true);
+
+        // Mock expects isAuthenticated() but NOT isAdmin() since short-circuit
+        $this->registry->expects($this->once())
+            ->method('isAuthenticated')
+            ->willReturn(false);
+
+        // isAdmin() should NOT be called when not authenticated (short-circuit)
+        $this->registry->expects($this->never())
+            ->method('isAdmin');
+
         $request = $this->requestFactory->createServerRequest('GET', '/test');
         $response = $middleware->process($request, $this->handler);
 
+        // Verify HORDE_GLOBAL_ADMIN attribute is NOT set
         $authAdminUser = $this->recentlyHandledRequest->getAttribute('HORDE_GLOBAL_ADMIN');
-        // assert that $authAdminUser has the correct Value
-
         $this->assertNull($authAdminUser);
+
+        // Verify request still passed through
         $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testAdminWhenBothTrue()
+    {
+        $middleware = $this->getMiddleware();
+
+        // Edge case: explicitly verify both must be true
+        $this->registry->expects($this->once())
+            ->method('isAuthenticated')
+            ->willReturn(true);
+
+        $this->registry->expects($this->once())
+            ->method('isAdmin')
+            ->willReturn(true);
+
+        $request = $this->requestFactory->createServerRequest('GET', '/admin/panel');
+        $response = $middleware->process($request, $this->handler);
+
+        // Both checks passed, so admin attribute should be set
+        $this->assertTrue($this->recentlyHandledRequest->getAttribute('HORDE_GLOBAL_ADMIN'));
     }
 }

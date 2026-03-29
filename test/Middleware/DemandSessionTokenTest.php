@@ -20,7 +20,17 @@ use Horde_Exception;
 
 class DemandSessionTokenTest extends TestCase
 {
-    use SetUpTrait;
+    use SetUpTrait {
+        setUp as protected traitSetUp;
+    }
+
+    protected function setUp(): void
+    {
+        // Call trait setUp first
+        $this->traitSetUp();
+        // Then replace stub with mock for expectations
+        $this->session = $this->createMock(Horde_Session::class);
+    }
 
     protected function getMiddleware()
     {
@@ -35,20 +45,38 @@ class DemandSessionTokenTest extends TestCase
     {
         $middleware = $this->getMiddleware();
 
-        $this->session->method('checkToken')->willThrowException(new Horde_Exception('test'));
+        // Mock expects checkToken() to be called once and throw exception
+        $this->session->expects($this->once())
+            ->method('checkToken')
+            ->willThrowException(new Horde_Exception('Invalid token'));
+
         $request = $this->requestFactory->createServerRequest('GET', '/test');
         $response = $middleware->process($request, $this->handler);
 
+        // Should return 403 Forbidden
         $this->assertEquals(403, $response->getStatusCode());
+
+        // Check reason phrase contains meaningful message
+        $this->assertStringContainsString('Horde-Session-Token', $response->getReasonPhrase());
     }
 
     public function testSessionTokenCorrect()
     {
         $middleware = $this->getMiddleware();
 
+        // Mock expects checkToken() to be called once and succeed (no exception)
+        $this->session->expects($this->once())
+            ->method('checkToken')
+            ->willReturn(true);
+
         $request = $this->requestFactory->createServerRequest('GET', '/test');
         $response = $middleware->process($request, $this->handler);
 
+        // Should pass through to handler
         $this->assertEquals($this->defaultPayloadResponse, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        // Verify request reached the handler
+        $this->assertNotNull($this->recentlyHandledRequest);
     }
 }

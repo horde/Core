@@ -38,26 +38,16 @@ use PHPUnit\Framework\Attributes\CoversClass;
 class LdapGroupServiceTest extends TestCase
 {
     private HordeLdapService $ldapService;
-    private Horde_Ldap $ldapAdapter;
-    private LdapGroupService $service;
 
     protected function setUp(): void
     {
-        $this->ldapService = $this->createMock(HordeLdapService::class);
-        $this->ldapAdapter = $this->createMock(Horde_Ldap::class);
-
-        $this->ldapService->method('getAdapter')->willReturn($this->ldapAdapter);
-
-        $this->service = new LdapGroupService(
-            $this->ldapService,
-            'ou=groups,dc=example,dc=com'
-        );
+        $this->ldapService = $this->createStub(HordeLdapService::class);
     }
 
     /**
-     * Create a mock of Horde_Ldap_Search without calling constructor/destructor
+     * Create a stub of Horde_Ldap_Search without calling constructor/destructor
      */
-    private function createSearchMock(): Horde_Ldap_Search
+    private function createSearchStub(): Horde_Ldap_Search
     {
         return $this->getMockBuilder(Horde_Ldap_Search::class)
             ->disableOriginalConstructor()
@@ -66,9 +56,9 @@ class LdapGroupServiceTest extends TestCase
     }
 
     /**
-     * Create a mock of Horde_Ldap_Entry without calling constructor
+     * Create a stub of Horde_Ldap_Entry without calling constructor
      */
-    private function createEntryMock(): Horde_Ldap_Entry
+    private function createEntryStub(): Horde_Ldap_Entry
     {
         return $this->getMockBuilder(Horde_Ldap_Entry::class)
             ->disableOriginalConstructor()
@@ -77,9 +67,10 @@ class LdapGroupServiceTest extends TestCase
 
     public function testListAllGroups(): void
     {
-        $search = $this->createSearchMock();
+        $ldapAdapter = $this->createMock(Horde_Ldap::class);
+        $search = $this->createMock(Horde_Ldap_Search::class);
 
-        $entry1 = $this->createEntryMock();
+        $entry1 = $this->createEntryStub();
         $entry1->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
             if ($attr === 'cn' && $mode === 'single') {
                 return 'developers';
@@ -93,7 +84,7 @@ class LdapGroupServiceTest extends TestCase
             return null;
         });
 
-        $entry2 = $this->createEntryMock();
+        $entry2 = $this->createEntryStub();
         $entry2->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
             if ($attr === 'cn' && $mode === 'single') {
                 return 'admins';
@@ -112,11 +103,14 @@ class LdapGroupServiceTest extends TestCase
         $search->expects($this->exactly(2))->method('current')->willReturn($entry1, $entry2);
         $search->expects($this->exactly(2))->method('next');
 
-        $this->ldapAdapter->expects($this->once())
+        $ldapAdapter->expects($this->once())
             ->method('search')
             ->willReturn($search);
 
-        $result = $this->service->listAll();
+        $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
+        $service = new LdapGroupService($this->ldapService, 'ou=groups,dc=example,dc=com');
+
+        $result = $service->listAll();
 
         $this->assertCount(2, $result->groups);
         $this->assertEquals('developers', $result->groups[0]->name);
@@ -125,7 +119,8 @@ class LdapGroupServiceTest extends TestCase
 
     public function testGetGroup(): void
     {
-        $entry = $this->createEntryMock();
+        $ldapAdapter = $this->createMock(Horde_Ldap::class);
+        $entry = $this->createEntryStub();
         $entry->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
             if ($attr === 'memberUid') {
                 return ['alice', 'bob'];
@@ -136,12 +131,15 @@ class LdapGroupServiceTest extends TestCase
             return null;
         });
 
-        $this->ldapAdapter->expects($this->once())
+        $ldapAdapter->expects($this->once())
             ->method('getEntry')
             ->with('cn=developers,ou=groups,dc=example,dc=com')
             ->willReturn($entry);
 
-        $group = $this->service->get('developers');
+        $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
+        $service = new LdapGroupService($this->ldapService, 'ou=groups,dc=example,dc=com');
+
+        $group = $service->get('developers');
 
         $this->assertEquals('developers', $group->id);
         $this->assertEquals(['alice', 'bob'], $group->members);
@@ -150,50 +148,63 @@ class LdapGroupServiceTest extends TestCase
 
     public function testCreateGroup(): void
     {
-        // Mock search for generating next GID
-        $search = $this->createSearchMock();
+        $ldapAdapter = $this->createMock(Horde_Ldap::class);
+        // Stub search for generating next GID
+        $search = $this->createSearchStub();
         $search->method('valid')->willReturn(false); // Empty result
-        $this->ldapAdapter->method('search')->willReturn($search);
+        $ldapAdapter->method('search')->willReturn($search);
 
-        $this->ldapAdapter->expects($this->once())
+        $ldapAdapter->expects($this->once())
             ->method('add')
             ->with($this->callback(function ($entry) {
                 return $entry instanceof Horde_Ldap_Entry;
             }));
 
-        $result = $this->service->create('developers');
+        $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
+        $service = new LdapGroupService($this->ldapService, 'ou=groups,dc=example,dc=com');
+
+        $result = $service->create('developers');
 
         $this->assertEquals('developers', $result->id);
     }
 
     public function testUpdateMembers(): void
     {
-        $entry = $this->createEntryMock();
+        $ldapAdapter = $this->createMock(Horde_Ldap::class);
+        $entry = $this->createMock(Horde_Ldap_Entry::class);
         $entry->expects($this->once())
             ->method('replace')
             ->with(['memberUid' => ['alice', 'bob', 'charlie']]);
         $entry->expects($this->once())
             ->method('update');
 
-        $this->ldapAdapter->expects($this->once())
+        $ldapAdapter->expects($this->once())
             ->method('getEntry')
             ->willReturn($entry);
 
-        $this->service->setMembers('developers', ['alice', 'bob', 'charlie']);
+        $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
+        $service = new LdapGroupService($this->ldapService, 'ou=groups,dc=example,dc=com');
+
+        $service->setMembers('developers', ['alice', 'bob', 'charlie']);
     }
 
     public function testDeleteGroup(): void
     {
-        $this->ldapAdapter->expects($this->once())
+        $ldapAdapter = $this->createMock(Horde_Ldap::class);
+        $ldapAdapter->expects($this->once())
             ->method('delete')
             ->with('cn=developers,ou=groups,dc=example,dc=com');
 
-        $this->service->delete('developers');
+        $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
+        $service = new LdapGroupService($this->ldapService, 'ou=groups,dc=example,dc=com');
+
+        $service->delete('developers');
     }
 
     public function testExistsTrue(): void
     {
-        $entry = $this->createEntryMock();
+        $ldapAdapter = $this->createStub(Horde_Ldap::class);
+        $entry = $this->createEntryStub();
         $entry->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
             if ($attr === 'memberUid') {
                 return [];
@@ -204,22 +215,30 @@ class LdapGroupServiceTest extends TestCase
             return null;
         });
 
-        $this->ldapAdapter->method('getEntry')->willReturn($entry);
+        $ldapAdapter->method('getEntry')->willReturn($entry);
 
-        $this->assertTrue($this->service->exists('developers'));
+        $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
+        $service = new LdapGroupService($this->ldapService, 'ou=groups,dc=example,dc=com');
+
+        $this->assertTrue($service->exists('developers'));
     }
 
     public function testExistsFalse(): void
     {
-        $this->ldapAdapter->method('getEntry')
+        $ldapAdapter = $this->createStub(Horde_Ldap::class);
+        $ldapAdapter->method('getEntry')
             ->willThrowException(new \Horde_Ldap_Exception('Not found'));
 
-        $this->assertFalse($this->service->exists('nonexistent'));
+        $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
+        $service = new LdapGroupService($this->ldapService, 'ou=groups,dc=example,dc=com');
+
+        $this->assertFalse($service->exists('nonexistent'));
     }
 
     public function testAddMember(): void
     {
-        $entry = $this->createEntryMock();
+        $ldapAdapter = $this->createStub(Horde_Ldap::class);
+        $entry = $this->createMock(Horde_Ldap_Entry::class);
         $entry->method('getValue')->willReturn(['alice']);
         $entry->expects($this->once())
             ->method('replace')
@@ -227,25 +246,33 @@ class LdapGroupServiceTest extends TestCase
         $entry->expects($this->once())
             ->method('update');
 
-        $this->ldapAdapter->method('getEntry')->willReturn($entry);
+        $ldapAdapter->method('getEntry')->willReturn($entry);
 
-        $this->service->addMember('developers', 'bob');
+        $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
+        $service = new LdapGroupService($this->ldapService, 'ou=groups,dc=example,dc=com');
+
+        $service->addMember('developers', 'bob');
     }
 
     public function testAddMemberAlreadyExists(): void
     {
-        $entry = $this->createEntryMock();
+        $ldapAdapter = $this->createStub(Horde_Ldap::class);
+        $entry = $this->createMock(Horde_Ldap_Entry::class);
         $entry->method('getValue')->willReturn(['alice', 'bob']);
         $entry->expects($this->never())->method('update');
 
-        $this->ldapAdapter->method('getEntry')->willReturn($entry);
+        $ldapAdapter->method('getEntry')->willReturn($entry);
 
-        $this->service->addMember('developers', 'bob');
+        $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
+        $service = new LdapGroupService($this->ldapService, 'ou=groups,dc=example,dc=com');
+
+        $service->addMember('developers', 'bob');
     }
 
     public function testRemoveMember(): void
     {
-        $entry = $this->createEntryMock();
+        $ldapAdapter = $this->createStub(Horde_Ldap::class);
+        $entry = $this->createMock(Horde_Ldap_Entry::class);
         $entry->method('getValue')->willReturn(['alice', 'bob']);
         $entry->expects($this->once())
             ->method('replace')
@@ -253,14 +280,18 @@ class LdapGroupServiceTest extends TestCase
         $entry->expects($this->once())
             ->method('update');
 
-        $this->ldapAdapter->method('getEntry')->willReturn($entry);
+        $ldapAdapter->method('getEntry')->willReturn($entry);
 
-        $this->service->removeMember('developers', 'bob');
+        $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
+        $service = new LdapGroupService($this->ldapService, 'ou=groups,dc=example,dc=com');
+
+        $service->removeMember('developers', 'bob');
     }
 
     public function testGetMembers(): void
     {
-        $entry = $this->createEntryMock();
+        $ldapAdapter = $this->createStub(Horde_Ldap::class);
+        $entry = $this->createEntryStub();
         $entry->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
             if ($attr === 'memberUid') {
                 return ['alice', 'bob'];
@@ -271,16 +302,20 @@ class LdapGroupServiceTest extends TestCase
             return null;
         });
 
-        $this->ldapAdapter->method('getEntry')->willReturn($entry);
+        $ldapAdapter->method('getEntry')->willReturn($entry);
 
-        $members = $this->service->getMembers('developers');
+        $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
+        $service = new LdapGroupService($this->ldapService, 'ou=groups,dc=example,dc=com');
+
+        $members = $service->getMembers('developers');
 
         $this->assertEquals(['alice', 'bob'], $members);
     }
 
     public function testAddMembers(): void
     {
-        $entry = $this->createEntryMock();
+        $ldapAdapter = $this->createStub(Horde_Ldap::class);
+        $entry = $this->createMock(Horde_Ldap_Entry::class);
         $entry->method('getValue')->willReturn(['alice']);
         $entry->expects($this->once())
             ->method('replace')
@@ -288,14 +323,18 @@ class LdapGroupServiceTest extends TestCase
         $entry->expects($this->once())
             ->method('update');
 
-        $this->ldapAdapter->method('getEntry')->willReturn($entry);
+        $ldapAdapter->method('getEntry')->willReturn($entry);
 
-        $this->service->addMembers('developers', ['bob', 'charlie']);
+        $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
+        $service = new LdapGroupService($this->ldapService, 'ou=groups,dc=example,dc=com');
+
+        $service->addMembers('developers', ['bob', 'charlie']);
     }
 
     public function testRemoveMembers(): void
     {
-        $entry = $this->createEntryMock();
+        $ldapAdapter = $this->createStub(Horde_Ldap::class);
+        $entry = $this->createMock(Horde_Ldap_Entry::class);
         $entry->method('getValue')->willReturn(['alice', 'bob', 'charlie']);
         $entry->expects($this->once())
             ->method('replace')
@@ -303,13 +342,17 @@ class LdapGroupServiceTest extends TestCase
         $entry->expects($this->once())
             ->method('update');
 
-        $this->ldapAdapter->method('getEntry')->willReturn($entry);
+        $ldapAdapter->method('getEntry')->willReturn($entry);
 
-        $this->service->removeMembers('developers', ['bob', 'charlie']);
+        $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
+        $service = new LdapGroupService($this->ldapService, 'ou=groups,dc=example,dc=com');
+
+        $service->removeMembers('developers', ['bob', 'charlie']);
     }
 
     public function testIsReadOnly(): void
     {
-        $this->assertFalse($this->service->isReadOnly());
+        $service = new LdapGroupService($this->ldapService, 'ou=groups,dc=example,dc=com');
+        $this->assertFalse($service->isReadOnly());
     }
 }

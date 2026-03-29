@@ -49,11 +49,15 @@ trait SetUpTrait
         $this->requestFactory = new RequestFactory();
         $this->streamFactory = new StreamFactory();
         $this->responseFactory = new ResponseFactory();
-        $this->session = $this->createMock(Horde_Session::class);
-        $this->registry = $this->createMock(Horde_Registry::class);
+
+        // Use stubs instead of mocks when no expectations are needed
+        $this->session = $this->createStub(Horde_Session::class);
+        $this->registry = $this->createStub(Horde_Registry::class);
 
         $this->defaultPayloadResponse = $this->responseFactory->createResponse(200);
-        $this->defaultPayloadHandler = $this->createMock(RequestHandlerInterface::class);
+
+        // Use stub for handler, but configure willReturnCallback
+        $this->defaultPayloadHandler = $this->createStub(RequestHandlerInterface::class);
         $this->recentlyHandledRequest = null;
         $this->defaultPayloadHandler->method('handle')->willReturnCallback(function ($request) {
             $this->recentlyHandledRequest = $request;
@@ -67,6 +71,6 @@ trait SetUpTrait
             $this->defaultPayloadHandler
         );
 
-        $this->authDriver = $this->createMock(Horde_Auth_Base::class);
+        $this->authDriver = $this->createStub(Horde_Auth_Base::class);
     }
 }
