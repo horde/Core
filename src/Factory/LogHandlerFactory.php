@@ -86,7 +86,12 @@ class LogHandlerFactory extends Horde_Core_Factory_Injector
 
                 $options = new Options();
                 $options->ident = $this->config->getIdent();
-                $handler = new StreamHandler($this->config->getName(), $append, $options, $formatters);
+                $handler = new StreamHandler(
+                    streamOrUrl: $this->config->getName(),
+                    mode: $append,
+                    options: $options,
+                    formatters: $formatters
+                );
                 break;
 
             case 'syslog':
@@ -99,7 +104,11 @@ class LogHandlerFactory extends Horde_Core_Factory_Injector
                 if (!empty($ident)) {
                     $options->ident = $ident;
                 }
-                $handler = new SyslogHandler($options, $formatters, []);
+                $handler = new SyslogHandler(
+                    options: $options,
+                    formatters: $formatters,
+                    filters: []
+                );
                 break;
 
             case 'null':
@@ -120,7 +129,12 @@ class LogHandlerFactory extends Horde_Core_Factory_Injector
     public function createStreamHandler($streamOrUrl, string $mode = 'a+', ?array $formatters = null, array $filters = []): StreamHandler
     {
         $options = new Options();
-        $handler = new StreamHandler($streamOrUrl, $mode, $options, $formatters);
+        $handler = new StreamHandler(
+            streamOrUrl: $streamOrUrl,
+            mode: $mode,
+            options: $options,
+            formatters: $formatters
+        );
         foreach ($filters as $filter) {
             $handler->addFilter($filter);
         }
@@ -129,7 +143,11 @@ class LogHandlerFactory extends Horde_Core_Factory_Injector
 
     public function createSyslogHandler(array $formatters, array $filters = []): SyslogHandler
     {
-        $handler = new SyslogHandler(new SyslogOptions(), $formatters, $filters);
+        $handler = new SyslogHandler(
+            options: new SyslogOptions(),
+            formatters: $formatters,
+            filters: $filters
+        );
         return $handler;
     }
 }
