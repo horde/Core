@@ -1182,9 +1182,12 @@ class Horde_Config
      */
     public function configSQL($ctx, $node = null, $switchname = 'driverconfig')
     {
-        // Try new metadata system first
+        // Try new metadata system first if enabled
+        $useMetadata = isset($GLOBALS['conf']['config']['use_metadata'])
+            && $GLOBALS['conf']['config']['use_metadata'];
         $injector = $this->_injector ?? $GLOBALS['injector'] ?? null;
-        if ($injector) {
+
+        if ($useMetadata && $injector) {
             try {
                 $provider = $injector->getInstance(
                     ConfigMetadataProvider::class
