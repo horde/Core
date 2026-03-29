@@ -563,7 +563,7 @@ class Horde
         $url = '';
         $schemeRegexp = '|^([a-zA-Z][a-zA-Z0-9+.-]{0,19})://|';
         $webroot = ltrim(
-            $GLOBALS['registry']->get(
+            (string) $GLOBALS['registry']->get(
                 'webroot',
                 empty($opts['app']) ? null : $opts['app']
             ),
@@ -881,7 +881,7 @@ class Horde
         if ($script_params) {
             $url = new Horde_Url($url);
             if ($pathInfo = Horde_Util::getPathInfo()) {
-                $url->pathInfo = ltrim($pathInfo, '/');
+                $url->pathInfo = ltrim((string) $pathInfo, '/');
             }
             if (!empty($_SERVER['QUERY_STRING'])) {
                 parse_str($_SERVER['QUERY_STRING'], $args);
