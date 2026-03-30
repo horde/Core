@@ -16,6 +16,7 @@ use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Driver\DriverRepository;
 use Horde\Core\Factory\ConfigMetadataProviderFactory;
 use Horde\Core\Factory\DriverRepositoryFactory;
+use NetDNS2\Exception as NetDNS2Exception;
 
 /**
  * The registry provides a set of methods for communication between Horde
@@ -2638,7 +2639,7 @@ class Horde_Registry implements Horde_Shutdown_Task
                         }
                     }
                 }
-            } catch (\NetDNS2\Exception $e) {
+            } catch (NetDNS2Exception $e) {
             }
         } elseif (!isset($out->host)) {
             $out->host = gethostbyaddr($out->addr);
