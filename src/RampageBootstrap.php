@@ -17,6 +17,7 @@ use Horde\Http\StreamFactory;
 use Horde\Core\Middleware\HordeCore as HordeCoreMiddleware;
 use Horde_Injector;
 use Horde_Injector_TopLevel;
+use Psr\Log\NullLogger;
 
 /**
  * Bootstrap the Rampage HTTP endpoint
@@ -40,7 +41,8 @@ class RampageBootstrap
         $middlewares = [
             // JWT Session middleware - runs BEFORE HordeCoreMiddleware
             // Sets custom session ID from JWT refresh token if present
-            new JwtSession(),
+            // Use NullLogger as logger not yet available in DI container
+            new JwtSession(new NullLogger()),
             // TODO: Unconditionally setup the output compressor, it should act only upon an attribute
             // TODO: Unconditionally setup the error handler
             // Setup the horde init middleware. It will add more middleware to the stack
