@@ -1829,6 +1829,12 @@ class Horde_Registry implements Horde_Shutdown_Task
         }
 
         $GLOBALS['conf'] = $this->_cache['conf'][$app]->toArray();
+
+        // Bind LegacyMergedConfig to injector for current app context
+        if (isset($this->_injector)) {
+            $legacyConfig = new \Horde\Core\Config\LegacyMergedConfig($GLOBALS['conf']);
+            $this->_injector->setInstance(\Horde\Core\Config\LegacyMergedConfig::class, $legacyConfig);
+        }
     }
 
     /**
