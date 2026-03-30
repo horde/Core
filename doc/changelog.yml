@@ -1,4 +1,19 @@
 ---
+3.0.0-beta13:
+  api: 3.0.0-beta13
+  state:
+    release: beta
+    api: beta
+  date: 2026-03-30
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    Merge pull request #73 from horde/fix/jwtsession-logger-dependency
+    Merge pull request #72 from horde/fix/NetDNS2-Exception-handling
+    Use "use" statement instead of FQCN
+    fix: JWT Middleware with not JWT configured
+    Update exception handling namespace in Registry.php
 3.0.0-beta12:
   api: 3.0.0-beta12
   state:
