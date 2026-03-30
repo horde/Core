@@ -2638,7 +2638,7 @@ class Horde_Registry implements Horde_Shutdown_Task
                         }
                     }
                 }
-            } catch (Net_DNS2_Exception $e) {
+            } catch (\NetDNS2\Exception $e) {
             }
         } elseif (!isset($out->host)) {
             $out->host = gethostbyaddr($out->addr);
