@@ -6,6 +6,11 @@
     "license": "LGPL-2.1-only",
     "authors": [
         {
+            "name": "Ralf Lang",
+            "email": "ralf.lang@ralf-lang.de",
+            "role": "maintainer"
+        },
+        {
             "name": "Jan Schneider",
             "email": "jan@horde.org",
             "role": "lead"
@@ -26,7 +31,13 @@
             "role": "developer"
         }
     ],
-    "time": "2026-03-29",
+    "keywords": [
+        "glue",
+        "framework",
+        "config",
+        "errorhandler"
+    ],
+    "time": "2026-03-30",
     "repositories": [],
     "require": {
         "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || ^3 || ^2",
@@ -47,6 +58,7 @@
         "horde/group": "^3 || dev-FRAMEWORK_6_0",
         "horde/hashtable": "^2 || dev-FRAMEWORK_6_0",
         "horde/history": "^3 || dev-FRAMEWORK_6_0",
+        "horde/hordeymlfile": "^1 || dev-FRAMEWORK_6_0",
         "horde/http": "^3 || dev-FRAMEWORK_6_0",
         "horde/http_server": "^1 || dev-FRAMEWORK_6_0",
         "horde/injector": "^3 || dev-FRAMEWORK_6_0",

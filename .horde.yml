@@ -10,6 +10,12 @@ type: horde-library
 homepage: https://www.horde.org/libraries/Horde_Core
 authors:
   -
+    name: Ralf Lang
+    user: rlang
+    email: ralf.lang@ralf-lang.de
+    active: true
+    role: maintainer
+  -
     name: Jan Schneider
     user: jan
     email: jan@horde.org
@@ -34,7 +40,7 @@ authors:
     active: false
     role: developer
 version:
-  release: 3.0.0-beta11
+  release: 3.0.0-beta12
   api: 3.0.0alpha1
 state:
   release: beta
@@ -62,7 +68,7 @@ dependencies:
       horde/group: ^3
       horde/hashtable: ^2
       horde/history: ^3
-      horde/hordeymlfile: ^0.0.1
+      horde/hordeymlfile: ^1
       horde/http: ^3
       horde/http_server: ^1
       horde/injector: ^3
@@ -112,3 +118,8 @@ autoload:
   psr-4:
     Horde\Core\: src/
 vendor: horde
+keywords:
+  - glue
+  - framework
+  - config
+  - errorhandler

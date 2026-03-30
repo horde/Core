@@ -1,4 +1,18 @@
 ---
+3.0.0-beta12:
+  api: 3.0.0-beta12
+  state:
+    release: beta
+    api: beta
+  date: 2026-03-30
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    test: Add tests for LegacyMergedConfig
+    chore: add explicit dependency on horde/hordeymlfile
+    feat: Make $conf injectable via LegacyMergedConfig
+    fix: Architecture violation - Writing back to $GLOBALS['conf'] from a factory.
 3.0.0-beta11:
   api: 3.0.0-beta11
   state:
