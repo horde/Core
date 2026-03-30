@@ -20,6 +20,7 @@ use Horde\Core\Config\LegacyMergedConfig;
 use Horde\Core\Config\State;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 /**
  * Tests for LegacyMergedConfig.
@@ -86,7 +87,7 @@ class LegacyMergedConfigTest extends TestCase
     {
         $config = new LegacyMergedConfig(['key' => 'value']);
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('ConfigState is immutable');
 
         $config['key'] = 'modified';

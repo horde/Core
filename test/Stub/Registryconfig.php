@@ -27,6 +27,14 @@ use Horde_Registry_Registryconfig;
  */
 class Registryconfig extends Horde_Registry_Registryconfig
 {
+    /**
+     * Flag indicating basic horde application configuration.
+     * Added to match Horde_Registry::$hordeInit for test compatibility.
+     *
+     * @var boolean
+     */
+    public $hordeInit = false;
+
     public function __construct()
     {
     }

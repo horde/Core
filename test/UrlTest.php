@@ -462,6 +462,8 @@ class UrlTest extends TestCase
 
 class Registry
 {
+    public $hordeInit = false;
+
     public function get()
     {
         return '/hordeurl';
