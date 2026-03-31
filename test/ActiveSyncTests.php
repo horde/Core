@@ -31,7 +31,7 @@ class ActiveSyncTests extends TestCase
     protected $_mailboxes;
     protected $_special;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->_auth = $this->getMockSkipConstructor('Horde_Auth_Auto');
         $this->_state = $this->getMockSkipConstructor('Horde_ActiveSync_State_Sql');
@@ -464,5 +464,95 @@ class ActiveSyncTests extends TestCase
         $fb = $driver->buildFbString($fixture, $start, $end);
         $expected = '440000000000000000000000000000220000000000000000';
         $this->assertEquals($expected, $fb);
+    }
+
+    public function testGetUserReturnsAuthenticatedUser()
+    {
+        $serverRequest = new \Horde\Http\ServerRequest('POST', '/');
+        $connector = new MockConnector();
+        $mockRegistry = $this->getMockSkipConstructor('Horde_Registry');
+
+        $driver = new Horde_Core_ActiveSync_Driver([
+            'state' => $this->_state,
+            'connector' => $connector,
+            'auth' => $this->_auth,
+            'serverrequest' => $serverRequest,
+            'registry' => $mockRegistry,
+            'imap' => null,
+        ]);
+
+        // Simulate authentication
+        $driver->authenticate('authenticated_user', 'password');
+
+        $this->assertEquals('authenticated_user', $driver->getUser());
+    }
+
+    public function testGetUserFallsBackToGetParameter()
+    {
+        $uri = new \Horde\Http\Uri('http://example.com/path?User=get_param_user');
+        $serverRequest = new \Horde\Http\ServerRequest('POST', $uri);
+        $connector = new MockConnector();
+        $mockRegistry = $this->getMockSkipConstructor('Horde_Registry');
+
+        $mockRegistry->expects($this->never())
+            ->method('getAuth');
+
+        $driver = new Horde_Core_ActiveSync_Driver([
+            'state' => $this->_state,
+            'connector' => $connector,
+            'auth' => $this->_auth,
+            'serverrequest' => $serverRequest,
+            'registry' => $mockRegistry,
+            'imap' => null,
+        ]);
+
+        // No authentication, should use GET parameter
+        $this->assertEquals('get_param_user', $driver->getUser());
+    }
+
+    public function testGetUserFallsBackToRegistry()
+    {
+        $serverRequest = new \Horde\Http\ServerRequest('POST', '/');
+        $connector = new MockConnector();
+        $mockRegistry = $this->getMockSkipConstructor('Horde_Registry');
+
+        $mockRegistry->expects($this->once())
+            ->method('getAuth')
+            ->willReturn('registry_user');
+
+        $driver = new Horde_Core_ActiveSync_Driver([
+            'state' => $this->_state,
+            'connector' => $connector,
+            'auth' => $this->_auth,
+            'serverrequest' => $serverRequest,
+            'registry' => $mockRegistry,
+            'imap' => null,
+        ]);
+
+        // No authentication, no GET parameter, should use registry
+        $this->assertEquals('registry_user', $driver->getUser());
+    }
+
+    public function testGetParameterOverridesRegistry()
+    {
+        $uri = new \Horde\Http\Uri('http://example.com/path?User=get_param_user');
+        $serverRequest = new \Horde\Http\ServerRequest('POST', $uri);
+        $connector = new MockConnector();
+        $mockRegistry = $this->getMockSkipConstructor('Horde_Registry');
+
+        $mockRegistry->expects($this->never())
+            ->method('getAuth');
+
+        $driver = new Horde_Core_ActiveSync_Driver([
+            'state' => $this->_state,
+            'connector' => $connector,
+            'auth' => $this->_auth,
+            'serverrequest' => $serverRequest,
+            'registry' => $mockRegistry,
+            'imap' => null,
+        ]);
+
+        // No authentication, GET parameter present, should not call registry
+        $this->assertEquals('get_param_user', $driver->getUser());
     }
 }

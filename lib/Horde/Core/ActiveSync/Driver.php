@@ -1,5 +1,7 @@
 <?php
 
+use Psr\Http\Message\ServerRequestInterface;
+
 /**
  * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
  *
@@ -109,6 +111,20 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     protected $_cache;
 
     /**
+     * PSR-7 server request
+     *
+     * @var ServerRequestInterface
+     */
+    protected $_serverRequest;
+
+    /**
+     * Horde Registry
+     *
+     * @var Horde_Registry
+     */
+    protected $_registry;
+
+    /**
      * Class => Id map
      *
      * @var array
@@ -155,6 +171,20 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             $this->_auth = $auth;
         } else {
             throw new InvalidArgumentException('Missing required Auth object');
+        }
+
+        $serverRequest = self::extractArrayValue($params, 'serverrequest');
+        if ($serverRequest instanceof ServerRequestInterface) {
+            $this->_serverRequest = $serverRequest;
+        } else {
+            throw new InvalidArgumentException('Missing required PSR-7 ServerRequest object.');
+        }
+
+        $registry = self::extractArrayValue($params, 'registry');
+        if ($registry instanceof Horde_Registry) {
+            $this->_registry = $registry;
+        } else {
+            throw new InvalidArgumentException('Missing required Horde_Registry object.');
         }
 
         $this->_imap = self::extractArrayValue($params, 'imap');
@@ -322,6 +352,39 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             )
         );
         return true;
+    }
+
+    /**
+     * Get the username for this request with Horde-specific resolution logic.
+     *
+     * Priority order:
+     * 1. Authenticated user (from authenticate() flow)
+     * 2. GET parameter ?User=username (Horde ActiveSync extension for device provisioning)
+     * 3. Registry authenticated user (fallback for edge cases)
+     *
+     * @return string  The resolved username
+     */
+    public function getUser()
+    {
+        // Priority 1: Authenticated user (from parent::authenticate())
+        $user = parent::getUser();
+
+        // Priority 2: GET parameter (Horde-specific ActiveSync extension)
+        // Used in device provisioning scenarios where auth hasn't completed yet
+        if (empty($user)) {
+            $queryParams = $this->_serverRequest->getQueryParams();
+            if (!empty($queryParams['User'])) {
+                $user = $queryParams['User'];
+            }
+        }
+
+        // Priority 3: Registry auth fallback
+        // For scenarios where request comes from authenticated session
+        if (empty($user)) {
+            $user = $this->_registry->getAuth();
+        }
+
+        return $user;
     }
 
     /**
