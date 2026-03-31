@@ -1,6 +1,7 @@
 <?php
 
 use Horde\Http\ServerRequest;
+use Horde\Injector\NotFoundException as InjectorNotFoundException;
 
 /**
  * @category Horde
@@ -15,7 +16,13 @@ class Horde_Core_Factory_ActiveSyncBackend extends Horde_Core_Factory_Injector
         // Get PSR-7 ServerRequest from injector
         try {
             $serverRequest = $injector->get(ServerRequest::class);
-        } catch (Horde_Exception_NotFound $e) {
+        } catch (Throwable $e) {
+            // Injector throws Horde\Injector\NotFoundException when ServerRequest is
+            // unbound; legacy code threw Horde_Exception_NotFound. Both must use the
+            // superglobal fallback (PHP 7.4: no union catch).
+            if (!$e instanceof Horde_Exception_NotFound && !$e instanceof InjectorNotFoundException) {
+                throw $e;
+            }
             // Fallback: Create from PHP superglobals
             $serverRequest = new ServerRequest(
                 $_SERVER['REQUEST_METHOD'] ?? 'GET',
