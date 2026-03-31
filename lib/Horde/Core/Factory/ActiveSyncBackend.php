@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Http\ServerRequest;
+
 /**
  * @category Horde
  * @package Core
@@ -9,6 +11,21 @@ class Horde_Core_Factory_ActiveSyncBackend extends Horde_Core_Factory_Injector
     public function create(Horde_Injector $injector)
     {
         global $conf, $registry;
+
+        // Get PSR-7 ServerRequest from injector
+        try {
+            $serverRequest = $injector->get(ServerRequest::class);
+        } catch (Horde_Exception_NotFound $e) {
+            // Fallback: Create from PHP superglobals
+            $serverRequest = new ServerRequest(
+                $_SERVER['REQUEST_METHOD'] ?? 'GET',
+                $_SERVER['REQUEST_URI'] ?? '/',
+                getallheaders() ?: [],
+                fopen('php://input', 'r'),
+                $_SERVER['SERVER_PROTOCOL'] ?? '1.1',
+                $_SERVER
+            );
+        }
 
         // Backend driver and dependencies
         $params = ['registry' => $registry];
@@ -21,13 +38,15 @@ class Horde_Core_Factory_ActiveSyncBackend extends Horde_Core_Factory_Injector
 
         $driver_params = [
             'connector' => new Horde_Core_ActiveSync_Connector($params),
+            'serverrequest' => $serverRequest,
+            'registry' => $registry,
             'imap' => $emailsyncEnabled
                 ? new Horde_ActiveSync_Imap_Adapter($adapter_params)
                 : null,
             'ping' => $conf['activesync']['ping'],
-            'state' => $injector->getInstance('Horde_ActiveSyncState'),
+            'state' => $injector->get('Horde_ActiveSyncState'),
             'auth' => $this->_getAuth(),
-            'cache' => $injector->getInstance('Horde_Cache')];
+            'cache' => $injector->get('Horde_Cache')];
 
         return new Horde_Core_ActiveSync_Driver($driver_params);
     }
