@@ -214,6 +214,10 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     {
         global $injector, $conf;
 
+        // Initialize base auth state immediately so _authUser is always set,
+        // even if we return a policy denial before the end of this method.
+        parent::authenticate($username, $password, $domain);
+
         $this->_logger->info(
             sprintf(
                 '%sHorde_Core_ActiveSync_Driver::authenticate() attempt for %s%s',
@@ -274,8 +278,18 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         }
 
         // Get the username from the registry so we capture it after any
-        // hooks were run on it.
-        $username = $GLOBALS['registry']->getAuth();
+        // hooks were run on it. In some setups this can be empty even after
+        // successful backend auth; fall back to the client-provided username
+        // to avoid saving device state with a NULL user.
+        $registryAuth = $GLOBALS['registry']->getAuth();
+        if (!empty($registryAuth)) {
+            $username = $registryAuth;
+        } else {
+            $this->_logger->warn(sprintf(
+                'Registry auth is empty after successful ActiveSync authentication; falling back to provided username "%s".',
+                (string)$username
+            ));
+        }
         $perms = $injector->getInstance('Horde_Perms');
         if ($perms->exists('horde:activesync')) {
             // Check permissions to ActiveSync
@@ -290,7 +304,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             }
         }
 
-        return parent::authenticate($username, $password, $domain);
+        return true;
     }
 
     /**
@@ -3140,6 +3154,157 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         }
 
         return $uid;
+    }
+
+    /**
+     * Optionally change the supported EAS version per-user via permissions.
+     *
+     * The global conf['activesync']['version'] acts as default.
+     *
+     * @param Horde_ActiveSync $server  The ActiveSync server instance.
+     */
+    public function versionCallback(Horde_ActiveSync $server)
+    {
+        $credentials = new Horde_ActiveSync_Credentials($server);
+        $authUsername = !empty($credentials->username)
+            ? (string)$credentials->username
+            : null;
+        if ($authUsername === null) {
+            $get = $server->getGetVars();
+            if (!empty($get['User'])) {
+                $authUsername = (string)$get['User'];
+            }
+        }
+        if ($authUsername === null && !empty($GLOBALS['registry']->getAuth())) {
+            $authUsername = (string)$GLOBALS['registry']->getAuth();
+        }
+        if ($authUsername === null) {
+            $authUsername = $this->getUser();
+        }
+        if (empty($authUsername)) {
+            $this->_logger->meta('Cannot resolve ActiveSync username for version override; skipping override.');
+            return;
+        }
+
+        $username = $this->getUsernameFromEmail($authUsername);
+        if (empty($username)) {
+            $username = $authUsername;
+        }
+        $pos = strrpos($username, '\\');
+        if ($pos !== false) {
+            $username = substr($username, $pos + 1);
+        }
+        if (empty($username)) {
+            $this->_logger->meta('Resolved ActiveSync username is empty after normalization; skipping version override.');
+            return;
+        }
+
+        $mode = !empty($GLOBALS['conf']['activesync']['version_mode'])
+            ? strtolower((string)$GLOBALS['conf']['activesync']['version_mode'])
+            : 'user';
+
+        if ($mode === 'device') {
+            $allowed = $this->_getDeviceScopedVersionPermission($server, $username);
+        } else {
+            $perms = $GLOBALS['injector']->getInstance('Horde_Perms');
+            if (!$perms->exists('horde:activesync:version')) {
+                return;
+            }
+            $allowed = $perms->getPermissions('horde:activesync:version', $username);
+        }
+
+        $resolved = $this->_resolveRestrictedEasVersion(
+            $allowed,
+            [
+                Horde_ActiveSync::VERSION_TWOFIVE,
+                Horde_ActiveSync::VERSION_TWELVE,
+                Horde_ActiveSync::VERSION_TWELVEONE,
+                Horde_ActiveSync::VERSION_FOURTEEN,
+                Horde_ActiveSync::VERSION_FOURTEENONE,
+                Horde_ActiveSync::VERSION_SIXTEEN,
+            ]
+        );
+
+        if ($resolved === null) {
+            return;
+        }
+
+        $server->setSupportedVersion($resolved);
+        $this->_logger->meta(sprintf(
+            'Restricted EAS version for %s to %s via %s mode.',
+            $username,
+            $resolved,
+            $mode
+        ));
+    }
+
+    /**
+     * Resolve device-scoped EAS version from hooks.
+     *
+     * Configure with conf['activesync']['version_mode'] = 'device' and implement
+     * hooks.php: activesync_device_version($deviceId, $user), returning:
+     *  - string: one EAS version (e.g. "16.0")
+     *  - array: multiple candidates (restrictive min is selected)
+     *  - null/false/''/-1: no override
+     *
+     * @param Horde_ActiveSync $server  The ActiveSync server.
+     * @param string $username          Authenticated Horde username.
+     *
+     * @return mixed  Hook return value or null if unavailable.
+     */
+    protected function _getDeviceScopedVersionPermission(Horde_ActiveSync $server, $username)
+    {
+        $get = $server->getGetVars();
+        $deviceId = !empty($get['DeviceId']) ? Horde_String::upper($get['DeviceId']) : null;
+        if (empty($deviceId)) {
+            return null;
+        }
+
+        try {
+            return $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
+                ->callHook('activesync_device_version', 'horde', [$deviceId, $username]);
+        } catch (Horde_Exception_HookNotSet $e) {
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolve effective EAS version from permission value(s), restrictive mode.
+     *
+     * @param mixed $allowed        Scalar or array permission value(s).
+     * @param array $supported      Supported versions in ascending order.
+     *
+     * @return string|null  The resolved version or null if no valid override.
+     */
+    protected function _resolveRestrictedEasVersion($allowed, array $supported)
+    {
+        if ($allowed === null || $allowed === false || $allowed === '') {
+            return null;
+        }
+
+        $supported = array_values(array_filter(array_map('strval', $supported)));
+        if (empty($supported)) {
+            return null;
+        }
+
+        $rank = array_flip($supported);
+        $values = is_array($allowed) ? $allowed : [$allowed];
+        $candidates = [];
+        foreach ($values as $value) {
+            $value = trim((string)$value);
+            if ($value === '' || !isset($rank[$value])) {
+                continue;
+            }
+            $candidates[$value] = $rank[$value];
+        }
+
+        if (empty($candidates)) {
+            return null;
+        }
+
+        asort($candidates);
+        return (string)key($candidates);
     }
 
     /**
