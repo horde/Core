@@ -30,8 +30,7 @@ class Horde_Core_Share_Driver
     protected $_storageMap = [
         'Horde_Share_Sql' => 'Horde_Db_Adapter',
         'Horde_Share_Sqlng' => 'Horde_Db_Adapter',
-        'Horde_Share_Sql_Hierarchical' => 'Horde_Db_Adapter',
-        'Horde_Share_Kolab' => 'Horde_Kolab_Storage'];
+        'Horde_Share_Sql_Hierarchical' => 'Horde_Db_Adapter'];
 
     /**
      */

@@ -27,13 +27,6 @@ class Horde_Core_Factory_Group extends Horde_Core_Factory_Injector
                 $params['api'] = $GLOBALS['registry']->contacts;
                 break;
 
-            case 'Kolab':
-                $class = 'Horde_Group_Kolab';
-                $params['ldap'] = $injector
-                    ->getInstance('Horde_Core_Factory_Ldap')
-                    ->create('horde', 'group');
-                break;
-
             case 'Ldap':
                 $class = 'Horde_Core_Group_Ldap';
                 $params['ldap'] = $injector

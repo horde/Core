@@ -146,11 +146,6 @@ class Horde_Core_Factory_Auth extends Horde_Core_Factory_Base
                 $params['imsp'] = $this->_injector->getInstance('Horde_Core_Factory_Imsp')->create();
                 break;
 
-            case 'horde_auth_kolab':
-                $params['kolab'] = $this->_injector
-                    ->getInstance('Horde_Kolab_Session');
-                break;
-
             case 'horde_core_auth_ldap':
             case 'horde_core_auth_msad':
                 $params['ldap'] = $this->_injector

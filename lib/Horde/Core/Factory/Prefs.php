@@ -140,15 +140,6 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
                     $params['db'] = $this->_injector->getInstance('Horde_Core_Factory_Db')->create('horde', 'prefs');
                     break;
 
-                case 'Horde_Prefs_Storage_KolabImap':
-                    if ($registry->isAdmin()) {
-                        throw new Horde_Exception('The IMAP based Kolab preferences backend is unavailable for system administrators.');
-                    }
-                    $params['kolab'] = $this->_injector
-                        ->getInstance('Horde_Kolab_Storage');
-                    $params['logger'] = $opts['logger'];
-                    break;
-
                 case 'Horde_Prefs_Storage_Imsp':
                     $imspParams = $conf['imsp'];
                     $imspParams['username'] = $registry->getAuth('bare');
