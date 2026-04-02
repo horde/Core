@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Util\Domhtml;
+
 /**
  * Horde_Core_ActiveSync_Mail::
  *
@@ -733,7 +735,7 @@ class Horde_Core_ActiveSync_Mail
             );
         } else {
             // If no tidy, use Horde_Dom.
-            $dom = new Horde_Domhtml($html, 'UTF-8');
+            $dom = new Domhtml($html, 'UTF-8');
             return $dom->returnBody();
         }
     }
