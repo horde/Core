@@ -2004,10 +2004,11 @@ class Horde_Config
      */
     protected function _handleSpecials($node)
     {
+        $registry = $GLOBALS['registry'];
         $app = $node->getAttribute('application');
         try {
-            if (!in_array($app, $GLOBALS['registry']->listApps())) {
-                $app = $GLOBALS['registry']->hasInterface($app);
+            if (!in_array($app, $registry->listAllApps())) {
+                $app = $registry->hasInterface($app);
             }
         } catch (Horde_Exception $e) {
             return [];
@@ -2015,9 +2016,21 @@ class Horde_Config
         if (!$app) {
             return [];
         }
+
         try {
-            return $GLOBALS['registry']->callAppMethod($app, 'configSpecialValues', ['args' => [$node->getAttribute('name')], 'noperms' => true]);
+            return $registry->callAppMethod($app, 'configSpecialValues', ['args' => [$node->getAttribute('name')], 'noperms' => true]);
         } catch (Horde_Exception $e) {
+            /* callAppMethod failed — likely because pushApp() rejected an
+             * unconfigured/inactive app. Fall back to calling
+             * configSpecialValues() directly without full app init. */
+            try {
+                $appOb = $registry->getApiInstance($app, 'application');
+                if (method_exists($appOb, 'configSpecialValues')) {
+                    return $appOb->configSpecialValues($node->getAttribute('name'));
+                }
+            } catch (\Throwable $e2) {
+                Horde::log('configSpecialValues failed for ' . $app . ': ' . $e2->getMessage(), 'DEBUG');
+            }
             return [];
         }
     }
