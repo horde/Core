@@ -1,16 +1,18 @@
 <?php
 
 /**
- * Copyright 2015-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2015-2026 The Horde Project (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
  *
  * @category  Horde
- * @copyright 2015-2017 Horde LLC
+ * @copyright 2015-2026 The Horde Project
  * @license   http://www.horde.org/licenses/lgpl21 LGPL
  * @package   Core
  */
+
+use Horde\Crypt\Blowfish\Blowfish;
 
 /**
  * Horde_Secret, using single session key, with CBC based Blowfish encryption.
@@ -25,7 +27,7 @@
  *
  * @author    Michael Slusarz <slusarz@horde.org>
  * @category  Horde
- * @copyright 2015-2017 Horde LLC
+ * @copyright 2015-2026 The Horde Project
  * @license   http://www.horde.org/licenses/lgpl21 LGPL
  * @package   Core
  * @since     2.20.0
@@ -33,24 +35,27 @@
 class Horde_Core_Secret_Cbc extends Horde_Core_Secret
 {
     /**
+     * Key used for current cached cipher object.
+     *
+     * @var string
+     */
+    protected $_cachedKey = '';
+
+    /**
      */
     protected function _getCipherOb($key)
     {
-        global $conf;
+        $key = substr($key, 0, 56);
 
         if (!isset($this->_cipherCache[self::HORDE_KEYNAME]) ||
-            $this->_cipherCache[self::HORDE_KEYNAME]->key != $key) {
-            /* Use more secure CBC mode (rather than ECB). */
-            $this->_cipherCache[self::HORDE_KEYNAME] = new Horde_Crypt_Blowfish(
-                substr($key, 0, 56),
-                [
-                    'cipher' => 'cbc',
-                    'iv' => $this->_params['iv'],
-                ]
+            $this->_cachedKey !== $key) {
+            $this->_cipherCache[self::HORDE_KEYNAME] = Blowfish::cbc(
+                $key,
+                $this->_params['iv']
             );
+            $this->_cachedKey = $key;
         }
 
         return $this->_cipherCache[self::HORDE_KEYNAME];
     }
-
 }
