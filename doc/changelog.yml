@@ -1,4 +1,23 @@
 ---
+3.0.0-beta14:
+  api: 3.0.0-beta14
+  state:
+    release: beta
+    api: beta
+  date: 2026-04-10
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    fix: Add fallback for configspecialvalues if pushapp fails on an unconfigured app
+    refactor: Use the modern version of the blowfish library
+    chore: Use modern domhtml internally
+    chore(kolab): Remove Kolab factory references
+    feat(kolab)!: Remove Kolab backends
+    Merge pull request #75 from horde/feat/activesync-driver-inject-serverrequest-registry
+    Merge pull request #74 from horde/fix/refactor_auth_handling
+    feat: Transition to injection and handle user fallback
+    Refactor authentication to handle empty registry auth
 3.0.0-beta13:
   api: 3.0.0-beta13
   state:
