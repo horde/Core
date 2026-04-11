@@ -586,7 +586,7 @@ class Horde_Core_Prefs_Ui
                     case 'password':
                     case 'text':
                     case 'textarea':
-                        $t->set('val', htmlspecialchars($prefs->getValue($pref)));
+                        $t->set('val', htmlspecialchars((string) $prefs->getValue($pref)));
                         break;
 
                     case 'rawhtml':

@@ -109,7 +109,7 @@ class Horde_Core_Mime_Viewer_Vcard extends Horde_Mime_Viewer_Base
             && $registry->hasMethod('contacts/import')) {
             $source = Horde_Util::getFormData('source');
             $count = 0;
-            foreach ($iCal->getComponents() as $c) {
+            foreach ($iCal->getComponents() ?? [] as $c) {
                 if ($c->getType() == 'vcard') {
                     try {
                         $registry->call('contacts/import', [$c, null, $source]);
@@ -134,7 +134,7 @@ class Horde_Core_Mime_Viewer_Vcard extends Horde_Mime_Viewer_Base
 
         $html .= '<table class="horde-table" style="width:100%">';
 
-        foreach ($iCal->getComponents() as $i => $vc) {
+        foreach ($iCal->getComponents() ?? [] as $i => $vc) {
             if ($i > 0) {
                 $html .= '<tr><td colspan="2">&nbsp;</td></tr>';
             }

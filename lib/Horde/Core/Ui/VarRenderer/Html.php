@@ -348,7 +348,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
                 $filter = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->create('emoticons');
                 $icon_list = [];
 
-                foreach (array_flip($filter->getIcons()) as $icon => $string) {
+                foreach (array_flip($filter->getIcons() ?? []) as $icon => $string) {
                     $icon_list[] = [
                         $filter->getIcon($icon),
                         $string,

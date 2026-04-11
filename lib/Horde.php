@@ -651,8 +651,8 @@ class Horde
         $ob = new Horde_Url($url, $full);
 
         if (empty($GLOBALS['conf']['session']['use_only_cookies'])
-            && ($append_session == 1
-             || $append_session == 0 && !isset($_COOKIE[session_name()]))) {
+            && ($append_session === 1
+             || $append_session === 0 && !isset($_COOKIE[session_name()]))) {
             $ob->add(session_name(), session_id());
         }
 

@@ -166,7 +166,7 @@ abstract class Horde_Core_Ajax_Application
     {
         global $injector;
 
-        if (!strlen($this->_action)) {
+        if (!strlen((string) $this->_action)) {
             return;
         }
 

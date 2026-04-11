@@ -214,7 +214,11 @@ class Horde_Config
 
         /* Load the DOM object. */
         $dom = new DOMDocument();
-        $dom->loadXML(file_get_contents($path . '/conf.xml'));
+        $xml = file_get_contents($path . '/conf.xml');
+        if ($xml === false) {
+            throw new Horde_Exception(sprintf('Could not read configuration file %s/conf.xml', $path));
+        }
+        $dom->loadXML($xml);
 
         /* Create config file hash. */
         $this->_configHash = hash_file('sha1', $path . '/conf.xml');

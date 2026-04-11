@@ -184,7 +184,7 @@ class Horde_Core_Prefs_Identity extends Horde_Prefs_Identity
         global $registry;
 
         if (!isset($this->_names[$ident])
-            && !strlen($this->getValue($this->_prefnames['fullname'], $ident))) {
+            && !strlen((string) $this->getValue($this->_prefnames['fullname'], $ident))) {
             $this->_names[$ident] = $registry->convertUsername($this->_user, false);
         }
 

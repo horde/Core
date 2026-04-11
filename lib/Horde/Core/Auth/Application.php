@@ -125,7 +125,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
      */
     public function authenticate($userId, $credentials, $login = true)
     {
-        if (!strlen($credentials['password'])) {
+        if (!strlen((string) ($credentials['password'] ?? ''))) {
             return false;
         }
 

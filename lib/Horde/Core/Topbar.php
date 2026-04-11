@@ -239,7 +239,7 @@ class Horde_Core_Topbar
                      * user's locale may not have been loaded when registry.php was
                      * parsed, and the translations of the application names are
                      * not in the Core package. */
-                    $name = strlen($params['name']) ? _($params['name']) : '';
+                    $name = strlen((string) ($params['name'] ?? '')) ? _($params['name']) : '';
 
                     /* Headings have no webroot; they're just containers for other
                      * menu items. */

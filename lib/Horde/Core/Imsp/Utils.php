@@ -213,7 +213,7 @@ class Horde_Core_Imsp_Utils
     {
         if (strpos($bookName, $username) === 0) {
             return true;
-        } elseif (strpos($acl, 'a')) {
+        } elseif (strpos((string) $acl, 'a') !== false) {
             return true;
         }
         return false;

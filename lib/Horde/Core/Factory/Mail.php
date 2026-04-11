@@ -102,7 +102,7 @@ class Horde_Core_Factory_Mail extends Horde_Core_Factory_Base
          * the authentication name but not the credentials. */
         if (strcasecmp($transport, 'smtp') === 0) {
             if ($registry->isAuthenticated()
-                && strlen($auth = $registry->getAuth())) {
+                && strlen((string) ($auth = $registry->getAuth()))) {
                 if (!empty($params['username_auth'])) {
                     $params['username'] = $auth;
                 }

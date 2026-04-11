@@ -84,7 +84,7 @@ class Horde_Core_ActiveSync_Mail_Draft extends Horde_Core_ActiveSync_Mail
 
         // Check to see if we have any existing parts to add.
         if (!empty($this->_imapMessage)) {
-            foreach ($this->_imapMessage->getStructure() as $part) {
+            foreach ($this->_imapMessage->getStructure() ?? [] as $part) {
                 if ($part->isAttachment()
                     && !in_array($part->getMimeId(), $this->_atcDelete)) {
                     $base->addPart(
