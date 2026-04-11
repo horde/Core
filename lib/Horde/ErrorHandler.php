@@ -119,7 +119,7 @@ class Horde_ErrorHandler
         $er = error_reporting();
 
         // Calls prefixed with '@'.
-        if ($er == 0) {
+        if ($er === 0) {
             // Must return false to populate $php_errormsg (as of PHP 5.2).
             return false;
         }

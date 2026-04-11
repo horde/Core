@@ -1947,7 +1947,7 @@ class Horde_Registry implements Horde_Shutdown_Task
         }
 
         return ($parameter == 'name')
-            ? (strlen($pval) ? _($pval) : '')
+            ? (strlen((string) $pval) ? _($pval) : '')
             : $pval;
     }
 

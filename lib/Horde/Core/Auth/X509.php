@@ -24,7 +24,7 @@ class Horde_Core_Auth_X509 extends Horde_Auth_X509
              * @deprecated Use $GLOBALS['injector']->getInstance('Horde_Core_Hooks')->callHook() instead
              * @see Horde_Deprecated::callHook()
              */
-return Horde::callHook('x509_validate', [$certificate]);
+            return Horde::callHook('x509_validate', [$certificate]);
         } catch (Horde_Exception_HookNotSet $e) {
         }
 

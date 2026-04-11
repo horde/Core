@@ -407,6 +407,9 @@ class Horde_Core_ActiveSync_Mail
     {
         $mail = new Horde_Mime_Mail($this->_headers->toArray(['charset' => 'UTF-8']));
         $base_part = $this->imapMessage->getStructure();
+        if ($base_part === null) {
+            throw new Horde_ActiveSync_Exception('Unable to retrieve message structure.');
+        }
         $plain_id = $base_part->findBody('plain');
         $html_id = $base_part->findBody('html');
 
@@ -427,7 +430,7 @@ class Horde_Core_ActiveSync_Mail
             $mail->setBody($this->_getPlainPart($plain_id, $mime_message, $body_data, $base_part));
         }
 
-        foreach ($mime_message->contentTypeMap() as $mid => $type) {
+        foreach ($mime_message->contentTypeMap() ?? [] as $mid => $type) {
             if ($mid != 0 && $mid != $mime_message->findBody('plain') && $mid != $mime_message->findBody('html')) {
                 $mail->addMimePart($mime_message->getPart($mid));
             }
@@ -469,7 +472,7 @@ class Horde_Core_ActiveSync_Mail
         $mail->setBody($this->_getSmartPlainText($mime_message));
         $mail->setHtmlBody($this->_getSmartHtmlText($mime_message));
 
-        foreach ($mime_message->contentTypeMap() as $mid => $type) {
+        foreach ($mime_message->contentTypeMap() ?? [] as $mid => $type) {
             if ($mid != 0 && $mid != $mime_message->findBody('plain') && $mid != $mime_message->findBody('html')) {
                 $mail->addMimePart($mime_message->getPart($mid));
             }

@@ -219,10 +219,10 @@ abstract class Horde_Core_TagBrowser
             // Multiple types.
             $counts = [];
             foreach ($result_data as $data) {
-                $counts = array_merge($counts, $this->_tagger->getTagCountsByObjects($data));
+                $counts = array_merge($counts, $this->_tagger->getTagCountsByObjects($data) ?? []);
             }
         } else {
-            $counts = $this->_tagger->getTagCountsByObjects($result_data);
+            $counts = $this->_tagger->getTagCountsByObjects($result_data) ?? [];
         }
         $tag_ids = array_keys($tags);
         foreach ($counts as $result) {
