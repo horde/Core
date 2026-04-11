@@ -20,6 +20,7 @@ use Horde\Core\Config\PrefsConfigLoader;
 use Horde\Core\Config\PrefsState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Closure;
 
 /**
  * Tests for PrefsConfigLoader.
@@ -352,7 +353,7 @@ class PrefsConfigLoaderTest extends TestCase
         $computed = $state->getPref('computed');
 
         // First closure wins (from vendor)
-        $this->assertInstanceOf(\Closure::class, $computed['value']);
+        $this->assertInstanceOf(Closure::class, $computed['value']);
         $this->assertSame('vendor', ($computed['value'])());
         // But type is overridden
         $this->assertSame('override', $computed['type']);

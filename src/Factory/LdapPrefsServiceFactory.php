@@ -20,6 +20,7 @@ use Horde\Core\Service\LdapPrefsService;
 use Horde\Core\Service\HordeLdapService;
 use Horde\Core\Config\ConfigLoader;
 use Horde_Injector;
+use RuntimeException;
 
 /**
  * Factory for creating LDAP-based PrefsService
@@ -36,7 +37,7 @@ class LdapPrefsServiceFactory
      *
      * @param Horde_Injector $injector Dependency injector
      * @return LdapPrefsService LDAP prefs service instance
-     * @throws \RuntimeException If configuration invalid
+     * @throws RuntimeException If configuration invalid
      */
     public function create(Horde_Injector $injector): LdapPrefsService
     {
@@ -50,7 +51,7 @@ class LdapPrefsServiceFactory
         $params = $config->get('prefs.params', []);
 
         if (empty($params['basedn'])) {
-            throw new \RuntimeException('LDAP prefs require basedn configuration');
+            throw new RuntimeException('LDAP prefs require basedn configuration');
         }
 
         return new LdapPrefsService(

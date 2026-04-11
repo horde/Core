@@ -35,8 +35,7 @@ class LegacyConfigAdapter
 {
     public function __construct(
         private readonly ConfigMetadataProvider $provider,
-    ) {
-    }
+    ) {}
 
     /**
      * Convert driver metadata to legacy configSQL() format.

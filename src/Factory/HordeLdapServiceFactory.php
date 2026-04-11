@@ -21,6 +21,8 @@ use Horde\Core\Config\ConfigLoader;
 use Horde_Cache;
 use Horde_Injector;
 use Horde_Ldap;
+use Exception;
+use RuntimeException;
 
 /**
  * Factory for creating HordeLdapService from configuration
@@ -51,7 +53,7 @@ class HordeLdapServiceFactory
      * @param Horde_Injector $injector Dependency injector
      * @param string $serviceId Service identifier ('horde', 'horde:groups', etc.)
      * @return StandardHordeLdapService LDAP service instance
-     * @throws \RuntimeException If no LDAP configuration found
+     * @throws RuntimeException If no LDAP configuration found
      */
     public function create(Horde_Injector $injector, string $serviceId = 'horde'): StandardHordeLdapService
     {
@@ -113,7 +115,7 @@ class HordeLdapServiceFactory
                 $ldapConfig['cache'] = $cache;
                 $ldapConfig['cache_root_dse'] = true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Cache not available, continue without it
         }
 
@@ -130,7 +132,7 @@ class HordeLdapServiceFactory
      * @param \Horde\Core\Config\State $state Configuration state
      * @param string|null $service Optional service name
      * @return array LDAP configuration
-     * @throws \RuntimeException If no LDAP configuration found
+     * @throws RuntimeException If no LDAP configuration found
      */
     private function resolveConfig($state, ?string $service): array
     {
@@ -159,9 +161,9 @@ class HordeLdapServiceFactory
             return $config;
         }
 
-        throw new \RuntimeException(
-            'No LDAP configuration found for service: ' .
-            ($service ? "$service" : 'default')
+        throw new RuntimeException(
+            'No LDAP configuration found for service: '
+            . ($service ? "$service" : 'default')
         );
     }
 

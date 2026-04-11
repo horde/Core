@@ -38,8 +38,7 @@ class StandardHordeLdapService implements HordeLdapService
      */
     public function __construct(
         private Horde_Ldap $adapter
-    ) {
-    }
+    ) {}
 
     /**
      * Get LDAP connection

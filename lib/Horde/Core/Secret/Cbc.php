@@ -47,8 +47,8 @@ class Horde_Core_Secret_Cbc extends Horde_Core_Secret
     {
         $key = substr($key, 0, 56);
 
-        if (!isset($this->_cipherCache[self::HORDE_KEYNAME]) ||
-            $this->_cachedKey !== $key) {
+        if (!isset($this->_cipherCache[self::HORDE_KEYNAME])
+            || $this->_cachedKey !== $key) {
             $this->_cipherCache[self::HORDE_KEYNAME] = Blowfish::cbc(
                 $key,
                 $this->_params['iv']

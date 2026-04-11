@@ -4,7 +4,7 @@
  * The Horde_Core_Auth_Shibboleth class provides Horde-specific code that
  * extends the base Shibboleth driver.
  *
- * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you did
  * not receive this file, see http://opensource.org/licenses/lgpl-2.1.php
@@ -24,8 +24,8 @@ class Horde_Core_Auth_Shibboleth extends Horde_Auth_Shibboleth
      */
     public function validateAuth()
     {
-        if (!empty($_SERVER[$this->getParam('username_header')]) &&
-            ($this->_removeScope($_SERVER[$this->getParam('username_header')]) == $GLOBALS['registry']->getAuth('original'))) {
+        if (!empty($_SERVER[$this->getParam('username_header')])
+            && ($this->_removeScope($_SERVER[$this->getParam('username_header')]) == $GLOBALS['registry']->getAuth('original'))) {
             return true;
         }
 

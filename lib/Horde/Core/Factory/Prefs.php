@@ -14,7 +14,7 @@
 /**
  * A Horde_Injector:: based Horde_Prefs:: factory.
  *
- * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -62,8 +62,8 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
         if (array_key_exists('driver', $opts)) {
             $driver = $opts['driver'];
             $params = [];
-        } elseif (empty($conf['prefs']['driver']) ||
-                  $conf['prefs']['driver'] == 'Session') {
+        } elseif (empty($conf['prefs']['driver'])
+                  || $conf['prefs']['driver'] == 'Session') {
             $driver = 'Horde_Prefs_Storage_Null';
             $params = [];
             $opts['cache'] = $conf['prefs']['driver'] == 'Session';
@@ -101,8 +101,8 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
 
         /* If $params['user_hook'] is defined, use it to retrieve the value to
          * use for the username. */
-        if (!empty($params['user_hook']) &&
-            function_exists($params['user_hook'])) {
+        if (!empty($params['user_hook'])
+            && function_exists($params['user_hook'])) {
             $opts['user'] = call_user_func($params['user_hook'], $opts['user']);
         }
 

@@ -3,7 +3,7 @@
 /**
  * Default class for application defined API calls.
  *
- * Copyright 2009-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2009-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -87,8 +87,8 @@ class Horde_Registry_Api
             $disabled = $this->disabled();
             $reflect = new ReflectionClass($this);
             foreach ($reflect->getMethods(ReflectionMethod::IS_PUBLIC) as $v) {
-                if (($v->getDeclaringClass()->name != __CLASS__) &&
-                    !in_array($v->name, $disabled)) {
+                if (($v->getDeclaringClass()->name != __CLASS__)
+                    && !in_array($v->name, $disabled)) {
                     $this->_methods[] = $v->name;
                 }
             }

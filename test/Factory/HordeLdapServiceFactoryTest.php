@@ -25,6 +25,9 @@ use Horde_Injector;
 use Horde_Ldap;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Exception;
+use ReflectionClass;
+use RuntimeException;
 
 /**
  * Tests for HordeLdapServiceFactory
@@ -54,7 +57,7 @@ class HordeLdapServiceFactoryTest extends TestCase
                 if ($class === ConfigLoader::class) {
                     return $this->configLoader;
                 }
-                throw new \Exception("Unknown dependency: $class");
+                throw new Exception("Unknown dependency: $class");
             });
 
         $this->factory = new HordeLdapServiceFactory();
@@ -185,7 +188,7 @@ class HordeLdapServiceFactoryTest extends TestCase
 
         $this->configLoader->expects($this->once())->method('load')->with('horde')->willReturn($mockState);
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('No LDAP configuration found');
 
         $this->factory->create($this->injector, 'horde');
@@ -194,7 +197,7 @@ class HordeLdapServiceFactoryTest extends TestCase
     public function testParseServiceIdSimple(): void
     {
         $factory = new HordeLdapServiceFactory();
-        $reflection = new \ReflectionClass($factory);
+        $reflection = new ReflectionClass($factory);
         $method = $reflection->getMethod('parseServiceId');
         $method->setAccessible(true);
 
@@ -205,7 +208,7 @@ class HordeLdapServiceFactoryTest extends TestCase
     public function testParseServiceIdWithService(): void
     {
         $factory = new HordeLdapServiceFactory();
-        $reflection = new \ReflectionClass($factory);
+        $reflection = new ReflectionClass($factory);
         $method = $reflection->getMethod('parseServiceId');
         $method->setAccessible(true);
 

@@ -13,8 +13,8 @@ class Horde_Core_Factory_Facebook extends Horde_Core_Factory_Injector
     {
         global $conf;
 
-        if (empty($conf['facebook']['id']) ||
-            empty($conf['facebook']['secret'])) {
+        if (empty($conf['facebook']['id'])
+            || empty($conf['facebook']['secret'])) {
             throw new Horde_Exception('Unable to find required Facebook configuration.');
         }
 

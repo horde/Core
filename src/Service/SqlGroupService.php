@@ -39,8 +39,7 @@ class SqlGroupService implements GroupService
      */
     public function __construct(
         private Horde_Group_Base $backend
-    ) {
-    }
+    ) {}
 
     /**
      * List all groups with pagination

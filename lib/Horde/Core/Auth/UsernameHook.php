@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2015-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you did
  * not receive this file, see http://opensource.org/licenses/lgpl-2.1.php
@@ -52,9 +52,7 @@ class Horde_Core_Auth_UsernameHook extends Horde_Auth_Base
 
     /**
      */
-    protected function _authenticate($userId, $credentials)
-    {
-    }
+    protected function _authenticate($userId, $credentials) {}
 
     /**
      */

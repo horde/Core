@@ -33,8 +33,7 @@ class ValidationResult
      */
     public function __construct(
         private readonly array $errors = [],
-    ) {
-    }
+    ) {}
 
     /**
      * Check if validation passed.

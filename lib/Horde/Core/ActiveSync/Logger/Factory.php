@@ -3,8 +3,6 @@
 /**
  * Horde_Core_ActiveSync_Logger::
  *
- * PHP Version 5
- *
  * @deprecated Use Horde_ActiveSync_Log_Factory instead.
  *
  * @license   http://www.horde.org/licenses/gpl GPLv2

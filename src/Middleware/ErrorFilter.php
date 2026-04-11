@@ -62,7 +62,7 @@ class ErrorFilter implements MiddlewareInterface
     protected function getErrorResponse(ServerRequestInterface $request, Throwable $throwable): ResponseInterface
     {
         $isAdmin = $this->registry->isAdmin();
-        $acceptsJson = in_array('application/json', array_map(fn ($val) => strtolower($val), $request->getHeader('Accept')));
+        $acceptsJson = in_array('application/json', array_map(fn($val) => strtolower($val), $request->getHeader('Accept')));
         if ($acceptsJson) {
             return $this->getJsonResponse($throwable, $isAdmin);
         } else {

@@ -20,6 +20,7 @@ use Horde\Core\Service\LdapGroupService;
 use Horde\Core\Service\HordeLdapService;
 use Horde\Core\Config\ConfigLoader;
 use Horde_Injector;
+use RuntimeException;
 
 /**
  * Factory for creating LDAP-based GroupService
@@ -36,7 +37,7 @@ class LdapGroupServiceFactory
      *
      * @param Horde_Injector $injector Dependency injector
      * @return LdapGroupService LDAP group service instance
-     * @throws \RuntimeException If configuration invalid
+     * @throws RuntimeException If configuration invalid
      */
     public function create(Horde_Injector $injector): LdapGroupService
     {
@@ -50,7 +51,7 @@ class LdapGroupServiceFactory
         $params = $config->get('groups.params', []);
 
         if (empty($params['basedn'])) {
-            throw new \RuntimeException('LDAP groups require basedn configuration');
+            throw new RuntimeException('LDAP groups require basedn configuration');
         }
 
         return new LdapGroupService(

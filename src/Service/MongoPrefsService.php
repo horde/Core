@@ -20,6 +20,7 @@ use Horde_Mongo_Client;
 use MongoCollection;
 use MongoException;
 use RuntimeException;
+use MongoBinData;
 
 /**
  * MongoDB-based preferences storage service
@@ -120,7 +121,7 @@ class MongoPrefsService implements PrefsService
 
             // Handle MongoBinData for binary values (legacy compatibility)
             $value = $doc['value'];
-            if ($value instanceof \MongoBinData) {
+            if ($value instanceof MongoBinData) {
                 return $value->bin;
             }
 
@@ -218,7 +219,7 @@ class MongoPrefsService implements PrefsService
                 $value = $doc['value'];
 
                 // Handle MongoBinData
-                if ($value instanceof \MongoBinData) {
+                if ($value instanceof MongoBinData) {
                     $value = $value->bin;
                 }
 

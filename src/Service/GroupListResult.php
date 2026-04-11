@@ -45,6 +45,5 @@ class GroupListResult
         public readonly int $perPage,
         public readonly bool $hasNext,
         public readonly bool $hasPrev
-    ) {
-    }
+    ) {}
 }

@@ -7,6 +7,8 @@ namespace Horde\Core\Test\View;
 use Horde\Core\View\ResponsiveTemplateView;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * Tests for ResponsiveTemplateView class
@@ -40,7 +42,7 @@ class ResponsiveTemplateViewTest extends TestCase
 
     public function testConstructorThrowsExceptionForMissingTemplate(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Template not found');
 
         new ResponsiveTemplateView('/nonexistent/template.php', []);
@@ -145,7 +147,7 @@ class ResponsiveTemplateViewTest extends TestCase
         file_put_contents($this->tempTemplate, '<?php echo "test"; ?>');
         $view = new ResponsiveTemplateView($this->tempTemplate, ['key' => 'value']);
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('immutable');
 
         $view->key = 'new value';
@@ -233,7 +235,7 @@ class ResponsiveTemplateViewTest extends TestCase
 
         $view = new ResponsiveTemplateView($this->tempTemplate, []);
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Template rendering failed');
 
         $view->render();

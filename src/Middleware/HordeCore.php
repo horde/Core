@@ -19,6 +19,7 @@ use Horde\Http\UriFactory;
 use Horde\Http\StreamFactory;
 use Horde\Http\ResponseFactory;
 use Horde\Routes\Mapper;
+use Horde_Exception;
 
 /**
  * HordeCoreMiddleware
@@ -34,10 +35,10 @@ class HordeCore implements MiddlewareInterface
         // run AppInit, implicitly load core
         // Using ::class would defeat the purpose here
         if (!class_exists('Horde_Application')) {
-            throw new \Horde_Exception('Autoloading issue');
+            throw new Horde_Exception('Autoloading issue');
         }
         if (!class_exists('Horde_Registry')) {
-            throw new \Horde_Exception('Autoloading issue');
+            throw new Horde_Exception('Autoloading issue');
         }
         // This does way too much
         $hordeEnv = Horde_Registry::appInit('horde', ['authentication' => 'none']);

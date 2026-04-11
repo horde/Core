@@ -3,7 +3,7 @@
 /**
  * Defines the AJAX interface for an application.
  *
- * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -117,9 +117,7 @@ abstract class Horde_Core_Ajax_Application
     /**
      * Application initialization code.
      */
-    protected function _init()
-    {
-    }
+    protected function _init() {}
 
     /**
      */
@@ -144,9 +142,9 @@ abstract class Horde_Core_Ajax_Application
     final public function addHandler($class)
     {
         if (!isset($this->_handlers[$class])) {
-            if (!class_exists($class) ||
-                !($ob = new $class($this)) ||
-                !($ob instanceof Horde_Core_Ajax_Application_Handler)) {
+            if (!class_exists($class)
+                || !($ob = new $class($this))
+                || !($ob instanceof Horde_Core_Ajax_Application_Handler)) {
                 throw new InvalidArgumentException('Bad AJAX handler: ' . $class);
             }
 

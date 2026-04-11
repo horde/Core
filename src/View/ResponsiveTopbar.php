@@ -23,6 +23,7 @@ namespace Horde\Core\View;
 
 use Horde_Registry;
 use Horde_Perms;
+use Horde;
 
 /**
  * Responsive Topbar Renderer
@@ -115,7 +116,7 @@ class ResponsiveTopbar
 
             $appData = [
                 'name' => strlen($params['name'] ?? '') ? _($params['name']) : '',
-                'url' => (string) \Horde::url($this->registry->getInitialPage($app), true, ['app' => $app]),
+                'url' => (string) Horde::url($this->registry->getInitialPage($app), true, ['app' => $app]),
                 'icon' => $params['icon'] ?? $this->registry->get('icon', $app),
                 'app' => $app, // Add app identifier for CSS class
             ];

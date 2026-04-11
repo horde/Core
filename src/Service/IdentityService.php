@@ -36,8 +36,7 @@ class IdentityService
      */
     public function __construct(
         private PrefsService $prefsService
-    ) {
-    }
+    ) {}
 
     /**
      * Get all identities for user
@@ -139,7 +138,7 @@ class IdentityService
     public function getDefault(string $uid, string $scope = 'horde'): int
     {
         $default = $this->prefsService->getValue($uid, $scope, 'default_identity');
-        return $default ? (int)$default : 0;
+        return $default ? (int) $default : 0;
     }
 
     /**
@@ -156,7 +155,7 @@ class IdentityService
         if (!isset($identities[$index])) {
             throw new IdentityNotFoundException("Identity $index not found for user $uid");
         }
-        $this->prefsService->setValue($uid, $scope, 'default_identity', (string)$index);
+        $this->prefsService->setValue($uid, $scope, 'default_identity', (string) $index);
     }
 
     /**

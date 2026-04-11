@@ -5,7 +5,7 @@
  * configuration of Horde applications, writing conf.php files from
  * conf.xml source files, generating user interfaces, etc.
  *
- * Copyright 2002-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2002-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -223,8 +223,8 @@ class Horde_Config
         /* TODO: Remove for Horde 6. */
         $node = $dom->firstChild;
         while (!empty($node)) {
-            if (($node->nodeType == XML_COMMENT_NODE) &&
-                ($vers_tag = $this->getVersion($node->nodeValue))) {
+            if (($node->nodeType == XML_COMMENT_NODE)
+                && ($vers_tag = $this->getVersion($node->nodeValue))) {
                 $this->_versionTag = $vers_tag . "\n";
                 break;
             }
@@ -263,9 +263,9 @@ class Horde_Config
     public function getVersion($text)
     {
         // Old CVS tag
-        if (preg_match('/\$.*?conf\.xml,v .*? .*\$/', $text, $match) ||
+        if (preg_match('/\$.*?conf\.xml,v .*? .*\$/', $text, $match)
             // New Git tag
-            preg_match('/\$Id:\s*[0-9a-f]+\s*\$/', $text, $match)) {
+            || preg_match('/\$Id:\s*[0-9a-f]+\s*\$/', $text, $match)) {
             return $match[0];
         }
 
@@ -425,8 +425,8 @@ class Horde_Config
                 }
             } elseif (isset($configitem['_type'])) {
                 $val = $formvars->getExists($configname, $wasset);
-                if (!$wasset &&
-                    ((array_key_exists('is_default', $configitem) && $configitem['is_default'])
+                if (!$wasset
+                    && ((array_key_exists('is_default', $configitem) && $configitem['is_default'])
                      || !array_key_exists('is_default', $configitem))) {
 
                     $val = $configitem['default'] ?? null;
@@ -477,7 +477,7 @@ class Horde_Config
 
                     case 'int':
                         if (strlen($val)) {
-                            $value = (int)$val;
+                            $value = (int) $val;
                         }
                         break;
 
@@ -530,7 +530,7 @@ class Horde_Config
             }
             $name = $node->getAttribute('name');
             // Don't pass Null or Integer to a Text Filter
-            $desc = (string)$node->getAttribute('desc');
+            $desc = (string) $node->getAttribute('desc');
             $desc = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($desc, 'linkurls');
             $required = !($node->getAttribute('required') == 'false');
             $quote = !($node->getAttribute('quote') == 'false');
@@ -698,8 +698,8 @@ class Horde_Config
                         'is_default' => $this->_isDefault($curctx, $this->_getNodeOnlyText($node)),
                     ];
 
-                    if ($node->getAttribute('octal') == 'true' &&
-                        $conf[$name]['default'] != '') {
+                    if ($node->getAttribute('octal') == 'true'
+                        && $conf[$name]['default'] != '') {
                         $conf[$name]['_type'] = 'octal';
                         $conf[$name]['default'] = sprintf('0%o', $this->_default($curctx, octdec($this->_getNodeOnlyText($node))));
                     }
@@ -1260,7 +1260,7 @@ class Horde_Config
                 }
 
                 return $config;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Fall through to legacy implementation
             }
         }
@@ -1354,8 +1354,8 @@ class Horde_Config
         ];
 
         $mysql_protocol = $protocol;
-        $mysql_protocol['switch']['tcp']['fields']['port']['default'] =
-            $this->_default(
+        $mysql_protocol['switch']['tcp']['fields']['port']['default']
+            = $this->_default(
                 $ctx . '|port',
                 $node ? ($xpath->evaluate('string(configinteger[@name="port"])', $node) ?: 3306) : 3306
             );
@@ -1936,8 +1936,8 @@ class Horde_Config
         }
 
         foreach ($node->childNodes as $vnode) {
-            if ($vnode->nodeType == XML_ELEMENT_NODE &&
-                $vnode->tagName == 'values') {
+            if ($vnode->nodeType == XML_ELEMENT_NODE
+                && $vnode->tagName == 'values') {
                 if (!$vnode->hasChildNodes()) {
                     return [];
                 }
@@ -2028,7 +2028,7 @@ class Horde_Config
                 if (method_exists($appOb, 'configSpecialValues')) {
                     return $appOb->configSpecialValues($node->getAttribute('name'));
                 }
-            } catch (\Throwable $e2) {
+            } catch (Throwable $e2) {
                 Horde::log('configSpecialValues failed for ' . $app . ': ' . $e2->getMessage(), 'DEBUG');
             }
             return [];

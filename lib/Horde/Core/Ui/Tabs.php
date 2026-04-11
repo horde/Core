@@ -3,8 +3,8 @@
 /**
  * The Horde_Core_Ui_Tabs:: class manages and renders a tab-like interface.
  *
- * Copyright 2001-2003 Robert E. Coyle <robertecoyle@hotmail.com>
- * Copyright 2003-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2001-2026 Robert E. Coyle <robertecoyle@hotmail.com>
+ * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -41,10 +41,10 @@ class Horde_Core_Ui_Tabs extends Horde_Core_Ui_Widget
 
         $this->_tabs[] = array_merge(
             ['title' => $title,
-                                           'link' => $link->copy(),
-                                           'tabname' => null,
-                                           'img' => null,
-                                           'class' => null],
+                'link' => $link->copy(),
+                'tabname' => null,
+                'img' => null,
+                'class' => null],
             $params
         );
     }
@@ -91,8 +91,8 @@ class Horde_Core_Ui_Tabs extends Horde_Core_Ui_Widget
             if (isset($tab['class'])) {
                 $classes[] = $tab['class'];
             }
-            if ((!is_null($active_tab) && (string)$active_tab == (string)$tab['tabname']) ||
-                ($active == $tab['link'] . $tab['tabname'])) {
+            if ((!is_null($active_tab) && (string) $active_tab == (string) $tab['tabname'])
+                || ($active == $tab['link'] . $tab['tabname'])) {
                 $classes[] = 'horde-active';
             }
             $class = $classes

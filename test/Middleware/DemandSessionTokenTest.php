@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016-2021 Horde LLC (http://www.horde.org/)
+ * Copyright 2016-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -18,6 +18,9 @@ use Horde\Test\TestCase;
 use Horde_Session;
 use Horde_Exception;
 
+/**
+ * @coversNothing
+ */
 class DemandSessionTokenTest extends TestCase
 {
     use SetUpTrait {

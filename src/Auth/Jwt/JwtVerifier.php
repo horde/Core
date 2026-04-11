@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Horde\Core\Auth\Jwt;
 
 use InvalidArgumentException;
+use Exception;
 
 /**
  * JWT Verifier for validating and decoding JWTs
@@ -149,7 +150,7 @@ class JwtVerifier
         try {
             $headerJson = $this->base64UrlDecode($headerEncoded);
             $header = json_decode($headerJson, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new InvalidArgumentException('Invalid JWT header: ' . $e->getMessage());
         }
 
@@ -157,7 +158,7 @@ class JwtVerifier
         try {
             $payloadJson = $this->base64UrlDecode($payloadEncoded);
             $payload = json_decode($payloadJson, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new InvalidArgumentException('Invalid JWT payload: ' . $e->getMessage());
         }
 

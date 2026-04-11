@@ -104,8 +104,8 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
             }
 
             for ($col = 0; $col < $cols; ++$col) {
-                if (isset($this->_layout[$row][$col]) &&
-                    is_array($this->_layout[$row][$col])) {
+                if (isset($this->_layout[$row][$col])
+                    && is_array($this->_layout[$row][$col])) {
                     $field = $this->_layout[$row][$col];
 
                     $emptyrows[$row] = false;
@@ -132,8 +132,8 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
 
             // Strip empty blocks from the end of the rows.
             for ($col = $cols - 1; $col >= 0; --$col) {
-                if (isset($this->_layout[$row][$col]) &&
-                    $this->_layout[$row][$col] != 'empty') {
+                if (isset($this->_layout[$row][$col])
+                    && $this->_layout[$row][$col] != 'empty') {
                     break;
                 }
                 unset($this->_layout[$row][$col]);
@@ -221,13 +221,13 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
 
                 // Is this a new block?
                 $new = false;
-                if ($this->isEmpty($row, $col) ||
-                    !$this->rowExists($row) ||
-                    !$this->colExists($col)) {
+                if ($this->isEmpty($row, $col)
+                    || !$this->rowExists($row)
+                    || !$this->colExists($col)) {
                     // Check permissions.
                     $max_blocks = $GLOBALS['injector']->getInstance('Horde_Core_Perms')->hasAppPermission('max_blocks');
-                    if (($max_blocks !== true) &&
-                        ($max_blocks <= count($this))) {
+                    if (($max_blocks !== true)
+                        && ($max_blocks <= count($this))) {
                         Horde::permissionDeniedError(
                             'horde',
                             'max_blocks',
@@ -249,9 +249,9 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
                     $info = $this->getBlockInfo($row, $col);
                     $exists = $this->isBlock($row, $col);
                     // Has a different block been selected?
-                    if ($exists &&
-                        ($info['app'] != $newapp ||
-                         $info['block'] != $newtype)) {
+                    if ($exists
+                        && ($info['app'] != $newapp
+                         || $info['block'] != $newtype)) {
                         $changed = true;
                     }
                 }
@@ -259,7 +259,7 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
                 if ($new || $changed) {
                     // Change app or type.
                     $info = ['app'   => $newapp,
-                                  'block' => $newtype];
+                        'block' => $newtype];
                     $params = $this->_collection->getParams($newapp, $newtype);
                     foreach ($params as $newparam) {
                         $info['params'][$newparam] = $this->_collection->getDefaultValue($newapp, $newtype, $newparam);
@@ -355,16 +355,16 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
 
         /* This is a covered field. */
         for ($test = $row - 1; $test >= 0; $test--) {
-            if (!$this->isCovered($test, $col) &&
-                !$this->isEmpty($test, $col) &&
-                $test + $this->getHeight($test, $col) - 1 == $row) {
+            if (!$this->isCovered($test, $col)
+                && !$this->isEmpty($test, $col)
+                && $test + $this->getHeight($test, $col) - 1 == $row) {
                 return [$test, $col];
             }
         }
         for ($test = $col - 1; $test >= 0; $test--) {
-            if (!$this->isCovered($row, $test) &&
-                !$this->isEmpty($test, $col) &&
-                $test + $this->getWidth($row, $test) - 1 == $col) {
+            if (!$this->isCovered($row, $test)
+                && !$this->isEmpty($test, $col)
+                && $test + $this->getWidth($row, $test) - 1 == $col) {
                 return [$row, $test];
             }
         }
@@ -387,9 +387,9 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
      */
     public function getBlockInfo($row, $col)
     {
-        if (!isset($this->_layout[$row][$col]) ||
-            $this->isEmpty($row, $col) ||
-            $this->isCovered($row, $col)) {
+        if (!isset($this->_layout[$row][$col])
+            || $this->isEmpty($row, $col)
+            || $this->isCovered($row, $col)) {
             throw new Horde_Exception('No block exists at the requested position');
         }
 
@@ -503,10 +503,10 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
      */
     public function isBlock($row, $col)
     {
-        return ($this->rowExists($row) &&
-                $this->colExists($col) &&
-                !$this->isEmpty($row, $col) &&
-                !$this->isCovered($row, $col));
+        return ($this->rowExists($row)
+                && $this->colExists($col)
+                && !$this->isEmpty($row, $col)
+                && !$this->isCovered($row, $col));
     }
 
     /**
@@ -519,8 +519,8 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
      */
     public function isChanged($row, $col)
     {
-        return (($this->_changedRow === $row) &&
-                ($this->_changedCol === $col));
+        return (($this->_changedRow === $row)
+                && ($this->_changedCol === $col));
     }
 
     /**
@@ -595,8 +595,8 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
                 break;
         }
 
-        return Horde::link($url, $title) .
-            Horde_Themes_Image::tag('block/' . $img . '.png', ['alt' => $title]) . '</a>';
+        return Horde::link($url, $title)
+            . Horde_Themes_Image::tag('block/' . $img . '.png', ['alt' => $title]) . '</a>';
     }
 
     /**
@@ -635,8 +635,8 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
      */
     public function getWidth($row, $col)
     {
-        if (!isset($this->_layout[$row][$col]) ||
-            !is_array($this->_layout[$row][$col])) {
+        if (!isset($this->_layout[$row][$col])
+            || !is_array($this->_layout[$row][$col])) {
             return 1;
         }
         if (!isset($this->_layout[$row][$col]['width'])) {
@@ -657,8 +657,8 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
      */
     public function getHeight($row, $col)
     {
-        if (!isset($this->_layout[$row][$col]) ||
-            !is_array($this->_layout[$row][$col])) {
+        if (!isset($this->_layout[$row][$col])
+            || !is_array($this->_layout[$row][$col])) {
             return 1;
         }
         if (!isset($this->_layout[$row][$col]['height'])) {
@@ -683,10 +683,10 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
         }
 
         $this->_layout[$row][$col] = ['app' => null,
-                                           'height' => 1,
-                                           'width' => 1,
-                                           'params' => ['type2' => null,
-                                                             'params' => []]];
+            'height' => 1,
+            'width' => 1,
+            'params' => ['type2' => null,
+                'params' => []]];
     }
 
     /**
@@ -825,9 +825,9 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
             for ($i = 0; $i < $width; $i++) {
                 if (!$this->isEmpty($row - 1, $col + $i)) {
                     $in_way = $this->getBlockAt($row - 1, $col + $i);
-                    if (!is_null($in_way) &&
-                        $in_way[1] == $col &&
-                        $this->getWidth($in_way[0], $in_way[1]) == $width) {
+                    if (!is_null($in_way)
+                        && $in_way[1] == $col
+                        && $this->getWidth($in_way[0], $in_way[1]) == $width) {
                         // We need to swap the blocks.
                         $rec1 = Horde_Array::getRectangle(
                             $this->_layout,
@@ -899,9 +899,9 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
             for ($i = 0; $i < $width; $i++) {
                 if (!$this->isEmpty($lastrow, $col + $i)) {
                     $in_way = $this->getBlockAt($lastrow, $col + $i);
-                    if (!is_null($in_way) &&
-                        $in_way[1] == $col &&
-                        $this->getWidth($in_way[0], $in_way[1]) == $width) {
+                    if (!is_null($in_way)
+                        && $in_way[1] == $col
+                        && $this->getWidth($in_way[0], $in_way[1]) == $width) {
                         // We need to swap the blocks.
                         $rec1 = Horde_Array::getRectangle(
                             $this->_layout,
@@ -1002,9 +1002,9 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
             for ($i = 0; $i < $height; $i++) {
                 if (!$this->isEmpty($row + $i, $col - 1)) {
                     $in_way = $this->getBlockAt($row + $i, $col - 1);
-                    if (!is_null($in_way) &&
-                        $in_way[0] == $row &&
-                        $this->getHeight($in_way[0], $in_way[1]) == $height) {
+                    if (!is_null($in_way)
+                        && $in_way[0] == $row
+                        && $this->getHeight($in_way[0], $in_way[1]) == $height) {
                         // We need to swap the blocks.
                         $rec1 = Horde_Array::getRectangle(
                             $this->_layout,
@@ -1079,9 +1079,9 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
             for ($i = 0; $i < $height; $i++) {
                 if (!$this->isEmpty($row + $i, $lastcol)) {
                     $in_way = $this->getBlockAt($row + $i, $lastcol);
-                    if (!is_null($in_way) &&
-                        $in_way[0] == $row &&
-                        $this->getHeight($in_way[0], $in_way[1]) == $height) {
+                    if (!is_null($in_way)
+                        && $in_way[0] == $row
+                        && $this->getHeight($in_way[0], $in_way[1]) == $height) {
                         // We need to swap the blocks.
                         $rec1 = Horde_Array::getRectangle(
                             $this->_layout,
@@ -1407,7 +1407,7 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
      *
      * @return integer  The number of blocks.
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function count()
     {
         $rows = $this->rows();
@@ -1416,8 +1416,8 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
         for ($row = 0; $row < $rows; $row++) {
             $cols = $this->columns($row);
             for ($col = 0; $col < $cols; $col++) {
-                if (!$this->isEmpty($row, $col) &&
-                    !$this->isCovered($row, $col)) {
+                if (!$this->isEmpty($row, $col)
+                    && !$this->isCovered($row, $col)) {
                     ++$count;
                 }
             }

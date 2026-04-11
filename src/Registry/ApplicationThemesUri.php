@@ -12,6 +12,4 @@ use Horde\Http\Uri;
  * By default, this is $deploymentWebrootUri . '/themes/$application/';
  *
  */
-class ApplicationThemesUri extends Uri
-{
-}
+class ApplicationThemesUri extends Uri {}

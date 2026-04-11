@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * @author  Michael J Rubinsky <mrubinsk@horde.org>
  * @category   Horde
@@ -23,6 +23,7 @@ use Horde_Date;
 * @category   Horde
 * @package    Core
 * @subpackage UnitTests
+ * @coversNothing
 */
 class ActiveSyncTests extends TestCase
 {

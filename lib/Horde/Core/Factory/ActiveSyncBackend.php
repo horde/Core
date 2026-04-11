@@ -16,7 +16,7 @@ class Horde_Core_Factory_ActiveSyncBackend extends Horde_Core_Factory_Injector
         // Get PSR-7 ServerRequest from injector
         try {
             $serverRequest = $injector->get(ServerRequest::class);
-        } catch (Horde_Exception_NotFound | InjectorNotFoundException $e) {
+        } catch (Horde_Exception_NotFound|InjectorNotFoundException $e) {
             // Injector throws Horde\Injector\NotFoundException when ServerRequest is
             // unbound; legacy code threw Horde_Exception_NotFound. Both must use the
             // superglobal fallback (PHP 7.4: no union catch).

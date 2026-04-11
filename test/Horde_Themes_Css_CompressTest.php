@@ -5,6 +5,7 @@
  *
  * @category Horde
  * @package  Core
+ * @coversNothing
  */
 class Horde_Themes_Css_CompressTest extends PHPUnit\Framework\TestCase
 {
@@ -19,7 +20,7 @@ class Horde_Themes_Css_CompressTest extends PHPUnit\Framework\TestCase
         $GLOBALS['registry'] = $this->createStub(Horde_Registry::class);
 
         // Use stubs for logger and injector
-        $logger = $this->createStub(\Psr\Log\LoggerInterface::class);
+        $logger = $this->createStub(Psr\Log\LoggerInterface::class);
         $GLOBALS['injector'] = $this->createStub(Horde_Injector::class);
         $GLOBALS['injector']->method('get')->willReturn($logger);
 

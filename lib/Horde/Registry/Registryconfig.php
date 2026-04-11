@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2014-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -16,7 +16,7 @@
  * Parses registry configuration files into applications and interfaces
  * arrays.
  *
- * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2014-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -103,12 +103,12 @@ class Horde_Registry_Registryconfig
         }
 
         if (!isset($this->applications['horde']['staticfs'])) {
-            $this->applications['horde']['staticfs'] =
-                $this->applications['horde']['fileroot'] . '/static';
+            $this->applications['horde']['staticfs']
+                = $this->applications['horde']['fileroot'] . '/static';
         }
         if (!isset($this->applications['horde']['staticuri'])) {
-            $this->applications['horde']['staticuri'] =
-                $this->applications['horde']['webroot'] . '/static';
+            $this->applications['horde']['staticuri']
+                = $this->applications['horde']['webroot'] . '/static';
         }
 
         /* Scan for all APIs provided by each app, and set other common
@@ -116,9 +116,9 @@ class Horde_Registry_Registryconfig
         foreach ($this->applications as $appName => &$app) {
             if (!isset($app['status'])) {
                 $app['status'] = 'active';
-            } elseif ($app['status'] == 'heading' ||
-                      $app['status'] == 'topbar'  ||
-                      $app['status'] == 'link') {
+            } elseif ($app['status'] == 'heading'
+                      || $app['status'] == 'topbar'
+                      || $app['status'] == 'link') {
                 continue;
             }
 
@@ -130,14 +130,14 @@ class Horde_Registry_Registryconfig
                 $app['name'] = '';
             }
 
-            if (!file_exists($app['fileroot']) ||
-                (!$reg_ob->isTest() &&
+            if (!file_exists($app['fileroot'])
+                || (!$reg_ob->isTest()
                  // If a config XML file exists but no conf.php file exists in either $app/config/ or var/config/$app
-                 file_exists($app['fileroot'] . '/config/conf.xml') &&
-                 (
-                     !file_exists($app['fileroot'] . '/config/conf.php') &&
+                 && file_exists($app['fileroot'] . '/config/conf.xml')
+                 && (
+                     !file_exists($app['fileroot'] . '/config/conf.php')
                  //
-                 !(defined('HORDE_CONFIG_BASE') && file_exists(HORDE_CONFIG_BASE . DIRECTORY_SEPARATOR . $appName . DIRECTORY_SEPARATOR . 'conf.php'))
+                 && !(defined('HORDE_CONFIG_BASE') && file_exists(HORDE_CONFIG_BASE . DIRECTORY_SEPARATOR . $appName . DIRECTORY_SEPARATOR . 'conf.php'))
                  ))) {
                 $app['status'] = 'inactive';
                 Horde::log('Setting ' . $appName . ' inactive because the fileroot does not exist or the application is not configured yet.', 'DEBUG');
@@ -147,9 +147,9 @@ class Horde_Registry_Registryconfig
                 ? rtrim($app['webroot'], ' /')
                 : $app_webroot . '/' . $appName;
 
-            if (($app['status'] != 'inactive') &&
-                isset($app['provides']) &&
-                (($app['status'] != 'admin') || $reg_ob->isAdmin())) {
+            if (($app['status'] != 'inactive')
+                && isset($app['provides'])
+                && (($app['status'] != 'admin') || $reg_ob->isAdmin())) {
                 if (is_array($app['provides'])) {
                     foreach ($app['provides'] as $interface) {
                         $this->interfaces[$interface] = $appName;

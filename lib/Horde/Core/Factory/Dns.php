@@ -19,7 +19,7 @@ class Horde_Core_Factory_Dns extends Horde_Core_Factory_Injector
             $config = [
                 'cache_file' => $tmpdir . '/horde_dns.cache' . gethostname(),
                 'cache_size' => 100000,
-                'cache_type' => \NetDNS2\Cache::CACHE_TYPE_FILE,
+                'cache_type' => NetDNS2\Cache::CACHE_TYPE_FILE,
             ];
         } else {
             $config = [];

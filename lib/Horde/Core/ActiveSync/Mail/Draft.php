@@ -85,8 +85,8 @@ class Horde_Core_ActiveSync_Mail_Draft extends Horde_Core_ActiveSync_Mail
         // Check to see if we have any existing parts to add.
         if (!empty($this->_imapMessage)) {
             foreach ($this->_imapMessage->getStructure() as $part) {
-                if ($part->isAttachment() &&
-                    !in_array($part->getMimeId(), $this->_atcDelete)) {
+                if ($part->isAttachment()
+                    && !in_array($part->getMimeId(), $this->_atcDelete)) {
                     $base->addPart(
                         $this->_imapMessage->getMimePart($part->getMimeId())
                     );
@@ -100,7 +100,7 @@ class Horde_Core_ActiveSync_Mail_Draft extends Horde_Core_ActiveSync_Mail
         // Add Mime headers
         $base->addMimeHeaders(
             [
-            'headers' => $this->_headers]
+                'headers' => $this->_headers]
         );
 
         foreach ($this->_atcAdd as $atc) {
@@ -120,8 +120,8 @@ class Horde_Core_ActiveSync_Mail_Draft extends Horde_Core_ActiveSync_Mail
         );
 
         foreach ($base as $part) {
-            if ($part->isAttachment() &&
-                !empty($atc_map[$part->getName()])) {
+            if ($part->isAttachment()
+                && !empty($atc_map[$part->getName()])) {
                 $atc_hash['add'][$atc_map[$part->getName()]] = $folderid . ':' . $stat['id'] . ':' . $part->getMimeId();
             }
         }

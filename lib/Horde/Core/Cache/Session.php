@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2014-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -93,8 +93,8 @@ class Horde_Core_Cache_Session extends Horde_Cache_Storage_Base
     {
         global $session;
 
-        if ($this->_params['maxsize'] &&
-            (strlen($data) > $this->_params['maxsize'])) {
+        if ($this->_params['maxsize']
+            && (strlen($data) > $this->_params['maxsize'])) {
             $this->_params['cache']->set($this->_getCid($key, false), $data);
             $this->_stored[$key] = 1;
             $this->_saveStored();

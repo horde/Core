@@ -20,6 +20,7 @@ use Horde\Core\Config\ConfigLoader;
 use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Vhost;
 use Horde_Injector;
+use Exception;
 
 /**
  * Factory for ConfigLoader service
@@ -45,7 +46,7 @@ class ConfigLoaderFactory
         $metadataProvider = null;
         try {
             $metadataProvider = $injector->getInstance(ConfigMetadataProvider::class);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Metadata provider not available, continue without it
         }
 

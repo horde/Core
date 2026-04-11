@@ -4,7 +4,7 @@
  * Provides a method to display notification messages in Smartmobile views
  * (using the mobile jquery framework).
  *
- * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2012-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -33,9 +33,9 @@ class Horde_Core_Notification_Listener_SmartmobileStatus extends Horde_Notificat
         // location of original page, or else closing notification reloads
         // previous page (Ticket #11103).
         $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineScript([
-            '$(function() {HordeMobile.showNotifications(' .
-            Horde_Serialize::serialize($events, Horde_Serialize::JSON) .
-            ');});',
+            '$(function() {HordeMobile.showNotifications('
+            . Horde_Serialize::serialize($events, Horde_Serialize::JSON)
+            . ');});',
         ]);
     }
 

@@ -3,7 +3,7 @@
 /**
  * The Horde_Core_Ui_Pager:: provides links to individual pages.
  *
- * Copyright 2004-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2004-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -58,7 +58,7 @@ class Horde_Core_Ui_Pager extends Horde_Core_Ui_Widget
         if (is_integer($pages)) {
             $pages--;
         }
-        $pages = (int)$pages;
+        $pages = (int) $pages;
 
         // Return nothing if there is only one page.
         if ($pages == 0 || $num == 0) {
@@ -105,8 +105,8 @@ class Horde_Core_Ui_Pager extends Horde_Core_Ui_Widget
         if ($top < $pages) {
             $link = $this->_link($this->_addPreserved($url->copy()->add($this->_name, $top + 1)));
 
-            $html .= ' ' . Horde::link($link, '', 'nextRange') . '[' .
-                ($top + 2 == $pages + 1 ? $pages + 1 : ($top + 2) . '-' . ($pages + 1)) . ']</a>';
+            $html .= ' ' . Horde::link($link, '', 'nextRange') . '['
+                . ($top + 2 == $pages + 1 ? $pages + 1 : ($top + 2) . '-' . ($pages + 1)) . ']</a>';
         }
 
         // Create the 'Next>>' link if we are not on the last page.

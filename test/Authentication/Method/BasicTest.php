@@ -10,6 +10,9 @@ use Horde\Core\Config\State as ConfigState;
 use Horde_Controller_Request_Mock as MockRequest;
 use Horde_Exception_NotFound as NotFoundException;
 
+/**
+ * @coversNothing
+ */
 class BasicTest extends TestCase
 {
     public function testNoHeader(): void

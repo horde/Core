@@ -22,6 +22,7 @@ use Horde\Core\Config\Metadata\PropertyMetadata;
 use Horde\Core\Config\Metadata\ValidationResult;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 /**
  * Tests for ConfigStateWithMetadata.
@@ -197,7 +198,7 @@ class ConfigStateWithMetadataTest extends TestCase
         // Provider throws exception
         $provider->expects($this->once())
             ->method('validateConfig')
-            ->willThrowException(new \RuntimeException('Driver not found'));
+            ->willThrowException(new RuntimeException('Driver not found'));
 
         $config = ['sql' => []];
         $state = new ConfigStateWithMetadata($config, $provider);

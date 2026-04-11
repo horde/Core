@@ -16,6 +16,7 @@ use Horde\Core\Config\LoggerConfig;
 use Horde\Core\Config\State;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Horde_Log;
 
 #[CoversClass(LoggerConfig::class)]
 class LoggerConfigTest extends TestCase
@@ -152,7 +153,7 @@ class LoggerConfigTest extends TestCase
         ]);
         $config = new LoggerConfig($state);
 
-        $this->assertSame(\Horde_Log::WARN, $config->getPriorityValue());
+        $this->assertSame(Horde_Log::WARN, $config->getPriorityValue());
     }
 
     public function testFormatDefault(): void
@@ -288,7 +289,7 @@ class LoggerConfigTest extends TestCase
         $this->assertSame('/var/log/horde/horde.log', $config->getName());
         $this->assertSame('HORDE', $config->getIdent());
         $this->assertSame('NOTICE', $config->getPriority());
-        $this->assertSame(\Horde_Log::NOTICE, $config->getPriorityValue());
+        $this->assertSame(Horde_Log::NOTICE, $config->getPriorityValue());
         $this->assertSame('default', $config->getFormat());
         $this->assertTrue($config->getAppend());
         $this->assertSame('a+', $config->getAppendMode());
@@ -313,7 +314,7 @@ class LoggerConfigTest extends TestCase
         $this->assertSame(24, $config->getFacility());
         $this->assertSame('horde-imp', $config->getIdent());
         $this->assertSame('WARN', $config->getPriority()); // Normalized
-        $this->assertSame(\Horde_Log::WARN, $config->getPriorityValue());
+        $this->assertSame(Horde_Log::WARN, $config->getPriorityValue());
     }
 
     public function testMissingLogConfiguration(): void

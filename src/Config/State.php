@@ -17,6 +17,8 @@ namespace Horde\Core\Config;
 
 use ArrayAccess;
 use RuntimeException;
+use Horde_Exception;
+use ReturnTypeWillChange;
 
 /**
  * Horde Config encapsulated in an object
@@ -50,7 +52,7 @@ class State implements ArrayAccess
         } elseif (isset($GLOBALS['conf'])) {
             $this->conf = $GLOBALS['conf'];
         } else {
-            throw new \Horde_Exception(
+            throw new Horde_Exception(
                 'Config neither passed nor available from global'
             );
         }
@@ -116,7 +118,7 @@ class State implements ArrayAccess
         return array_key_exists($offset, $this->conf);
     }
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function offsetGet($offset): mixed
     {
         return $this->conf[$offset] ?? null;

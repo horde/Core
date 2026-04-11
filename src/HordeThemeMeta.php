@@ -6,8 +6,6 @@ class HordeThemeMeta
 {
     public function __construct(
         public readonly string $vendorDirPath
-    ) {
-
-    }
+    ) {}
 
 }

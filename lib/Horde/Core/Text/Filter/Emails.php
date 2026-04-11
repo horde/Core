@@ -4,7 +4,7 @@
  * The Horde_Text_Filter_Emails:: class finds email addresses in a block of
  * text and turns them into links.
  *
- * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -48,10 +48,10 @@ class Horde_Core_Text_Filter_Emails extends Horde_Text_Filter_Emails
      */
     protected function _regexCallback($matches)
     {
-        if ($this->_params['always_mailto'] ||
-            (!$this->_params['callback'] &&
-             (!($app = $GLOBALS['registry']->hasMethod('mail/compose')) ||
-              !$GLOBALS['registry']->hasPermission($app, Horde_Perms::EDIT)))) {
+        if ($this->_params['always_mailto']
+            || (!$this->_params['callback']
+             && (!($app = $GLOBALS['registry']->hasMethod('mail/compose'))
+              || !$GLOBALS['registry']->hasPermission($app, Horde_Perms::EDIT)))) {
             return parent::_regexCallback($matches);
         }
 
@@ -86,7 +86,7 @@ class Horde_Core_Text_Filter_Emails extends Horde_Text_Filter_Emails
             ? ''
             : ' class="' . $this->_params['class'] . '"';
 
-        return '<a' . $class .' href="' . $href . '"' . $onclick . '>'
+        return '<a' . $class . ' href="' . $href . '"' . $onclick . '>'
             . htmlspecialchars($email) . htmlspecialchars($args_long)
             . '</a>';
     }

@@ -413,8 +413,8 @@ class Horde_Core_ActiveSync_Mail
         try {
             $body_data = $this->imapMessage->getMessageBodyData(
                 [
-                'protocolversion' => $this->_version,
-                'bodyprefs' => [Horde_ActiveSync::BODYPREF_TYPE_MIME => true]]
+                    'protocolversion' => $this->_version,
+                    'bodyprefs' => [Horde_ActiveSync::BODYPREF_TYPE_MIME => true]]
             );
         } catch (Horde_Exception_NotFound $e) {
             throw new Horde_ActiveSync_Exception($e->getMessage());
@@ -691,7 +691,7 @@ class Horde_Core_ActiveSync_Mail
     protected function _msgBody(array $body_data, Horde_Mime_Part $part, $html, $flow = false)
     {
         $subtype = $html == true ? 'html' : 'plain';
-        $msg = (string)$body_data[$subtype]['body'];
+        $msg = (string) $body_data[$subtype]['body'];
         if (!$html) {
             if ($part->getContentTypeParameter('format') == 'flowed') {
                 $flowed = new Horde_Text_Flowed($msg, 'UTF-8');

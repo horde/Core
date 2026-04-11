@@ -3,7 +3,7 @@
 /**
  * Imple to provide weather/location autocompletion.
  *
- * Copyright 2011-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2011-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (GPL). If you
  * did not receive this file, see http://www.horde.org/licenses/gpl.
@@ -28,10 +28,10 @@ class Horde_Core_Ajax_Imple_WeatherLocationAutoCompleter_Metar extends Horde_Cor
 
         $weather =  new Horde_Service_Weather_Metar(
             [
-            'cache' => $injector->getInstance('Horde_Cache'),
-            'cache_lifetime' => $conf['weather']['params']['lifetime'],
-            'http_client' => $injector->createInstance('Horde_Core_Factory_HttpClient')->create(),
-            'db' => $injector->getInstance('Horde_Db_Adapter')]
+                'cache' => $injector->getInstance('Horde_Cache'),
+                'cache_lifetime' => $conf['weather']['params']['lifetime'],
+                'http_client' => $injector->createInstance('Horde_Core_Factory_HttpClient')->create(),
+                'db' => $injector->getInstance('Horde_Db_Adapter')]
         );
 
         return $weather->autocompleteLocation($input);

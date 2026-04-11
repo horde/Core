@@ -33,6 +33,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Exception;
 
 /**
  * Unit tests for AppRouter middleware
@@ -88,9 +89,7 @@ class AppRouterTest extends TestCase
     private function createTestMiddleware(string $name): MiddlewareInterface
     {
         return new class ($name) implements MiddlewareInterface {
-            public function __construct(private string $name)
-            {
-            }
+            public function __construct(private string $name) {}
 
             public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
             {
@@ -146,7 +145,7 @@ class AppRouterTest extends TestCase
                 if ($key === RedirectToLogin::class) {
                     return $this->createTestMiddleware('RedirectToLogin');
                 }
-                throw new \Exception("Injector: Unknown key: $key");
+                throw new Exception("Injector: Unknown key: $key");
             });
 
         // Setup injector to return a mock controller
@@ -222,7 +221,7 @@ class AppRouterTest extends TestCase
                 if ($key === RedirectToLogin::class) {
                     return $this->createTestMiddleware('RedirectToLogin');
                 }
-                throw new \Exception("Injector: Unknown key: $key");
+                throw new Exception("Injector: Unknown key: $key");
             });
 
         // Mock controller that tracks middleware execution
@@ -301,7 +300,7 @@ class AppRouterTest extends TestCase
                 if ($key === AuthHordeSession::class || $key === RedirectToLogin::class) {
                     $this->fail("Middleware {$key} should not be requested with empty stack");
                 }
-                throw new \Exception("Injector: Unknown key: $key");
+                throw new Exception("Injector: Unknown key: $key");
             });
         $mockController = $this->createMock(RequestHandlerInterface::class);
         $mockController->expects($this->once())->method('handle')
@@ -376,7 +375,7 @@ class AppRouterTest extends TestCase
                 if ($key === AuthHordeSession::class || $key === RedirectToLogin::class) {
                     $this->fail("Middleware {$key} should not be requested with HordeAuthType=NONE");
                 }
-                throw new \Exception("Injector: Unknown key: $key");
+                throw new Exception("Injector: Unknown key: $key");
             });
 
         $mockController = $this->createMock(RequestHandlerInterface::class);
@@ -415,7 +414,7 @@ class AppRouterTest extends TestCase
      */
     public function testMissingAppAttributeThrowsException(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage("Missing Attribute: 'app'");
 
         // Injector.has() is called early to check for config loaders
@@ -441,7 +440,7 @@ class AppRouterTest extends TestCase
      */
     public function testMissingRouterPrefixThrowsException(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage("Missing Attribute: 'routerPrefix'");
 
         // Injector.has() is called early to check for config loaders
@@ -498,7 +497,7 @@ class AppRouterTest extends TestCase
                 if ($key === StreamFactoryInterface::class) {
                     return $this->streamFactory;
                 }
-                throw new \Exception("Injector: Unknown key: $key");
+                throw new Exception("Injector: Unknown key: $key");
             });
 
         $mockController = $this->createMock(RequestHandlerInterface::class);

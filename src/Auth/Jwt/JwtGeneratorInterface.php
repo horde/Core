@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Horde\Core\Auth\Jwt;
 
+use RuntimeException;
+
 /**
  * Interface for JWT generation
  *
@@ -25,7 +27,7 @@ interface JwtGeneratorInterface
      * @param PrivateKey $privateKey Private key for signing
      * @param int $expirySeconds JWT expiry time in seconds
      * @return GeneratedJwt
-     * @throws \RuntimeException If JWT generation fails
+     * @throws RuntimeException If JWT generation fails
      */
     public function generate(
         int $appId,

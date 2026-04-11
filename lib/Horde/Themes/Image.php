@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -91,8 +91,8 @@ class Horde_Themes_Image extends Horde_Themes_Element
         }
 
         /* If no directory has been specified, get it from the registry. */
-        if (!($src instanceof Horde_Themes_Image) &&
-            (substr($src, 0, 1) != '/')) {
+        if (!($src instanceof Horde_Themes_Image)
+            && (substr($src, 0, 1) != '/')) {
             $src = Horde_Themes::img($src, $opts['imgopts']);
         }
 
@@ -126,8 +126,8 @@ class Horde_Themes_Image extends Horde_Themes_Element
             return $in;
         }
 
-        if (!is_null($limit) &&
-            (is_bool($dataurl) || ($limit < $dataurl))) {
+        if (!is_null($limit)
+            && (is_bool($dataurl) || ($limit < $dataurl))) {
             $dataurl = $limit;
         }
 
@@ -142,8 +142,8 @@ class Horde_Themes_Image extends Horde_Themes_Element
         /* Delete approx. 50 chars from the limit to account for the various
          * data/base64 header text.  Multiply by 0.75 to determine the
          * base64 encoded size. */
-        return (($dataurl === true) ||
-                (filesize($in->fs) <= (($dataurl * 0.75) - 50)))
+        return (($dataurl === true)
+                || (filesize($in->fs) <= (($dataurl * 0.75) - 50)))
             ? strval(Horde_Url_Data::create(Horde_Mime_Magic::extToMime(substr($in->uri, strrpos($in->uri, '.') + 1)), file_get_contents($in->fs)))
             : $in->uri;
     }

@@ -14,7 +14,7 @@
 /**
  * A Horde_Injector:: based factory for creating Horde_Ldap objects.
  *
- * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -74,9 +74,9 @@ class Horde_Core_Factory_Ldap extends Horde_Core_Factory_Base
         try {
             $this->_instances[$sig] = new Horde_Ldap($config);
             try {
-                if (isset($config['bindas']) &&
-                    $config['bindas'] == 'user' &&
-                    $GLOBALS['registry']->getAuth()) {
+                if (isset($config['bindas'])
+                    && $config['bindas'] == 'user'
+                    && $GLOBALS['registry']->getAuth()) {
                     $this->_instances[$sig]->bind(
                         $this->_instances[$sig]->findUserDN($GLOBALS['registry']->getAuth()),
                         $GLOBALS['registry']->getAuthCredential('password')

@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace Horde\Core\Service\Exception;
 
+use RuntimeException;
+
 /**
  * Exception thrown when attempting to create a group that already exists
  *
@@ -24,6 +26,4 @@ namespace Horde\Core\Service\Exception;
  * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
-class GroupExistsException extends \RuntimeException
-{
-}
+class GroupExistsException extends RuntimeException {}

@@ -18,7 +18,7 @@ trait FileTrait
         string|Stringable $path,
     ) {
         // Flatten Stringables to strings, we want to decouple our value from other objects.
-        $this->path = (string)$path;
+        $this->path = (string) $path;
     }
 
     /**

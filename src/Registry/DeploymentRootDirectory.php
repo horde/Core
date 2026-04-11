@@ -11,6 +11,4 @@ use Horde\Core\Directory;
  *
  * Canonically the autoloader is $this  . '/vendor/autoload.php'.
  */
-class DeploymentRootDirectory extends Directory
-{
-}
+class DeploymentRootDirectory extends Directory {}

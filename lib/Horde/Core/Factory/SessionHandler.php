@@ -3,7 +3,7 @@
 /**
  * Factory for creating Horde_SessionHandler objects.
  *
- * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * @category Horde
  * @package  Core
@@ -74,9 +74,9 @@ class Horde_Core_Factory_SessionHandler extends Horde_Core_Factory_Injector
         $class = $this->_getDriverName($driver, 'Horde_SessionHandler_Storage');
         $storage = $this->storage = new $class($params);
 
-        if ((!empty($conf['sessionhandler']['hashtable']) ||
-             !empty($conf['sessionhandler']['memcache'])) &&
-            !in_array($driver, ['builtin', 'hashtable'])) {
+        if ((!empty($conf['sessionhandler']['hashtable'])
+             || !empty($conf['sessionhandler']['memcache']))
+            && !in_array($driver, ['builtin', 'hashtable'])) {
             $storage = new Horde_SessionHandler_Storage_Stack([
                 'stack' => [
                     new Horde_SessionHandler_Storage_Hashtable([

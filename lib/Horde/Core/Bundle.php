@@ -3,7 +3,7 @@
 /**
  * Base class for the Horde bundle API.
  *
- * Copyright 2011-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2011-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -37,9 +37,9 @@ abstract class Horde_Core_Bundle
     public function init()
     {
         // Check if conf.php is writeable.
-        if ((file_exists(HORDE_BASE . '/config/conf.php') &&
-             !is_writable(HORDE_BASE . '/config/conf.php')) ||
-            !is_writable(HORDE_BASE . '/config')) {
+        if ((file_exists(HORDE_BASE . '/config/conf.php')
+             && !is_writable(HORDE_BASE . '/config/conf.php'))
+            || !is_writable(HORDE_BASE . '/config')) {
             $this->_cli->message(Horde_Util::realPath(HORDE_BASE . '/config/conf.php') . ' is not writable.', 'cli.error');
         }
 
@@ -167,8 +167,8 @@ abstract class Horde_Core_Bundle
     public function writeAllConfigs()
     {
         foreach ($GLOBALS['registry']->listAllApps() as $app) {
-            if ($app == 'horde' ||
-                !file_exists($GLOBALS['registry']->get('fileroot', $app) . '/config/conf.xml')) {
+            if ($app == 'horde'
+                || !file_exists($GLOBALS['registry']->get('fileroot', $app) . '/config/conf.xml')) {
                 continue;
             }
             $config = new Horde_Config($app);

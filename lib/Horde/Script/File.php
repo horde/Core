@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2012-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -125,9 +125,9 @@ class Horde_Script_File
 
             case 'tag':
             case 'tag_full':
-                return '<script type="text/javascript" src="' .
-                    (($name == 'tag') ? $this->url : $this->url_full) .
-                    '"></script>';
+                return '<script type="text/javascript" src="'
+                    . (($name == 'tag') ? $this->url : $this->url_full)
+                    . '"></script>';
 
             case 'uncompressed':
                 return $this;

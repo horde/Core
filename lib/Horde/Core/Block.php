@@ -3,7 +3,7 @@
 /**
  * An abstract class representing a single block in the portal/block display.
  *
- * Copyright 2003-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -250,7 +250,7 @@ abstract class Horde_Core_Block
     {
         $ajax_url = $GLOBALS['registry']->getServiceLink('ajax')
             ->add(['app' => $this->getApp(),
-                        'blockid' => get_class($this)]);
+                'blockid' => get_class($this)]);
         $ajax_url->pathInfo = 'blockUpdate';
 
         return $ajax_url;

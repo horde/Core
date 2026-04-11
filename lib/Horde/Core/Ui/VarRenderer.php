@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2003-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -63,7 +63,7 @@ class Horde_Core_Ui_VarRenderer
         }
 
         $driver = Horde_String::ucfirst(basename($driver));
-        $class = (empty($app) ? 'Horde_Core' : $app) .  '_Ui_VarRenderer_' . $driver;
+        $class = (empty($app) ? 'Horde_Core' : $app) . '_Ui_VarRenderer_' . $driver;
 
         $ok = class_exists($class);
 

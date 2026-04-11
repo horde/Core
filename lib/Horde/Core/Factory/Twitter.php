@@ -13,8 +13,8 @@ class Horde_Core_Factory_Twitter extends Horde_Core_Factory_Injector
     {
         global $conf;
 
-        if (empty($conf['twitter']['key']) ||
-            empty($conf['twitter']['secret'])) {
+        if (empty($conf['twitter']['key'])
+            || empty($conf['twitter']['secret'])) {
             throw new Horde_Service_Twitter_Exception(Horde_Core_Translation::t('No OAuth Key or Secret found for the Twitter API'));
         }
 

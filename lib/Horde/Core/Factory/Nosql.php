@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2013-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -58,8 +58,8 @@ class Horde_Core_Factory_Nosql extends Horde_Core_Factory_Base
             : $this->getConfig($backend);
 
         /* Determine if we are using the base SQL config. */
-        if (isset($config['driverconfig']) &&
-            ($config['driverconfig'] == 'horde')) {
+        if (isset($config['driverconfig'])
+            && ($config['driverconfig'] == 'horde')) {
             $this->_instances[$sig] = $this->create();
             return $this->_instances[$sig];
         }

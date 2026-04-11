@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2014-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -61,17 +61,17 @@ class Horde_Themes_Css_Cache_File extends Horde_Themes_Css_Cache
             }
 
             $temp = Horde_Util::getTempFile('staticcss', true, $js_fs);
-            if (!file_put_contents($temp, $compress->compress($css, $logger), LOCK_EX) ||
-                !chmod($temp, 0o777 & ~umask()) ||
-                !rename($temp, $path)) {
+            if (!file_put_contents($temp, $compress->compress($css, $logger), LOCK_EX)
+                || !chmod($temp, 0o777 & ~umask())
+                || !rename($temp, $path)) {
                 Horde::log('Could not write cached CSS file to disk.', 'EMERG');
                 return [];
             }
         }
 
         return [
-             Horde::url($registry->get('staticuri', 'horde') . '/' . $filename, true, ['append_session' => -1]),
-         ];
+            Horde::url($registry->get('staticuri', 'horde') . '/' . $filename, true, ['append_session' => -1]),
+        ];
     }
 
     /**

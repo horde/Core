@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2013-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -92,8 +92,8 @@ class Horde_Core_Nosql
         foreach ($drivers as $key => $val) {
             if ($mask & self::HAS_INDICES) {
                 if ($val instanceof Horde_Mongo_Collection_Index) {
-                    if (($mask & self::NEEDS_INDICES) &&
-                        $val->checkMongoIndices()) {
+                    if (($mask & self::NEEDS_INDICES)
+                        && $val->checkMongoIndices()) {
                         unset($drivers[$key]);
                     }
                 } else {

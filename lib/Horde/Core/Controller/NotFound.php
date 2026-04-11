@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2009-2020 Horde LLC (http://www.horde.org/)
+ * Copyright 2009-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -17,7 +17,7 @@
  * a premade controller for scenarios where a resource
  * either does not exist or is not visible to the requester
  *
- * Copyright 2009-2020 Horde LLC (http://www.horde.org/)
+ * Copyright 2009-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL-2). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl.

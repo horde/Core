@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -118,8 +118,8 @@ class Horde_Session
                     : 0;
 
             case 'regenerate_due':
-                return (isset($this->_data[self::REGENERATE]) &&
-                        (time() >= $this->_data[self::REGENERATE]));
+                return (isset($this->_data[self::REGENERATE])
+                        && (time() >= $this->_data[self::REGENERATE]));
 
             case 'regenerate_interval':
                 // DEFAULT: 6 hours
@@ -160,8 +160,8 @@ class Horde_Session
             ini_set('session.use_only_cookies', 0);
         } else {
             ini_set('session.use_only_cookies', 1);
-            if (!empty($conf['cookie']['domain']) &&
-                (strpos($conf['server']['name'], '.') === false)) {
+            if (!empty($conf['cookie']['domain'])
+                && (strpos($conf['server']['name'], '.') === false)) {
                 throw new Horde_Exception('Session cookies will not work without a FQDN and with a non-empty cookie domain. Either use a fully qualified domain name like "http://www.example.com" instead of "http://example" only, or set the cookie domain in the Horde configuration to an empty value, or enable non-cookie (url-based) sessions in the Horde configuration.');
             }
         }
@@ -210,9 +210,9 @@ class Horde_Session
 
         /* We have reopened a session. Check to make sure that authentication
          * status has not changed in the meantime. */
-        if (!$this->_readonly &&
-            !is_null($this->_relogin) &&
-            (($GLOBALS['registry']->getAuth() !== false) !== $this->_relogin)) {
+        if (!$this->_readonly
+            && !is_null($this->_relogin)
+            && (($GLOBALS['registry']->getAuth() !== false) !== $this->_relogin)) {
             Horde::log('Previous session attempted to be reopened after authentication status change. All session modifications will be ignored.', 'DEBUG');
             $this->_readonly = true;
         }
@@ -425,9 +425,9 @@ class Horde_Session
          * does not need to be rebuilt every time the session is reloaded.
          * For convenience, encrypted data is ALWAYS serialized, regardless
          * of whether it is already a string. */
-        if (($mask & self::ENCRYPT) ||
-            is_object($value) || ($mask & self::TYPE_OBJECT) ||
-            is_array($value) || ($mask & self::TYPE_ARRAY)) {
+        if (($mask & self::ENCRYPT)
+            || is_object($value) || ($mask & self::TYPE_OBJECT)
+            || is_array($value) || ($mask & self::TYPE_ARRAY)) {
             $opts = ['compress' => 0];
             if (is_object($value) || ($mask & self::TYPE_OBJECT)) {
                 $opts['phpob'] = true;
@@ -443,8 +443,8 @@ class Horde_Session
             $value = self::NOT_SERIALIZED . $value;
         }
 
-        if (!$this->exists($app, $name) ||
-            ($this->_data[$app][$name] !== $value)) {
+        if (!$this->exists($app, $name)
+            || ($this->_data[$app][$name] !== $value)) {
             $this->_data[$app][$name] = $value;
             $this->sessionHandler->changed = true;
         }
@@ -503,9 +503,9 @@ class Horde_Session
     {
         $ret = [];
 
-        if ($name &&
-            isset($this->_data[$app]) &&
-            ($name[strlen($name) - 1] == '/')) {
+        if ($name
+            && isset($this->_data[$app])
+            && ($name[strlen($name) - 1] == '/')) {
             foreach (array_keys($this->_data[$app]) as $k) {
                 if (strpos($k, $name) === 0) {
                     $ret[substr($k, strlen($name))] = $k;

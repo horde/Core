@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2016-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -15,6 +15,7 @@ namespace Horde\Core\Test;
 
 use Horde\Test\TestCase;
 use Horde\Core\Config\State;
+use Horde_Exception;
 
 /**
  * Tests for Horde\Core\Config\State.
@@ -23,6 +24,7 @@ use Horde\Core\Config\State;
  * @category Horde
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
+ * @coversNothing
  */
 class ConfigStateTest extends TestCase
 {
@@ -31,7 +33,7 @@ class ConfigStateTest extends TestCase
         if (isset($GLOBALS['conf'])) {
             unset($GLOBALS['conf']);
         }
-        $this->expectException(\Horde_Exception::class);
+        $this->expectException(Horde_Exception::class);
         $state = new State();
         $this->assertEquals([], $state->toArray());
     }

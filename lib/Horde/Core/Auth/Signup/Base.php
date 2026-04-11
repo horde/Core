@@ -4,7 +4,7 @@
  * This class defines the abstract driver implementation for
  * Horde_Core_Auth_Signup.
  *
- * Copyright 2002-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2002-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you did
  * not receive this file, see http://opensource.org/licenses/lgpl-2.1.php
@@ -142,8 +142,8 @@ abstract class Horde_Core_Auth_Signup_Base
 
         // Check to see if the username already exists in the auth backend or
         // the signup queue.
-        if ($auth->exists($info['user_name']) ||
-            $this->exists($info['user_name'])) {
+        if ($auth->exists($info['user_name'])
+            || $this->exists($info['user_name'])) {
             throw new Horde_Exception(sprintf(Horde_Core_Translation::t('Username "%s" already exists.'), $info['user_name']));
         }
     }

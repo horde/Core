@@ -113,7 +113,7 @@ class BackendConfigLoader
             case 'vhost':
                 // Need to check if vhosts enabled - requires loading base config first
                 // For introspection, just return empty if vhost file doesn't exist
-                $vhostFile = $confDir . $pathInfo['filename'] . '-*.'. $pathInfo['extension'];
+                $vhostFile = $confDir . $pathInfo['filename'] . '-*.' . $pathInfo['extension'];
                 $vhostFiles = glob($vhostFile);
                 if ($vhostFiles === false || empty($vhostFiles)) {
                     return [];

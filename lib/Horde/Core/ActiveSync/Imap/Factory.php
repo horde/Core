@@ -77,8 +77,8 @@ class Horde_Core_ActiveSync_Imap_Factory implements Horde_ActiveSync_Interface_I
                         //        mailbox strings here but don't see anyway
                         //        around it.
                         // @TODO  REMOVE - deprecated in IMP 6.
-                        if (strpos($mbox['ob']->utf8, "impsearch\000") === false &&
-                            (!$subscriptions || ($mbox['a'] & 8))) {
+                        if (strpos($mbox['ob']->utf8, "impsearch\000") === false
+                            && (!$subscriptions || ($mbox['a'] & 8))) {
                             $this->_mailboxlist[$mbox['ob']->utf8] = $mbox;
                         }
                     }

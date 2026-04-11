@@ -20,6 +20,8 @@ use Horde\Core\Service\HordeLdapService;
 use Horde_Ldap;
 use Horde_Ldap_Filter;
 use Horde_Ldap_Exception;
+use Horde_Ldap_Entry;
+use RuntimeException;
 
 /**
  * LDAP-based group service implementation
@@ -51,8 +53,7 @@ class LdapGroupService implements GroupService
         private string $memberAttr = 'memberUid',
         private array $objectClass = ['posixGroup'],
         private array $newGroupObjectClass = ['posixGroup']
-    ) {
-    }
+    ) {}
 
     /**
      * List all groups
@@ -60,7 +61,7 @@ class LdapGroupService implements GroupService
      * @param int $page Page number (1-based)
      * @param int $perPage Number of groups per page
      * @return GroupListResult List of all groups
-     * @throws \RuntimeException If LDAP search fails
+     * @throws RuntimeException If LDAP search fails
      */
     public function listAll(int $page = 1, int $perPage = 50): GroupListResult
     {
@@ -101,7 +102,7 @@ class LdapGroupService implements GroupService
 
             return new GroupListResult($groups, $total, $page, $perPage, $hasNext, $hasPrev);
         } catch (Horde_Ldap_Exception $e) {
-            throw new \RuntimeException('Failed to list LDAP groups: ' . $e->getMessage(), 0, $e);
+            throw new RuntimeException('Failed to list LDAP groups: ' . $e->getMessage(), 0, $e);
         }
     }
 
@@ -110,7 +111,7 @@ class LdapGroupService implements GroupService
      *
      * @param string $id Group ID
      * @return GroupInfo Group information
-     * @throws \RuntimeException If group not found or LDAP error
+     * @throws RuntimeException If group not found or LDAP error
      */
     public function get(string $id): GroupInfo
     {
@@ -137,7 +138,7 @@ class LdapGroupService implements GroupService
                 extra: $extra
             );
         } catch (Horde_Ldap_Exception $e) {
-            throw new \RuntimeException("Failed to get LDAP group '$id': " . $e->getMessage(), 0, $e);
+            throw new RuntimeException("Failed to get LDAP group '$id': " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -146,7 +147,7 @@ class LdapGroupService implements GroupService
      *
      * @param string $name Group name (must be unique)
      * @return GroupInfo Created group information
-     * @throws \RuntimeException If group creation fails
+     * @throws RuntimeException If group creation fails
      */
     public function create(string $name): GroupInfo
     {
@@ -164,7 +165,7 @@ class LdapGroupService implements GroupService
                 $attributes['gidNumber'] = $this->getNextGidNumber();
             }
 
-            $entry = \Horde_Ldap_Entry::createFresh($dn, $attributes);
+            $entry = Horde_Ldap_Entry::createFresh($dn, $attributes);
             $ldap->add($entry);
 
             return new GroupInfo(
@@ -174,7 +175,7 @@ class LdapGroupService implements GroupService
                 extra: []
             );
         } catch (Horde_Ldap_Exception $e) {
-            throw new \RuntimeException("Failed to create LDAP group '$name': " . $e->getMessage(), 0, $e);
+            throw new RuntimeException("Failed to create LDAP group '$name': " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -182,7 +183,7 @@ class LdapGroupService implements GroupService
      * Delete group
      *
      * @param string $id Group ID
-     * @throws \RuntimeException If group deletion fails
+     * @throws RuntimeException If group deletion fails
      */
     public function delete(string $id): void
     {
@@ -192,7 +193,7 @@ class LdapGroupService implements GroupService
 
             $ldap->delete($dn);
         } catch (Horde_Ldap_Exception $e) {
-            throw new \RuntimeException("Failed to delete LDAP group '$id': " . $e->getMessage(), 0, $e);
+            throw new RuntimeException("Failed to delete LDAP group '$id': " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -207,7 +208,7 @@ class LdapGroupService implements GroupService
         try {
             $this->get($id);
             return true;
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             return false;
         }
     }
@@ -217,7 +218,7 @@ class LdapGroupService implements GroupService
      *
      * @param string $groupId Group ID
      * @return array List of user IDs
-     * @throws \RuntimeException If operation fails
+     * @throws RuntimeException If operation fails
      */
     public function getMembers(string $groupId): array
     {
@@ -230,7 +231,7 @@ class LdapGroupService implements GroupService
      *
      * @param string $groupId Group ID
      * @param string $userId User ID
-     * @throws \RuntimeException If operation fails
+     * @throws RuntimeException If operation fails
      */
     public function addMember(string $groupId, string $userId): void
     {
@@ -248,7 +249,7 @@ class LdapGroupService implements GroupService
                 $entry->update();
             }
         } catch (Horde_Ldap_Exception $e) {
-            throw new \RuntimeException("Failed to add member '$userId' to LDAP group '$groupId': " . $e->getMessage(), 0, $e);
+            throw new RuntimeException("Failed to add member '$userId' to LDAP group '$groupId': " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -257,7 +258,7 @@ class LdapGroupService implements GroupService
      *
      * @param string $groupId Group ID
      * @param array $userIds Array of user IDs
-     * @throws \RuntimeException If operation fails
+     * @throws RuntimeException If operation fails
      */
     public function addMembers(string $groupId, array $userIds): void
     {
@@ -276,7 +277,7 @@ class LdapGroupService implements GroupService
                 $entry->update();
             }
         } catch (Horde_Ldap_Exception $e) {
-            throw new \RuntimeException("Failed to add members to LDAP group '$groupId': " . $e->getMessage(), 0, $e);
+            throw new RuntimeException("Failed to add members to LDAP group '$groupId': " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -285,7 +286,7 @@ class LdapGroupService implements GroupService
      *
      * @param string $groupId Group ID
      * @param string $userId User ID
-     * @throws \RuntimeException If operation fails
+     * @throws RuntimeException If operation fails
      */
     public function removeMember(string $groupId, string $userId): void
     {
@@ -297,12 +298,12 @@ class LdapGroupService implements GroupService
             $members = $entry->getValue($this->memberAttr);
             $members = is_array($members) ? $members : [];
 
-            $members = array_values(array_filter($members, fn ($m) => $m !== $userId));
+            $members = array_values(array_filter($members, fn($m) => $m !== $userId));
 
             $entry->replace([$this->memberAttr => $members]);
             $entry->update();
         } catch (Horde_Ldap_Exception $e) {
-            throw new \RuntimeException("Failed to remove member '$userId' from LDAP group '$groupId': " . $e->getMessage(), 0, $e);
+            throw new RuntimeException("Failed to remove member '$userId' from LDAP group '$groupId': " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -311,7 +312,7 @@ class LdapGroupService implements GroupService
      *
      * @param string $groupId Group ID
      * @param array $userIds Array of user IDs
-     * @throws \RuntimeException If operation fails
+     * @throws RuntimeException If operation fails
      */
     public function removeMembers(string $groupId, array $userIds): void
     {
@@ -328,7 +329,7 @@ class LdapGroupService implements GroupService
             $entry->replace([$this->memberAttr => $members]);
             $entry->update();
         } catch (Horde_Ldap_Exception $e) {
-            throw new \RuntimeException("Failed to remove members from LDAP group '$groupId': " . $e->getMessage(), 0, $e);
+            throw new RuntimeException("Failed to remove members from LDAP group '$groupId': " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -337,7 +338,7 @@ class LdapGroupService implements GroupService
      *
      * @param string $groupId Group ID
      * @param array $userIds Array of user IDs (new member list)
-     * @throws \RuntimeException If operation fails
+     * @throws RuntimeException If operation fails
      */
     public function setMembers(string $groupId, array $userIds): void
     {
@@ -349,7 +350,7 @@ class LdapGroupService implements GroupService
             $entry->replace([$this->memberAttr => $userIds]);
             $entry->update();
         } catch (Horde_Ldap_Exception $e) {
-            throw new \RuntimeException("Failed to set members for LDAP group '$groupId': " . $e->getMessage(), 0, $e);
+            throw new RuntimeException("Failed to set members for LDAP group '$groupId': " . $e->getMessage(), 0, $e);
         }
     }
 

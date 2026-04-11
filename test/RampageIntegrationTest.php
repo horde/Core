@@ -35,6 +35,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Exception;
 
 /**
  * Semi-integration tests for Rampage request handling
@@ -49,6 +50,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @category Horde
  * @package  Core
+ * @coversNothing
  */
 #[Group('integration')]
 class RampageIntegrationTest extends TestCase
@@ -167,7 +169,7 @@ class RampageIntegrationTest extends TestCase
                     StreamFactoryInterface::class => $this->streamFactory,
                     AuthHordeSession::class => $authMiddleware,
                     RedirectToLogin::class => $redirectMiddleware,
-                    default => throw new \Exception("Injector: Unknown key: $key")
+                    default => throw new Exception("Injector: Unknown key: $key")
                 };
             });
 
@@ -285,7 +287,7 @@ class RampageIntegrationTest extends TestCase
                 return match ($key) {
                     ResponseFactoryInterface::class => $this->responseFactory,
                     StreamFactoryInterface::class => $this->streamFactory,
-                    default => throw new \Exception("Injector: Unknown key: $key")
+                    default => throw new Exception("Injector: Unknown key: $key")
                 };
             });
 
@@ -337,8 +339,7 @@ class RampageIntegrationTest extends TestCase
             public function __construct(
                 private string $name,
                 private array &$tracker
-            ) {
-            }
+            ) {}
 
             public function process(
                 ServerRequestInterface $request,

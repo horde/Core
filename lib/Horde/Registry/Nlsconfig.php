@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -44,8 +44,8 @@ class Horde_Registry_Nlsconfig
             'curr_rtl',
         ];
 
-        if (in_array($name, $cached) &&
-            $session->exists('horde', 'nls/' . $name)) {
+        if (in_array($name, $cached)
+            && $session->exists('horde', 'nls/' . $name)) {
             return $session->get('horde', 'nls/' . $name);
         }
 

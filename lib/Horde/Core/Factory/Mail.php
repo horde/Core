@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2013-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -71,8 +71,8 @@ class Horde_Core_Factory_Mail extends Horde_Core_Factory_Base
         $class = $this->_getDriverName($transport, 'Horde_Mail_Transport');
         $ob = new $class($params);
 
-        if (!empty($params['sendmail_eol']) &&
-            (strcasecmp($transport, 'sendmail') == 0)) {
+        if (!empty($params['sendmail_eol'])
+            && (strcasecmp($transport, 'sendmail') == 0)) {
             $ob->sep = $params['sendmail_eol'];
         }
 
@@ -101,8 +101,8 @@ class Horde_Core_Factory_Mail extends Horde_Core_Factory_Base
          * running from CLI with 'user_admin' registry flag, which sets
          * the authentication name but not the credentials. */
         if (strcasecmp($transport, 'smtp') === 0) {
-            if ($registry->isAuthenticated() &&
-                strlen($auth = $registry->getAuth())) {
+            if ($registry->isAuthenticated()
+                && strlen($auth = $registry->getAuth())) {
                 if (!empty($params['username_auth'])) {
                     $params['username'] = $auth;
                 }

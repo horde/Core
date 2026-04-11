@@ -35,8 +35,7 @@ class BackendState
      */
     public function __construct(
         private array $backends
-    ) {
-    }
+    ) {}
 
     /**
      * Get specific backend definition
@@ -63,7 +62,7 @@ class BackendState
 
         return array_filter(
             $this->backends,
-            fn ($backend) => empty($backend['disabled'])
+            fn($backend) => empty($backend['disabled'])
         );
     }
 

@@ -21,7 +21,7 @@ use Horde_Exception;
 /**
  * Test the Kolab_Server factory.
  *
- * Copyright 2009-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2009-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -30,6 +30,7 @@ use Horde_Exception;
  * @package  Core
  * @author   Gunnar Wrobel <wrobel@pardus.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
+ * @coversNothing
  */
 class KolabServerTest extends TestCase
 {

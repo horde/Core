@@ -23,6 +23,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use RuntimeException;
+use Throwable;
 
 /**
  * Test that all ENUM fields use associative arrays with labels.
@@ -43,6 +45,7 @@ use RecursiveIteratorIterator;
  * @copyright 2026 The Horde Project
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
+ * @coversNothing
  */
 class EnumOptionsFormatTest extends TestCase
 {
@@ -162,21 +165,21 @@ class EnumOptionsFormatTest extends TestCase
                 try {
                     $driver = new $class();
                     $drivers[$class] = [$driver];
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     // Skip drivers that can't be instantiated
                     // (they'll be caught by AllDriversInstantiationTest)
                 }
             }
 
             if (empty($drivers)) {
-                throw new \RuntimeException('No drivers discovered - check path');
+                throw new RuntimeException('No drivers discovered - check path');
             }
 
             return $drivers;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // If data provider fails, PHPUnit silently returns empty array
             // Force a visible error by throwing
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Data provider failed: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 0,
                 $e
@@ -215,8 +218,8 @@ class EnumOptionsFormatTest extends TestCase
 
             $content = file_get_contents($file->getPathname());
 
-            if (preg_match('/namespace ([^;]+);/', $content, $nsMatch) &&
-                preg_match('/class (\w+)\s+implements\s+DriverInterface/', $content, $clsMatch)
+            if (preg_match('/namespace ([^;]+);/', $content, $nsMatch)
+                && preg_match('/class (\w+)\s+implements\s+DriverInterface/', $content, $clsMatch)
             ) {
                 $classes[] = $nsMatch[1] . '\\' . $clsMatch[1];
             }

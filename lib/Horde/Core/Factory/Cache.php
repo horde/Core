@@ -14,7 +14,7 @@
 /**
  * A Horde_Injector:: based Horde_Cache:: factory.
  *
- * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -84,8 +84,8 @@ class Horde_Core_Factory_Cache extends Horde_Core_Factory_Injector
 
         $storage = $this->storage = $this->_getStorage($driver, $sparams);
 
-        if (!empty($conf['cache']['use_memorycache']) &&
-            in_array($driver, ['file', 'sql'])) {
+        if (!empty($conf['cache']['use_memorycache'])
+            && in_array($driver, ['file', 'sql'])) {
             switch (Horde_String::lower($conf['cache']['use_memorycache'])) {
                 case 'hashtable':
                 case 'memcache':

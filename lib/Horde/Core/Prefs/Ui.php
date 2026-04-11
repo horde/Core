@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2001-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2001-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -115,8 +115,8 @@ class Horde_Core_Prefs_Ui
 
         /* Suppress prefs groups, as needed. */
         foreach ($this->_getPrefGroups() as $key => $val) {
-            if (!empty($val['suppress']) &&
-                (!is_callable($val['suppress']) || $val['suppress']())) {
+            if (!empty($val['suppress'])
+                && (!is_callable($val['suppress']) || $val['suppress']())) {
                 $this->suppressGroups[] = $key;
             }
         }
@@ -131,7 +131,7 @@ class Horde_Core_Prefs_Ui
      */
     public function groupIsEditable($group)
     {
-        return (bool)count($this->getChangeablePrefs($group));
+        return (bool) count($this->getChangeablePrefs($group));
     }
 
     /**
@@ -153,8 +153,8 @@ class Horde_Core_Prefs_Ui
             $group = $this->group;
         }
 
-        if (empty($this->prefGroups[$group]['members']) ||
-            in_array($group, $this->suppressGroups)) {
+        if (empty($this->prefGroups[$group]['members'])
+            || in_array($group, $this->suppressGroups)) {
             return [];
         }
 
@@ -171,13 +171,13 @@ class Horde_Core_Prefs_Ui
              *   4. Not an implicit pref
              *   5. All required prefs are non-zero
              *   6. All required_nolock prefs are not locked */
-            if (!$prefs->isLocked($pref) &&
-                !in_array($pref, $this->suppress) &&
-                (empty($p['advanced']) ||
-                 $session->get('horde', 'prefs_advanced')) &&
-                ((!empty($p['type']) && ($p['type'] != 'implicit')))) {
-                if (!empty($p['suppress']) &&
-                    (!is_callable($p['suppress']) || $p['suppress']())) {
+            if (!$prefs->isLocked($pref)
+                && !in_array($pref, $this->suppress)
+                && (empty($p['advanced'])
+                 || $session->get('horde', 'prefs_advanced'))
+                && ((!empty($p['type']) && ($p['type'] != 'implicit')))) {
+                if (!empty($p['suppress'])
+                    && (!is_callable($p['suppress']) || $p['suppress']())) {
                     continue;
                 }
 
@@ -246,12 +246,12 @@ class Horde_Core_Prefs_Ui
     public function handleForm()
     {
         /* Toggle Advanced/Basic mode. */
-        if (!empty($this->vars->show_advanced) ||
-            !empty($this->vars->show_basic)) {
+        if (!empty($this->vars->show_advanced)
+            || !empty($this->vars->show_basic)) {
             $GLOBALS['session']->set('horde', 'prefs_advanced', !empty($this->vars->show_advanced));
-        } elseif (!$this->vars->actionID ||
-                  !$this->group ||
-                  !$this->groupIsEditable($this->group)) {
+        } elseif (!$this->vars->actionID
+                  || !$this->group
+                  || !$this->groupIsEditable($this->group)) {
             return;
         } elseif (isset($this->vars->prefs_return)) {
             $this->group = $this->vars->actionID = '';
@@ -267,8 +267,8 @@ class Horde_Core_Prefs_Ui
 
         switch ($this->vars->actionID) {
             case 'update_prefs':
-                if (isset($this->prefGroups[$this->group]['type']) &&
-                    ($this->prefGroups[$this->group]['type'] == 'identities')) {
+                if (isset($this->prefGroups[$this->group]['type'])
+                    && ($this->prefGroups[$this->group]['type'] == 'identities')) {
                     $this->_identitiesUpdate();
                 } else {
                     $this->_handleForm($this->getChangeablePrefs($this->group), $GLOBALS['prefs']);
@@ -307,8 +307,8 @@ class Horde_Core_Prefs_Ui
         foreach ($preflist as $pref) {
             $pref_updated = false;
 
-            if (isset($this->prefs[$pref]['on_init']) &&
-                is_callable($this->prefs[$pref]['on_init'])) {
+            if (isset($this->prefs[$pref]['on_init'])
+                && is_callable($this->prefs[$pref]['on_init'])) {
                 $this->prefs[$pref]['on_init']($this);
             }
 
@@ -346,7 +346,7 @@ class Horde_Core_Prefs_Ui
 
                 case 'number':
                     $num = $this->vars->$pref;
-                    if ((string)(float)$num !== $num) {
+                    if ((string) (float) $num !== $num) {
                         $this->_errors[$pref] = Horde_Core_Translation::t('This value must be a number.');
                     } elseif (empty($num) && empty($this->prefs[$pref]['zero'])) {
                         $this->_errors[$pref] = Horde_Core_Translation::t('This value must be non-zero.');
@@ -365,8 +365,8 @@ class Horde_Core_Prefs_Ui
                 case 'special':
                     /* Code for special elements written specifically for each
                      * application. */
-                    if (isset($this->prefs[$pref]['handler']) &&
-                        ($ob = $injector->getInstance($this->prefs[$pref]['handler']))) {
+                    if (isset($this->prefs[$pref]['handler'])
+                        && ($ob = $injector->getInstance($this->prefs[$pref]['handler']))) {
                         $ob->init($this);
                         $pref_updated = $ob->update($this);
                     }
@@ -376,8 +376,8 @@ class Horde_Core_Prefs_Ui
             if ($pref_updated) {
                 $updated = true;
 
-                if (isset($this->prefs[$pref]['on_change']) &&
-                    is_callable($this->prefs[$pref]['on_change'])) {
+                if (isset($this->prefs[$pref]['on_change'])
+                    && is_callable($this->prefs[$pref]['on_change'])) {
                     $this->prefs[$pref]['on_change']();
                 }
             }
@@ -454,8 +454,8 @@ class Horde_Core_Prefs_Ui
             }
 
             /* Add necessary init stuff for identities pages. */
-            if (isset($prefgroups[$this->group]['type']) &&
-                ($prefgroups[$this->group]['type'] == 'identities')) {
+            if (isset($prefgroups[$this->group]['type'])
+                && ($prefgroups[$this->group]['type'] == 'identities')) {
                 $page_output->addScriptFile('identityselect.js', 'horde');
                 $identities = true;
 
@@ -492,14 +492,14 @@ class Horde_Core_Prefs_Ui
             }
 
             foreach ($pref_list as $pref) {
-                if (isset($this->prefs[$pref]['on_init']) &&
-                    is_callable($this->prefs[$pref]['on_init'])) {
+                if (isset($this->prefs[$pref]['on_init'])
+                    && is_callable($this->prefs[$pref]['on_init'])) {
                     $this->prefs[$pref]['on_init']($this);
                 }
 
-                if (($this->prefs[$pref]['type'] == 'special') &&
-                    isset($this->prefs[$pref]['handler']) &&
-                    ($ob = $GLOBALS['injector']->getInstance($this->prefs[$pref]['handler']))) {
+                if (($this->prefs[$pref]['type'] == 'special')
+                    && isset($this->prefs[$pref]['handler'])
+                    && ($ob = $GLOBALS['injector']->getInstance($this->prefs[$pref]['handler']))) {
                     $ob->init($this);
                     echo $ob->display($this);
                     continue;
@@ -823,8 +823,8 @@ class Horde_Core_Prefs_Ui
             try {
                 $res = $this->_loadPrefs('horde', true);
                 foreach ($res['prefGroups'] as $pgroup) {
-                    if (isset($pgroup['type']) &&
-                        ($pgroup['type'] == 'identities')) {
+                    if (isset($pgroup['type'])
+                        && ($pgroup['type'] == 'identities')) {
                         foreach ($pgroup['members'] as $key => $member) {
                             if (!$GLOBALS['prefs']->isLocked($member)) {
                                 $this->prefs[$member] = $res['_prefs'][$member];
@@ -996,12 +996,12 @@ class Horde_Core_Prefs_Ui
         }
 
         $new_from = $identity->getValue('from_addr');
-        if (!empty($conf['user']['verify_from_addr']) &&
-            empty($new_from)) {
+        if (!empty($conf['user']['verify_from_addr'])
+            && empty($new_from)) {
             $notification->push(Horde_Core_Translation::t('The e-mail field cannot be empty.'), 'horde.error');
-        } elseif (!empty($conf['user']['verify_from_addr']) &&
-            ($current_from != $new_from) &&
-            !in_array($new_from, $from_addresses)) {
+        } elseif (!empty($conf['user']['verify_from_addr'])
+            && ($current_from != $new_from)
+            && !in_array($new_from, $from_addresses)) {
             try {
                 $identity->verifyIdentity($id, empty($current_from) ? $new_from : $current_from);
             } catch (Horde_Exception $e) {

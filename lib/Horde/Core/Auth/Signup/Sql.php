@@ -3,7 +3,7 @@
 /**
  * The SQL implementation of Horde_Core_Auth_Signup.
  *
- * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2008-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you did
  * not receive this file, see http://opensource.org/licenses/lgpl-2.1.php
@@ -73,11 +73,11 @@ class Horde_Core_Auth_Signup_Sql extends Horde_Core_Auth_Signup_Base
             return false;
         }
 
-        $query = 'SELECT 1 FROM ' . $this->_params['table'] .
-                 ' WHERE user_name = ?';
+        $query = 'SELECT 1 FROM ' . $this->_params['table']
+                 . ' WHERE user_name = ?';
         $values = [$user];
 
-        return (bool)$GLOBALS['injector']->getInstance('Horde_Core_Factory_Db')->create('horde', 'signup')->selectValue($query, $values);
+        return (bool) $GLOBALS['injector']->getInstance('Horde_Core_Factory_Db')->create('horde', 'signup')->selectValue($query, $values);
     }
 
     /**
@@ -92,8 +92,8 @@ class Horde_Core_Auth_Signup_Sql extends Horde_Core_Auth_Signup_Base
      */
     public function getQueuedSignup($username)
     {
-        $query = 'SELECT * FROM ' . $this->_params['table'] .
-                 ' WHERE user_name = ?';
+        $query = 'SELECT * FROM ' . $this->_params['table']
+                 . ' WHERE user_name = ?';
         $values = [$username];
 
         $result = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Db')->create('horde', 'signup')->selectOne($query, $values);
@@ -115,8 +115,8 @@ class Horde_Core_Auth_Signup_Sql extends Horde_Core_Auth_Signup_Base
      */
     public function getQueuedSignups()
     {
-        $query = 'SELECT * FROM ' . $this->_params['table'] .
-                 ' ORDER BY signup_date';
+        $query = 'SELECT * FROM ' . $this->_params['table']
+                 . ' ORDER BY signup_date';
 
         $result = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Db')->create('horde', 'signup')->select($query);
 
@@ -139,8 +139,8 @@ class Horde_Core_Auth_Signup_Sql extends Horde_Core_Auth_Signup_Base
      */
     public function removeQueuedSignup($username)
     {
-        $query = 'DELETE FROM ' . $this->_params['table'] .
-                 ' WHERE user_name = ?';
+        $query = 'DELETE FROM ' . $this->_params['table']
+                 . ' WHERE user_name = ?';
         $values = [$username];
 
         $GLOBALS['injector']->getInstance('Horde_Core_Factory_Db')->create('horde', 'signup')->delete($query, $values);

@@ -12,6 +12,4 @@ use Horde\Core\Directory;
  * Themes put their global stylesheets and assets in $this . /horde/$theme/ and their per-application
  * stylesheets and assets in $this . /$application/$theme/.
  */
-class ApplicationWebThemesDirectory extends Directory
-{
-}
+class ApplicationWebThemesDirectory extends Directory {}

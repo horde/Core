@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2003-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -21,7 +21,7 @@ class Horde_Core_Ui_VarRenderer_TablesetHtml extends Horde_Core_Ui_VarRenderer_H
         $var_name = $var->getVarName() . '[]';
         $checkedValues = $var->getValue($vars);
         $actions = $this->_getActionScripts($form, $var);
-        $function_name = 'select'  . $form_name . $var->getVarName();
+        $function_name = 'select' . $form_name . $var->getVarName();
         $enable = Horde_Core_Translation::t('Select all');
         $disable = Horde_Core_Translation::t('Select none');
         $invert = Horde_Core_Translation::t('Invert selection');
@@ -68,8 +68,8 @@ function %s()
         $i = 0;
         foreach ($values as $value => $displays) {
             $checked = (in_array($value, $checkedValues)) ? ' checked="checked"' : '';
-            $html .= '<tr>' .
-                sprintf(
+            $html .= '<tr>'
+                . sprintf(
                     '<td style="text-align: center"><input id="%s[]" type="checkbox" name="%s[]" value="%s"%s%s /></td>',
                     $name,
                     $name,
@@ -100,8 +100,8 @@ function %s()
         $checkedValues = $var->getValue($vars);
 
         $GLOBALS['injector']->getInstance('Horde_PageOutput')->addScriptFile('tables.js', 'horde');
-        $html = '<table style="width: 100%" class="sortable striped" id="tableset_' . $name . '"><thead><tr>' .
-            '<th>&nbsp;</th>';
+        $html = '<table style="width: 100%" class="sortable striped" id="tableset_' . $name . '"><thead><tr>'
+            . '<th>&nbsp;</th>';
         foreach ($header as $col_title) {
             $html .= sprintf('<th class="leftAlign">%s</th>', $col_title);
         }
@@ -115,8 +115,8 @@ function %s()
             $checked = '[ <span style="font-weight: bold; color: '
                 . (in_array($value, $checkedValues)) ? ' green">V' : 'red">X'
                 . '</span> ]';
-            $html .= '<tr>'.
-                sprintf('<td style="text-align: center">%s</td>', $checked);
+            $html .= '<tr>'
+                . sprintf('<td style="text-align: center">%s</td>', $checked);
             foreach ($displays as $col) {
                 $html .= '<td>&nbsp;' . $col . '</td>';
             }

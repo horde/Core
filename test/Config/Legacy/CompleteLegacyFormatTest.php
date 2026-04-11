@@ -23,6 +23,7 @@ use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Throwable;
 
 /**
  * Test legacy format conversion for all drivers.
@@ -38,6 +39,7 @@ use RecursiveIteratorIterator;
  * @copyright 2026 The Horde Project
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
+ * @coversNothing
  */
 class CompleteLegacyFormatTest extends TestCase
 {
@@ -52,7 +54,7 @@ class CompleteLegacyFormatTest extends TestCase
         foreach ($this->discoverAllDriverClasses() as $class) {
             try {
                 $this->repository->register(new $class());
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // Skip drivers that can't be instantiated
             }
         }
@@ -70,7 +72,7 @@ class CompleteLegacyFormatTest extends TestCase
 
         try {
             $legacy = $this->provider->toLegacyFormat($type, $name);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->fail("Failed to convert {$type}:{$name} to legacy format: " . $e->getMessage());
         }
 
@@ -209,7 +211,7 @@ class CompleteLegacyFormatTest extends TestCase
         foreach (self::discoverAllDriverClasses() as $class) {
             try {
                 $repository->register(new $class());
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // Skip
             }
         }
@@ -260,8 +262,8 @@ class CompleteLegacyFormatTest extends TestCase
 
             $content = file_get_contents($file->getPathname());
 
-            if (preg_match('/namespace ([^;]+);/', $content, $nsMatch) &&
-                preg_match('/class (\w+)\s+implements\s+DriverInterface/', $content, $clsMatch)
+            if (preg_match('/namespace ([^;]+);/', $content, $nsMatch)
+                && preg_match('/class (\w+)\s+implements\s+DriverInterface/', $content, $clsMatch)
             ) {
                 $classes[] = $nsMatch[1] . '\\' . $clsMatch[1];
             }

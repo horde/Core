@@ -8,6 +8,7 @@ use Horde\Core\Prefs\StrftimeFinding;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Error;
 
 #[CoversClass(StrftimeFinding::class)]
 class StrftimeFindingTest extends TestCase
@@ -197,7 +198,7 @@ class StrftimeFindingTest extends TestCase
         );
 
         // PHP 8.1+ readonly properties throw Error when attempting to modify
-        $this->expectException(\Error::class);
+        $this->expectException(Error::class);
         $finding->pref = 'modified';
     }
 

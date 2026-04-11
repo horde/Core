@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016-2022 Horde LLC (http://www.horde.org/)
+ * Copyright 2016-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -15,7 +15,12 @@ namespace Horde\Core\Test\Middleware;
 
 use Horde\Core\Middleware\AuthHttpBasic;
 use Horde\Test\TestCase;
+use Horde_Auth_Base;
+use Horde_Registry;
 
+/**
+ * @coversNothing
+ */
 class AuthHttpBasicTest extends TestCase
 {
     use SetUpTrait {
@@ -26,8 +31,8 @@ class AuthHttpBasicTest extends TestCase
     {
         $this->traitSetUp();
         // Replace stubs with mocks for expectations
-        $this->authDriver = $this->createMock(\Horde_Auth_Base::class);
-        $this->registry = $this->createMock(\Horde_Registry::class);
+        $this->authDriver = $this->createMock(Horde_Auth_Base::class);
+        $this->registry = $this->createMock(Horde_Registry::class);
     }
 
     protected function getMiddleware()

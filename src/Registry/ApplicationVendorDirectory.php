@@ -19,7 +19,7 @@ class ApplicationVendorDirectory extends Directory
      */
     public function getOurVendorDirectory(): Directory
     {
-        return new Directory(dirname((string)$this, 1));
+        return new Directory(dirname((string) $this, 1));
     }
 
     /**
@@ -27,6 +27,6 @@ class ApplicationVendorDirectory extends Directory
      */
     public function getTopVendorDirectory(): Directory
     {
-        return new Directory(dirname((string)$this, 2));
+        return new Directory(dirname((string) $this, 2));
     }
 }

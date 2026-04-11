@@ -26,6 +26,7 @@ use Horde_Registry;
 use Horde_ActiveSync_State_Sql;
 use Horde_Cache;
 use Horde_Exception_NotFound;
+use Horde_Core_ActiveSync_Driver;
 
 /**
  * Unit tests for Horde_Core_Factory_ActiveSyncBackend
@@ -52,7 +53,7 @@ class ActiveSyncBackendFactoryTest extends TestCase
                 'emailsync' => false,
                 'ping' => [],
                 'auth' => ['type' => 'basic'],
-            ]
+            ],
         ];
 
         // Mock registry
@@ -81,7 +82,7 @@ class ActiveSyncBackendFactoryTest extends TestCase
         $factory = new Horde_Core_Factory_ActiveSyncBackend($mockInjector);
         $driver = $factory->create($mockInjector);
 
-        $this->assertInstanceOf(\Horde_Core_ActiveSync_Driver::class, $driver);
+        $this->assertInstanceOf(Horde_Core_ActiveSync_Driver::class, $driver);
 
         // Verify driver can access dependencies (getUser should work)
         // Without authentication or GET params, should fall back to registry
@@ -105,7 +106,7 @@ class ActiveSyncBackendFactoryTest extends TestCase
                 'emailsync' => false,
                 'ping' => [],
                 'auth' => ['type' => 'basic'],
-            ]
+            ],
         ];
 
         // Mock registry
@@ -133,7 +134,7 @@ class ActiveSyncBackendFactoryTest extends TestCase
         $factory = new Horde_Core_Factory_ActiveSyncBackend($mockInjector);
         $driver = $factory->create($mockInjector);
 
-        $this->assertInstanceOf(\Horde_Core_ActiveSync_Driver::class, $driver);
+        $this->assertInstanceOf(Horde_Core_ActiveSync_Driver::class, $driver);
     }
 
     /**
@@ -148,7 +149,7 @@ class ActiveSyncBackendFactoryTest extends TestCase
                 'emailsync' => false,
                 'ping' => [],
                 'auth' => ['type' => 'basic'],
-            ]
+            ],
         ];
 
         $registry = $this->getMockSkipConstructor(Horde_Registry::class);

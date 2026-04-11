@@ -11,6 +11,7 @@ use Horde;
  * @category   Horde
  * @package    Core
  * @subpackage UnitTests
+ * @coversNothing
  */
 class UrlTest extends TestCase
 {
@@ -281,12 +282,12 @@ class UrlTest extends TestCase
                     $GLOBALS['conf']['use_ssl'] = $ssl;
                     foreach ($ports as $port) {
                         $GLOBALS['conf']['server']['port'] = $port;
-                        $this->assertEquals($expected[$expect++], (string)Horde::url($uri, $full, ['append_session' => -1]), sprintf('URI: %s, full: %s, SSL: %s, port: %d, session: -1', $uri, var_export($full, true), $ssl, $port));
+                        $this->assertEquals($expected[$expect++], (string) Horde::url($uri, $full, ['append_session' => -1]), sprintf('URI: %s, full: %s, SSL: %s, port: %d, session: -1', $uri, var_export($full, true), $ssl, $port));
                         unset($_COOKIE[session_name()]);
-                        $this->assertEquals($expected[$expect++], (string)Horde::url($uri, $full, ['append_session' => 0]), sprintf('URI: %s, full: %s, SSL: %s, port: %d, session: 0, cookie: false', $uri, var_export($full, true), $ssl, $port));
+                        $this->assertEquals($expected[$expect++], (string) Horde::url($uri, $full, ['append_session' => 0]), sprintf('URI: %s, full: %s, SSL: %s, port: %d, session: 0, cookie: false', $uri, var_export($full, true), $ssl, $port));
                         $_COOKIE[session_name()] = [];
-                        $this->assertEquals($expected[$expect++], (string)Horde::url($uri, $full, ['append_session' => 0]), sprintf('URI: %s, full: %s, SSL: %s, port: %d, session: 0, cookie: true', $uri, var_export($full, true), $ssl, $port));
-                        $this->assertEquals($expected[$expect++], (string)Horde::url($uri, $full, ['append_session' => 1]), sprintf('URI: %s, full: %s, SSL: %s, port: %d, session: 1, cookie: true', $uri, var_export($full, true), $ssl, $port));
+                        $this->assertEquals($expected[$expect++], (string) Horde::url($uri, $full, ['append_session' => 0]), sprintf('URI: %s, full: %s, SSL: %s, port: %d, session: 0, cookie: true', $uri, var_export($full, true), $ssl, $port));
+                        $this->assertEquals($expected[$expect++], (string) Horde::url($uri, $full, ['append_session' => 1]), sprintf('URI: %s, full: %s, SSL: %s, port: %d, session: 1, cookie: true', $uri, var_export($full, true), $ssl, $port));
                     }
                 }
             }
@@ -301,15 +302,15 @@ class UrlTest extends TestCase
 
         $this->assertEquals(
             'http://www.example.com/hordeurl/foo',
-            (string)Horde::url('foo', true, ['append_session' => -1])
+            (string) Horde::url('foo', true, ['append_session' => -1])
         );
         $this->assertEquals(
             'http://www.example.com/hordeurl/foo',
-            (string)Horde::url('/hordeurl/foo', true, ['append_session' => -1])
+            (string) Horde::url('/hordeurl/foo', true, ['append_session' => -1])
         );
         $this->assertEquals(
             'http://www.example.com/hordeurl/foo/bar',
-            (string)Horde::url('http://www.example.com/hordeurl/foo/bar', true, ['append_session' => -1])
+            (string) Horde::url('http://www.example.com/hordeurl/foo/bar', true, ['append_session' => -1])
         );
     }
 
@@ -339,64 +340,64 @@ class UrlTest extends TestCase
         // Simple script access.
         $_SERVER['SCRIPT_NAME'] = '/hordeurl/test.php';
         $_SERVER['QUERY_STRING'] = '';
-        $this->assertEquals('/hordeurl/test.php', (string)Horde::selfUrl());
-        $this->assertEquals('/hordeurl/test.php', (string)Horde::selfUrl(true));
-        $this->assertEquals('http://example.com/hordeurl/test.php', (string)Horde::selfUrl(true, false, true));
-        $this->assertEquals('https://example.com/hordeurl/test.php', (string)Horde::selfUrl(true, false, true, true));
+        $this->assertEquals('/hordeurl/test.php', (string) Horde::selfUrl());
+        $this->assertEquals('/hordeurl/test.php', (string) Horde::selfUrl(true));
+        $this->assertEquals('http://example.com/hordeurl/test.php', (string) Horde::selfUrl(true, false, true));
+        $this->assertEquals('https://example.com/hordeurl/test.php', (string) Horde::selfUrl(true, false, true, true));
 
         // No SCRIPT_NAME.
         unset($_SERVER['SCRIPT_NAME']);
         $_SERVER['PHP_SELF'] = '/hordeurl/test.php';
         $_SERVER['QUERY_STRING'] = '';
-        $this->assertEquals('/hordeurl/test.php', (string)Horde::selfUrl());
+        $this->assertEquals('/hordeurl/test.php', (string) Horde::selfUrl());
 
         // With parameters.
         $_SERVER['SCRIPT_NAME'] = '/hordeurl/test.php';
         $_SERVER['QUERY_STRING'] = 'foo=bar&x=y';
-        $this->assertEquals('/hordeurl/test.php', (string)Horde::selfUrl());
-        $this->assertEquals('/hordeurl/test.php?foo=bar&amp;x=y', (string)Horde::selfUrl(true));
-        $this->assertEquals('http://example.com/hordeurl/test.php?foo=bar&x=y', (string)Horde::selfUrl(true, false, true));
-        $this->assertEquals('https://example.com/hordeurl/test.php?foo=bar&x=y', (string)Horde::selfUrl(true, false, true, true));
+        $this->assertEquals('/hordeurl/test.php', (string) Horde::selfUrl());
+        $this->assertEquals('/hordeurl/test.php?foo=bar&amp;x=y', (string) Horde::selfUrl(true));
+        $this->assertEquals('http://example.com/hordeurl/test.php?foo=bar&x=y', (string) Horde::selfUrl(true, false, true));
+        $this->assertEquals('https://example.com/hordeurl/test.php?foo=bar&x=y', (string) Horde::selfUrl(true, false, true, true));
 
         // index.php script name.
         $_SERVER['SCRIPT_NAME'] = '/hordeurl/index.php';
         $_SERVER['QUERY_STRING'] = 'foo=bar&x=y';
-        $this->assertEquals('/hordeurl/', (string)Horde::selfUrl());
-        $this->assertEquals('/hordeurl/?foo=bar&amp;x=y', (string)Horde::selfUrl(true));
-        $this->assertEquals('http://example.com/hordeurl/?foo=bar&x=y', (string)Horde::selfUrl(true, false, true));
+        $this->assertEquals('/hordeurl/', (string) Horde::selfUrl());
+        $this->assertEquals('/hordeurl/?foo=bar&amp;x=y', (string) Horde::selfUrl(true));
+        $this->assertEquals('http://example.com/hordeurl/?foo=bar&x=y', (string) Horde::selfUrl(true, false, true));
 
         // Directory access.
         $_SERVER['SCRIPT_NAME'] = '/hordeurl/';
         $_SERVER['QUERY_STRING'] = 'foo=bar&x=y';
-        $this->assertEquals('/hordeurl/', (string)Horde::selfUrl());
-        $this->assertEquals('/hordeurl/?foo=bar&amp;x=y', (string)Horde::selfUrl(true));
-        $this->assertEquals('http://example.com/hordeurl/?foo=bar&x=y', (string)Horde::selfUrl(true, false, true));
+        $this->assertEquals('/hordeurl/', (string) Horde::selfUrl());
+        $this->assertEquals('/hordeurl/?foo=bar&amp;x=y', (string) Horde::selfUrl(true));
+        $this->assertEquals('http://example.com/hordeurl/?foo=bar&x=y', (string) Horde::selfUrl(true, false, true));
 
         // Path info.
         $_SERVER['REQUEST_URI'] = '/hordeurl/test.php/foo/bar?foo=bar&x=y';
         $_SERVER['SCRIPT_NAME'] = '/hordeurl/test.php';
         $_SERVER['QUERY_STRING'] = 'foo=bar&x=y';
-        $this->assertEquals('/hordeurl/test.php', (string)Horde::selfUrl());
-        $this->assertEquals('/hordeurl/test.php/foo/bar?foo=bar&amp;x=y', (string)Horde::selfUrl(true));
-        $this->assertEquals('http://example.com/hordeurl/test.php/foo/bar?foo=bar&x=y', (string)Horde::selfUrl(true, false, true));
+        $this->assertEquals('/hordeurl/test.php', (string) Horde::selfUrl());
+        $this->assertEquals('/hordeurl/test.php/foo/bar?foo=bar&amp;x=y', (string) Horde::selfUrl(true));
+        $this->assertEquals('http://example.com/hordeurl/test.php/foo/bar?foo=bar&x=y', (string) Horde::selfUrl(true, false, true));
 
         // URL rewriting.
         $_SERVER['REQUEST_URI'] = '/hordeurl/test/foo/bar?foo=bar&x=y';
         $_SERVER['SCRIPT_NAME'] = '/hordeurl/test/index.php';
         $_SERVER['QUERY_STRING'] = 'foo=bar&x=y';
-        $this->assertEquals('/hordeurl/test/', (string)Horde::selfUrl());
-        $this->assertEquals('/hordeurl/test/foo/bar?foo=bar&amp;x=y', (string)Horde::selfUrl(true));
-        $this->assertEquals('http://example.com/hordeurl/test/foo/bar?foo=bar&x=y', (string)Horde::selfUrl(true, false, true));
+        $this->assertEquals('/hordeurl/test/', (string) Horde::selfUrl());
+        $this->assertEquals('/hordeurl/test/foo/bar?foo=bar&amp;x=y', (string) Horde::selfUrl(true));
+        $this->assertEquals('http://example.com/hordeurl/test/foo/bar?foo=bar&x=y', (string) Horde::selfUrl(true, false, true));
         $_SERVER['REQUEST_URI'] = '/hordeurl/foo/bar?foo=bar&x=y';
         $_SERVER['SCRIPT_NAME'] = '/hordeurl/test.php';
-        $this->assertEquals('/hordeurl/', (string)Horde::selfUrl());
-        $this->assertEquals('/hordeurl/foo/bar?foo=bar&amp;x=y', (string)Horde::selfUrl(true));
+        $this->assertEquals('/hordeurl/', (string) Horde::selfUrl());
+        $this->assertEquals('/hordeurl/foo/bar?foo=bar&amp;x=y', (string) Horde::selfUrl(true));
 
         // Special cases.
         $_SERVER['REQUEST_URI'] = '/test/42?id=42';
         $_SERVER['SCRIPT_NAME'] = '/test/index.php';
         $_SERVER['QUERY_STRING'] = 'id=42&id=42';
-        $this->assertEquals('/test/42?id=42', (string)Horde::selfUrl(true));
+        $this->assertEquals('/test/42?id=42', (string) Horde::selfUrl(true));
 
         // Non-standard port
         $_SERVER['REQUEST_URI'] = '/hordeurl/test/foo/bar?foo=bar&x=y';

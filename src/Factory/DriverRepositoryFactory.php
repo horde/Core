@@ -67,8 +67,7 @@ class DriverRepositoryFactory
 {
     public function __construct(
         private readonly Horde_Injector $injector,
-    ) {
-    }
+    ) {}
 
     /**
      * Create and populate DriverRepository.

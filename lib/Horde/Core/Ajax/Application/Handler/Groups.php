@@ -3,7 +3,7 @@
 /**
  * Defines AJAX calls used to interact with Horde Groups.
  *
- * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2012-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -29,8 +29,8 @@ class Horde_Core_Ajax_Application_Handler_Groups extends Horde_Core_Ajax_Applica
         try {
             $groups = $GLOBALS['injector']
                 ->getInstance('Horde_Group')
-                ->listAll(empty($GLOBALS['conf']['share']['any_group']) &&
-                          !$GLOBALS['registry']->isAdmin()
+                ->listAll(empty($GLOBALS['conf']['share']['any_group'])
+                          && !$GLOBALS['registry']->isAdmin()
                           ? $GLOBALS['registry']->getAuth()
                           : null);
             if ($groups) {

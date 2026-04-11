@@ -9,6 +9,4 @@ use Horde\Core\Directory;
 /**
  * An application's templates directory. Usually $deployment/web/$application/templates.
  */
-class ApplicationTemplatesDirectory extends Directory
-{
-}
+class ApplicationTemplatesDirectory extends Directory {}

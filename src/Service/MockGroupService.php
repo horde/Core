@@ -263,7 +263,7 @@ class MockGroupService implements GroupService
         $this->groups[$id]['members'] = array_values(
             array_filter(
                 $this->groups[$id]['members'],
-                fn ($member) => $member !== $username
+                fn($member) => $member !== $username
             )
         );
     }

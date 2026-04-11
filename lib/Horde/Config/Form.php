@@ -4,7 +4,7 @@
  * A Horde_Form:: form that implements a user interface for the config
  * system.
  *
- * Copyright 2002-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2002-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -149,7 +149,7 @@ class Horde_Config_Form extends Horde_Form
                                 }
                                 break;
                             case 'int':
-                                $this->_vars->set($varname, (string)$configitem['default']);
+                                $this->_vars->set($varname, (string) $configitem['default']);
                                 break;
                             default:
                                 $this->_vars->set($varname, $configitem['default']);

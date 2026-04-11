@@ -33,8 +33,7 @@ class RegistryApplication
         protected string $templatesFs = 'templates/',
         // Only used for overrides, otherwise let the theme handle it
         protected string $iconUri = '',
-    ) {
-    }
+    ) {}
 
     public function getName(): string
     {

@@ -9,6 +9,8 @@ use Horde\Core\Assets\ResponsiveAssetsFilesystem;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Horde_Registry;
+use Exception;
+use Horde_Prefs;
 
 /**
  * Tests for ResponsiveAssets helper class
@@ -270,7 +272,7 @@ class ResponsiveAssetsTest extends TestCase
     public function testGetThemeWithPreference(): void
     {
         // Stub preferences
-        $prefsStub = $this->createStub(\Horde_Prefs::class);
+        $prefsStub = $this->createStub(Horde_Prefs::class);
         $prefsStub->method('getValue')
             ->willReturnCallback(function ($key) {
                 return $key === 'theme' ? 'dark' : null;
@@ -291,7 +293,7 @@ class ResponsiveAssetsTest extends TestCase
     {
         // Registry throws exception
         $this->registryStub->method('get')
-            ->willThrowException(new \Exception('Registry error'));
+            ->willThrowException(new Exception('Registry error'));
 
         $this->registryStub->method('getApp')
             ->willReturn('horde');
@@ -307,7 +309,7 @@ class ResponsiveAssetsTest extends TestCase
     {
         // Registry throws exception
         $this->registryStub->method('get')
-            ->willThrowException(new \Exception('Registry error'));
+            ->willThrowException(new Exception('Registry error'));
 
         $this->registryStub->method('getApp')
             ->willReturn('horde');

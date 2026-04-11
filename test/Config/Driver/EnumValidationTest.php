@@ -22,6 +22,7 @@ use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Throwable;
 
 /**
  * Test that ENUM fields can validate their values correctly.
@@ -38,6 +39,7 @@ use RecursiveIteratorIterator;
  * @copyright 2026 The Horde Project
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
+ * @coversNothing
  */
 class EnumValidationTest extends TestCase
 {
@@ -185,7 +187,7 @@ class EnumValidationTest extends TestCase
                         ];
                     }
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // Skip drivers that can't be instantiated
             }
         }
@@ -249,8 +251,8 @@ class EnumValidationTest extends TestCase
 
             $content = file_get_contents($file->getPathname());
 
-            if (preg_match('/namespace ([^;]+);/', $content, $nsMatch) &&
-                preg_match('/class (\w+)\s+implements\s+DriverInterface/', $content, $clsMatch)
+            if (preg_match('/namespace ([^;]+);/', $content, $nsMatch)
+                && preg_match('/class (\w+)\s+implements\s+DriverInterface/', $content, $clsMatch)
             ) {
                 $classes[] = $nsMatch[1] . '\\' . $clsMatch[1];
             }

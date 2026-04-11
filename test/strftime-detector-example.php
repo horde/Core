@@ -36,7 +36,7 @@ try {
             echo '  • ' . $finding->format() . "\n";
         }
     }
-} catch (\Exception $e) {
+} catch (Exception $e) {
     echo 'Error loading prefs: ' . $e->getMessage() . "\n";
 }
 
@@ -69,11 +69,11 @@ $findings = $detector->scanArray($prefsArray);
 echo 'Found ' . count($findings) . " strftime pattern(s):\n\n";
 foreach ($findings as $finding) {
     echo sprintf(
-        "  • Pref: %s\n" .
-        "    Field: %s\n" .
-        "    Strftime: %s\n" .
-        "    ICU: %s\n" .
-        "    Confidence: %s\n\n",
+        "  • Pref: %s\n"
+        . "    Field: %s\n"
+        . "    Strftime: %s\n"
+        . "    ICU: %s\n"
+        . "    Confidence: %s\n\n",
         $finding->pref,
         $finding->field,
         $finding->strftime,
@@ -87,7 +87,7 @@ echo "\n=== Example 3: Filter by confidence ===\n\n";
 
 $highConfidence = array_filter(
     $findings,
-    fn ($f) => $f->confidence === StrftimeFinding::CONFIDENCE_HIGH
+    fn($f) => $f->confidence === StrftimeFinding::CONFIDENCE_HIGH
 );
 
 echo 'High confidence findings: ' . count($highConfidence) . "\n";

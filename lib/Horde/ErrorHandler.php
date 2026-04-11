@@ -3,7 +3,7 @@
 /**
  * Provides methods used to handle error reporting.
  *
- * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2012-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -30,8 +30,8 @@ class Horde_ErrorHandler
                 case 'Horde_Exception_AuthenticationFailure':
                     $auth_app = !$registry->clearAuthApp($error->application);
 
-                    if ($auth_app &&
-                        $registry->isAuthenticated(['app' => $error->application, 'notransparent' => true])) {
+                    if ($auth_app
+                        && $registry->isAuthenticated(['app' => $error->application, 'notransparent' => true])) {
                         break;
                     }
 

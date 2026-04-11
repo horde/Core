@@ -34,6 +34,7 @@ use ReflectionClass;
  * @copyright 2026 The Horde Project
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
+ * @coversNothing
  */
 class PropertyMetadataParameterTest extends TestCase
 {
@@ -187,8 +188,8 @@ class PropertyMetadataParameterTest extends TestCase
             $content = file_get_contents($file->getPathname());
 
             // Extract namespace and class name
-            if (preg_match('/namespace ([^;]+);/', $content, $nsMatch) &&
-                preg_match('/class (\w+)\s+implements\s+DriverInterface/', $content, $clsMatch)
+            if (preg_match('/namespace ([^;]+);/', $content, $nsMatch)
+                && preg_match('/class (\w+)\s+implements\s+DriverInterface/', $content, $clsMatch)
             ) {
                 $classes[] = $nsMatch[1] . '\\' . $clsMatch[1];
             }

@@ -26,6 +26,4 @@ use RuntimeException;
  * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
-class IdentityNotFoundException extends RuntimeException
-{
-}
+class IdentityNotFoundException extends RuntimeException {}

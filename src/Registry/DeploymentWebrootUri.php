@@ -22,6 +22,4 @@ use Horde\Http\Uri;
  * Also, an installation may be called by other host or FQDN names or even through IPs.
  *
  */
-class DeploymentWebrootUri extends Uri
-{
-}
+class DeploymentWebrootUri extends Uri {}

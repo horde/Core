@@ -11,6 +11,4 @@ use Horde\Core\Directory;
  *
  * Canonically this is the $deployment/web/themes/ directory.
  */
-class ThemesRootDirectory extends Directory
-{
-}
+class ThemesRootDirectory extends Directory {}

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Horde\Core\Assets;
 
 use Horde_Registry;
+use Exception;
 
 /**
  * Responsive Assets Helper
@@ -175,7 +176,7 @@ class ResponsiveAssets
             $themesFs = $this->registry->get('themesfs', $app);
             $filePath = $themesFs . '/' . $theme . '/' . $filename;
             return $this->filesystem->fileExists($filePath);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -193,7 +194,7 @@ class ResponsiveAssets
             $jsFs = $this->registry->get('jsfs', $app);
             $filePath = $jsFs . '/' . $filename;
             return $this->filesystem->fileExists($filePath);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }

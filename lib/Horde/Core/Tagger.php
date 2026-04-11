@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2009-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2009-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -126,7 +126,7 @@ abstract class Horde_Core_Tagger
             $this->_tagger->tag(
                 $owner,
                 ['object' => $localId,
-                          'type' => $this->_type_ids[$content_type]],
+                    'type' => $this->_type_ids[$content_type]],
                 $tags
             );
         } catch (Content_Exception $e) {
@@ -331,7 +331,7 @@ abstract class Horde_Core_Tagger
         }
 
         if (!isset($type)) {
-            $type = (int)$this->_type_ids[$this->_types[0]];
+            $type = (int) $this->_type_ids[$this->_types[0]];
         }
 
         return $this->_tagger->getTagCloud([
@@ -358,8 +358,8 @@ abstract class Horde_Core_Tagger
         if (empty($tags)) {
             return $this->_tagger->getTags(
                 [
-                'userId' => $user,
-                'typeId' => $this->_type_ids]
+                    'userId' => $user,
+                    'typeId' => $this->_type_ids]
             );
         }
         try {

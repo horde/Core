@@ -6,6 +6,4 @@ namespace Horde\Core\Config;
 
 use Horde\Core\Directory;
 
-class StaticFsDirectory extends Directory
-{
-}
+class StaticFsDirectory extends Directory {}

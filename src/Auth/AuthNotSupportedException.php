@@ -29,6 +29,4 @@ use RuntimeException;
  * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
-class AuthNotSupportedException extends RuntimeException
-{
-}
+class AuthNotSupportedException extends RuntimeException {}

@@ -35,8 +35,7 @@ class RegistryState
      */
     public function __construct(
         private array $applications
-    ) {
-    }
+    ) {}
 
     /**
      * Get specific application definition

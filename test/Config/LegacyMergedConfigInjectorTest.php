@@ -36,6 +36,7 @@ use RuntimeException;
  * @copyright 2026 The Horde Project
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
+ * @coversNothing
  */
 class LegacyMergedConfigInjectorTest extends TestCase
 {

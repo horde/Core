@@ -20,6 +20,8 @@ use Horde\Core\Service\HordeLdapService;
 use Horde_Ldap;
 use Horde_Ldap_Filter;
 use Horde_Ldap_Exception;
+use Exception;
+use RuntimeException;
 
 /**
  * LDAP-based preferences service implementation
@@ -44,8 +46,7 @@ class LdapPrefsService implements PrefsService
     public function __construct(
         private HordeLdapService $ldapService,
         private string $basedn
-    ) {
-    }
+    ) {}
 
     /**
      * Get preference value
@@ -54,7 +55,7 @@ class LdapPrefsService implements PrefsService
      * @param string $scope Preference scope (application name)
      * @param string $key Preference key
      * @return string|null Preference value or null if not found
-     * @throws \RuntimeException If LDAP error occurs
+     * @throws RuntimeException If LDAP error occurs
      */
     public function getValue(string $uid, string $scope, string $key): ?string
     {
@@ -88,7 +89,7 @@ class LdapPrefsService implements PrefsService
             $entry = $search->shiftEntry();
             return $entry->getValue($attrName, 'single');
         } catch (Horde_Ldap_Exception $e) {
-            throw new \RuntimeException("Failed to get LDAP preference '$scope:$key' for user '$uid': " . $e->getMessage(), 0, $e);
+            throw new RuntimeException("Failed to get LDAP preference '$scope:$key' for user '$uid': " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -99,7 +100,7 @@ class LdapPrefsService implements PrefsService
      * @param string $scope Preference scope
      * @param string $key Preference key
      * @param mixed $value Preference value
-     * @throws \RuntimeException If LDAP error occurs
+     * @throws RuntimeException If LDAP error occurs
      */
     public function setValue(string $uid, string $scope, string $key, $value): void
     {
@@ -108,7 +109,7 @@ class LdapPrefsService implements PrefsService
             $userDN = $this->findUserDN($ldap, $uid);
 
             if (!$userDN) {
-                throw new \RuntimeException("User '$uid' not found in LDAP");
+                throw new RuntimeException("User '$uid' not found in LDAP");
             }
 
             // Convert value to string for LDAP storage
@@ -141,7 +142,7 @@ class LdapPrefsService implements PrefsService
                 $entry->update();
             }
         } catch (Horde_Ldap_Exception $e) {
-            throw new \RuntimeException("Failed to set LDAP preference '$scope:$key' for user '$uid': " . $e->getMessage(), 0, $e);
+            throw new RuntimeException("Failed to set LDAP preference '$scope:$key' for user '$uid': " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -151,7 +152,7 @@ class LdapPrefsService implements PrefsService
      * @param string $uid User ID
      * @param string $scope Preference scope
      * @param string $key Preference key
-     * @throws \RuntimeException If LDAP error occurs
+     * @throws RuntimeException If LDAP error occurs
      */
     public function deleteValue(string $uid, string $scope, string $key): void
     {
@@ -184,7 +185,7 @@ class LdapPrefsService implements PrefsService
                 }
             }
         } catch (Horde_Ldap_Exception $e) {
-            throw new \RuntimeException("Failed to delete LDAP preference '$scope:$key' for user '$uid': " . $e->getMessage(), 0, $e);
+            throw new RuntimeException("Failed to delete LDAP preference '$scope:$key' for user '$uid': " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -194,7 +195,7 @@ class LdapPrefsService implements PrefsService
      * @param string $uid User ID
      * @param string $scope Preference scope
      * @return array Associative array of key => value
-     * @throws \RuntimeException If LDAP error occurs
+     * @throws RuntimeException If LDAP error occurs
      */
     public function getAllInScope(string $uid, string $scope): array
     {
@@ -237,7 +238,7 @@ class LdapPrefsService implements PrefsService
 
             return $prefs;
         } catch (Horde_Ldap_Exception $e) {
-            throw new \RuntimeException("Failed to get LDAP preferences in scope '$scope' for user '$uid': " . $e->getMessage(), 0, $e);
+            throw new RuntimeException("Failed to get LDAP preferences in scope '$scope' for user '$uid': " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -254,7 +255,7 @@ class LdapPrefsService implements PrefsService
         try {
             $value = $this->getValue($uid, $scope, $key);
             return $value !== null;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }

@@ -11,9 +11,7 @@ use Horde_Core_ActiveSync_Connector;
  */
 class MockConnector extends Horde_Core_ActiveSync_Connector
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function horde_listApis()
     {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -72,12 +72,12 @@ class Horde_Core_Topbar
              * everyone (but get filtered out later if they have no
              * children). Administrators always see all applications except
              * those marked 'inactive'. */
-            if (($app != 'horde') &&
-                 (in_array($params['status'], ['heading', 'link']) ||
-                  (in_array($params['status'], ['active', 'admin', 'noadmin', 'topbar']) &&
-                  !($isAdmin && ($params['status'] == 'noadmin')) &&
-                  !(!$isAdmin && ($params['status'] == 'admin')) &&
-                  $registry->hasPermission((!empty($params['app']) ? $params['app'] : $app), Horde_Perms::SHOW)))) {
+            if (($app != 'horde')
+                 && (in_array($params['status'], ['heading', 'link'])
+                  || (in_array($params['status'], ['active', 'admin', 'noadmin', 'topbar'])
+                  && !($isAdmin && ($params['status'] == 'noadmin'))
+                  && !(!$isAdmin && ($params['status'] == 'admin'))
+                  && $registry->hasPermission((!empty($params['app']) ? $params['app'] : $app), Horde_Perms::SHOW)))) {
                 $menu[$app] = $params;
             }
         }
@@ -92,8 +92,8 @@ class Horde_Core_Topbar
 
             $found = false;
             foreach (array_keys($menu) as $key) {
-                if (($menu[$key]['status'] == 'heading') &&
-                    empty($children[$key])) {
+                if (($menu[$key]['status'] == 'heading')
+                    && empty($children[$key])) {
                     unset($menu[$key]);
                     $found = true;
                 }
@@ -106,8 +106,8 @@ class Horde_Core_Topbar
         $admin_item_count = 0;
         try {
             foreach ($registry->callByPackage('horde', 'admin_list') as $method => $val) {
-                if ($isAdmin ||
-                    $perms->hasPermission('horde:administration:' . $method, $registry->getAuth(), Horde_Perms::SHOW)) {
+                if ($isAdmin
+                    || $perms->hasPermission('horde:administration:' . $method, $registry->getAuth(), Horde_Perms::SHOW)) {
                     ++$admin_item_count;
                     $menu['administration_' . $method] = [
                         'icon' => $val['icon'],
@@ -137,8 +137,8 @@ class Horde_Core_Topbar
         ];
 
         /* Add preferences. */
-        if ($registry->showService('prefs') &&
-            !($prefs instanceof Horde_Prefs_Session)) {
+        if ($registry->showService('prefs')
+            && !($prefs instanceof Horde_Prefs_Session)) {
             $menu['prefs'] = [
                 'icon' => Horde_Themes::img('prefs.png'),
                 'menu_parent' => 'settings',
@@ -187,8 +187,8 @@ class Horde_Core_Topbar
         ];
 
         /* Add problem link. */
-        if ($registry->showService('problem') &&
-            ($problem_link = $registry->getServiceLink('problem', $current))) {
+        if ($registry->showService('problem')
+            && ($problem_link = $registry->getServiceLink('problem', $current))) {
             $menu['problem_' . $current] = [
                 'icon' => 'problem.png',
                 'menu_parent' => 'settings',
@@ -199,8 +199,8 @@ class Horde_Core_Topbar
         }
 
         /* Add help link. */
-        if ($registry->showService('help') &&
-            ($help_link = $registry->getServiceLink('help', $current))) {
+        if ($registry->showService('help')
+            && ($help_link = $registry->getServiceLink('help', $current))) {
             $menu['help_' . $current] = [
                 'icon' => 'help_index.png',
                 'menu_parent' => 'settings',
@@ -245,8 +245,8 @@ class Horde_Core_Topbar
                      * menu items. */
                     if (isset($params['url'])) {
                         $url = $params['url'];
-                    } elseif (($params['status'] == 'heading') ||
-                              !isset($params['webroot'])) {
+                    } elseif (($params['status'] == 'heading')
+                              || !isset($params['webroot'])) {
                         $url = '';
                     } else {
                         $url = Horde::url($registry->getInitialPage($app), false, ['app' => $app]);

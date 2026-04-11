@@ -33,8 +33,7 @@ class DriverAvailability
     public function __construct(
         public readonly bool $available,
         public readonly ?string $reason = null,
-    ) {
-    }
+    ) {}
 
     /**
      * Create an available status.

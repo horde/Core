@@ -38,8 +38,7 @@ class StandardHordeDbService implements HordeDbService
      */
     public function __construct(
         private Horde_Db_Adapter $adapter
-    ) {
-    }
+    ) {}
 
     /**
      * Get database adapter

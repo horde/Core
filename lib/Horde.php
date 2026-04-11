@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 1999-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 1999-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -80,8 +80,8 @@ class Horde
 
         /* Chicken/egg: we must wait until we have basic framework setup
          * before we can start logging. Otherwise, queue entries. */
-        if (isset($GLOBALS['injector']) &&
-            Horde_Core_Factory_Logger::available()) {
+        if (isset($GLOBALS['injector'])
+            && Horde_Core_Factory_Logger::available()) {
             $GLOBALS['injector']->getInstance('Horde_Log_Logger')->logObject($log_ob);
         } else {
             Horde_Core_Factory_Logger::queue($log_ob);
@@ -440,9 +440,9 @@ class Horde
             // base SQL config and the explicit driver we are creating, we
             // need to remove the not-used connection config since they use
             // different keys.
-            if ((!isset($c['params']['driverconfig']) ||
-                 $c['params']['driverconfig'] != 'horde') &&
-                !is_null($type) && $type == 'sql') {
+            if ((!isset($c['params']['driverconfig'])
+                 || $c['params']['driverconfig'] != 'horde')
+                && !is_null($type) && $type == 'sql') {
                 if (($c['params']['protocol'] ?? null) == 'unix') {
                     unset($result['hostspec'], $result['port']);
                 } else {
@@ -495,8 +495,8 @@ class Horde
 
         if (!is_array($params) || !count($params)) {
             throw new Horde_Exception(
-                sprintf(Horde_Core_Translation::t('No configuration information specified for %s.'), $name) . "\n\n" .
-                sprintf(
+                sprintf(Horde_Core_Translation::t('No configuration information specified for %s.'), $name) . "\n\n"
+                . sprintf(
                     Horde_Core_Translation::t('The file %s should contain some %s settings.'),
                     $fileroot . '/config/' . $file,
                     sprintf("%s['%s']['params']", $variable, $driver)
@@ -507,8 +507,8 @@ class Horde
         foreach ($fields as $field) {
             if (!isset($params[$field])) {
                 throw new Horde_Exception(
-                    sprintf(Horde_Core_Translation::t('Required "%s" not specified in %s configuration.'), $field, $name) . "\n\n" .
-                    sprintf(
+                    sprintf(Horde_Core_Translation::t('Required "%s" not specified in %s configuration.'), $field, $name) . "\n\n"
+                    . sprintf(
                         Horde_Core_Translation::t('The file %s should contain a %s setting.'),
                         $fileroot . '/config/' . $file,
                         sprintf("%s['%s']['params']['%s']", $variable, $driver, $field)
@@ -570,9 +570,9 @@ class Horde
             '/'
         );
 
-        if ($full &&
-            !isset($puri['scheme']) &&
-            !preg_match($schemeRegexp, $webroot)) {
+        if ($full
+            && !isset($puri['scheme'])
+            && !preg_match($schemeRegexp, $webroot)) {
 
             /* Store connection parameters in local variables. */
             $server_name = $GLOBALS['conf']['server']['name'];
@@ -599,9 +599,9 @@ class Horde
             }
 
             /* If using a non-standard port, add to the URL. */
-            if (!empty($server_port) &&
-                ($protocol === 'http' && $server_port != 80 ||
-                 $protocol === 'https' && $server_port != 443)) {
+            if (!empty($server_port)
+                && ($protocol === 'http' && $server_port != 80
+                 || $protocol === 'https' && $server_port != 443)) {
                 $server_name .= ':' . $server_port;
             }
 
@@ -614,16 +614,16 @@ class Horde
                 $url .= '//' . $puri['host'];
 
                 /* If using a non-standard port, add to the URL. */
-                if (isset($puri['port']) &&
-                    ($puri['scheme'] === 'http' && $puri['port'] != 80 ||
-                     $puri['scheme'] === 'https' && $puri['port'] != 443)) {
+                if (isset($puri['port'])
+                    && ($puri['scheme'] === 'http' && $puri['port'] != 80
+                     || $puri['scheme'] === 'https' && $puri['port'] != 443)) {
                     $url .= ':' . $puri['port'];
                 }
             }
         }
 
-        if (substr($puri['path'], 0, 1) === '/' &&
-            (!preg_match($schemeRegexp, $webroot) || isset($puri['scheme']))) {
+        if (substr($puri['path'], 0, 1) === '/'
+            && (!preg_match($schemeRegexp, $webroot) || isset($puri['scheme']))) {
 
             $url .= $puri['path'];
 
@@ -650,9 +650,9 @@ class Horde
 
         $ob = new Horde_Url($url, $full);
 
-        if (empty($GLOBALS['conf']['session']['use_only_cookies']) &&
-            ($append_session == 1 ||
-             $append_session == 0 && !isset($_COOKIE[session_name()]))) {
+        if (empty($GLOBALS['conf']['session']['use_only_cookies'])
+            && ($append_session == 1
+             || $append_session == 0 && !isset($_COOKIE[session_name()]))) {
             $ob->add(session_name(), session_id());
         }
 
@@ -671,9 +671,9 @@ class Horde
      */
     public static function externalUrl($url, $tag = false)
     {
-        if (!isset($_GET[session_name()]) ||
-            Horde_String::substr($url, 0, 1) == '#' ||
-            Horde_String::substr($url, 0, 7) == 'mailto:') {
+        if (!isset($_GET[session_name()])
+            || Horde_String::substr($url, 0, 1) == '#'
+            || Horde_String::substr($url, 0, 7) == 'mailto:') {
             $ext = $url;
         } else {
             $ext = self::signQueryString($GLOBALS['registry']->getServiceLink('go', 'horde')->add('url', $url));
@@ -868,8 +868,8 @@ class Horde
             // PHP_SELF instead.
             $url = $_SERVER['PHP_SELF'];
         } else {
-            $url = $_SERVER['SCRIPT_NAME'] ??
-                $_SERVER['PHP_SELF'];
+            $url = $_SERVER['SCRIPT_NAME']
+                ?? $_SERVER['PHP_SELF'];
         }
         if (isset($_SERVER['REQUEST_URI'])) {
             $url = Horde_String::common($_SERVER['REQUEST_URI'], $url);
@@ -1062,15 +1062,15 @@ class Horde
             self::$_noAccessKey = !$GLOBALS['browser']->hasFeature('accesskey') || !$GLOBALS['prefs']->getValue('widget_accesskey');
         }
 
-        if (self::$_noAccessKey ||
-            !preg_match('/_(\w)/u', $label, $match)) {
+        if (self::$_noAccessKey
+            || !preg_match('/_(\w)/u', $label, $match)) {
             return '';
         }
         $key = Horde_String_Transliterate::toAscii($match[1]);
 
         /* Has this key already been used? */
-        if (isset(self::$_used[strtolower($key)]) &&
-            !($nocheck && isset(self::$_labels[$label]))) {
+        if (isset(self::$_used[strtolower($key)])
+            && !($nocheck && isset(self::$_labels[$label]))) {
             return '';
         }
 
@@ -1093,8 +1093,8 @@ class Horde
      */
     public static function stripAccessKey($label)
     {
-        $replace = $GLOBALS['registry']->nlsconfig->curr_multibyte &&
-            preg_match('/[\x80-\xff]/', $label)
+        $replace = $GLOBALS['registry']->nlsconfig->curr_multibyte
+            && preg_match('/[\x80-\xff]/', $label)
             ? ''
             : '$1';
         return preg_replace('/_(\w)/u', $replace, $label);
@@ -1120,9 +1120,9 @@ class Horde
         if ($GLOBALS['registry']->nlsconfig->curr_multibyte) {
             /* Prefix parenthesis with the UTF-8 representation of the LRO
              * (Left-to-Right-Override) Unicode codepoint U+202D. */
-            return $stripped_label . "\xe2\x80\xad" .
-                '(<span class="accessKey">' . strtoupper($accessKey) .
-                '</span>' . ')';
+            return $stripped_label . "\xe2\x80\xad"
+                . '(<span class="accessKey">' . strtoupper($accessKey)
+                . '</span>' . ')';
         }
 
         return preg_replace(
@@ -1325,8 +1325,8 @@ class Horde
      */
     public static function contentSent()
     {
-        return ((self::$_bufferLevel && self::$_contentSent) ||
-                (!self::$_bufferLevel && (ob_get_length() || headers_sent())));
+        return ((self::$_bufferLevel && self::$_contentSent)
+                || (!self::$_bufferLevel && (ob_get_length() || headers_sent())));
     }
 
     /**

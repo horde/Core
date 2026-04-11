@@ -4,7 +4,7 @@
  * This class extends the base LoginTasks class in order to ensure Horde
  * tasks are always run first.
  *
- * Copyright 2011-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2011-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -41,8 +41,8 @@ class Horde_Core_LoginTasks extends Horde_LoginTasks
             $opts['url'] = Horde::selfUrl(true, true, true);
         }
 
-        if (($this->_app != 'horde') &&
-            ($GLOBALS['session']->get('horde', 'logintasks') !== true)) {
+        if (($this->_app != 'horde')
+            && ($GLOBALS['session']->get('horde', 'logintasks') !== true)) {
             $GLOBALS['injector']->getInstance('Horde_Core_Factory_LoginTasks')->create('horde')->runTasks($opts);
         }
 

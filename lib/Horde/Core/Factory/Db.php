@@ -14,7 +14,7 @@
 /**
  * A Horde_Injector:: based factory for creating Horde_Db_Adapter objects.
  *
- * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -99,8 +99,8 @@ class Horde_Core_Factory_Db extends Horde_Core_Factory_Base
         $sig = hash('md5', serialize($config));
 
         /* Determine if we are using the base SQL config. */
-        if (isset($config['driverconfig']) &&
-            ($config['driverconfig'] == 'horde')) {
+        if (isset($config['driverconfig'])
+            && ($config['driverconfig'] == 'horde')) {
             $this->_instances[$sig] = $this->create();
         } elseif (!isset($this->_instances[$sig])) {
             try {

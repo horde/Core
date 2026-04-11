@@ -16,7 +16,7 @@
  * A Horde_Injector:: based factory for creating Horde_Core_Block_Collection
  * objects.
  *
- * Copyright 2011-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2011-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -56,8 +56,8 @@ class Horde_Core_Factory_BlockCollection extends Horde_Core_Factory_Base
         $sig = hash('md5', json_encode([$apps, $layout]));
 
         if (!isset($this->_instances[$sig])) {
-            $this->_instances[$sig] =
-                new Horde_Core_Block_Collection($apps, $layout);
+            $this->_instances[$sig]
+                = new Horde_Core_Block_Collection($apps, $layout);
         }
 
         return $this->_instances[$sig];

@@ -3,7 +3,7 @@
 /**
  * This class provides an API to the blocks (applets) framework.
  *
- * Copyright 2003-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -125,8 +125,8 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
         if (is_null($params)) {
             foreach ($this->getLayout() as $row) {
                 foreach ($row as $col) {
-                    if (is_array($col) &&
-                        (strcasecmp($col['params']['type2'], $name) === 0)) {
+                    if (is_array($col)
+                        && (strcasecmp($col['params']['type2'], $name) === 0)) {
                         $params = $col['params']['params'];
                         break 2;
                     }
@@ -430,8 +430,8 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
             $this->_blocks[$app][$block]['params'] = $blockOb->getParams();
         }
 
-        if (isset($this->_blocks[$app][$block]['params']) &&
-            is_array($this->_blocks[$app][$block]['params'])) {
+        if (isset($this->_blocks[$app][$block]['params'])
+            && is_array($this->_blocks[$app][$block]['params'])) {
             return array_keys($this->_blocks[$app][$block]['params']);
         }
 

@@ -3,7 +3,7 @@
 /**
  * Horde_Core_TagBrowser:: class provides logic for dealing with tag browsing.
  *
- * Copyright 2011-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2011-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (GPL). If you
  * did not receive this file, see http://www.horde.org/licenses/gpl.
@@ -107,7 +107,7 @@ abstract class Horde_Core_TagBrowser
      */
     public function addTag($tag)
     {
-        $tag_id = (int)current($this->_tagger->getTagIds($tag));
+        $tag_id = (int) current($this->_tagger->getTagIds($tag));
         if (empty($tag_id)) {
             return;
         }

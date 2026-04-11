@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2014-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2014-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -34,8 +34,8 @@ class Horde_Themes_Css_Cache_Null extends Horde_Themes_Css_Cache
 
         foreach ($css as $file) {
             $url = Horde::url($file['uri'], true, -1);
-            if (!is_null($file['app']) &&
-                !empty($this->_params['url_version_param'])) {
+            if (!is_null($file['app'])
+                && !empty($this->_params['url_version_param'])) {
                 $url->add('v', hash(
                     'md5',
                     $registry->getVersion($file['app'])

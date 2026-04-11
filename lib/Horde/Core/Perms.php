@@ -4,7 +4,7 @@
  * The Horde_Core_Perms class provides information about internal Horde
  * elements that can be managed through the Horde_Perms system.
  *
- * Copyright 2001-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2001-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -94,9 +94,9 @@ class Horde_Core_Perms
         /* Get the part of the app's permissions based on the permission
          * name requested. */
         $children = Horde_Array::getElement($perms['tree'], $levels);
-        if (($children === false) ||
-            !is_array($children) ||
-            !count($children)) {
+        if (($children === false)
+            || !is_array($children)
+            || !count($children)) {
             /* No array of children available for this permission name. */
             return false;
         }

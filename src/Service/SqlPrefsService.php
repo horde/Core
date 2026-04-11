@@ -20,6 +20,7 @@ use Horde_Db_Adapter;
 use Horde_Prefs;
 use Horde_Prefs_Storage_Sql;
 use Horde_Prefs_Scope;
+use Horde_Db_Exception;
 
 /**
  * SQL-based preferences service implementation
@@ -44,8 +45,7 @@ class SqlPrefsService implements PrefsService
     public function __construct(
         private Horde_Db_Adapter $db,
         private string $table = 'horde_prefs'
-    ) {
-    }
+    ) {}
 
     /**
      * Get preference value
@@ -122,8 +122,8 @@ class SqlPrefsService implements PrefsService
     public function getAllInScope(string $uid, string $scope): array
     {
         try {
-            $query = 'SELECT pref_name, pref_value FROM ' . $this->table .
-                ' WHERE pref_uid = ? AND pref_scope = ?';
+            $query = 'SELECT pref_name, pref_value FROM ' . $this->table
+                . ' WHERE pref_uid = ? AND pref_scope = ?';
             $result = $this->db->select($query, [$uid, $scope]);
 
             $prefs = [];
@@ -136,7 +136,7 @@ class SqlPrefsService implements PrefsService
             }
 
             return $prefs;
-        } catch (\Horde_Db_Exception $e) {
+        } catch (Horde_Db_Exception $e) {
             // Return empty array on error
             return [];
         }

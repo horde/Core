@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2013-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -133,8 +133,8 @@ class Horde_Core_Log_Object
                 'line' => $event->getLine(),
             ];
 
-            if (empty($options['notracelog']) &&
-                class_exists('Horde_Support_Backtrace')) {
+            if (empty($options['notracelog'])
+                && class_exists('Horde_Support_Backtrace')) {
                 $this->_backtrace = new Horde_Support_Backtrace($event);
             }
         } else {
@@ -171,8 +171,8 @@ class Horde_Core_Log_Object
                     if (!in_array($trace[$frame]['class'], ['Horde_Log_Logger', 'Horde_Core_Log_Logger'])) {
                         break;
                     }
-                } elseif (isset($trace[$frame]['function']) &&
-                          !in_array($trace[$frame]['function'], ['call_user_func', 'call_user_func_array'])) {
+                } elseif (isset($trace[$frame]['function'])
+                          && !in_array($trace[$frame]['function'], ['call_user_func', 'call_user_func_array'])) {
                     break;
                 }
                 ++$frame;
@@ -189,9 +189,9 @@ class Horde_Core_Log_Object
                 ? $GLOBALS['registry']->getApp()
                 : 'horde';
 
-            $this->_message = ($app ? '[' . $app . '] ' : '') .
-                $text .
-                ' [pid ' . getmypid();
+            $this->_message = ($app ? '[' . $app . '] ' : '')
+                . $text
+                . ' [pid ' . getmypid();
 
             if (isset($options['file']) || isset($trace['file'])) {
                 $file = $options['file']

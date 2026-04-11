@@ -13,6 +13,4 @@ use Horde\Http\Uri;
  * Shared assets are retrieved from the base application, i.e. /js/horde/
  * In Horde 5 and older, the canonical URI was /horde/$application/js/ and horde/js
  */
-class ApplicationJsUri extends Uri
-{
-}
+class ApplicationJsUri extends Uri {}

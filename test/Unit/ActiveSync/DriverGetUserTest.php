@@ -22,6 +22,10 @@ use Horde\Http\ServerRequest;
 use Horde\Http\Uri;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Horde_Core_ActiveSync_Driver;
+use Horde_Core_ActiveSync_Auth;
+use Horde_Core_ActiveSync_Connector;
+use Horde_Registry;
+use InvalidArgumentException;
 
 /**
  * Unit tests for Horde_Core_ActiveSync_Driver::getUser() priority logic
@@ -49,11 +53,11 @@ class DriverGetUserTest extends TestCase
 
         $serverRequest = new ServerRequest('POST', '/');
 
-        $mockConnector = $this->getMockSkipConstructor(\Horde_Core_ActiveSync_Connector::class);
-        $mockAuth = $this->getMockSkipConstructor(\Horde_Core_ActiveSync_Auth::class);
+        $mockConnector = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Connector::class);
+        $mockAuth = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Auth::class);
         $mockAuth->method('authenticate')->willReturn(true);
         $mockState = $this->getMockSkipConstructor('Horde_ActiveSync_State_Sql');
-        $mockRegistry = $this->getMockSkipConstructor(\Horde_Registry::class);
+        $mockRegistry = $this->getMockSkipConstructor(Horde_Registry::class);
 
         $driver = new Horde_Core_ActiveSync_Driver([
             'connector' => $mockConnector,
@@ -81,10 +85,10 @@ class DriverGetUserTest extends TestCase
         $uri = new Uri('http://example.com/path?User=get_param_user&DeviceId=123');
         $serverRequest = new ServerRequest('POST', $uri);
 
-        $mockConnector = $this->getMockSkipConstructor(\Horde_Core_ActiveSync_Connector::class);
-        $mockAuth = $this->getMockSkipConstructor(\Horde_Core_ActiveSync_Auth::class);
+        $mockConnector = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Connector::class);
+        $mockAuth = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Auth::class);
         $mockState = $this->getMockSkipConstructor('Horde_ActiveSync_State_Sql');
-        $mockRegistry = $this->getMockSkipConstructor(\Horde_Registry::class);
+        $mockRegistry = $this->getMockSkipConstructor(Horde_Registry::class);
 
         $mockRegistry->expects($this->never())
             ->method('getAuth');
@@ -112,10 +116,10 @@ class DriverGetUserTest extends TestCase
 
         $serverRequest = new ServerRequest('POST', '/');
 
-        $mockConnector = $this->getMockSkipConstructor(\Horde_Core_ActiveSync_Connector::class);
-        $mockAuth = $this->getMockSkipConstructor(\Horde_Core_ActiveSync_Auth::class);
+        $mockConnector = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Connector::class);
+        $mockAuth = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Auth::class);
         $mockState = $this->getMockSkipConstructor('Horde_ActiveSync_State_Sql');
-        $mockRegistry = $this->getMockSkipConstructor(\Horde_Registry::class);
+        $mockRegistry = $this->getMockSkipConstructor(Horde_Registry::class);
 
         $mockRegistry->expects($this->once())
             ->method('getAuth')
@@ -145,11 +149,11 @@ class DriverGetUserTest extends TestCase
         $uri = new Uri('http://example.com/path?User=get_param_user');
         $serverRequest = new ServerRequest('POST', $uri);
 
-        $mockConnector = $this->getMockSkipConstructor(\Horde_Core_ActiveSync_Connector::class);
-        $mockAuth = $this->getMockSkipConstructor(\Horde_Core_ActiveSync_Auth::class);
+        $mockConnector = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Connector::class);
+        $mockAuth = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Auth::class);
         $mockAuth->method('authenticate')->willReturn(true);
         $mockState = $this->getMockSkipConstructor('Horde_ActiveSync_State_Sql');
-        $mockRegistry = $this->getMockSkipConstructor(\Horde_Registry::class);
+        $mockRegistry = $this->getMockSkipConstructor(Horde_Registry::class);
 
         $driver = new Horde_Core_ActiveSync_Driver([
             'connector' => $mockConnector,
@@ -177,10 +181,10 @@ class DriverGetUserTest extends TestCase
         $uri = new Uri('http://example.com/path?User=get_param_user');
         $serverRequest = new ServerRequest('POST', $uri);
 
-        $mockConnector = $this->getMockSkipConstructor(\Horde_Core_ActiveSync_Connector::class);
-        $mockAuth = $this->getMockSkipConstructor(\Horde_Core_ActiveSync_Auth::class);
+        $mockConnector = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Connector::class);
+        $mockAuth = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Auth::class);
         $mockState = $this->getMockSkipConstructor('Horde_ActiveSync_State_Sql');
-        $mockRegistry = $this->getMockSkipConstructor(\Horde_Registry::class);
+        $mockRegistry = $this->getMockSkipConstructor(Horde_Registry::class);
 
         $mockRegistry->expects($this->never())
             ->method('getAuth');
@@ -206,13 +210,13 @@ class DriverGetUserTest extends TestCase
             $this->markTestSkipped('horde/activesync not available');
         }
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Missing required PSR-7 ServerRequest object.');
 
-        $mockConnector = $this->getMockSkipConstructor(\Horde_Core_ActiveSync_Connector::class);
-        $mockAuth = $this->getMockSkipConstructor(\Horde_Core_ActiveSync_Auth::class);
+        $mockConnector = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Connector::class);
+        $mockAuth = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Auth::class);
         $mockState = $this->getMockSkipConstructor('Horde_ActiveSync_State_Sql');
-        $mockRegistry = $this->getMockSkipConstructor(\Horde_Registry::class);
+        $mockRegistry = $this->getMockSkipConstructor(Horde_Registry::class);
 
         new Horde_Core_ActiveSync_Driver([
             'connector' => $mockConnector,
@@ -232,13 +236,13 @@ class DriverGetUserTest extends TestCase
             $this->markTestSkipped('horde/activesync not available');
         }
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Missing required Horde_Registry object.');
 
         $serverRequest = new ServerRequest('POST', '/');
 
-        $mockConnector = $this->getMockSkipConstructor(\Horde_Core_ActiveSync_Connector::class);
-        $mockAuth = $this->getMockSkipConstructor(\Horde_Core_ActiveSync_Auth::class);
+        $mockConnector = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Connector::class);
+        $mockAuth = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Auth::class);
         $mockState = $this->getMockSkipConstructor('Horde_ActiveSync_State_Sql');
 
         new Horde_Core_ActiveSync_Driver([

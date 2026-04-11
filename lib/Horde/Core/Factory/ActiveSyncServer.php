@@ -36,11 +36,11 @@ class Horde_Core_Factory_ActiveSyncServer extends Horde_Core_Factory_Injector
 
         $server->setLogger(
             new Horde_ActiveSync_Log_Factory([
-            'type' => $conf['activesync']['logging']['type'],
-            'path' => !empty($conf['activesync']['logging']['path'])
-                ? $conf['activesync']['logging']['path']
-                : '',
-            'level' => $level])
+                'type' => $conf['activesync']['logging']['type'],
+                'path' => !empty($conf['activesync']['logging']['path'])
+                    ? $conf['activesync']['logging']['path']
+                    : '',
+                'level' => $level])
         );
         if (!empty($conf['openssl']['cafile'])) {
             $server->setRootCertificatePath($conf['openssl']['cafile']);

@@ -18,6 +18,7 @@ namespace Horde\Core\Prefs;
 
 use Horde\Core\Config\PrefsState;
 use Horde\Date\Format as DateFormat;
+use Closure;
 
 /**
  * Detector for strftime format patterns in preference definitions
@@ -99,7 +100,7 @@ class StrftimeDetector
             $value = $prefDef['value'];
 
             // Skip closures - can't analyze runtime values
-            if (!($value instanceof \Closure) && is_string($value)) {
+            if (!($value instanceof Closure) && is_string($value)) {
                 if ($this->isStrftimePattern($value)) {
                     $findings[] = new StrftimeFinding(
                         pref: $prefName,

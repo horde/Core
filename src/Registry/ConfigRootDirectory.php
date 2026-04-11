@@ -9,6 +9,4 @@ use Horde\Core\Directory;
 /**
  * A deployment's root directory for configuration files. Usually $deployment/var/config/
  */
-class ConfigRootDirectory extends Directory
-{
-}
+class ConfigRootDirectory extends Directory {}

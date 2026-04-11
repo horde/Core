@@ -4,7 +4,7 @@
  * Collection of prefs UI widgets for use with application-specific (a/k/a
  * 'special') configuration.
  *
- * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -194,14 +194,14 @@ class Horde_Core_Prefs_Ui_Widgets
 
         if (!empty($selected) || !empty($unselected)) {
             $out = Horde_Core_Prefs_Ui_Widgets::source([
-                  'mainlabel' => Horde_Core_Translation::t('Choose the order of address books to search when expanding addresses.'),
-                  'selectlabel' => Horde_Core_Translation::t('Selected address books:'),
-                  'sources' => [[
-                      'selected' => $selected,
-                      'unselected' => $unselected,
-                  ]],
-                  'unselectlabel' => Horde_Core_Translation::t('Available address books:'),
-             ]);
+                'mainlabel' => Horde_Core_Translation::t('Choose the order of address books to search when expanding addresses.'),
+                'selectlabel' => Horde_Core_Translation::t('Selected address books:'),
+                'sources' => [[
+                    'selected' => $selected,
+                    'unselected' => $unselected,
+                ]],
+                'unselectlabel' => Horde_Core_Translation::t('Available address books:'),
+            ]);
 
             $t->set('selected', count($unselected) > 1);
 
@@ -216,8 +216,8 @@ class Horde_Core_Prefs_Ui_Widgets
                                 'name' => $field['name'],
                                 'label' => $field['label'],
                             ];
-                            if (isset($data['fields'][$source]) &&
-                                in_array($field['name'], $data['fields'][$source])) {
+                            if (isset($data['fields'][$source])
+                                && in_array($field['name'], $data['fields'][$source])) {
                                 $tmpsel[] = $field['name'];
                             }
                         }
@@ -323,7 +323,7 @@ class Horde_Core_Prefs_Ui_Widgets
                             'name' => $pref . '_' . $name,
                             'text' => true,
                             'value' => empty($alarm_pref[$method][$name]) ? '' : htmlspecialchars($alarm_pref[$method][$name]),
-                            ];
+                        ];
                         break;
 
                     case 'bool':

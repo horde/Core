@@ -10,6 +10,4 @@ use Horde\Core\Directory;
  * A deployment's root directory for web exposed files. Usually $deployment/web/.
  *
  */
-class WebRootDirectory extends Directory
-{
-}
+class WebRootDirectory extends Directory {}

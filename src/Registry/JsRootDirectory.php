@@ -11,6 +11,4 @@ use Horde\Core\Directory;
  *
  * Canonically this is the $deployment/web/js/ directory.
  */
-class JsRootDirectory extends Directory
-{
-}
+class JsRootDirectory extends Directory {}

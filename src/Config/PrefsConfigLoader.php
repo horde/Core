@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Horde\Core\Config;
 
 use RuntimeException;
+use Closure;
 
 /**
  * Prefs config loader for Horde applications
@@ -217,9 +218,9 @@ class PrefsConfigLoader
                     // Merge pref definitions
                     // Special handling: closures cannot be merged, keep first one
                     foreach ($value as $prefKey => $prefValue) {
-                        if ($prefValue instanceof \Closure) {
+                        if ($prefValue instanceof Closure) {
                             // Keep existing closure if present, otherwise use new
-                            if (!isset($existing['_prefs'][$key][$prefKey]) || !($existing['_prefs'][$key][$prefKey] instanceof \Closure)) {
+                            if (!isset($existing['_prefs'][$key][$prefKey]) || !($existing['_prefs'][$key][$prefKey] instanceof Closure)) {
                                 $existing['_prefs'][$key][$prefKey] = $prefValue;
                             }
                         } else {

@@ -19,6 +19,7 @@ namespace Horde\Core\Config;
 
 use Horde\Core\Config\Metadata\PropertyMetadata;
 use Horde\Core\Config\Metadata\ValidationResult;
+use Exception;
 
 /**
  * Configuration state with metadata support.
@@ -71,7 +72,7 @@ class ConfigStateWithMetadata extends State
                     return $this->arrayToMetadata($field);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return null;
         }
 
@@ -116,7 +117,7 @@ class ConfigStateWithMetadata extends State
         // A full implementation would require access to the actual driver instance
         return new PropertyMetadata(
             name: $field['name'],
-            type: \Horde\Core\Config\Metadata\FieldType::from($field['type']),
+            type: Metadata\FieldType::from($field['type']),
             description: $field['description'] ?? '',
             required: $field['required'] ?? false,
             default: $field['default'] ?? null,

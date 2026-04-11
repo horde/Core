@@ -7,7 +7,7 @@
  * CSS class names "toggleQuoteHide" and "toggleQuoteShow" are used to style
  * toggle text.
  *
- * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -47,10 +47,10 @@ class Horde_Core_Text_Filter_Highlightquotes extends Horde_Text_Filter_Highlight
      */
     protected function _beginLargeBlock($lines, $qcount)
     {
-        return (($this->_params['citeblock']) ? '<br />' : '') .
-            '<div class="toggleQuoteParent">' .
-            '<span class="widget toggleQuoteShow"' . ($this->_params['hideBlocks'] ? '' : ' style="display:none"') . '>' . htmlspecialchars(sprintf(Horde_Core_Translation::t('[Show Quoted Text - %d lines]'), $qcount)) . '</span>' .
-            '<span class="widget toggleQuoteHide"' . ($this->_params['hideBlocks'] ? ' style="display:none"' : '') . '>' . htmlspecialchars(Horde_Core_Translation::t('[Hide Quoted Text]')) . '</span>';
+        return (($this->_params['citeblock']) ? '<br />' : '')
+            . '<div class="toggleQuoteParent">'
+            . '<span class="widget toggleQuoteShow"' . ($this->_params['hideBlocks'] ? '' : ' style="display:none"') . '>' . htmlspecialchars(sprintf(Horde_Core_Translation::t('[Show Quoted Text - %d lines]'), $qcount)) . '</span>'
+            . '<span class="widget toggleQuoteHide"' . ($this->_params['hideBlocks'] ? ' style="display:none"' : '') . '>' . htmlspecialchars(Horde_Core_Translation::t('[Hide Quoted Text]')) . '</span>';
     }
 
     /**

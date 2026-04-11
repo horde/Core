@@ -4,7 +4,7 @@
  * This class collects the javascript files needed for inclusion in the
  * browser output.
  *
- * Copyright 1999-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 1999-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -70,7 +70,7 @@ class Horde_Script_List implements Countable, Iterator
 
     /* Countable methods. */
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function count()
     {
         return count($this->_files);
@@ -78,25 +78,25 @@ class Horde_Script_List implements Countable, Iterator
 
     /* Iterator methods. */
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function current()
     {
         return current($this->_tmp);
     }
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function key()
     {
         return key($this->_tmp);
     }
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function next()
     {
         next($this->_tmp);
     }
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function rewind()
     {
         $files = [];
@@ -114,7 +114,7 @@ class Horde_Script_List implements Countable, Iterator
         reset($this->_tmp);
     }
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function valid()
     {
         return !is_null(key($this->_tmp));

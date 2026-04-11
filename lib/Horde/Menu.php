@@ -4,7 +4,7 @@
  * The Horde_Menu:: class provides standardized methods for creating menus in
  * Horde applications.
  *
- * Copyright 1999-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 1999-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -209,10 +209,10 @@ class Horde_Menu
 
         /* Try to match the item's path against the current script
            filename as well as other possible URLs to this script. */
-        return isset($check_url['path']) &&
-            (($check_url['path'] == $server_url['path']) ||
-             ($check_url['path'] . 'index.php' == $server_url['path']) ||
-             ($check_url['path'] . '/index.php' == $server_url['path']));
+        return isset($check_url['path'])
+            && (($check_url['path'] == $server_url['path'])
+             || ($check_url['path'] . 'index.php' == $server_url['path'])
+             || ($check_url['path'] . '/index.php' == $server_url['path']));
     }
 
 }

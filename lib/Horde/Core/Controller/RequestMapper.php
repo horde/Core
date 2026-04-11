@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2009-2020 Horde LLC (http://www.horde.org/)
+ * Copyright 2009-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -31,7 +31,7 @@ use Horde\Routes\Mapper;
  * below the horde base URL or even on a separate domain as long as
  * it is properly configured in the registry.
  *
- * Copyright 2009-2020 Horde LLC (http://www.horde.org/)
+ * Copyright 2009-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL-2). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl.
@@ -107,10 +107,10 @@ class Horde_Core_Controller_RequestMapper
         // listApps() would return empty on unauthenticated access
         foreach ($registry->listApps(null, false, null) as $app) {
             $default = [
-               'scheme' => $scheme,
-               'host' => $host,
-               'path' => '',
-               'app' => $app,
+                'scheme' => $scheme,
+                'host' => $host,
+                'path' => '',
+                'app' => $app,
             ];
             $applicationUrl = array_merge($default, parse_url($registry->get('webroot', $app)));
             $applicationUrl['path'] = $this->_normalize($applicationUrl['path']);

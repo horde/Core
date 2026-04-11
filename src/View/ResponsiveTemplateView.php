@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Horde\Core\View;
 
+use InvalidArgumentException;
+use RuntimeException;
+use Throwable;
+
 /**
  * Responsive Template View
  *
@@ -37,12 +41,12 @@ class ResponsiveTemplateView
      *
      * @param string $templatePath Absolute path to template file
      * @param array $data View data (will be extracted for template)
-     * @throws \InvalidArgumentException If template file not found
+     * @throws InvalidArgumentException If template file not found
      */
     public function __construct(string $templatePath, array $data = [])
     {
         if (!file_exists($templatePath)) {
-            throw new \InvalidArgumentException("Template not found: {$templatePath}");
+            throw new InvalidArgumentException("Template not found: {$templatePath}");
         }
 
         $this->templatePath = $templatePath;
@@ -53,7 +57,7 @@ class ResponsiveTemplateView
      * Render template to string
      *
      * @return string Rendered HTML
-     * @throws \RuntimeException If template rendering fails
+     * @throws RuntimeException If template rendering fails
      */
     public function render(): string
     {
@@ -65,9 +69,9 @@ class ResponsiveTemplateView
         try {
             require $this->templatePath;
             return ob_get_clean();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             ob_end_clean();
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 "Template rendering failed: {$e->getMessage()}",
                 0,
                 $e
@@ -113,11 +117,11 @@ class ResponsiveTemplateView
      *
      * @param string $name Property name
      * @param mixed $value Property value
-     * @throws \RuntimeException Always - view is immutable
+     * @throws RuntimeException Always - view is immutable
      */
     public function __set(string $name, $value): void
     {
-        throw new \RuntimeException('ResponsiveTemplateView is immutable');
+        throw new RuntimeException('ResponsiveTemplateView is immutable');
     }
 
     /**
@@ -131,7 +135,7 @@ class ResponsiveTemplateView
         if ($value === null) {
             return '';
         }
-        return htmlspecialchars((string)$value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        return htmlspecialchars((string) $value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
     /**

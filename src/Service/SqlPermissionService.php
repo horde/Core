@@ -21,6 +21,7 @@ use Horde_Perms_Base;
 use Horde_Perms_Permission;
 use Horde_Perms_Exception;
 use Horde_Perms;
+use Exception;
 
 /**
  * SQL-based permission service implementation
@@ -44,8 +45,7 @@ class SqlPermissionService implements PermissionService
     public function __construct(
         private Horde_Perms_Base $backend,
         private GroupService $groupService
-    ) {
-    }
+    ) {}
 
     /**
      * List all permissions
@@ -172,7 +172,7 @@ class SqlPermissionService implements PermissionService
                 : $this->compressGroupsFromArraySimple($data['groups']);
 
             foreach ($groupData as $gid => $value) {
-                $perm->setPerm(['class' => 'groups', 'name' => (string)$gid], $value, false);
+                $perm->setPerm(['class' => 'groups', 'name' => (string) $gid], $value, false);
             }
         }
 
@@ -366,14 +366,14 @@ class SqlPermissionService implements PermissionService
         foreach ($groups as $gid => $bits) {
             $groupName = null;
             try {
-                $groupInfo = $this->groupService->get((string)$gid);
+                $groupInfo = $this->groupService->get((string) $gid);
                 $groupName = $groupInfo->name;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Group not found - name stays null (loose coupling)
             }
 
             $result[] = [
-                'id' => (string)$gid,
+                'id' => (string) $gid,
                 'name' => $groupName,
                 'permissions' => $this->expandPermissionBits($bits),
             ];
@@ -393,14 +393,14 @@ class SqlPermissionService implements PermissionService
         foreach ($groups as $gid => $value) {
             $groupName = null;
             try {
-                $groupInfo = $this->groupService->get((string)$gid);
+                $groupInfo = $this->groupService->get((string) $gid);
                 $groupName = $groupInfo->name;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Group not found - name stays null
             }
 
             $result[] = [
-                'id' => (string)$gid,
+                'id' => (string) $gid,
                 'name' => $groupName,
                 'permissions' => $value,
             ];
@@ -467,7 +467,7 @@ class SqlPermissionService implements PermissionService
                 try {
                     $groupInfo = $this->groupService->get($group['name']);
                     $gid = $groupInfo->id;
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     continue; // Cannot resolve, skip
                 }
             }
@@ -497,7 +497,7 @@ class SqlPermissionService implements PermissionService
                 try {
                     $groupInfo = $this->groupService->get($group['name']);
                     $gid = $groupInfo->id;
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     continue;
                 }
             }
@@ -518,10 +518,10 @@ class SqlPermissionService implements PermissionService
     private function expandPermissionBits(int $bits): array
     {
         return [
-            'show' => (bool)($bits & Horde_Perms::SHOW),
-            'read' => (bool)($bits & Horde_Perms::READ),
-            'edit' => (bool)($bits & Horde_Perms::EDIT),
-            'delete' => (bool)($bits & Horde_Perms::DELETE),
+            'show' => (bool) ($bits & Horde_Perms::SHOW),
+            'read' => (bool) ($bits & Horde_Perms::READ),
+            'edit' => (bool) ($bits & Horde_Perms::EDIT),
+            'delete' => (bool) ($bits & Horde_Perms::DELETE),
         ];
     }
 

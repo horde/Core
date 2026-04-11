@@ -116,10 +116,10 @@ class AppRouter extends RampageRequestHandler implements MiddlewareInterface, Re
         $app = $request->getAttribute('app');
         $prefix = $request->getAttribute('routerPrefix');
         if (is_null($prefix)) {
-            throw new \Exception("Missing Attribute: 'routerPrefix'");
+            throw new Exception("Missing Attribute: 'routerPrefix'");
         }
         if (empty($app)) {
-            throw new \Exception("Missing Attribute: 'app'");
+            throw new Exception("Missing Attribute: 'app'");
         }
         $defaultStack = [
             AuthHordeSession::class,
@@ -130,7 +130,7 @@ class AppRouter extends RampageRequestHandler implements MiddlewareInterface, Re
         $fileroot = $this->registry->get('fileroot', $app);
         $routeFile = $fileroot . '/config/routes.php';
         if (!file_exists($routeFile)) {
-            throw new \Exception("No Routes file found for App $app");
+            throw new Exception("No Routes file found for App $app");
         }
 
         // TODO: Should this move to another middleware?

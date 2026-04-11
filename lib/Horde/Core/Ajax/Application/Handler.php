@@ -3,7 +3,7 @@
 /**
  * Defines AJAX actions to be handled by an application's endpoint.
  *
- * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2012-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -97,9 +97,9 @@ class Horde_Core_Ajax_Application_Handler
             return false;
         }
 
-        return ($method->isPublic() &&
-                !in_array($action, $this->_ignored) &&
-                ($method->getDeclaringClass()->name != __CLASS__));
+        return ($method->isPublic()
+                && !in_array($action, $this->_ignored)
+                && ($method->getDeclaringClass()->name != __CLASS__));
     }
 
     /**

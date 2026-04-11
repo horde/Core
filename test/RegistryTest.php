@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2011-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2011-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -25,6 +25,7 @@ use Horde_Registry_Hordeconfig;
  * @category Horde
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
+ * @coversNothing
  */
 class RegistryTest extends TestCase
 {
@@ -166,7 +167,7 @@ class RegistryTest extends TestCase
                 'a1_only' => [
                     'a' => 1,
                     'b' => [
-                    'c' => 2,
+                        'c' => 2,
                     ],
                 ],
                 'a2_only' => [

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2002-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2002-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you did
  * not receive this file, see http://opensource.org/licenses/lgpl-2.1.php
@@ -569,9 +569,9 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
      */
     public function requireAuth()
     {
-        return !$this->_base &&
-               ($this->hasCapability('authenticate') ||
-                $this->hasCapability('transparent'));
+        return !$this->_base
+               && ($this->hasCapability('authenticate')
+                || $this->hasCapability('transparent'));
     }
 
     /**
@@ -678,9 +678,9 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
             $this->_setView();
         }
 
-        if ($this->_base &&
-            isset($GLOBALS['notification']) &&
-            ($expire = $this->_base->getCredential('expire'))) {
+        if ($this->_base
+            && isset($GLOBALS['notification'])
+            && ($expire = $this->_base->getCredential('expire'))) {
             $toexpire = ($expire - time()) / 86400;
             $GLOBALS['notification']->push(sprintf(Horde_Core_Translation::ngettext('%d day until your password expires.', '%d days until your password expires.', $toexpire), $toexpire), 'horde.warning');
         }
@@ -764,9 +764,9 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
                 break;
         }
 
-        if (($browser->getBrowser() == 'msie') &&
-            ($browser->getMajor() < 8) &&
-            ($mode != 'mobile')) {
+        if (($browser->getBrowser() == 'msie')
+            && ($browser->getMajor() < 8)
+            && ($mode != 'mobile')) {
             $notification->push(Horde_Core_Translation::t('You are using an old, unsupported version of Internet Explorer. You need at least Internet Explorer 8. If you already run IE8 or higher, disable the Compatibility View. Minimal view will be used until you upgrade your browser.'));
             $mode = 'mobile';
         }

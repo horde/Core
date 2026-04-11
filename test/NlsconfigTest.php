@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2016-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -27,6 +27,7 @@ use Horde_Registry_Nlsconfig;
  * @category Horde
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
+ * @coversNothing
  */
 class NlsconfigTest extends TestCase
 {
@@ -74,8 +75,8 @@ class NlsconfigTest extends TestCase
     public function testGet()
     {
         $this->markTestIncomplete(
-            'Test for Nlsconfig::__get() not yet implemented. ' .
-            'Should test accessing $nls->languages, $nls->aliases, and $nls->charsets.'
+            'Test for Nlsconfig::__get() not yet implemented. '
+            . 'Should test accessing $nls->languages, $nls->aliases, and $nls->charsets.'
         );
     }
 

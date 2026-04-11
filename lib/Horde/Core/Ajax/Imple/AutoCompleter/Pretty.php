@@ -3,7 +3,7 @@
 /**
  * The pretty AJAX autocompleter.
  *
- * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2012-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -38,9 +38,9 @@ class Horde_Core_Ajax_Imple_AutoCompleter_Pretty extends Horde_Core_Ajax_Imple_A
         parent::__construct(
             array_merge(
                 [
-                'deleteIcon' => strval(Horde_Themes::img('delete-small.png')),
-                'triggerContainer' => strval(new Horde_Support_Randomid()),
-            ],
+                    'deleteIcon' => strval(Horde_Themes::img('delete-small.png')),
+                    'triggerContainer' => strval(new Horde_Support_Randomid()),
+                ],
                 $params
             )
         );
@@ -69,9 +69,9 @@ class Horde_Core_Ajax_Imple_AutoCompleter_Pretty extends Horde_Core_Ajax_Imple_A
             $this->params['uri'] = strval($ac->getImpleUrl()->setRaw(true));
         }
 
-        return 'new PrettyAutocompleter(' .
-            Horde_Serialize::serialize($dom_id, Horde_Serialize::JSON) . ',' .
-            '{' . implode(',', $this->_getOpts($ac)) . '})';
+        return 'new PrettyAutocompleter('
+            . Horde_Serialize::serialize($dom_id, Horde_Serialize::JSON) . ','
+            . '{' . implode(',', $this->_getOpts($ac)) . '})';
     }
 
 }

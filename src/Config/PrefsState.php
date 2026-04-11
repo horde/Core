@@ -37,8 +37,7 @@ class PrefsState
     public function __construct(
         private array $prefs,
         private array $prefGroups = []
-    ) {
-    }
+    ) {}
 
     /**
      * Get specific preference definition

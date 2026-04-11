@@ -28,6 +28,7 @@ use PHPUnit\Framework\TestCase;
  * Integration tests for the config metadata system.
  *
  * Tests the complete flow from drivers through provider to state.
+ * @coversNothing
  */
 class ConfigMetadataIntegrationTest extends TestCase
 {

@@ -40,8 +40,7 @@ class ConfigMetadataProvider
 {
     public function __construct(
         private readonly DriverRepository $repository,
-    ) {
-    }
+    ) {}
 
     /**
      * Get the driver repository.

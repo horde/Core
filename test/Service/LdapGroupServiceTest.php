@@ -24,6 +24,7 @@ use Horde_Ldap_Search;
 use Horde_Ldap_Entry;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Horde_Ldap_Exception;
 
 /**
  * Tests for LdapGroupService
@@ -217,7 +218,7 @@ class LdapGroupServiceTest extends TestCase
     {
         $ldapAdapter = $this->createStub(Horde_Ldap::class);
         $ldapAdapter->method('getEntry')
-            ->willThrowException(new \Horde_Ldap_Exception('Not found'));
+            ->willThrowException(new Horde_Ldap_Exception('Not found'));
 
         $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
         $service = new LdapGroupService($this->ldapService, 'ou=groups,dc=example,dc=com');

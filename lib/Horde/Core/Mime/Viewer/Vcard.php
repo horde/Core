@@ -3,7 +3,7 @@
 /**
  * The Horde_Core_Mime_Viewer_Vcard class renders out vCards in HTML format.
  *
- * Copyright 2002-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2002-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -104,9 +104,9 @@ class Horde_Core_Mime_Viewer_Vcard extends Horde_Mime_Viewer_Base
             $notification->push(Horde_Core_Translation::t('There was an error reading the contact data.'), 'horde.error');
         }
 
-        if (Horde_Util::getFormData('import') &&
-            Horde_Util::getFormData('source') &&
-            $registry->hasMethod('contacts/import')) {
+        if (Horde_Util::getFormData('import')
+            && Horde_Util::getFormData('source')
+            && $registry->hasMethod('contacts/import')) {
             $source = Horde_Util::getFormData('source');
             $count = 0;
             foreach ($iCal->getComponents() as $c) {
@@ -171,18 +171,18 @@ class Horde_Core_Mime_Viewer_Vcard extends Horde_Mime_Viewer_Base
 
             $photos = $vc->getAllAttributes('PHOTO');
             foreach ($photos as $p => $photo) {
-                if (isset($photo['params']['VALUE']) &&
-                    Horde_String::upper($photo['params']['VALUE']) == 'URI') {
+                if (isset($photo['params']['VALUE'])
+                    && Horde_String::upper($photo['params']['VALUE']) == 'URI') {
                     $html .= $this->_row(
                         Horde_Core_Translation::t('Photo'),
                         '<img src="' . htmlspecialchars($photo['value']) . '" />',
                         false
                     );
-                } elseif (isset($photo['params']['ENCODING']) &&
-                          Horde_String::upper($photo['params']['ENCODING']) == 'B' &&
-                          isset($photo['params']['TYPE'])) {
-                    if ($browser->hasFeature('datauri') === true ||
-                        $browser->hasFeature('datauri') >= strlen($photo['value'])) {
+                } elseif (isset($photo['params']['ENCODING'])
+                          && Horde_String::upper($photo['params']['ENCODING']) == 'B'
+                          && isset($photo['params']['TYPE'])) {
+                    if ($browser->hasFeature('datauri') === true
+                        || $browser->hasFeature('datauri') >= strlen($photo['value'])) {
                         $html .= $this->_row(
                             Horde_Core_Translation::t('Photo'),
                             '<img src="' . Horde_Url_Data::create($photo['params']['TYPE'], base64_decode($photo['value'])) . '" />',
@@ -420,8 +420,8 @@ class Horde_Core_Mime_Viewer_Vcard extends Horde_Mime_Viewer_Base
 
         $html .=  '</table>';
 
-        if ($registry->hasMethod('contacts/import') &&
-            $registry->hasMethod('contacts/sources')) {
+        if ($registry->hasMethod('contacts/import')
+            && $registry->hasMethod('contacts/sources')) {
             $html .= '<div class="horde-form-buttons"><form action="'
                 . Horde::selfUrl() . '" method="get" name="vcard_import" id="vcard_import">'
                 . Horde_Util::formInput();
@@ -432,8 +432,8 @@ class Horde_Core_Mime_Viewer_Vcard extends Horde_Mime_Viewer_Base
 
             $sources = $registry->call('contacts/sources', [true]);
             if (count($sources) > 1) {
-                $html .=
-                    '<input type="submit" class="horde-default" name="import" value="'
+                $html
+                    .= '<input type="submit" class="horde-default" name="import" value="'
                     . Horde_Core_Translation::t('Add to address book:') . '" />'
                     . ' <label for="add_source" class="hidden">'
                     . Horde_Core_Translation::t('Address Book') . '</label>'
@@ -448,8 +448,8 @@ class Horde_Core_Mime_Viewer_Vcard extends Horde_Mime_Viewer_Base
                 $html .= '</select>';
             } else {
                 reset($sources);
-                $html .=
-                    '<input type="submit" class="horde-default" name="import" value="'
+                $html
+                    .= '<input type="submit" class="horde-default" name="import" value="'
                     . Horde_Core_Translation::t('Add to my address book') . '" />'
                     . '<input type="hidden" name="source" value="'
                     . htmlspecialchars(key($sources)) . '" />';
@@ -476,9 +476,9 @@ class Horde_Core_Mime_Viewer_Vcard extends Horde_Mime_Viewer_Base
             $label = htmlspecialchars($label);
             $value = htmlspecialchars($value);
         }
-        return '<tr><td>' . $label .
-            '</td><td>' . nl2br($value) .
-            "</td></tr>\n";
+        return '<tr><td>' . $label
+            . '</td><td>' . nl2br($value)
+            . "</td></tr>\n";
     }
 
 }

@@ -3,7 +3,7 @@
 /**
  * Horde specific wrapper for Horde_Share drivers. Adds Horde hook calls etc...
  *
- * Copyright 2002-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2002-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you did
  * not receive this file, see http://opensource.org/licenses/lgpl-2.1.php
@@ -187,7 +187,7 @@ class Horde_Core_Share_Driver
         }
 
         return ['type' => $locktargettype,
-                     'lock' => reset($result)];
+            'lock' => reset($result)];
     }
 
     /**

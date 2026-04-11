@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016-2021 Horde LLC (http://www.horde.org/)
+ * Copyright 2016-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -15,7 +15,11 @@ namespace Horde\Core\Test\Middleware;
 
 use Horde\Core\Middleware\AuthIsGlobalAdmin;
 use Horde\Test\TestCase;
+use Horde_Registry;
 
+/**
+ * @coversNothing
+ */
 class AuthIsGlobalAdminTest extends TestCase
 {
     use SetUpTrait {
@@ -26,7 +30,7 @@ class AuthIsGlobalAdminTest extends TestCase
     {
         $this->traitSetUp();
         // Replace stub with mock since we need expectations
-        $this->registry = $this->createMock(\Horde_Registry::class);
+        $this->registry = $this->createMock(Horde_Registry::class);
     }
 
     protected function getMiddleware()

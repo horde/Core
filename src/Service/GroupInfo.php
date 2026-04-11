@@ -41,8 +41,7 @@ class GroupInfo
         public readonly string $name,
         public readonly array $members,
         public readonly array $extra = []
-    ) {
-    }
+    ) {}
 
     /**
      * Create from backend data array

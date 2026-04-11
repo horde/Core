@@ -3,7 +3,7 @@
 /**
  * The local (browser-side) autocompleter.
  *
- * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2012-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -61,10 +61,10 @@ class Horde_Core_Ajax_Imple_AutoCompleter_Local extends Horde_Core_Ajax_Imple_Au
     {
         $dom_id = $ac->getDomId();
 
-        return 'new Autocompleter.Local(' .
-            Horde_Serialize::serialize($dom_id, Horde_Serialize::JSON) . ',' .
-            (is_string($this->_search) ? $this->_search : Horde_Serialize::serialize($this->_search, Horde_Serialize::JSON)) . ',' .
-            '{' . implode(',', $this->_getOpts($ac)) . '})';
+        return 'new Autocompleter.Local('
+            . Horde_Serialize::serialize($dom_id, Horde_Serialize::JSON) . ','
+            . (is_string($this->_search) ? $this->_search : Horde_Serialize::serialize($this->_search, Horde_Serialize::JSON)) . ','
+            . '{' . implode(',', $this->_getOpts($ac)) . '})';
     }
 
 }

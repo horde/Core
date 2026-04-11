@@ -3,7 +3,7 @@
 /**
  * View helper class for smartmobile pages.
  *
- * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2012-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -32,27 +32,27 @@ class Horde_Core_Smartmobile_View_Helper extends Horde_View_Helper_Base
     {
         global $registry;
 
-        $out = '<div data-position="fixed" data-role="header" data-tap-toggle="' .
-            (empty($params['taptoggle']) ? 'false' : 'true') .
-            '">';
+        $out = '<div data-position="fixed" data-role="header" data-tap-toggle="'
+            . (empty($params['taptoggle']) ? 'false' : 'true')
+            . '">';
 
         if (!empty($params['backlink'])) {
             if (is_array($params['backlink'])) {
-                $out .= '<a class="smartmobile-back ui-btn-left" href="' .
-                    $params['backlink'][0] .
-                    '" data-icon="arrow-l" data-direction="reverse">' .
-                    $params['backlink'][1] . '</a>';
+                $out .= '<a class="smartmobile-back ui-btn-left" href="'
+                    . $params['backlink'][0]
+                    . '" data-icon="arrow-l" data-direction="reverse">'
+                    . $params['backlink'][1] . '</a>';
             } else {
-                $out .= '<a class="smartmobile-back ui-btn-left" href="#" ' .
-                    'data-icon="arrow-l" data-rel="back">' . Horde_Core_Translation::t('Back') . '</a>';
+                $out .= '<a class="smartmobile-back ui-btn-left" href="#" '
+                    . 'data-icon="arrow-l" data-rel="back">' . Horde_Core_Translation::t('Back') . '</a>';
             }
         }
 
-        if (!empty($params['portal']) &&
-            ($portal = $registry->getServiceLink('portal', 'horde')->setRaw(false))) {
-            $out .= '<a class="smartmobile-portal ui-btn-left" ' .
-                'data-ajax="false" href="' . $portal . '">' .
-                Horde_Core_Translation::t('Applications') . '</a>';
+        if (!empty($params['portal'])
+            && ($portal = $registry->getServiceLink('portal', 'horde')->setRaw(false))) {
+            $out .= '<a class="smartmobile-portal ui-btn-left" '
+                . 'data-ajax="false" href="' . $portal . '">'
+                . Horde_Core_Translation::t('Applications') . '</a>';
         }
 
         if (isset($params['title']) && strlen($params['title'])) {
@@ -62,10 +62,10 @@ class Horde_Core_Smartmobile_View_Helper extends Horde_View_Helper_Base
         if (!empty($params['logout']) && $registry->showService('logout')) {
             // Use modern logout endpoint (no token required)
             $logout = $registry->get('webroot', 'horde') . '/auth/logout';
-            $out .= '<a class="smartmobile-logout ui-btn-right" href="' .
-                htmlspecialchars($logout) .
-                '" data-ajax="false" data-theme="e" data-icon="delete">' .
-                Horde_Core_Translation::t('Log out') . '</a>';
+            $out .= '<a class="smartmobile-logout ui-btn-right" href="'
+                . htmlspecialchars($logout)
+                . '" data-ajax="false" data-theme="e" data-icon="delete">'
+                . Horde_Core_Translation::t('Log out') . '</a>';
         }
 
         return $out . '</div>';

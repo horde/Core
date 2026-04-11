@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2012-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -204,8 +204,8 @@ class Horde_PageOutput
 
         if (!empty($this->smartmobileInit)) {
             echo Horde::wrapInlineScript([
-                'var horde_jquerymobile_init = function() {' .
-                implode('', $this->smartmobileInit) . '};',
+                'var horde_jquerymobile_init = function() {'
+                . implode('', $this->smartmobileInit) . '};',
             ]);
             $this->smartmobileInit = [];
         }
@@ -411,9 +411,9 @@ class Horde_PageOutput
     public function outputMetaTags()
     {
         foreach ($this->metaTags as $key => $val) {
-            echo '<meta content="' . $val['c'] . '" ' .
-                ($val['h'] ? 'http-equiv' : 'name') .
-                '="' . $key . "\" />\n";
+            echo '<meta content="' . $val['c'] . '" '
+                . ($val['h'] ? 'http-equiv' : 'name')
+                . '="' . $key . "\" />\n";
         }
 
         $this->metaTags = [];
@@ -508,11 +508,11 @@ class Horde_PageOutput
         }
 
         /* Compress output if requested and possible. */
-        if ($GLOBALS['conf']['compress_pages'] &&
-            !$GLOBALS['browser']->hasQuirk('buggy_compression') &&
-            !(bool)ini_get('zlib.output_compression') &&
-            !(bool)ini_get('zend_accelerator.compress_all') &&
-            ini_get('output_handler') != 'ob_gzhandler') {
+        if ($GLOBALS['conf']['compress_pages']
+            && !$GLOBALS['browser']->hasQuirk('buggy_compression')
+            && !(bool) ini_get('zlib.output_compression')
+            && !(bool) ini_get('zend_accelerator.compress_all')
+            && ini_get('output_handler') != 'ob_gzhandler') {
             if (ob_get_level()) {
                 ob_end_clean();
             }
@@ -608,11 +608,11 @@ class Horde_PageOutput
 
                 $this->smartmobileInit = array_merge(
                     [
-                    '$.mobile.page.prototype.options.backBtnText = "' . Horde_Core_Translation::t('Back') .'";',
-                    '$.mobile.dialog.prototype.options.closeBtnText = "' . Horde_Core_Translation::t('Close') .'";',
-                    '$.mobile.listview.prototype.options.filterPlaceholder = "' . Horde_Core_Translation::t('Filter items...') . '";',
-                    '$.mobile.loader.prototype.options.text = "' . Horde_Core_Translation::t('loading') . '";',
-            ],
+                        '$.mobile.page.prototype.options.backBtnText = "' . Horde_Core_Translation::t('Back') . '";',
+                        '$.mobile.dialog.prototype.options.closeBtnText = "' . Horde_Core_Translation::t('Close') . '";',
+                        '$.mobile.listview.prototype.options.filterPlaceholder = "' . Horde_Core_Translation::t('Filter items...') . '";',
+                        '$.mobile.loader.prototype.options.text = "' . Horde_Core_Translation::t('loading') . '";',
+                    ],
                     $opts['smartmobileinit'] ?? [],
                     $this->smartmobileInit
                 );
@@ -791,9 +791,7 @@ class Horde_PageOutput
      *
      * @deprecated
      */
-    public function outputSmartmobileFiles()
-    {
-    }
+    public function outputSmartmobileFiles() {}
 
     /**
      * Output page footer.

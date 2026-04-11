@@ -34,7 +34,7 @@ class Directory implements Stringable
     public function getRecursiveDirectoryIterator(): RecursiveDirectoryIterator
     {
         if ($this->isReadable()) {
-            return new \RecursiveDirectoryIterator($this->path);
+            return new RecursiveDirectoryIterator($this->path);
         }
         throw new RuntimeException("Directory is not readable: {$this->path}");
     }
@@ -47,7 +47,7 @@ class Directory implements Stringable
         if ($this->isReadable()) {
             return new DirectoryIterator($this->path);
         }
-        throw new \RuntimeException("Directory is not readable: {$this->path}");
+        throw new RuntimeException("Directory is not readable: {$this->path}");
     }
 
     public function getFilesystemIterator(): FilesystemIterator

@@ -42,8 +42,7 @@ class AuthService
      */
     public function __construct(
         private Horde_Auth_Base $auth
-    ) {
-    }
+    ) {}
 
     /**
      * Check if backend supports user listing

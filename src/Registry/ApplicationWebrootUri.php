@@ -12,6 +12,4 @@ use Horde\Http\Uri;
  * By default, this is $deploymentWebrootUri . '/$application/';
  *
  */
-class ApplicationWebrootUri extends Uri
-{
-}
+class ApplicationWebrootUri extends Uri {}

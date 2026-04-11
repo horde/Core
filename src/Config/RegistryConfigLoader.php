@@ -210,7 +210,7 @@ class RegistryConfigLoader
     {
         // Create mock object with applications property
         // Registry files assign to $this->applications
-        $mock = new class () {
+        $mock = new class {
             public array $applications = [];
         };
 

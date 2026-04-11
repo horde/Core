@@ -3,7 +3,7 @@
 /**
  * Imple to allow in-place editing of a HTML element.
  *
- * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2012-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -60,9 +60,9 @@ abstract class Horde_Core_Ajax_Imple_InPlaceEditor extends Horde_Core_Ajax_Imple
             ];
             $config->ids = new stdClass();
             $config->ids->{$this->getDomId()} = [
-                'load_url' => (string)$load_url,
+                'load_url' => (string) $load_url,
                 'rows' => $this->_params['rows'],
-                'value_url' => (string)$value_url,
+                'value_url' => (string) $value_url,
             ];
 
             if (!empty($this->_params['width'])) {

@@ -8,6 +8,7 @@
  *
  * @category Horde
  * @package  Core
+ * @coversNothing
  */
 class Horde_Themes_Css_Compress_IntegrationTest extends PHPUnit\Framework\TestCase
 {
@@ -28,7 +29,7 @@ class Horde_Themes_Css_Compress_IntegrationTest extends PHPUnit\Framework\TestCa
         file_put_contents($tempFile, 'body { color: red; }');
 
         // Modern API validates at construction
-        $file = new \Horde\CssMinify\Input\CssFile('test.css', $tempFile);
+        $file = new Horde\CssMinify\Input\CssFile('test.css', $tempFile);
 
         $this->assertSame('test.css', $file->uri);
         $this->assertSame($tempFile, $file->filepath);
@@ -38,10 +39,10 @@ class Horde_Themes_Css_Compress_IntegrationTest extends PHPUnit\Framework\TestCa
 
     public function testCssFileThrowsOnInvalid(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('File not readable');
 
-        new \Horde\CssMinify\Input\CssFile('missing.css', '/nonexistent/path.css');
+        new Horde\CssMinify\Input\CssFile('missing.css', '/nonexistent/path.css');
     }
 
     public function testModernApiTypeSafety(): void
@@ -49,9 +50,9 @@ class Horde_Themes_Css_Compress_IntegrationTest extends PHPUnit\Framework\TestCa
         $tempFile = tempnam(sys_get_temp_dir(), 'css');
         file_put_contents($tempFile, 'body { color: red; }');
 
-        $file = new \Horde\CssMinify\Input\CssFile('test.css', $tempFile);
-        $collection = new \Horde\CssMinify\Input\FileCollectionInput($file);
-        $minifier = new \Horde\CssMinify\CssParserMinifier($collection);
+        $file = new Horde\CssMinify\Input\CssFile('test.css', $tempFile);
+        $collection = new Horde\CssMinify\Input\FileCollectionInput($file);
+        $minifier = new Horde\CssMinify\CssParserMinifier($collection);
 
         $result = $minifier->minify();
 
@@ -63,8 +64,8 @@ class Horde_Themes_Css_Compress_IntegrationTest extends PHPUnit\Framework\TestCa
 
     public function testSettingsImmutability(): void
     {
-        $urlCallback = new \Horde\CssMinify\UrlCallback(fn ($p) => $p);
-        $settings = new \Horde\CssMinify\Settings(dataUrlCallback: $urlCallback);
+        $urlCallback = new Horde\CssMinify\UrlCallback(fn($p) => $p);
+        $settings = new Horde\CssMinify\Settings(dataUrlCallback: $urlCallback);
 
         // Properties are readonly
         $this->assertSame($urlCallback, $settings->dataUrlCallback);
@@ -73,7 +74,7 @@ class Horde_Themes_Css_Compress_IntegrationTest extends PHPUnit\Framework\TestCa
     public function testCompressCodePath(): void
     {
         // This verifies the updated Compress.php code paths compile
-        $reflection = new \ReflectionClass('Horde_Themes_Css_Compress');
+        $reflection = new ReflectionClass('Horde_Themes_Css_Compress');
 
         // Verify compress method exists
         $this->assertTrue($reflection->hasMethod('compress'));

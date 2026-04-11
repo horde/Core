@@ -27,8 +27,7 @@ class GeneratedJwt
         public readonly string $token,
         public readonly int $expiresAt,
         public readonly array $claims = []
-    ) {
-    }
+    ) {}
 
     /**
      * Get a specific claim value

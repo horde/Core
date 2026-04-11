@@ -4,7 +4,7 @@
  * Preferences storage implementation that loads the default values from
  * the configuration files.
  *
- * Copyright 2010-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -42,8 +42,8 @@ class Horde_Core_Prefs_Storage_Configuration extends Horde_Prefs_Storage_Base
 
         if (isset($pconf->config['_prefs'])) {
             foreach ($pconf->config['_prefs'] as $name => $pref) {
-                if (!isset($pref['value']) ||
-                    (isset($pref['type']) && in_array($pref['type'], $ui))) {
+                if (!isset($pref['value'])
+                    || (isset($pref['type']) && in_array($pref['type'], $ui))) {
                     continue;
                 }
 

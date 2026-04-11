@@ -3,7 +3,7 @@
 /**
  * Class to attach PHP actions to javascript elements.
  *
- * Copyright 2005-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2005-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -94,9 +94,9 @@ abstract class Horde_Core_Ajax_Imple
             : $result;
 
         $page_output->addInlineScript([
-            'HordeImple.add(' .
-                Horde_Serialize::serialize($args, Horde_Serialize::JSON) .
-            ')',
+            'HordeImple.add('
+                . Horde_Serialize::serialize($args, Horde_Serialize::JSON)
+            . ')',
         ], true);
     }
 
@@ -167,8 +167,8 @@ abstract class Horde_Core_Ajax_Imple
     protected function _jsOnDoAction($js)
     {
         $GLOBALS['page_output']->addInlineScript([
-            'document.observe("' . get_class($this) . ':do", function(e) {' .
-            $js . '});',
+            'document.observe("' . get_class($this) . ':do", function(e) {'
+            . $js . '});',
         ]);
     }
 
@@ -181,8 +181,8 @@ abstract class Horde_Core_Ajax_Imple
     protected function _jsOnComplete($js)
     {
         $GLOBALS['page_output']->addInlineScript([
-            'document.observe("' . get_class($this) . ':complete", function(e) {' .
-            $js . '});',
+            'document.observe("' . get_class($this) . ':complete", function(e) {'
+            . $js . '});',
         ]);
     }
 

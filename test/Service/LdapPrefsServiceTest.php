@@ -23,6 +23,7 @@ use Horde_Ldap_Search;
 use Horde_Ldap_Entry;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Horde_Ldap_Exception;
 
 /**
  * Tests for LdapPrefsService
@@ -91,7 +92,7 @@ class LdapPrefsServiceTest extends TestCase
     {
         $ldapAdapter = $this->createStub(Horde_Ldap::class);
         $ldapAdapter->method('findUserDN')
-            ->willThrowException(new \Horde_Ldap_Exception('User not found'));
+            ->willThrowException(new Horde_Ldap_Exception('User not found'));
 
         $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
         $service = new LdapPrefsService($this->ldapService, 'ou=users,dc=example,dc=com');
@@ -176,7 +177,7 @@ class LdapPrefsServiceTest extends TestCase
     {
         $ldapAdapter = $this->createStub(Horde_Ldap::class);
         $ldapAdapter->method('findUserDN')
-            ->willThrowException(new \Horde_Ldap_Exception('User not found'));
+            ->willThrowException(new Horde_Ldap_Exception('User not found'));
 
         $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
         $service = new LdapPrefsService($this->ldapService, 'ou=users,dc=example,dc=com');
@@ -280,7 +281,7 @@ class LdapPrefsServiceTest extends TestCase
     {
         $ldapAdapter = $this->createStub(Horde_Ldap::class);
         $ldapAdapter->method('findUserDN')
-            ->willThrowException(new \Horde_Ldap_Exception('User not found'));
+            ->willThrowException(new Horde_Ldap_Exception('User not found'));
 
         $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
         $service = new LdapPrefsService($this->ldapService, 'ou=users,dc=example,dc=com');

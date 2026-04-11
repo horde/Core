@@ -4,7 +4,7 @@
  * Extend the base URL class to allow for use with the URL parameter scheme
  * used in Horde's smartmobile framework.
  *
- * Copyright 2012-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2012-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
@@ -23,37 +23,37 @@
  * @category Horde
  * @package  Core
  */
-class Horde_Core_Smartmobile_Url extends \Horde\Url\Url
+class Horde_Core_Smartmobile_Url extends Horde\Url\Url
 {
     /**
      * The URL used as the base for the smartmobile anchor.
      *
-     * @var \Horde\Url\Url
+     * @var Horde\Url\Url
      */
     protected $_baseUrl;
 
     /**
      * Constructor.
      *
-     * @param \Horde\Url\Url|Horde_Url|string|null $url  The basic URL (URL object or string).
+     * @param Horde\Url\Url|Horde_Url|string|null $url  The basic URL (URL object or string).
      * @param bool|null $raw                              Whether to output the URL in raw format or HTML-encoded.
      */
-    public function __construct(\Horde\Url\Url|Horde_Url|string|null $url = null, ?bool $raw = null)
+    public function __construct(Horde\Url\Url|Horde_Url|string|null $url = null, ?bool $raw = null)
     {
         if ($url === null) {
-            $url = new \Horde\Url\Url();
+            $url = new Horde\Url\Url();
         } elseif ($url instanceof Horde_Url) {
             // Convert legacy wrapper to modern Url
-            $url = new \Horde\Url\Url((string)$url, $raw);
+            $url = new Horde\Url\Url((string) $url, $raw);
             // Copy parameters from the wrapper
-            foreach ((array)$url->parameters as $key => $value) {
+            foreach ((array) $url->parameters as $key => $value) {
                 $url->add($key, $value);
             }
         } elseif (is_string($url)) {
             // Accept strings for convenience
-            $url = new \Horde\Url\Url($url, $raw);
-        } elseif (!($url instanceof \Horde\Url\Url)) {
-            throw new \InvalidArgumentException('First argument must be a URL object or string');
+            $url = new Horde\Url\Url($url, $raw);
+        } elseif (!($url instanceof Horde\Url\Url)) {
+            throw new InvalidArgumentException('First argument must be a URL object or string');
         }
 
         $query = '';
