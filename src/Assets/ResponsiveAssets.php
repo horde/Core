@@ -136,6 +136,60 @@ class ResponsiveAssets
     }
 
     /**
+     * Get URL for a theme graphic (first-found-wins cascade)
+     *
+     * Checks locations in most-specific-first order:
+     * 1. App selected theme:  themes/{app}/{theme}/graphics/{file}
+     * 2. App default theme:   themes/{app}/default/graphics/{file}
+     * 3. Horde selected theme: themes/horde/{theme}/graphics/{file}
+     * 4. Horde default theme: themes/horde/default/graphics/{file}
+     *
+     * Returns the URI of the first match, or empty string if none found.
+     *
+     * @param string      $file   Graphic filename (e.g. 'new.png' or 'mime/pdf.png')
+     * @param string|null $theme  Theme name (null = use preference)
+     * @param string|null $app    Application name (null = current app)
+     *
+     * @return string  URL to the graphic, or '' if not found
+     */
+    public function getGraphicUrl(
+        string $file,
+        ?string $theme = null,
+        ?string $app = null,
+    ): string {
+        $theme ??= $this->getThemePreference();
+        $app ??= $this->registry->getApp();
+
+        $candidates = [];
+
+        // Most specific first — app theme override
+        if ($app !== 'horde' && $theme !== 'default') {
+            $candidates[] = ['theme' => $theme, 'app' => $app];
+        }
+
+        // App default theme
+        if ($app !== 'horde') {
+            $candidates[] = ['theme' => 'default', 'app' => $app];
+        }
+
+        // Horde selected theme
+        if ($theme !== 'default') {
+            $candidates[] = ['theme' => $theme, 'app' => 'horde'];
+        }
+
+        // Horde default theme (ultimate fallback)
+        $candidates[] = ['theme' => 'default', 'app' => 'horde'];
+
+        foreach ($candidates as $candidate) {
+            if ($this->graphicFileExists($file, $candidate['theme'], $candidate['app'])) {
+                return $this->buildGraphicUrl($file, $candidate['theme'], $candidate['app']);
+            }
+        }
+
+        return '';
+    }
+
+    /**
      * Build CSS URL
      *
      * @param string $file CSS filename
@@ -193,6 +247,39 @@ class ResponsiveAssets
         try {
             $jsFs = $this->registry->get('jsfs', $app);
             $filePath = $jsFs . '/' . $filename;
+            return $this->filesystem->fileExists($filePath);
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Build graphic URL
+     *
+     * @param string $file Graphic filename
+     * @param string $theme Theme name
+     * @param string $app Application name
+     * @return string URL
+     */
+    private function buildGraphicUrl(string $file, string $theme, string $app): string
+    {
+        $themesUri = $this->registry->get('themesuri', $app);
+        return $themesUri . '/' . $theme . '/graphics/' . $file;
+    }
+
+    /**
+     * Check if graphic file exists
+     *
+     * @param string $filename Graphic filename
+     * @param string $theme Theme name
+     * @param string $app Application name
+     * @return bool
+     */
+    private function graphicFileExists(string $filename, string $theme, string $app): bool
+    {
+        try {
+            $themesFs = $this->registry->get('themesfs', $app);
+            $filePath = $themesFs . '/' . $theme . '/graphics/' . $filename;
             return $this->filesystem->fileExists($filePath);
         } catch (Exception $e) {
             return false;
