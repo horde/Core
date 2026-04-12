@@ -22,6 +22,7 @@ use Horde\Core\Factory\TinymcePageBinderFactory;
 use Horde\Core\Horde;
 use Horde\Editor\Tinymce;
 use NetDNS2\Exception as NetDNS2Exception;
+use Horde\Url\Url;
 use Horde\Util\Util;
 
 /**
@@ -1469,10 +1470,10 @@ class Horde_Registry implements Horde_Shutdown_Task
      * @param string $app        The name of the current Horde application.
      * @param boolean $full      Return a full url? @since 2.4.0
      *
-     * @return Horde_Url  The link.
+     * @return Url  The link.
      * @throws Horde_Exception
      */
-    public function getServiceLink($type, $app = null, $full = false)
+    public function getServiceLink($type, $app = null, $full = false): Url
     {
         $opts = ['app' => 'horde'];
 
@@ -2330,9 +2331,9 @@ class Horde_Registry implements Horde_Shutdown_Task
      *     - reason: (integer) The reason for logout
      *               DEFAULT: None
      *
-     * @return Horde_Url  The formatted URL.
+     * @return Url  The formatted URL.
      */
-    public function getLogoutUrl(array $options = [])
+    public function getLogoutUrl(array $options = []): Url
     {
         if (!isset($options['reason'])) {
             // TODO: This only returns the error for Horde-wide
@@ -2373,11 +2374,11 @@ class Horde_Registry implements Horde_Shutdown_Task
      * @param string $filename  The filename of the download data.
      * @param array $params     Additional URL parameters needed.
      *
-     * @return Horde_Url  The download URL. This URL should be used as-is,
+     * @return Url  The download URL. This URL should be used as-is,
      *                    since the filename MUST be the last parameter added
      *                    to the URL.
      */
-    public function downloadUrl($filename, array $params = [])
+    public function downloadUrl($filename, array $params = []): Url
     {
         $url = $this->getServiceLink('download', $this->getApp())
             /* Add parameters. */

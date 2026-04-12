@@ -818,7 +818,7 @@ class Horde
             || HordeString::substr($url, 0, 7) == 'mailto:') {
             $ext = $url;
         } else {
-            $ext = (string) self::signQueryString($GLOBALS['registry']->getServiceLink('go', 'horde')->add('url', $url));
+            $ext = (string) self::signQueryString((string) $GLOBALS['registry']->getServiceLink('go', 'horde')->add('url', $url));
         }
 
         if ($tag) {
