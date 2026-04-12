@@ -11,34 +11,35 @@ declare(strict_types=1);
 
 namespace Horde\Core;
 
-use Horde_Array;
-use Horde_Auth;
-use Horde_Browser;
-use Horde_Cache;
+use Horde\Exception\HordeException;
+use Horde\Log\Handler\BufferHandler;
+use Horde\Log\Handler\StreamHandler;
+use Horde\Log\Handler\SystemdJournalHandler;
+use Horde\Log\Handler\SystemdJournalOptions;
+use Horde\Log\Logger;
+use Horde\Log\LogLevel;
+use Horde\Log\LogMessage;
+use Horde\Support\Backtrace;
+use Horde\Url\Url;
+use Horde\Util\ArrayUtils;
+use Horde\Util\HordeString;
+use Horde\Util\StringTransliterate;
+use Horde\Util\Util;
 use Horde_Core_Factory_Logger;
 use Horde_Core_Hooks;
-use Horde_Core_HordeMap;
 use Horde_Core_Log_Object;
 use Horde_Core_Script_Package_Popup;
 use Horde_Core_Translation;
-use Horde_Exception;
 use Horde_Exception_HookNotSet;
-use Horde_Log;
-use Horde_Log_Handler_Stream;
-use Horde_Log_Logger;
 use Horde_Menu;
-use Horde_Registry;
 use Horde_Serialize;
 use Horde_Session;
-use Horde_String;
-use Horde_String_Transliterate;
-use Horde_Support_Backtrace;
-use Horde_Url;
-use Horde_Util;
-use Horde_Variables;
 use Horde_View_Sidebar;
 use Stringable;
 use stdClass;
+use Exception;
+use PEAR_Error;
+use Throwable;
 
 /**
  * Provides the base functionality shared by all Horde applications.
@@ -85,9 +86,17 @@ class Horde
     protected static array $_used = [];
 
     /**
+     * Pre-init log buffer for messages received before the logger is ready.
+     */
+    private static ?BufferHandler $_logBuffer = null;
+
+    /**
      * Shortcut to logging method.
      *
-     * @see Horde_Core_Log_Logger
+     * Uses the PSR-3 Horde\Log\Logger as primary target. Falls back to the
+     * legacy Horde_Core_Log_Logger if the PSR-4 logger is unavailable.
+     * Messages received before the framework is initialized are buffered
+     * in a BufferHandler and drained on the first post-init call.
      */
     public static function log(
         mixed $event,
@@ -97,21 +106,208 @@ class Horde
         $options['trace'] = isset($options['trace'])
             ? ($options['trace'] + 1)
             : 1;
-        $log_ob = new Horde_Core_Log_Object($event, $priority, $options);
 
-        /* Chicken/egg: we must wait until we have basic framework setup
-         * before we can start logging. Otherwise, queue entries. */
+        [$message, $resolvedPriority, $context] = self::buildLogPayload(
+            $event,
+            $priority,
+            $options,
+        );
+
+        // Skip already-logged HordeException events.
+        if ($message === null) {
+            return;
+        }
+
         if (isset($GLOBALS['injector'])
             && Horde_Core_Factory_Logger::available()) {
+            try {
+                $logger = $GLOBALS['injector']->getInstance(Logger::class);
+                self::drainBuffer($logger);
+                $logger->log($resolvedPriority, $message, $context);
+                return;
+            } catch (Throwable $e) {
+                // PSR-4 logger unavailable — fall through to legacy.
+            }
+            // Legacy fallback.
+            $log_ob = new Horde_Core_Log_Object($event, $priority, $options);
             $GLOBALS['injector']->getInstance('Horde_Log_Logger')->logObject($log_ob);
         } else {
-            Horde_Core_Factory_Logger::queue($log_ob);
+            // Framework not yet initialized — buffer for later.
+            self::bufferLog($resolvedPriority, $message, $context);
         }
     }
 
     /**
+     * Build a log payload from the event, replicating the message formatting
+     * logic of Horde_Core_Log_Object.
+     *
+     * @return array{0: ?string, 1: int, 2: array}  [message, priority, context]
+     *         Message is null if the event was already logged (dedup).
+     */
+    private static function buildLogPayload(
+        mixed $event,
+        ?int $priority,
+        array $options,
+    ): array {
+        $context = [];
+        $text = null;
+        $trace = null;
+
+        if (is_array($event)) {
+            if (isset($event['level'])) {
+                $priority = $event['level'];
+            }
+            $text = $event['message'] ?? '';
+            if (isset($event['timestamp'])) {
+                $context['timestamp'] = $event['timestamp'];
+            }
+        } elseif ($event instanceof Exception) {
+            if ($priority === null) {
+                $priority = 3; // ERR
+            }
+
+            if ($event instanceof HordeException) {
+                if ($event->logged) {
+                    return [null, $priority, []];
+                }
+                if ($loglevel = $event->getLogLevel()) {
+                    $priority = $loglevel;
+                }
+            }
+
+            $text = $event->getMessage();
+            if (!empty($event->details)) {
+                $text .= ' ' . $event->details;
+            }
+            $trace = [
+                'file' => $event->getFile(),
+                'line' => $event->getLine(),
+            ];
+
+            if (empty($options['notracelog'])
+                && class_exists(Backtrace::class)) {
+                $context['backtrace'] = strval(new Backtrace($event));
+            }
+        } elseif ($event instanceof PEAR_Error) {
+            if ($priority === null) {
+                $priority = 3; // ERR
+            }
+            $userinfo = $event->getUserInfo();
+            $text = $event->getMessage();
+            if (!empty($userinfo)) {
+                if (is_array($userinfo)) {
+                    $userinfo = @implode(', ', $userinfo);
+                }
+                $text .= ': ' . $userinfo;
+            }
+        } elseif (is_object($event)) {
+            $text = strval($event);
+            if (!is_string($text)) {
+                $text = is_callable([$event, 'getMessage'])
+                    ? $event->getMessage()
+                    : '';
+            }
+        } else {
+            $text = (string) $event;
+        }
+
+        // Resolve caller location from backtrace if not from an exception.
+        if ($trace === null && !is_array($event)) {
+            $bt = debug_backtrace();
+            $bt_count = count($bt);
+            $frame = isset($options['trace'])
+                ? min($bt_count, $options['trace'])
+                : 0;
+            while ($frame < $bt_count) {
+                if (isset($bt[$frame]['class'])) {
+                    if (!in_array($bt[$frame]['class'], [
+                        self::class,
+                        'Horde',
+                        'Horde_Log_Logger',
+                        'Horde_Core_Log_Logger',
+                    ])) {
+                        break;
+                    }
+                } elseif (isset($bt[$frame]['function'])
+                          && !in_array($bt[$frame]['function'], [
+                              'call_user_func',
+                              'call_user_func_array',
+                          ])) {
+                    break;
+                }
+                ++$frame;
+            }
+            if (isset($bt[$frame])) {
+                $trace = $bt[$frame];
+            }
+        }
+
+        // Default priority: INFO (6).
+        $priority ??= 6;
+
+        // Build the formatted message with app prefix and location suffix.
+        $app = isset($GLOBALS['registry'])
+            ? $GLOBALS['registry']->getApp()
+            : 'horde';
+
+        $message = ($app ? '[' . $app . '] ' : '') . $text . ' [pid ' . getmypid();
+
+        if (isset($options['file']) || isset($trace['file'])) {
+            $file = $options['file'] ?? $trace['file'];
+            $line = $options['line'] ?? ($trace['line'] ?? '');
+            $message .= ' on line ' . $line . ' of "' . $file . '"]';
+        } else {
+            $message .= ']';
+        }
+
+        return [$message, $priority, $context];
+    }
+
+    /**
+     * Buffer a log message for replay once the logger is available.
+     */
+    private static function bufferLog(int $priority, string $message, array $context): void
+    {
+        if (self::$_logBuffer === null) {
+            self::$_logBuffer = new BufferHandler();
+        }
+        $level = new LogLevel($priority, self::priorityName($priority));
+        $logMessage = new LogMessage($level, $message, $context);
+        self::$_logBuffer->log($logMessage);
+    }
+
+    /**
+     * Drain buffered pre-init messages into the given logger.
+     */
+    private static function drainBuffer(Logger $logger): void
+    {
+        if (self::$_logBuffer !== null && self::$_logBuffer->count() > 0) {
+            self::$_logBuffer->drain($logger);
+            self::$_logBuffer = null;
+        }
+    }
+
+    /**
+     * Map numeric priority to PSR-3 level name.
+     */
+    private static function priorityName(int $priority): string
+    {
+        return match ($priority) {
+            0 => 'emergency',
+            1 => 'alert',
+            2 => 'critical',
+            3 => 'error',
+            4 => 'warning',
+            5 => 'notice',
+            6 => 'info',
+            7 => 'debug',
+            default => 'info',
+        };
+    }
+
+    /**
      * Debug method.  Allows quick shortcut to produce debug output into a
-     * temporary file.
+     * temporary file and optionally the systemd journal.
      */
     public static function debug(
         mixed $event = null,
@@ -122,11 +318,30 @@ class Horde
             $fname = self::getTempDir() . '/horde_debug.txt';
         }
 
+        $handlers = [];
+
         try {
-            $logger = new Horde_Log_Logger(new Horde_Log_Handler_Stream($fname));
-        } catch (\Exception $e) {
+            $handlers[] = new StreamHandler($fname);
+        } catch (Exception $e) {
+            // Stream not writable — continue, journal may still work.
+        }
+
+        try {
+            $journalOpts = new SystemdJournalOptions();
+            $journalOpts->ident = 'horde-debug';
+            $journalHandler = new SystemdJournalHandler($journalOpts);
+            if ($journalHandler->isAvailable()) {
+                $handlers[] = $journalHandler;
+            }
+        } catch (Throwable $e) {
+            // Journal not available — ignore.
+        }
+
+        if (empty($handlers)) {
             return;
         }
+
+        $logger = new Logger($handlers);
 
         $html_ini = ini_set('html_errors', 'Off');
         self::startBuffer();
@@ -145,22 +360,22 @@ class Horde
 
         if ($backtrace) {
             echo "Backtrace:\n";
-            echo strval(new Horde_Support_Backtrace());
+            echo strval(new Backtrace());
         }
 
-        $logger->log(self::endBuffer(), Horde_Log::DEBUG);
+        $logger->debug(self::endBuffer());
         ini_set('html_errors', $html_ini);
     }
 
     /**
      * Adds a signature + timestamp to a URL and returns the signed URL.
      *
-     * @param string|Horde_Url $url  The URL to sign.
+     * @param string|Url $url  The URL to sign.
      * @param int|null $now          The timestamp at which to sign.
      *
-     * @return string|Horde_Url  The signed URL.
+     * @return string|Url  The signed URL.
      */
-    public static function signUrl(string|Horde_Url $url, ?int $now = null): string|Horde_Url
+    public static function signUrl(string|Url $url, ?int $now = null): string|Url
     {
         global $conf;
 
@@ -172,11 +387,11 @@ class Horde
             $now = time();
         }
 
-        if ($url instanceof Horde_Url) {
+        if ($url instanceof Url) {
             $url->setRaw(true)->add(['_t' => $now, '_h' => '']);
             $url->add(
                 '_h',
-                Horde_Url::uriB64Encode(
+                Url::uriB64Encode(
                     hash_hmac('sha1', $url . '=', $conf['secret_key'], true)
                 )
             );
@@ -193,7 +408,7 @@ class Horde
             $url .= '?';
         }
         $url .= '_t=' . $now . '&_h=';
-        $url .= Horde_Url::uriB64Encode(
+        $url .= Url::uriB64Encode(
             hash_hmac('sha1', $url, $conf['secret_key'], true)
         );
 
@@ -223,7 +438,7 @@ class Horde
         $url = substr($data, 0, $pos);
         $hmac = substr($data, $pos);
 
-        if ($hmac != Horde_Url::uriB64Encode(hash_hmac('sha1', $url, $conf['secret_key'], true))) {
+        if ($hmac != Url::uriB64Encode(hash_hmac('sha1', $url, $conf['secret_key'], true))) {
             return false;
         }
 
@@ -248,12 +463,12 @@ class Horde
      * Adds a signature + timestamp to a query string and returns the signed
      * query string.
      *
-     * @return string|Horde_Url  The signed query string (or Horde_Url object).
+     * @return string|Url  The signed query string (or Url object).
      */
     public static function signQueryString(
-        string|Horde_Url $queryString,
+        string|Url $queryString,
         ?int $now = null,
-    ): string|Horde_Url {
+    ): string|Url {
         if (!isset($GLOBALS['conf']['secret_key'])) {
             return $queryString;
         }
@@ -262,16 +477,16 @@ class Horde
             $now = time();
         }
 
-        if ($queryString instanceof Horde_Url) {
+        if ($queryString instanceof Url) {
             $queryString->setRaw(true)->add(['_t' => $now, '_h' => '']);
             $query = parse_url((string) $queryString, PHP_URL_QUERY);
-            $queryString->add('_h', Horde_Url::uriB64Encode(hash_hmac('sha1', $query . '=', $GLOBALS['conf']['secret_key'], true)));
+            $queryString->add('_h', Url::uriB64Encode(hash_hmac('sha1', $query . '=', $GLOBALS['conf']['secret_key'], true)));
             return $queryString;
         }
 
         $queryString .= '&_t=' . $now . '&_h=';
 
-        return $queryString . Horde_Url::uriB64Encode(hash_hmac('sha1', $queryString, $GLOBALS['conf']['secret_key'], true));
+        return $queryString . Url::uriB64Encode(hash_hmac('sha1', $queryString, $GLOBALS['conf']['secret_key'], true));
     }
 
     /**
@@ -292,7 +507,7 @@ class Horde
         $queryString = substr($data, 0, $pos);
         $hmac = substr($data, $pos);
 
-        if ($hmac != Horde_Url::uriB64Encode(hash_hmac('sha1', $queryString, $GLOBALS['conf']['secret_key'], true))) {
+        if ($hmac != Url::uriB64Encode(hash_hmac('sha1', $queryString, $GLOBALS['conf']['secret_key'], true))) {
             return false;
         }
 
@@ -355,12 +570,12 @@ class Horde
     /**
      * Throws an exception if not using a secure connection.
      *
-     * @throws Horde_Exception
+     * @throws HordeException
      */
     public static function requireSecureConnection(): void
     {
         if (!self::isConnectionSecure()) {
-            throw new Horde_Exception(Horde_Core_Translation::t('The encryption features require a secure web connection.'));
+            throw new HordeException(Horde_Core_Translation::t('The encryption features require a secure web connection.'));
         }
     }
 
@@ -379,11 +594,11 @@ class Horde
         global $conf;
 
         if ($type !== null) {
-            $type = Horde_String::lower($type);
+            $type = HordeString::lower($type);
         }
 
         if (is_array($backend)) {
-            $c = Horde_Array::getElement($conf, $backend);
+            $c = ArrayUtils::getElement($conf, $backend);
         } elseif (isset($conf[$backend])) {
             $c = $conf[$backend];
         } else {
@@ -420,7 +635,7 @@ class Horde
      * are set and throws a fatal error with a detailed explanation
      * how to fix this, if something is missing.
      *
-     * @throws Horde_Exception
+     * @throws HordeException
      */
     public static function assertDriverConfig(
         array $params,
@@ -438,7 +653,7 @@ class Horde
         $fileroot = isset($registry) ? $registry->get('fileroot') : '';
 
         if (!count($params)) {
-            throw new Horde_Exception(
+            throw new HordeException(
                 sprintf(Horde_Core_Translation::t('No configuration information specified for %s.'), $name) . "\n\n"
                 . sprintf(
                     Horde_Core_Translation::t('The file %s should contain some %s settings.'),
@@ -450,7 +665,7 @@ class Horde
 
         foreach ($fields as $field) {
             if (!isset($params[$field])) {
-                throw new Horde_Exception(
+                throw new HordeException(
                     sprintf(Horde_Core_Translation::t('Required "%s" not specified in %s configuration.'), $field, $name) . "\n\n"
                     . sprintf(
                         Horde_Core_Translation::t('The file %s should contain a %s setting.'),
@@ -473,7 +688,7 @@ class Horde
         string|Stringable $uri,
         bool $full = false,
         array|int $opts = [],
-    ): Horde_Url {
+    ): Url {
         if (is_array($opts)) {
             $append_session = $opts['append_session'] ?? 0;
             if (!empty($opts['force_ssl'])) {
@@ -581,7 +796,7 @@ class Horde
             $url .= '#' . $puri['fragment'];
         }
 
-        $ob = new Horde_Url($url, $full);
+        $ob = new Url($url, $full);
 
         if (empty($GLOBALS['conf']['session']['use_only_cookies'])
             && ($append_session === 1
@@ -599,8 +814,8 @@ class Horde
     public static function externalUrl(string $url, bool $tag = false): string
     {
         if (!isset($_GET[session_name()])
-            || Horde_String::substr($url, 0, 1) == '#'
-            || Horde_String::substr($url, 0, 7) == 'mailto:') {
+            || HordeString::substr($url, 0, 1) == '#'
+            || HordeString::substr($url, 0, 7) == 'mailto:') {
             $ext = $url;
         } else {
             $ext = (string) self::signQueryString($GLOBALS['registry']->getServiceLink('go', 'horde')->add('url', $url));
@@ -616,7 +831,7 @@ class Horde
     /**
      * Returns an anchor tag with the relevant parameters.
      *
-     * @param Horde_Url|string $url  The full URL to be linked to.
+     * @param Url|string $url  The full URL to be linked to.
      * @param string $title          The link title/description.
      * @param string $class          The CSS class of the link.
      * @param string $target         The window target to point to.
@@ -630,7 +845,7 @@ class Horde
      * @return string  The full <a href> tag.
      */
     public static function link(
-        Horde_Url|string $url = '',
+        Url|string $url = '',
         string $title = '',
         string $class = '',
         string $target = '',
@@ -639,8 +854,8 @@ class Horde
         array $attributes = [],
         bool $escape = true,
     ): string {
-        if (!($url instanceof Horde_Url)) {
-            $url = new Horde_Url($url);
+        if (!($url instanceof Url)) {
+            $url = new Url($url);
         }
 
         if (!empty($onclick)) {
@@ -677,7 +892,7 @@ class Horde
      * @return string  The full <a href> tag.
      */
     public static function linkTooltip(
-        Horde_Url|string $url,
+        Url|string $url,
         string $status = '',
         string $class = '',
         string $target = '',
@@ -729,9 +944,9 @@ class Horde
             $params
         );
 
-        $url = ($params['url'] instanceof Horde_Url)
+        $url = ($params['url'] instanceof Url)
             ? $params['url']
-            : new Horde_Url($params['url']);
+            : new Url($params['url']);
         $title = $params['title'];
         $params['accesskey'] = self::getAccessKey($title, $params['nocheck']);
 
@@ -750,7 +965,7 @@ class Horde
         bool $nocache = true,
         bool $full = false,
         bool $force_ssl = false,
-    ): Horde_Url {
+    ): Url {
         if (!strncmp(PHP_SAPI, 'cgi', 3)) {
             $url = $_SERVER['PHP_SELF'];
         } else {
@@ -758,15 +973,15 @@ class Horde
                 ?? $_SERVER['PHP_SELF'];
         }
         if (isset($_SERVER['REQUEST_URI'])) {
-            $url = Horde_String::common($_SERVER['REQUEST_URI'], $url);
+            $url = HordeString::common($_SERVER['REQUEST_URI'], $url);
         }
         if (substr($url, -9) == 'index.php') {
             $url = substr($url, 0, -9);
         }
 
         if ($script_params) {
-            $url = new Horde_Url($url);
-            if ($pathInfo = Horde_Util::getPathInfo()) {
+            $url = new Url($url);
+            if ($pathInfo = Util::getPathInfo()) {
                 $url->pathInfo = ltrim((string) $pathInfo, '/');
             }
             if (!empty($_SERVER['QUERY_STRING'])) {
@@ -786,7 +1001,7 @@ class Horde
      * Create a self URL of the current page, building the parameter list from
      * the current Horde_Variables object.
      */
-    public static function selfUrlParams(array $opts = []): Horde_Url
+    public static function selfUrlParams(array $opts = []): Url
     {
         $vars = $opts['vars']
             ?? $GLOBALS['injector']->createInstance('Horde_Variables');
@@ -847,7 +1062,7 @@ class Horde
         if (empty($dir) || !is_dir($dir)) {
             $dir = self::getTempDir();
         }
-        $tmpfile = Horde_Util::getTempFile($prefix, $delete, $dir, $secure);
+        $tmpfile = Util::getTempFile($prefix, $delete, $dir, $secure);
         if ($session_remove) {
             $gcfiles = $GLOBALS['session']->get('horde', 'gc_tempfiles', Horde_Session::TYPE_ARRAY);
             $gcfiles[] = $tmpfile;
@@ -915,7 +1130,7 @@ class Horde
             || !preg_match('/_(\w)/u', $label, $match)) {
             return '';
         }
-        $key = Horde_String_Transliterate::toAscii($match[1]);
+        $key = StringTransliterate::toAscii($match[1]);
 
         /* Has this key already been used? */
         if (isset(self::$_used[strtolower($key)])
@@ -1030,7 +1245,7 @@ class Horde
      * @param string $type   The cache type ('app', 'css', 'js').
      * @param array $params  Optional parameters.
      */
-    public static function getCacheUrl(string $type, array $params = []): Horde_Url
+    public static function getCacheUrl(string $type, array $params = []): Url
     {
         $url = $GLOBALS['registry']
             ->getserviceLink('cache', 'horde')
@@ -1045,19 +1260,19 @@ class Horde
     /**
      * Output the javascript needed to call the popup JS function.
      *
-     * @param string|Horde_Url $url  The page to load.
+     * @param string|Url $url  The page to load.
      * @param array $options         Additional options.
      *
      * @return string  The javascript needed to call the popup code.
      */
-    public static function popupJs(string|Horde_Url $url, array $options = []): string
+    public static function popupJs(string|Url $url, array $options = []): string
     {
         $GLOBALS['page_output']->addScriptPackage('Horde_Core_Script_Package_Popup');
 
         $params = new stdClass();
 
-        if (!$url instanceof Horde_Url) {
-            $url = new Horde_Url($url);
+        if (!$url instanceof Url) {
+            $url = new Url($url);
         }
         $params->url = $url->url;
 

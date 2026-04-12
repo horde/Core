@@ -16,6 +16,9 @@
 /**
  * Provides the base functionality shared by all Horde applications.
  *
+ * Methods in this class delegate to the namespaced {@see Horde\Core\Horde}
+ * wherever possible.  Callers should migrate to the namespaced class directly.
+ *
  * @author   Chuck Hagenbuch <chuck@horde.org>
  * @author   Jon Parise <jon@horde.org>
  * @category Horde
@@ -28,40 +31,8 @@ class Horde
     public const SSL_ALWAYS       = 1;
     public const SSL_AUTO         = 2;
     public const SSL_ONLY_LOGIN   = 3;
-    /**
-     * The current buffer level.
-     *
-     * @var integer
-     */
-    protected static $_bufferLevel = 0;
-
-    /**
-     * Has content been sent at the base buffer level?
-     *
-     * @var boolean
-     */
-    protected static $_contentSent = false;
-
-    /**
-     * The labels already used in this page.
-     *
-     * @var array
-     */
-    protected static $_labels = [];
-
-    /**
-     * Are accesskeys supported on this system.
-     *
-     * @var boolean
-     */
-    protected static $_noAccessKey;
-
-    /**
-     * The access keys already used in this page.
-     *
-     * @var array
-     */
-    protected static $_used = [];
+    // Static state ($_bufferLevel, $_contentSent, $_labels,
+    // $_noAccessKey, $_used) lives in \Horde\Core\Horde.
 
     /**
      * Shortcut to logging method.
@@ -209,6 +180,8 @@ class Horde
     /**
      * Verifies a signature and timestamp on a URL.
      *
+     * @deprecated Use {@see Horde\Core\Horde::verifySignedUrl()} instead.
+     *
      * @since Horde_Core 2.30.0
      *
      * @param string $data  The signed URL.
@@ -219,49 +192,17 @@ class Horde
      */
     public static function verifySignedUrl($data, $now = null)
     {
-        global $conf;
-
-        if (is_null($now)) {
-            $now = time();
-        }
-
         if (!is_string($data)) {
             return false;
         }
-
-        $pos = strrpos($data, '&_h=');
-        if ($pos === false) {
-            return false;
-        }
-        $pos += 4;
-
-        $url = substr($data, 0, $pos);
-        $hmac = substr($data, $pos);
-
-        if ($hmac != Horde_Url::uriB64Encode(hash_hmac('sha1', $url, $conf['secret_key'], true))) {
-            return false;
-        }
-
-        // String was not tampered with; now validate timestamp
-        parse_str(parse_url($url, PHP_URL_QUERY), $values);
-        if ($values['_t'] + $conf['urls']['hmac_lifetime'] * 60 < $now) {
-            return false;
-        }
-
-        $pos = strrpos($data, '&_t=');
-        if ($pos === false) {
-            $pos = strrpos($data, '?_t=');
-        }
-        if ($pos === false) {
-            return false;
-        }
-
-        return substr($data, 0, $pos);
+        return Horde\Core\Horde::verifySignedUrl($data, $now);
     }
 
     /**
      * Adds a signature + timestamp to a query string and returns the signed
      * query string.
+     *
+     * @deprecated Use {@see Horde\Core\Horde::signQueryString()} instead.
      *
      * @param mixed $queryString  The query string (or Horde_Url object)
      *                            to sign.
@@ -273,28 +214,13 @@ class Horde
      */
     public static function signQueryString($queryString, $now = null)
     {
-        if (!isset($GLOBALS['conf']['secret_key'])) {
-            return $queryString;
-        }
-
-        if (is_null($now)) {
-            $now = time();
-        }
-
-        if ($queryString instanceof Horde_Url) {
-            $queryString->setRaw(true)->add(['_t' => $now, '_h' => '']);
-            $query = parse_url($queryString, PHP_URL_QUERY);
-            $queryString->add('_h', Horde_Url::uriB64Encode(hash_hmac('sha1', $query . '=', $GLOBALS['conf']['secret_key'], true)));
-            return $queryString;
-        }
-
-        $queryString .= '&_t=' . $now . '&_h=';
-
-        return $queryString . Horde_Url::uriB64Encode(hash_hmac('sha1', $queryString, $GLOBALS['conf']['secret_key'], true));
+        return Horde\Core\Horde::signQueryString($queryString, $now);
     }
 
     /**
      * Verifies a signature and timestamp on a query string.
+     *
+     * @deprecated Use {@see Horde\Core\Horde::verifySignedQueryString()} instead.
      *
      * @param string $data  The signed query string.
      * @param integer $now  The current time (can override for testing).
@@ -303,31 +229,13 @@ class Horde
      */
     public static function verifySignedQueryString($data, $now = null)
     {
-        if (is_null($now)) {
-            $now = time();
-        }
-
-        $pos = strrpos($data, '&_h=');
-        if ($pos === false) {
-            return false;
-        }
-        $pos += 4;
-
-        $queryString = substr($data, 0, $pos);
-        $hmac = substr($data, $pos);
-
-        if ($hmac != Horde_Url::uriB64Encode(hash_hmac('sha1', $queryString, $GLOBALS['conf']['secret_key'], true))) {
-            return false;
-        }
-
-        // String was not tampered with; now validate timestamp
-        parse_str($queryString, $values);
-
-        return !($values['_t'] + $GLOBALS['conf']['urls']['hmac_lifetime'] * 60 < $now);
+        return Horde\Core\Horde::verifySignedQueryString($data, $now);
     }
 
     /**
      * Do necessary escaping to output JSON.
+     *
+     * @deprecated Use {@see Horde\Core\Horde::escapeJson()} instead.
      *
      * @param mixed $data     The data to JSON-ify.
      * @param array $options  Additional options:
@@ -340,68 +248,38 @@ class Horde
      */
     public static function escapeJson($data, array $options = [])
     {
-        $json = Horde_Serialize::serialize($data, Horde_Serialize::JSON);
-        if (empty($options['nodelimit'])) {
-            $json = '/*-secure-' . $json . '*/';
-        }
-
-        return empty($options['urlencode'])
-            ? $json
-            : '\'' . rawurlencode($json) . '\'';
+        return Horde\Core\Horde::escapeJson($data, $options);
     }
 
     /**
      * Is the current HTTP connection considered secure?
      * @TODO Move this to the request classes!
      *
+     * @deprecated Use {@see Horde\Core\Horde::isConnectionSecure()} instead.
+     *
      * @return boolean
      */
     public static function isConnectionSecure()
     {
-        global $browser, $conf, $registry;
-
-        if ($browser->usingSSLConnection()) {
-            return true;
-        }
-
-        if (!empty($conf['safe_ips'])) {
-            if (reset($conf['safe_ips']) == '*') {
-                return true;
-            }
-
-            /* $_SERVER['HTTP_X_FORWARDED_FOR'] is user data and not
-             * reliable. We don't consult it for safe IPs. We also have to
-             * assume that if it is present, the user is coming through a proxy
-             * server. If so, we don't count any non-SSL connection as safe, no
-             * matter the source IP. */
-            $remote = $registry->remoteHost();
-            if (!$remote->proxy) {
-                foreach ($conf['safe_ips'] as $safe_ip) {
-                    $safe_ip = preg_replace('/(\.0)*$/', '', $safe_ip);
-                    if (strpos($remote->addr, $safe_ip) === 0) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
+        return Horde\Core\Horde::isConnectionSecure();
     }
 
     /**
      * Throws an exception if not using a secure connection.
      *
+     * @deprecated Use {@see Horde\Core\Horde::requireSecureConnection()} instead.
+     *
      * @throws Horde_Exception
      */
     public static function requireSecureConnection()
     {
-        if (!self::isConnectionSecure()) {
-            throw new Horde_Exception(Horde_Core_Translation::t('The encryption features require a secure web connection.'));
-        }
+        Horde\Core\Horde::requireSecureConnection();
     }
 
     /**
      * Returns the driver parameters for the specified backend.
+     *
+     * @deprecated Use {@see Horde\Core\Horde::getDriverConfig()} instead.
      *
      * @param mixed $backend  The backend system (e.g. 'prefs', 'categories',
      *                        'contacts') being used.
@@ -415,53 +293,15 @@ class Horde
      */
     public static function getDriverConfig($backend, $type = 'sql')
     {
-        global $conf;
-
-        if (!is_null($type)) {
-            $type = Horde_String::lower($type);
-        }
-
-        if (is_array($backend)) {
-            $c = Horde_Array::getElement($conf, $backend);
-        } elseif (isset($conf[$backend])) {
-            $c = $conf[$backend];
-        } else {
-            $c = null;
-        }
-
-        if (!is_null($c) && isset($c['params'])) {
-            $c['params']['umask'] = $conf['umask'];
-
-            $result = (!is_null($type) && isset($conf[$type]))
-                ? array_merge($conf[$type], $c['params'])
-                : $c['params'];
-
-            // HOTFIX for Bug #14547. If using different protocols for the
-            // base SQL config and the explicit driver we are creating, we
-            // need to remove the not-used connection config since they use
-            // different keys.
-            if ((!isset($c['params']['driverconfig'])
-                 || $c['params']['driverconfig'] != 'horde')
-                && !is_null($type) && $type == 'sql') {
-                if (($c['params']['protocol'] ?? null) == 'unix') {
-                    unset($result['hostspec'], $result['port']);
-                } else {
-                    unset($result['socket']);
-                }
-            }
-
-            return $result;
-        }
-
-        return (!is_null($type) && isset($conf[$type]))
-            ? $conf[$type]
-            : [];
+        return Horde\Core\Horde::getDriverConfig($backend, $type);
     }
 
     /**
      * Checks if all necessary parameters for a driver configuration
      * are set and throws a fatal error with a detailed explanation
      * how to fix this, if something is missing.
+     *
+     * @deprecated Use {@see Horde\Core\Horde::assertDriverConfig()} instead.
      *
      * @param array $params     The configuration array with all parameters.
      * @param string $driver    The key name (in the configuration array) of
@@ -484,38 +324,14 @@ class Horde
         $file = 'conf.php',
         $variable = '$conf'
     ) {
-        global $registry;
-
-        // Don't generate a fatal error if we fail during or before
-        // Registry instantiation.
-        if (is_null($name)) {
-            $name = isset($registry) ? $registry->getApp() : '[unknown]';
-        }
-        $fileroot = isset($registry) ? $registry->get('fileroot') : '';
-
-        if (!is_array($params) || !count($params)) {
-            throw new Horde_Exception(
-                sprintf(Horde_Core_Translation::t('No configuration information specified for %s.'), $name) . "\n\n"
-                . sprintf(
-                    Horde_Core_Translation::t('The file %s should contain some %s settings.'),
-                    $fileroot . '/config/' . $file,
-                    sprintf("%s['%s']['params']", $variable, $driver)
-                )
-            );
-        }
-
-        foreach ($fields as $field) {
-            if (!isset($params[$field])) {
-                throw new Horde_Exception(
-                    sprintf(Horde_Core_Translation::t('Required "%s" not specified in %s configuration.'), $field, $name) . "\n\n"
-                    . sprintf(
-                        Horde_Core_Translation::t('The file %s should contain a %s setting.'),
-                        $fileroot . '/config/' . $file,
-                        sprintf("%s['%s']['params']['%s']", $variable, $driver, $field)
-                    )
-                );
-            }
-        }
+        Horde\Core\Horde::assertDriverConfig(
+            is_array($params) ? $params : [],
+            $driver,
+            $fields,
+            $name,
+            $file,
+            $variable,
+        );
     }
 
     /**
@@ -663,6 +479,8 @@ class Horde
      * Returns an external link passed through the dereferrer to strip session
      * IDs from the referrer.
      *
+     * @deprecated Use {@see Horde\Core\Horde::externalUrl()} instead.
+     *
      * @param string $url   The external URL to link to.
      * @param boolean $tag  If true, a complete <a> tag is returned, only the
      *                      url otherwise.
@@ -671,23 +489,13 @@ class Horde
      */
     public static function externalUrl($url, $tag = false)
     {
-        if (!isset($_GET[session_name()])
-            || Horde_String::substr($url, 0, 1) == '#'
-            || Horde_String::substr($url, 0, 7) == 'mailto:') {
-            $ext = $url;
-        } else {
-            $ext = self::signQueryString($GLOBALS['registry']->getServiceLink('go', 'horde')->add('url', $url));
-        }
-
-        if ($tag) {
-            $ext = self::link($ext, $url, '', '_blank');
-        }
-
-        return $ext;
+        return Horde\Core\Horde::externalUrl($url, $tag);
     }
 
     /**
      * Returns an anchor tag with the relevant parameters
+     *
+     * @deprecated Use {@see Horde\Core\Horde::link()} instead.
      *
      * @param Horde_Url|string $url  The full URL to be linked to.
      * @param string $title          The link title/description.
@@ -715,43 +523,25 @@ class Horde
         $attributes = [],
         $escape = true
     ) {
-        if (!($url instanceof Horde_Url)) {
-            $url = new Horde_Url($url);
-        }
-
         if (!empty($title2)) {
             $title = $title2;
         }
-        if (!empty($onclick)) {
-            $attributes['onclick'] = $onclick;
-        }
-        if (!empty($class)) {
-            $attributes['class'] = $class;
-        }
-        if (!empty($target)) {
-            $attributes['target'] = $target;
-        }
-        if (!empty($accesskey)) {
-            $attributes['accesskey'] = $accesskey;
-        }
-        if (!empty($title)) {
-            if ($escape) {
-                $title = str_replace(
-                    ["\r", "\n"],
-                    '',
-                    htmlspecialchars(nl2br(htmlspecialchars($title)))
-                );
-                /* Remove double encoded entities. */
-                $title = preg_replace('/&amp;([a-z]+|(#\d+));/i', '&\\1;', $title);
-            }
-            $attributes['title.raw'] = $title;
-        }
-
-        return $url->link($attributes);
+        return Horde\Core\Horde::link(
+            $url,
+            $title,
+            $class,
+            $target,
+            $onclick,
+            $accesskey,
+            $attributes,
+            $escape,
+        );
     }
 
     /**
      * Uses DOM Tooltips to display the 'title' attribute for link() calls.
+     *
+     * @deprecated Use {@see Horde\Core\Horde::linkTooltip()} instead.
      *
      * @param string $url        The full URL to be linked to
      * @param string $status     The JavaScript mouse-over string
@@ -777,35 +567,23 @@ class Horde
         $accesskey = '',
         $attributes = []
     ) {
-        if (strlen($title)) {
-            $attributes['nicetitle'] = Horde_Serialize::serialize(
-                preg_split(
-                    '/\r?\n/',
-                    preg_replace('/<br\s*\/?\s*>/', "\n", $title)
-                ),
-                Horde_Serialize::JSON
-            );
-            $title = null;
-            $GLOBALS['injector']->getInstance('Horde_PageOutput')
-                ->addScriptFile('tooltips.js', 'horde');
-        }
-
-        return self::link(
+        return Horde\Core\Horde::linkTooltip(
             $url,
-            $title,
+            $status,
             $class,
             $target,
             $onclick,
-            null,
+            $title,
             $accesskey,
             $attributes,
-            false
         );
     }
 
     /**
      * Returns an anchor sequence with the relevant parameters for a widget
      * with accesskey and text.
+     *
+     * @deprecated Use {@see Horde\Core\Horde::widget()} instead.
      *
      * @param array $params  A hash with widget options (other options will be
      *                       passed as attributes to the link tag):
@@ -819,26 +597,7 @@ class Horde
      */
     public static function widget($params)
     {
-        $params = array_merge(
-            [
-                'class' => '',
-                'target' => '',
-                'onclick' => '',
-                'nocheck' => false],
-            $params
-        );
-
-        $url = ($params['url'] instanceof Horde_Url)
-            ? $params['url']
-            : new Horde_Url($params['url']);
-        $title = $params['title'];
-        $params['accesskey'] = self::getAccessKey($title, $params['nocheck']);
-
-        unset($params['url'], $params['title'], $params['nocheck']);
-
-        return $url->link($params)
-            . self::highlightAccessKey($title, $params['accesskey'])
-            . '</a>';
+        return Horde\Core\Horde::widget($params);
     }
 
     /**
@@ -939,33 +698,21 @@ class Horde
      * Determines the location of the system temporary directory. If a specific
      * configuration cannot be found, it defaults to /tmp.
      *
+     * @deprecated Use {@see Horde\Core\Horde::getTempDir()} instead.
+     *
      * @return string  A directory name that can be used for temp files.
      *                 Returns false if one could not be found.
      */
     public static function getTempDir()
     {
-        global $conf;
-
-        /* If one has been specifically set, then use that */
-        if (!empty($conf['tmpdir'])) {
-            $tmp = $conf['tmpdir'];
-        }
-
-        /* Next, try sys_get_temp_dir(). */
-        if (empty($tmp)) {
-            $tmp = sys_get_temp_dir();
-        }
-
-        /* If it is still empty, we have failed, so return false;
-         * otherwise return the directory determined. */
-        return empty($tmp)
-            ? false
-            : $tmp;
+        return Horde\Core\Horde::getTempDir();
     }
 
     /**
      * Creates a temporary filename for the lifetime of the script, and
      * (optionally) registers it to be deleted at request shutdown.
+     *
+     * @deprecated Use {@see Horde\Core\Horde::getTempFile()} instead.
      *
      * @param string $prefix           Prefix to make the temporary name more
      *                                 recognizable.
@@ -988,43 +735,33 @@ class Horde
         $secure = false,
         $session_remove = false
     ) {
-        if (empty($dir) || !is_dir($dir)) {
-            $dir = self::getTempDir();
-        }
-        $tmpfile = Horde_Util::getTempFile($prefix, $delete, $dir, $secure);
-        if ($session_remove) {
-            $gcfiles = $GLOBALS['session']->get('horde', 'gc_tempfiles', Horde_Session::TYPE_ARRAY);
-            $gcfiles[] = $tmpfile;
-            $GLOBALS['session']->set('horde', 'gc_tempfiles', $gcfiles);
-        }
-
-        return $tmpfile;
+        return Horde\Core\Horde::getTempFile(
+            $prefix,
+            $delete,
+            $dir,
+            $secure,
+            $session_remove,
+        );
     }
 
     /**
      * Returns the Web server being used.
      * PHP string list built from the PHP 'configure' script.
      *
+     * @deprecated Use {@see Horde\Core\Horde::webServerID()} instead.
+     *
      * @return string  A web server identification string.
      * @see php_sapi_name()
      */
     public static function webServerID()
     {
-        switch (PHP_SAPI) {
-            case 'apache':
-                return 'apache1';
-
-            case 'apache2filter':
-            case 'apache2handler':
-                return 'apache2';
-
-            default:
-                return PHP_SAPI;
-        }
+        return Horde\Core\Horde::webServerID();
     }
 
     /**
      * Returns an un-used access key from the label given.
+     *
+     * @deprecated Use {@see Horde\Core\Horde::getAccessKey()} instead.
      *
      * @param string $label      The label to choose an access key from.
      * @param boolean $nocheck   Don't check if the access key already has been
@@ -1039,46 +776,7 @@ class Horde
         $nocheck = false,
         $shutdown = false
     ) {
-        /* Shutdown call for translators? */
-        if ($shutdown) {
-            if (!count(self::$_labels)) {
-                return;
-            }
-            $script = basename($_SERVER['PHP_SELF']);
-            $labels = array_keys(self::$_labels);
-            sort($labels);
-            $used = array_keys(self::$_used);
-            sort($used);
-            $remaining = str_replace($used, [], 'abcdefghijklmnopqrstuvwxyz');
-            self::log('Access key information for ' . $script);
-            self::log('Used labels: ' . implode(',', $labels));
-            self::log('Used keys: ' . implode('', $used));
-            self::log('Free keys: ' . $remaining);
-            return;
-        }
-
-        /* Use access keys at all? */
-        if (!isset(self::$_noAccessKey)) {
-            self::$_noAccessKey = !$GLOBALS['browser']->hasFeature('accesskey') || !$GLOBALS['prefs']->getValue('widget_accesskey');
-        }
-
-        if (self::$_noAccessKey
-            || !preg_match('/_(\w)/u', $label, $match)) {
-            return '';
-        }
-        $key = Horde_String_Transliterate::toAscii($match[1]);
-
-        /* Has this key already been used? */
-        if (isset(self::$_used[strtolower($key)])
-            && !($nocheck && isset(self::$_labels[$label]))) {
-            return '';
-        }
-
-        /* Save key and label. */
-        self::$_used[strtolower($key)] = true;
-        self::$_labels[$label] = true;
-
-        return $key;
+        return Horde\Core\Horde::getAccessKey($label, $nocheck, $shutdown);
     }
 
     /**
@@ -1087,21 +785,21 @@ class Horde
      * For multibyte charset strings the access key gets removed completely,
      * otherwise only the underscore gets removed.
      *
+     * @deprecated Use {@see Horde\Core\Horde::stripAccessKey()} instead.
+     *
      * @param string $label  The label containing an access key.
      *
      * @return string  The label with the access key being stripped.
      */
     public static function stripAccessKey($label)
     {
-        $replace = $GLOBALS['registry']->nlsconfig->curr_multibyte
-            && preg_match('/[\x80-\xff]/', $label)
-            ? ''
-            : '$1';
-        return preg_replace('/_(\w)/u', $replace, $label);
+        return Horde\Core\Horde::stripAccessKey($label);
     }
 
     /**
      * Highlights an access key in a label.
+     *
+     * @deprecated Use {@see Horde\Core\Horde::highlightAccessKey()} instead.
      *
      * @param string $label      The label to highlight the access key in.
      * @param string $accessKey  The access key to highlight.
@@ -1111,30 +809,14 @@ class Horde
      */
     public static function highlightAccessKey($label, $accessKey)
     {
-        $stripped_label = self::stripAccessKey($label);
-
-        if (empty($accessKey)) {
-            return $stripped_label;
-        }
-
-        if ($GLOBALS['registry']->nlsconfig->curr_multibyte) {
-            /* Prefix parenthesis with the UTF-8 representation of the LRO
-             * (Left-to-Right-Override) Unicode codepoint U+202D. */
-            return $stripped_label . "\xe2\x80\xad"
-                . '(<span class="accessKey">' . strtoupper($accessKey)
-                . '</span>' . ')';
-        }
-
-        return preg_replace(
-            '/_(\w)/u',
-            '<span class="accessKey">$1</span>',
-            $label
-        );
+        return Horde\Core\Horde::highlightAccessKey($label, $accessKey);
     }
 
     /**
      * Returns the appropriate "accesskey" and "title" attributes for an HTML
      * tag and the given label.
+     *
+     * @deprecated Use {@see Horde\Core\Horde::getAccessKeyAndTitle()} instead.
      *
      * @param string $label          The title of an HTML element
      * @param boolean $nocheck       Don't check if the access key already has
@@ -1149,27 +831,18 @@ class Horde
         $nocheck = false,
         $return_array = false
     ) {
-        $ak = self::getAccessKey($label, $nocheck);
-        $attributes = ['title' => self::stripAccessKey($label)];
-        if (!empty($ak)) {
-            $attributes['title'] .= sprintf(Horde_Core_Translation::t(' (Accesskey %s)'), strtoupper($ak));
-            $attributes['accesskey'] = $ak;
-        }
-
-        if ($return_array) {
-            return $attributes;
-        }
-
-        $html = '';
-        foreach ($attributes as $attribute => $value) {
-            $html .= sprintf(' %s="%s"', $attribute, $value);
-        }
-        return $html;
+        return Horde\Core\Horde::getAccessKeyAndTitle(
+            $label,
+            $nocheck,
+            $return_array,
+        );
     }
 
     /**
      * Returns a label element including an access key for usage in conjuction
      * with a form field. User preferences regarding access keys are respected.
+     *
+     * @deprecated Use {@see Horde\Core\Horde::label()} instead.
      *
      * @param string $for    The form field's id attribute.
      * @param string $label  The label text.
@@ -1180,22 +853,14 @@ class Horde
      */
     public static function label($for, $label, $ak = null)
     {
-        if (is_null($ak)) {
-            $ak = self::getAccessKey($label, 1);
-        }
-        $label = self::highlightAccessKey($label, $ak);
-
-        return sprintf(
-            '<label for="%s"%s>%s</label>',
-            $for,
-            !empty($ak) ? ' accesskey="' . $ak . '"' : '',
-            $label
-        );
+        return Horde\Core\Horde::label($for, $label, $ak);
     }
 
     /**
      * Print inline javascript to output buffer after wrapping with necessary
      * javascript tags.
+     *
+     * @deprecated Use {@see Horde\Core\Horde::wrapInlineScript()} instead.
      *
      * @param array $script  The script to output.
      *
@@ -1204,7 +869,7 @@ class Horde
      */
     public static function wrapInlineScript($script)
     {
-        return '<script type="text/javascript">//<![CDATA[' . "\n" . implode('', $script) . "\n//]]></script>\n";
+        return Horde\Core\Horde::wrapInlineScript($script);
     }
 
     /**
@@ -1240,6 +905,8 @@ class Horde
     /**
      * Output the javascript needed to call the popup JS function.
      *
+     * @deprecated Use {@see Horde\Core\Horde::popupJs()} instead.
+     *
      * @param string|Horde_Url $url  The page to load.
      * @param array $options         Additional options:
      *   - height: (integer) The height of the popup window.
@@ -1260,77 +927,47 @@ class Horde
      */
     public static function popupJs($url, $options = [])
     {
-        $GLOBALS['page_output']->addScriptPackage('Horde_Core_Script_Package_Popup');
-
-        $params = new stdClass();
-
-        if (!$url instanceof Horde_Url) {
-            $url = new Horde_Url($url);
-        }
-        $params->url = $url->url;
-
-        if (!empty($url->parameters)) {
-            if (!isset($options['params'])) {
-                $options['params'] = [];
-            }
-            foreach (array_merge($url->parameters, $options['params']) as $key => $val) {
-                $options['params'][$key] = addcslashes($val, '"');
-            }
-        }
-
-        if (!empty($options['menu'])) {
-            $params->menu = 1;
-        }
-        foreach (['height', 'onload', 'params', 'width'] as $key) {
-            if (!empty($options[$key])) {
-                $params->$key = $options[$key];
-            }
-        }
-
-        return 'void(HordePopup.popup(' . self::escapeJson($params, ['nodelimit' => true, 'urlencode' => !empty($options['urlencode'])]) . '));';
+        return Horde\Core\Horde::popupJs($url, $options);
     }
 
     /**
      * Start buffering output.
+     *
+     * @deprecated Use {@see Horde\Core\Horde::startBuffer()} instead.
      */
     public static function startBuffer()
     {
-        if (!self::$_bufferLevel) {
-            self::$_contentSent = self::contentSent();
-        }
-
-        ++self::$_bufferLevel;
-        ob_start();
+        Horde\Core\Horde::startBuffer();
     }
 
     /**
      * End buffering output.
      *
+     * @deprecated Use {@see Horde\Core\Horde::endBuffer()} instead.
+     *
      * @return string  The buffered output.
      */
     public static function endBuffer()
     {
-        if (self::$_bufferLevel) {
-            --self::$_bufferLevel;
-            return ob_get_clean();
-        }
-
-        return '';
+        return Horde\Core\Horde::endBuffer();
     }
 
     /**
      * Has any content been sent to the browser?
      *
+     * @deprecated Use {@see Horde\Core\Horde::contentSent()} instead.
+     *
      * @return boolean  True if content has been sent.
      */
     public static function contentSent()
     {
-        return ((self::$_bufferLevel && self::$_contentSent)
-                || (!self::$_bufferLevel && (ob_get_length() || headers_sent())));
+        return Horde\Core\Horde::contentSent();
     }
 
     /**
      * Returns the sidebar for the current application.
+     *
+     * @deprecated Use {@see Horde\Core\Horde::sidebar()} instead.
      *
      * @param string $app  The application to generate the menu for. Defaults
      *                     to the current app.
@@ -1339,27 +976,14 @@ class Horde
      */
     public static function sidebar($app = null)
     {
-        global $registry;
-
-        if (empty($app)) {
-            $app = $registry->getApp();
-        }
-
-        $menu = new Horde_Menu();
-        $registry->callAppMethod($app, 'menu', [
-            'args' => [$menu],
-        ]);
-        $sidebar = $menu->render();
-        $registry->callAppMethod($app, 'sidebar', [
-            'args' => [$sidebar],
-        ]);
-
-        return $sidebar;
+        return Horde\Core\Horde::sidebar($app);
     }
 
     /**
      * Process a permission denied error, running a user-defined hook if
      * necessary.
+     *
+     * @deprecated Use {@see Horde\Core\Horde::permissionDeniedError()} instead.
      *
      * @param string $app    Application name.
      * @param string $perm   Permission name.
@@ -1368,15 +992,7 @@ class Horde
      */
     public static function permissionDeniedError($app, $perm, $error = null)
     {
-        try {
-            $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
-                ->callHook('perms_denied', 'horde', [$app, $perm]);
-        } catch (Horde_Exception_HookNotSet $e) {
-        }
-
-        if (!is_null($error)) {
-            $GLOBALS['notification']->push($error, 'horde.warning');
-        }
+        Horde\Core\Horde::permissionDeniedError($app, $perm, $error);
     }
 
     /**
