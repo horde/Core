@@ -13,6 +13,8 @@
  * @license  http://opensource.org/licenses/lgpl-2.1.php LGPL
  * @package  Core
  */
+use Horde\Core\Horde;
+
 class Horde_Core_Share_Driver
 {
     /**
@@ -165,7 +167,7 @@ class Horde_Core_Share_Driver
         try {
             $result = $locks->getLocks($this->_share->getShareOb()->getApp(), $shareid, $locktype);
         } catch (Horde_Lock_Exception $e) {
-            Horde::log($e, 'ERR');
+            Horde::log($e, Horde_Log::ERR);
             throw new Horde_Exception_Wrapped($e);
         }
 
@@ -175,7 +177,7 @@ class Horde_Core_Share_Driver
             try {
                 $result = $locks->getLocks($this->_share->getShareOb()->getApp() . ':' . $shareid, $item_uid, $locktype);
             } catch (Horde_Lock_Exception $e) {
-                Horde::log($e, 'ERR');
+                Horde::log($e, Horde_Log::ERR);
                 throw new Horde_Exception($e->getMessage());
             }
         } else {

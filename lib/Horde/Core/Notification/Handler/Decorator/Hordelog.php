@@ -12,13 +12,15 @@
  * @category Horde
  * @package  Core
  */
+use Horde\Core\Horde;
+
 class Horde_Core_Notification_Handler_Decorator_Hordelog extends Horde_Notification_Handler_Decorator_Base
 {
     /**
      */
     protected function _push(Horde_Notification_Event $event, $options)
     {
-        Horde::log($event->message, 'DEBUG');
+        Horde::log($event->message, Horde_Log::DEBUG);
     }
 
 }

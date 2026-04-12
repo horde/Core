@@ -14,6 +14,8 @@
  * @license  http://opensource.org/licenses/lgpl-2.1.php LGPL
  * @package  Core
  */
+use Horde\Core\Horde;
+
 class Horde_Core_Auth_Shibboleth extends Horde_Auth_Shibboleth
 {
     /**
@@ -32,7 +34,7 @@ class Horde_Core_Auth_Shibboleth extends Horde_Auth_Shibboleth
         // Consider this a session expiration.
         $this->setError(Horde_Auth::REASON_SESSION);
 
-        Horde::log('Shibboleth authentication expired for user ' . $GLOBALS['registry']->getAuth(), 'INFO');
+        Horde::log('Shibboleth authentication expired for user ' . $GLOBALS['registry']->getAuth(), Horde_Log::INFO);
 
         return false;
     }

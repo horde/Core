@@ -8,6 +8,7 @@ use Horde\Core\Horde;
 use Horde\Http\ResponseFactory;
 use Horde\Http\StreamFactory;
 use Horde_ErrorHandler;
+use Horde_Log;
 use Horde_Registry;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -54,7 +55,7 @@ class ErrorFilter implements MiddlewareInterface
         try {
             return $handler->handle($request);
         } catch (Throwable $throwable) {
-            Horde::log($throwable, 'EMERG');
+            Horde::log($throwable, Horde_Log::EMERG);
             return $this->getErrorResponse($request, $throwable);
         }
     }

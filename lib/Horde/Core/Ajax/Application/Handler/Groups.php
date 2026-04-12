@@ -13,6 +13,8 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+use Horde\Core\Horde;
+
 class Horde_Core_Ajax_Application_Handler_Groups extends Horde_Core_Ajax_Application_Handler
 {
     /**

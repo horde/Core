@@ -27,6 +27,8 @@
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
+use Horde\Core\Horde;
+
 class Horde_Registry_Registryconfig
 {
     /**
@@ -140,7 +142,7 @@ class Horde_Registry_Registryconfig
                  && !(defined('HORDE_CONFIG_BASE') && file_exists(HORDE_CONFIG_BASE . DIRECTORY_SEPARATOR . $appName . DIRECTORY_SEPARATOR . 'conf.php'))
                  ))) {
                 $app['status'] = 'inactive';
-                Horde::log('Setting ' . $appName . ' inactive because the fileroot does not exist or the application is not configured yet.', 'DEBUG');
+                Horde::log('Setting ' . $appName . ' inactive because the fileroot does not exist or the application is not configured yet.', Horde_Log::DEBUG);
             }
 
             $app['webroot'] = isset($app['webroot'])

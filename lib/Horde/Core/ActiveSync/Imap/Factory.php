@@ -7,6 +7,8 @@
  * @package   Core
  */
 
+use Horde\Core\Horde;
+
 /**
  * Horde_Core_ActiveSync_Imap_Factory implements a factory/builder for
  * providing a Horde_ActiveSync_Imap_Adapter object as well as building a tree
@@ -87,7 +89,7 @@ class Horde_Core_ActiveSync_Imap_Factory implements Horde_ActiveSync_Interface_I
                 Horde::log(sprintf(
                     'Error retrieving mailbox list: %s',
                     $e->getMessage()
-                ), 'ERR');
+                ), Horde_Log::ERR);
                 throw new Horde_ActiveSync_Exception($e);
             }
         }
@@ -120,7 +122,7 @@ class Horde_Core_ActiveSync_Imap_Factory implements Horde_ActiveSync_Interface_I
                 Horde::log(sprintf(
                     'Error retrieving specialmailbox list: %s',
                     $e->getMessage()
-                ), 'ERR');
+                ), Horde_Log::ERR);
                 throw new Horde_ActiveSync_Exception($e);
             }
 

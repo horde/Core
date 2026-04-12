@@ -13,6 +13,8 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+use Horde\Core\Horde;
+
 class Horde_Core_Ajax_Imple_SpellChecker extends Horde_Core_Ajax_Imple
 {
     /**
@@ -99,7 +101,7 @@ class Horde_Core_Ajax_Imple_SpellChecker extends Horde_Core_Ajax_Imple
                 $injector->getInstance('Horde_Core_Factory_SpellChecker')->create($args, $input)->spellCheck($input)
             );
         } catch (Horde_Exception $e) {
-            Horde::log($e, 'ERR');
+            Horde::log($e, Horde_Log::ERR);
             return [
                 'bad' => [],
                 'suggestions' => [],

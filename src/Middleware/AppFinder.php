@@ -12,6 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Horde_Log;
 use Horde_Registry;
 
 /**
@@ -182,7 +183,7 @@ class AppFinder implements MiddlewareInterface
         if (empty($found)) {
             $path = $request->getUri()->getPath();
             $msg = sprintf('No App found for path: %s', $path);
-            Horde::log($msg, 'INFO');
+            Horde::log($msg, Horde_Log::INFO);
             return $this->responseFactory->createResponse(
                 404,
                 'Not Found'
