@@ -124,7 +124,7 @@ class Horde_Core_Factory_Db extends Horde_Core_Factory_Base
      */
     public function getConfig($backend)
     {
-        return Horde::getDriverConfig($backend, 'sql');
+        return Horde\Core\Horde::getDriverConfig($backend ?? '', 'sql');
     }
 
     /**

@@ -21,9 +21,9 @@ declare(strict_types=1);
 
 namespace Horde\Core\View;
 
-use Horde_Registry;
+use Horde\Core\Horde;
 use Horde_Perms;
-use Horde;
+use Horde_Registry;
 
 /**
  * Responsive Topbar Renderer

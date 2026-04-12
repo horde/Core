@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Horde\Core\Middleware;
 
 use Exception;
-use Horde;
+use Horde\Core\Horde;
 use Horde\Http\ResponseFactory;
 use Horde\Http\StreamFactory;
 use Psr\Http\Message\ServerRequestInterface;

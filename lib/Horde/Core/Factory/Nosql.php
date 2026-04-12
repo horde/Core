@@ -87,7 +87,7 @@ class Horde_Core_Factory_Nosql extends Horde_Core_Factory_Base
      */
     public function getConfig($backend)
     {
-        return Horde::getDriverConfig($backend, 'nosql');
+        return Horde\Core\Horde::getDriverConfig($backend ?? '', 'nosql');
     }
 
     /**

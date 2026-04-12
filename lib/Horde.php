@@ -216,7 +216,7 @@ class Horde
      */
     public static function signQueryString($queryString, $now = null)
     {
-        return Horde\Core\Horde::signQueryString($queryString, $now);
+        return Horde\Core\Horde::signQueryString($queryString ?? '', $now);
     }
 
     /**
@@ -231,7 +231,7 @@ class Horde
      */
     public static function verifySignedQueryString($data, $now = null)
     {
-        return Horde\Core\Horde::verifySignedQueryString($data, $now);
+        return Horde\Core\Horde::verifySignedQueryString((string) ($data ?? ''), $now);
     }
 
     /**
@@ -295,7 +295,7 @@ class Horde
      */
     public static function getDriverConfig($backend, $type = 'sql')
     {
-        return Horde\Core\Horde::getDriverConfig($backend, $type);
+        return Horde\Core\Horde::getDriverConfig($backend ?? '', $type);
     }
 
     /**
@@ -328,11 +328,11 @@ class Horde
     ) {
         Horde\Core\Horde::assertDriverConfig(
             is_array($params) ? $params : [],
-            $driver,
-            $fields,
+            (string) ($driver ?? ''),
+            is_array($fields) ? $fields : [],
             $name,
-            $file,
-            $variable,
+            (string) ($file ?? 'conf.php'),
+            (string) ($variable ?? '$conf'),
         );
     }
 
@@ -491,7 +491,7 @@ class Horde
      */
     public static function externalUrl($url, $tag = false)
     {
-        return Horde\Core\Horde::externalUrl($url, $tag);
+        return Horde\Core\Horde::externalUrl((string) ($url ?? ''), (bool) $tag);
     }
 
     /**
@@ -529,14 +529,14 @@ class Horde
             $title = $title2;
         }
         return Horde\Core\Horde::link(
-            $url,
-            $title,
-            $class,
-            $target,
-            $onclick,
-            $accesskey,
-            $attributes,
-            $escape,
+            $url ?? '',
+            (string) ($title ?? ''),
+            (string) ($class ?? ''),
+            (string) ($target ?? ''),
+            (string) ($onclick ?? ''),
+            (string) ($accesskey ?? ''),
+            is_array($attributes) ? $attributes : [],
+            (bool) $escape,
         );
     }
 
@@ -570,14 +570,14 @@ class Horde
         $attributes = []
     ) {
         return Horde\Core\Horde::linkTooltip(
-            $url,
-            $status,
-            $class,
-            $target,
-            $onclick,
-            $title,
-            $accesskey,
-            $attributes,
+            $url ?? '',
+            (string) ($status ?? ''),
+            (string) ($class ?? ''),
+            (string) ($target ?? ''),
+            (string) ($onclick ?? ''),
+            (string) ($title ?? ''),
+            (string) ($accesskey ?? ''),
+            is_array($attributes) ? $attributes : [],
         );
     }
 
@@ -599,7 +599,7 @@ class Horde
      */
     public static function widget($params)
     {
-        return Horde\Core\Horde::widget($params);
+        return Horde\Core\Horde::widget(is_array($params) ? $params : []);
     }
 
     /**
@@ -738,11 +738,11 @@ class Horde
         $session_remove = false
     ) {
         return Horde\Core\Horde::getTempFile(
-            $prefix,
-            $delete,
-            $dir,
-            $secure,
-            $session_remove,
+            (string) ($prefix ?? 'Horde'),
+            (bool) $delete,
+            (string) ($dir ?? ''),
+            (bool) $secure,
+            (bool) $session_remove,
         );
     }
 
@@ -778,7 +778,7 @@ class Horde
         $nocheck = false,
         $shutdown = false
     ) {
-        return Horde\Core\Horde::getAccessKey($label, $nocheck, $shutdown);
+        return Horde\Core\Horde::getAccessKey((string) ($label ?? ''), (bool) $nocheck, (bool) $shutdown);
     }
 
     /**
@@ -795,7 +795,7 @@ class Horde
      */
     public static function stripAccessKey($label)
     {
-        return Horde\Core\Horde::stripAccessKey($label);
+        return Horde\Core\Horde::stripAccessKey((string) ($label ?? ''));
     }
 
     /**
@@ -811,7 +811,7 @@ class Horde
      */
     public static function highlightAccessKey($label, $accessKey)
     {
-        return Horde\Core\Horde::highlightAccessKey($label, $accessKey);
+        return Horde\Core\Horde::highlightAccessKey((string) ($label ?? ''), (string) ($accessKey ?? ''));
     }
 
     /**
@@ -834,9 +834,9 @@ class Horde
         $return_array = false
     ) {
         return Horde\Core\Horde::getAccessKeyAndTitle(
-            $label,
-            $nocheck,
-            $return_array,
+            (string) ($label ?? ''),
+            (bool) $nocheck,
+            (bool) $return_array,
         );
     }
 
@@ -855,7 +855,7 @@ class Horde
      */
     public static function label($for, $label, $ak = null)
     {
-        return Horde\Core\Horde::label($for, $label, $ak);
+        return Horde\Core\Horde::label((string) ($for ?? ''), (string) ($label ?? ''), $ak);
     }
 
     /**
@@ -871,7 +871,7 @@ class Horde
      */
     public static function wrapInlineScript($script)
     {
-        return Horde\Core\Horde::wrapInlineScript($script);
+        return Horde\Core\Horde::wrapInlineScript(is_array($script) ? $script : []);
     }
 
     /**
@@ -929,7 +929,7 @@ class Horde
      */
     public static function popupJs($url, $options = [])
     {
-        return Horde\Core\Horde::popupJs($url, $options);
+        return Horde\Core\Horde::popupJs($url ?? '', is_array($options) ? $options : []);
     }
 
     /**
@@ -994,7 +994,7 @@ class Horde
      */
     public static function permissionDeniedError($app, $perm, $error = null)
     {
-        Horde\Core\Horde::permissionDeniedError($app, $perm, $error);
+        Horde\Core\Horde::permissionDeniedError((string) ($app ?? ''), (string) ($perm ?? ''), $error);
     }
 
     /**

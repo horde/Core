@@ -102,7 +102,7 @@ class Horde_Core_Factory_Ldap extends Horde_Core_Factory_Base
      */
     public function getConfig($backend)
     {
-        return Horde::getDriverConfig($backend, 'ldap');
+        return Horde\Core\Horde::getDriverConfig($backend ?? '', 'ldap');
     }
 
 }

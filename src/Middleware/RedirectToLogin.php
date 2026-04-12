@@ -5,19 +5,14 @@ declare(strict_types=1);
 namespace Horde\Core\Middleware;
 
 use Exception;
-use Psr\Http\Message\ServerRequestInterface;
+use Horde\Core\Config\State;
+use Horde\Core\Horde;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Horde_Registry;
-use Horde_Application;
-use Horde_Controller;
-use Horde_String;
-use Horde\Core\Config\State;
-use Horde;
-use Horde_Url;
-use Horde\Core\UserPassport;
-use Psr\Http\Message\ResponseFactoryInterface;
 
 /**
  * RedirectToLogin middleware
@@ -59,7 +54,7 @@ class RedirectToLogin implements MiddlewareInterface
             $baseUrl = $this->registry->getServiceLink('login');
         };
 
-        $redirectUrl = (string) Horde::Url($baseUrl, true)->add('url', $signedRequestUrl);
+        $redirectUrl = (string) Horde::url($baseUrl, true)->add('url', $signedRequestUrl);
 
         return $this->responseFactory->createResponse(302)->withHeader('Location', $redirectUrl);
     }
