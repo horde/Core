@@ -1,4 +1,15 @@
 ---
+3.0.0-beta17:
+  api: 3.0.0-beta17
+  state:
+    release: beta
+    api: beta
+  date: 2026-04-12
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    fix: Make delegators implicitly null safe.
 3.0.0-beta16:
   api: 3.0.0-beta16
   state:
