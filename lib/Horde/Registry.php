@@ -17,6 +17,7 @@ use Horde\Core\Config\Driver\DriverRepository;
 use Horde\Core\Factory\ConfigMetadataProviderFactory;
 use Horde\Core\Factory\DriverRepositoryFactory;
 use NetDNS2\Exception as NetDNS2Exception;
+use Horde\Util\Util;
 
 /**
  * The registry provides a set of methods for communication between Horde
@@ -710,9 +711,9 @@ class Horde_Registry implements Horde_Shutdown_Task
 
         /* First, try to load from cache. */
         if (!isset($cli) && !$this->isTest()) {
-            if (Horde_Util::extensionExists('apc')) {
+            if (Util::extensionExists('apc')) {
                 $cstorage = 'Horde_Cache_Storage_Apc';
-            } elseif (Horde_Util::extensionExists('xcache')) {
+            } elseif (Util::extensionExists('xcache')) {
                 $cstorage = 'Horde_Cache_Storage_Xcache';
             } else {
                 $cstorage = 'Horde_Cache_Storage_File';
@@ -1532,7 +1533,7 @@ class Horde_Registry implements Horde_Shutdown_Task
                 return Horde::url('services/problem.php', $full, $opts)
                     ->add(
                         'return_url',
-                        Horde_Util::getFormData(
+                        Util::getFormData(
                             'location',
                             Horde::signUrl(Horde::selfUrl(true, true, true))
                         )

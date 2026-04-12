@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Util\Util;
+
 /**
  * The Horde_Core_Mime_Viewer_Vcard class renders out vCards in HTML format.
  *
@@ -104,10 +106,10 @@ class Horde_Core_Mime_Viewer_Vcard extends Horde_Mime_Viewer_Base
             $notification->push(Horde_Core_Translation::t('There was an error reading the contact data.'), 'horde.error');
         }
 
-        if (Horde_Util::getFormData('import')
-            && Horde_Util::getFormData('source')
+        if (Util::getFormData('import')
+            && Util::getFormData('source')
             && $registry->hasMethod('contacts/import')) {
-            $source = Horde_Util::getFormData('source');
+            $source = Util::getFormData('source');
             $count = 0;
             foreach ($iCal->getComponents() ?? [] as $c) {
                 if ($c->getType() == 'vcard') {
@@ -424,7 +426,7 @@ class Horde_Core_Mime_Viewer_Vcard extends Horde_Mime_Viewer_Base
             && $registry->hasMethod('contacts/sources')) {
             $html .= '<div class="horde-form-buttons"><form action="'
                 . Horde::selfUrl() . '" method="get" name="vcard_import" id="vcard_import">'
-                . Horde_Util::formInput();
+                . Util::formInput();
             foreach ($_GET as $key => $val) {
                 $html .= '<input type="hidden" name="' . htmlspecialchars($key)
                     . '" value="' . htmlspecialchars($val) . '" />';

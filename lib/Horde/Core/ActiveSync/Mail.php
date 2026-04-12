@@ -1,6 +1,7 @@
 <?php
 
 use Horde\Util\Domhtml;
+use Horde\Util\Util;
 
 /**
  * Horde_Core_ActiveSync_Mail::
@@ -730,7 +731,7 @@ class Horde_Core_ActiveSync_Mail
     protected function _tidyHtml($html)
     {
         // This filter requires the tidy extenstion.
-        if (Horde_Util::extensionExists('tidy')) {
+        if (Util::extensionExists('tidy')) {
             return Horde_Text_Filter::filter(
                 $html,
                 'Cleanhtml',

@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Util\Util;
+
 /**
  * The Horde_Core_Perms_Ui class provides UI methods for the Horde permissions
  * system.
@@ -348,7 +350,7 @@ class Horde_Core_Perms_Ui
         } else {
             if ($new_users) {
                 if (is_array($new_users)) {
-                    $u_n = Horde_Util::getFormData('u_n');
+                    $u_n = Util::getFormData('u_n');
                     $u_n = empty($u_n['u']) ? null : $u_n['u'];
                     $user_html = '<select name="u_n[u]"><option value="">' . Horde_Core_Translation::t('-- select --') . '</option>';
                     foreach ($new_users as $new_user => $name) {
@@ -408,7 +410,7 @@ class Horde_Core_Perms_Ui
         } else {
             if ($new_groups) {
                 if (is_array($new_groups)) {
-                    $g_n = Horde_Util::getFormData('g_n');
+                    $g_n = Util::getFormData('g_n');
                     $g_n = empty($g_n['g']) ? null : $g_n['g'];
                     $group_html = '<select name="g_n[g]"><option value="">' . Horde_Core_Translation::t('-- select --') . '</option>';
                     foreach ($new_groups as $groupId => $group) {

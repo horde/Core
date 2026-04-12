@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Util\Util;
+
 /**
  * Provides manipulation of block layouts.
  *
@@ -214,10 +216,10 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
                 // Save the changes made to a block and continue editing.
             case 'save-resume':
                 // Check form token.
-                $GLOBALS['session']->checkToken(Horde_Util::getFormData('token'));
+                $GLOBALS['session']->checkToken(Util::getFormData('token'));
 
                 // Get requested block type.
-                [$newapp, $newtype] = explode(':', Horde_Util::getFormData('app'));
+                [$newapp, $newtype] = explode(':', Util::getFormData('app'));
 
                 // Is this a new block?
                 $new = false;
@@ -267,7 +269,7 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
                     $this->setBlockInfo($row, $col, $info);
                 } elseif ($exists) {
                     // Change values.
-                    $this->setBlockInfo($row, $col, ['params' => Horde_Util::getFormData('params', [])]);
+                    $this->setBlockInfo($row, $col, ['params' => Util::getFormData('params', [])]);
                 }
                 $this->_updated = true;
                 if ($action == 'save') {

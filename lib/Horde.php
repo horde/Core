@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Util\Util;
+
 /**
  * Copyright 1999-2026 Horde LLC (http://www.horde.org/)
  *
@@ -639,7 +641,7 @@ class Horde
 
         if ($script_params) {
             $url = new Horde_Url($url);
-            if ($pathInfo = Horde_Util::getPathInfo()) {
+            if ($pathInfo = Util::getPathInfo()) {
                 $url->pathInfo = ltrim((string) $pathInfo, '/');
             }
             if (!empty($_SERVER['QUERY_STRING'])) {

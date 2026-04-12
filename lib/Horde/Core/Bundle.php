@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Util\Util;
+
 /**
  * Base class for the Horde bundle API.
  *
@@ -40,7 +42,7 @@ abstract class Horde_Core_Bundle
         if ((file_exists(HORDE_BASE . '/config/conf.php')
              && !is_writable(HORDE_BASE . '/config/conf.php'))
             || !is_writable(HORDE_BASE . '/config')) {
-            $this->_cli->message(Horde_Util::realPath(HORDE_BASE . '/config/conf.php') . ' is not writable.', 'cli.error');
+            $this->_cli->message(Util::realPath(HORDE_BASE . '/config/conf.php') . ' is not writable.', 'cli.error');
         }
 
         // We need a valid conf.php to instantiate the registry.
@@ -147,7 +149,7 @@ abstract class Horde_Core_Bundle
         $configFile = $this->_config->configFile();
         $fp = fopen($configFile, 'w');
         if (!$fp) {
-            throw new Horde_Exception('Cannot write configuration file ' . Horde_Util::realPath($configFile));
+            throw new Horde_Exception('Cannot write configuration file ' . Util::realPath($configFile));
         }
         fwrite($fp, $php_config);
         fclose($fp);
@@ -174,7 +176,7 @@ abstract class Horde_Core_Bundle
             $config = new Horde_Config($app);
             $configFile = $config->configFile();
             if (!$config->writePHPConfig(new Horde_Variables())) {
-                throw new Horde_Exception('Cannot write configuration file ' . Horde_Util::realPath($configFile));
+                throw new Horde_Exception('Cannot write configuration file ' . Util::realPath($configFile));
             }
         }
     }

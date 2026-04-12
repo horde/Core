@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Util\Util;
+
 /**
  * Copyright 2001-2026 Horde LLC (http://www.horde.org/)
  *
@@ -664,7 +666,7 @@ class Horde_Core_Prefs_Ui
 
         $base_ui = clone $base;
         $base_ui->set('action', $options_link);
-        $base_ui->set('forminput', Horde_Util::formInput());
+        $base_ui->set('forminput', Util::formInput());
 
         /* Show the current application and a form for switching
          * applications. */

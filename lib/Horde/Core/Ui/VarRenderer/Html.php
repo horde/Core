@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Util\Util;
+
 /**
  * The Horde_Core_Ui_VarRenderer_html:: class renders variables to HTML.
  *
@@ -1662,7 +1664,7 @@ function obrowserCallback(name, oid)
                     if ($GLOBALS['registry']->hasMethod('files/getViewLink')) {
                         $filename = basename($filename);
                         $url = $GLOBALS['registry']->call('files/getViewLink', [$dir, $filename]);
-                        $filename = Horde::link($url, Horde_Core_Translation::t('Preview'), null, 'form_file_view') . htmlspecialchars(Horde_Util::realPath($dir . '/' . $filename)) . '</a>';
+                        $filename = Horde::link($url, Horde_Core_Translation::t('Preview'), null, 'form_file_view') . htmlspecialchars(Util::realPath($dir . '/' . $filename)) . '</a>';
                     } else {
                         if (!empty($dir) && ($dir != '.')) {
                             $filename = $dir . '/' . $filename;

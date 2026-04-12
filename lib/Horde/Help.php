@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Util\Util;
+
 /**
  * The Horde_Help:: class provides an interface to the online help subsystem.
  *
@@ -43,7 +45,7 @@ class Horde_Help
      */
     public function __construct($source, $data, array $views = [])
     {
-        if (!Horde_Util::extensionExists('dom')) {
+        if (!Util::extensionExists('dom')) {
             throw new Horde_Exception('DOM not available.');
         }
 

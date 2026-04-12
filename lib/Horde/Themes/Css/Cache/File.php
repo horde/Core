@@ -13,6 +13,7 @@
  */
 
 use Horde\Log\Logger;
+use Horde\Util\Util;
 
 /**
  * Filesystem backend for the CSS caching library.
@@ -60,7 +61,7 @@ class Horde_Themes_Css_Cache_File extends Horde_Themes_Css_Cache
                 // Logger not available, continue without logging
             }
 
-            $temp = Horde_Util::getTempFile('staticcss', true, $js_fs);
+            $temp = Util::getTempFile('staticcss', true, $js_fs);
             if (!file_put_contents($temp, $compress->compress($css, $logger), LOCK_EX)
                 || !chmod($temp, 0o777 & ~umask())
                 || !rename($temp, $path)) {
