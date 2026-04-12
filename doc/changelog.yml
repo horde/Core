@@ -1,4 +1,23 @@
 ---
+3.0.0-beta16:
+  api: 3.0.0-beta16
+  state:
+    release: beta
+    api: beta
+  date: 2026-04-12
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    test: Unit test for ResponsiveAssets
+    feat: Build Graphics URL helper in ResponsiveAssets class
+    feat: Add opt-in bindings for Tinymce
+    refactor: Migrate from old-style to new-style helper methods
+    test: Signed Url methods
+    test: Cover Horde\Core\Horde class with tests
+    refactor: Delegate most methods of Horde:: to Horde\Core\Horde typed alternative
+    feat: Add a PSR-4 equivalent of the Horde:: class but without support for Horde_Deprecated
+    fix: Various null safety and type compatibility issues
 3.0.0-beta15:
   api: 3.0.0-beta15
   state:

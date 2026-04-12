@@ -37,7 +37,7 @@
         "config",
         "errorhandler"
     ],
-    "time": "2026-04-11",
+    "time": "2026-04-12",
     "repositories": [],
     "require": {
         "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || ^3 || ^2",
