@@ -320,4 +320,199 @@ class ResponsiveAssetsTest extends TestCase
         // Should gracefully handle exception and return empty array
         $this->assertEmpty($urls);
     }
+
+    public function testGetGraphicUrlAppThemeFirst(): void
+    {
+        // App selected theme graphic exists → return it immediately
+        $this->registryStub->method('get')
+            ->willReturnCallback(function ($key, $app) {
+                if ($key === 'themesfs') {
+                    return $app === 'horde' ? '/horde/themes' : '/jonah/themes';
+                }
+                if ($key === 'themesuri') {
+                    return $app === 'horde' ? '/themes/horde' : '/themes/jonah';
+                }
+                return null;
+            });
+
+        $this->registryStub->method('getApp')
+            ->willReturn('jonah');
+
+        // Only app selected theme file exists
+        $this->filesystemStub->method('fileExists')
+            ->willReturnCallback(function ($path) {
+                return $path === '/jonah/themes/dark/graphics/new.png';
+            });
+
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
+        $url = $assets->getGraphicUrl('new.png', 'dark', 'jonah');
+
+        $this->assertEquals('/themes/jonah/dark/graphics/new.png', $url);
+    }
+
+    public function testGetGraphicUrlFallsToAppDefault(): void
+    {
+        // App selected theme missing → fall back to app default theme
+        $this->registryStub->method('get')
+            ->willReturnCallback(function ($key, $app) {
+                if ($key === 'themesfs') {
+                    return $app === 'horde' ? '/horde/themes' : '/jonah/themes';
+                }
+                if ($key === 'themesuri') {
+                    return $app === 'horde' ? '/themes/horde' : '/themes/jonah';
+                }
+                return null;
+            });
+
+        $this->registryStub->method('getApp')
+            ->willReturn('jonah');
+
+        $this->filesystemStub->method('fileExists')
+            ->willReturnCallback(function ($path) {
+                return $path === '/jonah/themes/default/graphics/new.png';
+            });
+
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
+        $url = $assets->getGraphicUrl('new.png', 'dark', 'jonah');
+
+        $this->assertEquals('/themes/jonah/default/graphics/new.png', $url);
+    }
+
+    public function testGetGraphicUrlFallsToHordeTheme(): void
+    {
+        // No app graphic → fall back to horde selected theme
+        $this->registryStub->method('get')
+            ->willReturnCallback(function ($key, $app) {
+                if ($key === 'themesfs') {
+                    return $app === 'horde' ? '/horde/themes' : '/jonah/themes';
+                }
+                if ($key === 'themesuri') {
+                    return $app === 'horde' ? '/themes/horde' : '/themes/jonah';
+                }
+                return null;
+            });
+
+        $this->registryStub->method('getApp')
+            ->willReturn('jonah');
+
+        $this->filesystemStub->method('fileExists')
+            ->willReturnCallback(function ($path) {
+                return $path === '/horde/themes/dark/graphics/edit.png';
+            });
+
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
+        $url = $assets->getGraphicUrl('edit.png', 'dark', 'jonah');
+
+        $this->assertEquals('/themes/horde/dark/graphics/edit.png', $url);
+    }
+
+    public function testGetGraphicUrlFallsToHordeDefault(): void
+    {
+        // Nothing else found → horde default theme as ultimate fallback
+        $this->registryStub->method('get')
+            ->willReturnCallback(function ($key, $app) {
+                if ($key === 'themesfs') {
+                    return $app === 'horde' ? '/horde/themes' : '/jonah/themes';
+                }
+                if ($key === 'themesuri') {
+                    return $app === 'horde' ? '/themes/horde' : '/themes/jonah';
+                }
+                return null;
+            });
+
+        $this->registryStub->method('getApp')
+            ->willReturn('jonah');
+
+        $this->filesystemStub->method('fileExists')
+            ->willReturnCallback(function ($path) {
+                return $path === '/horde/themes/default/graphics/edit.png';
+            });
+
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
+        $url = $assets->getGraphicUrl('edit.png', 'default', 'jonah');
+
+        $this->assertEquals('/themes/horde/default/graphics/edit.png', $url);
+    }
+
+    public function testGetGraphicUrlReturnsEmptyWhenNotFound(): void
+    {
+        $this->registryStub->method('get')
+            ->willReturnCallback(function ($key, $app) {
+                if ($key === 'themesfs') {
+                    return '/themes-fs/' . $app;
+                }
+                if ($key === 'themesuri') {
+                    return '/themes/' . $app;
+                }
+                return null;
+            });
+
+        $this->registryStub->method('getApp')
+            ->willReturn('jonah');
+
+        // No files exist
+        $this->filesystemStub->method('fileExists')
+            ->willReturn(false);
+
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
+        $url = $assets->getGraphicUrl('missing.png', 'default', 'jonah');
+
+        $this->assertSame('', $url);
+    }
+
+    public function testGetGraphicUrlHordeAppSkipsAppCandidates(): void
+    {
+        // When app is 'horde', only horde candidates are checked
+        $this->registryStub->method('get')
+            ->willReturnCallback(function ($key, $app) {
+                if ($key === 'themesfs') {
+                    return '/horde/themes';
+                }
+                if ($key === 'themesuri') {
+                    return '/themes/horde';
+                }
+                return null;
+            });
+
+        $this->registryStub->method('getApp')
+            ->willReturn('horde');
+
+        $this->filesystemStub->method('fileExists')
+            ->willReturnCallback(function ($path) {
+                return $path === '/horde/themes/default/graphics/logo.png';
+            });
+
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
+        $url = $assets->getGraphicUrl('logo.png', 'default', 'horde');
+
+        $this->assertEquals('/themes/horde/default/graphics/logo.png', $url);
+    }
+
+    public function testGetGraphicUrlSubdirectory(): void
+    {
+        // Supports subdirectories like 'mime/pdf.png'
+        $this->registryStub->method('get')
+            ->willReturnCallback(function ($key, $app) {
+                if ($key === 'themesfs') {
+                    return '/jonah/themes';
+                }
+                if ($key === 'themesuri') {
+                    return '/themes/jonah';
+                }
+                return null;
+            });
+
+        $this->registryStub->method('getApp')
+            ->willReturn('jonah');
+
+        $this->filesystemStub->method('fileExists')
+            ->willReturnCallback(function ($path) {
+                return $path === '/jonah/themes/default/graphics/mime/pdf.png';
+            });
+
+        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
+        $url = $assets->getGraphicUrl('mime/pdf.png', 'default', 'jonah');
+
+        $this->assertEquals('/themes/jonah/default/graphics/mime/pdf.png', $url);
+    }
 }
