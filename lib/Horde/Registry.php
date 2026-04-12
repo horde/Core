@@ -14,8 +14,12 @@
 
 use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Driver\DriverRepository;
+use Horde\Core\Editor\TinymcePageBinder;
 use Horde\Core\Factory\ConfigMetadataProviderFactory;
 use Horde\Core\Factory\DriverRepositoryFactory;
+use Horde\Core\Factory\TinymceFactory;
+use Horde\Core\Factory\TinymcePageBinderFactory;
+use Horde\Editor\Tinymce;
 use NetDNS2\Exception as NetDNS2Exception;
 use Horde\Util\Util;
 
@@ -474,6 +478,8 @@ class Horde_Registry implements Horde_Shutdown_Task
             'Horde\\Core\\Auth\\AuthService' => 'Horde\\Core\\Factory\\AuthServiceFactory',
             'Horde\\Core\\Service\\HordeLdapService' => 'Horde\\Core\\Factory\\HordeLdapServiceFactory',
             'Horde\\Core\\Service\\PermissionService' => 'Horde\\Core\\Factory\\PermissionServiceFactory',
+            Tinymce::class => TinymceFactory::class,
+            TinymcePageBinder::class => TinymcePageBinderFactory::class,
         ];
 
         /* Define implementations. */
