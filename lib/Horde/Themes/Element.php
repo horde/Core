@@ -12,6 +12,8 @@
  * @package   Core
  */
 
+use Horde\Core\Horde;
+
 /**
  * An object-oriented interface to a themes element.
  *
@@ -106,7 +108,7 @@ class Horde_Themes_Element
         try {
             return (string) $this->uri;
         } catch (Exception $e) {
-            Horde::log($e, 'ERR');
+            Horde::log($e, Horde_Log::ERR);
             return '';
         }
     }

@@ -12,6 +12,8 @@
  * @package   Core
  */
 
+use Horde\Core\Horde;
+
 /**
  * Generates the Horde topbar.
  *
@@ -205,7 +207,7 @@ class Horde_Core_Topbar
                 'icon' => 'help_index.png',
                 'menu_parent' => 'settings',
                 'name' => Horde_Core_Translation::t('Help'),
-                'onclick' => Horde::popupJs($help_link, ['urlencode' => true]) . 'return false;',
+                'onclick' => Horde::popupJs((string) $help_link, ['urlencode' => true]) . 'return false;',
                 'status' => 'active',
                 'target' => 'help',
                 'url' => $help_link,
@@ -230,7 +232,7 @@ class Horde_Core_Topbar
                     } catch (Horde_Exception_PushApp $e) {
                         // Ignore
                     } catch (Horde_Exception $e) {
-                        Horde::log($e, 'ERR');
+                        Horde::log($e, Horde_Log::ERR);
                     }
                     break;
 

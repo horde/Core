@@ -1,5 +1,6 @@
 <?php
 
+use Horde\Core\Horde;
 use Horde\Util\Util;
 
 /**
@@ -74,7 +75,7 @@ class Horde_Script_Cache_File extends Horde_Script_Cache
 
         Horde::log(
             sprintf('Cleaned out static JS files (removed %d file(s)).', $removed),
-            'DEBUG'
+            Horde_Log::DEBUG
         );
     }
 
@@ -108,7 +109,7 @@ class Horde_Script_Cache_File extends Horde_Script_Cache
         $js_filename = $sig . '.js';
         $js_fs = $registry->get('staticfs', 'horde');
         $js_path = $js_fs . '/' . $js_filename;
-        $js_url = $registry->get('staticuri', 'horde') . '/' . $js_filename;
+        $js_url = ($registry->get('staticuri', 'horde') ?? '') . '/' . $js_filename;
         if ($full) {
             $js_url = (string) Horde::url($js_url, true, -1);
         }

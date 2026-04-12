@@ -12,6 +12,8 @@
  * @package   Core
  */
 
+use Horde\Core\Horde;
+
 /**
  * Loads generic Horde configuration files, respecting local config file
  * overrides and virtual host settings.
@@ -121,7 +123,7 @@ class Horde_Registry_Loadconfig
 
         Horde::log(
             'Load config file (' . $conf_file . '; app: ' . $app . ')',
-            'DEBUG'
+            Horde_Log::DEBUG
         );
     }
 

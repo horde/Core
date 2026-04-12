@@ -17,6 +17,7 @@
 
 use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Legacy\LegacyConfigAdapter;
+use Horde\Core\Horde;
 use Horde\Injector\Injector;
 use Horde\Util\Util;
 
@@ -2034,7 +2035,7 @@ class Horde_Config
                     return $appOb->configSpecialValues($node->getAttribute('name'));
                 }
             } catch (Throwable $e2) {
-                Horde::log('configSpecialValues failed for ' . $app . ': ' . $e2->getMessage(), 'DEBUG');
+                Horde::log('configSpecialValues failed for ' . $app . ': ' . $e2->getMessage(), Horde_Log::DEBUG);
             }
             return [];
         }

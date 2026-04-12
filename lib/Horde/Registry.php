@@ -19,6 +19,7 @@ use Horde\Core\Factory\ConfigMetadataProviderFactory;
 use Horde\Core\Factory\DriverRepositoryFactory;
 use Horde\Core\Factory\TinymceFactory;
 use Horde\Core\Factory\TinymcePageBinderFactory;
+use Horde\Core\Horde;
 use Horde\Editor\Tinymce;
 use NetDNS2\Exception as NetDNS2Exception;
 use Horde\Util\Util;
@@ -645,11 +646,11 @@ class Horde_Registry implements Horde_Shutdown_Task
     {
         /* Register access key logger for translators. */
         if (!empty($GLOBALS['conf']['log_accesskeys'])) {
-            Horde::getAccessKey(null, null, true);
+            Horde::getAccessKey('', false, true);
         }
 
         /* Register memory tracker if logging in debug mode. */
-        Horde::log('Max memory usage: ' . memory_get_peak_usage(true) . ' bytes', 'DEBUG');
+        Horde::log('Max memory usage: ' . memory_get_peak_usage(true) . ' bytes', Horde_Log::DEBUG);
     }
 
     /**
@@ -818,7 +819,7 @@ class Horde_Registry implements Horde_Shutdown_Task
             try {
                 $api = $this->getApiInstance($app, 'api');
             } catch (Horde_Exception $e) {
-                Horde::log($e, 'DEBUG');
+                Horde::log($e, Horde_Log::DEBUG);
             }
         }
 
@@ -1637,7 +1638,7 @@ class Horde_Registry implements Horde_Shutdown_Task
                 if ($error_log) {
                     Horde::log(
                         sprintf($error_log, $auth, $error_app, $remote->host),
-                        'DEBUG'
+                        Horde_Log::DEBUG
                     );
                 }
 

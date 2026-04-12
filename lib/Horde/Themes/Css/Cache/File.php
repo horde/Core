@@ -12,6 +12,7 @@
  * @package   Core
  */
 
+use Horde\Core\Horde;
 use Horde\Log\Logger;
 use Horde\Util\Util;
 
@@ -65,13 +66,13 @@ class Horde_Themes_Css_Cache_File extends Horde_Themes_Css_Cache
             if (!file_put_contents($temp, $compress->compress($css, $logger), LOCK_EX)
                 || !chmod($temp, 0o777 & ~umask())
                 || !rename($temp, $path)) {
-                Horde::log('Could not write cached CSS file to disk.', 'EMERG');
+                Horde::log('Could not write cached CSS file to disk.', Horde_Log::EMERG);
                 return [];
             }
         }
 
         return [
-            Horde::url($registry->get('staticuri', 'horde') . '/' . $filename, true, ['append_session' => -1]),
+            Horde::url(($registry->get('staticuri', 'horde') ?? '') . '/' . $filename, true, ['append_session' => -1]),
         ];
     }
 
@@ -115,7 +116,7 @@ class Horde_Themes_Css_Cache_File extends Horde_Themes_Css_Cache
 
         Horde::log(
             sprintf('Cleaned out static CSS files (removed %d file(s)).', $removed),
-            'DEBUG'
+            Horde_Log::DEBUG
         );
     }
 

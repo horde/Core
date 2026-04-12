@@ -13,6 +13,8 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL-2.1
  * @package  Core
  */
+use Horde\Core\Horde;
+
 class Horde_ErrorHandler
 {
     /**
@@ -36,7 +38,7 @@ class Horde_ErrorHandler
                     }
 
                     try {
-                        Horde::log($error, 'NOTICE');
+                        Horde::log($error, Horde_Log::NOTICE);
                     } catch (Exception $e) {
                     }
 
@@ -73,7 +75,7 @@ class Horde_ErrorHandler
         }
 
         try {
-            Horde::log($error, 'EMERG');
+            Horde::log($error, Horde_Log::EMERG);
         } catch (Exception $e) {
         }
 

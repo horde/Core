@@ -1,16 +1,6 @@
 <?php
 
-/**
- * Copyright 2013-2026 Horde LLC (http://www.horde.org/)
- *
- * See the enclosed file LICENSE for license information (LGPL). If you
- * did not receive this file, see http://www.horde.org/licenses/lgpl21.
- *
- * @category Horde
- * @copyright 2013-2017 Horde LLC
- * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
- * @package  Core
- */
+use Horde\Core\Horde;
 
 /**
  * Runs Horde application hooks.
@@ -55,14 +45,14 @@ class Horde_Core_Hooks
         try {
             Horde::log(
                 sprintf('Hook %s in application %s called.', $hook, $app),
-                'DEBUG'
+                Horde_Log::DEBUG
             );
             return call_user_func_array(
                 [$this->_apps[$app], $hook],
                 $args
             );
         } catch (Horde_Exception $e) {
-            Horde::log($e, 'ERR');
+            Horde::log($e, Horde_Log::ERR);
             throw $e;
         }
     }

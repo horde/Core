@@ -20,6 +20,8 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+use Horde\Core\Horde;
+
 abstract class Horde_Core_Ajax_Imple_ContactAutoCompleter extends Horde_Core_Ajax_Imple_AutoCompleter
 {
     /**
@@ -79,7 +81,7 @@ abstract class Horde_Core_Ajax_Imple_ContactAutoCompleter extends Horde_Core_Aja
                 'emailSearch' => true,
             ]]);
         } catch (Horde_Exception $e) {
-            Horde::log($e, 'ERR');
+            Horde::log($e, Horde_Log::ERR);
             return new Horde_Mail_Rfc822_List();
         }
 

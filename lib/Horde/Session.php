@@ -12,6 +12,8 @@
  * @package  Core
  */
 
+use Horde\Core\Horde;
+
 /**
  * The Horde_Session class provides a set of methods for handling the
  * administration and contents of the Horde session variable.
@@ -213,7 +215,7 @@ class Horde_Session
         if (!$this->_readonly
             && !is_null($this->_relogin)
             && (($GLOBALS['registry']->getAuth() !== false) !== $this->_relogin)) {
-            Horde::log('Previous session attempted to be reopened after authentication status change. All session modifications will be ignored.', 'DEBUG');
+            Horde::log('Previous session attempted to be reopened after authentication status change. All session modifications will be ignored.', Horde_Log::DEBUG);
             $this->_readonly = true;
         }
     }

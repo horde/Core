@@ -13,6 +13,8 @@
  * @package Core
  */
 
+use Horde\Core\Horde;
+
 /**
  * @author  Jan Schneider <jan@horde.org>
  * @package Core
