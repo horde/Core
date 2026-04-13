@@ -41,7 +41,7 @@ class Horde_Core_Mime_Viewer_Syntaxhighlighter extends Horde_Mime_Viewer_Syntaxh
             $sh_js_uri = Horde::url($this->getConfigParam('registry')->get('jsuri', 'horde'), false, -1) . '/syntaxhighlighter/styles/';
             $page_output->addStylesheet($sh_js_fs . 'theme.css', $sh_js_uri . 'theme.css');
         }
-        $results = '<pre class="brush: ' . $language . '; toolbar: false;">' . htmlspecialchars(Horde_String::convertCharset($this->_mimepart->getContents(), $this->_mimepart->getCharset(), $this->getConfigParam('charset')), ENT_QUOTES, $this->getConfigParam('charset')) . '</pre>';
+        $results = '<pre class="brush: ' . $language . '; toolbar: false;">' . htmlspecialchars(Horde_String::convertCharset($this->_mimepart->getContents() ?? '', $this->_mimepart->getCharset(), $this->getConfigParam('charset')), ENT_QUOTES, $this->getConfigParam('charset')) . '</pre>';
         return $this->_renderReturn(
             $results,
             'text/html; charset=' . $this->getConfigParam('charset')
