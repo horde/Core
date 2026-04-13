@@ -90,7 +90,7 @@ class JwtServiceFactory
             );
         }
 
-        $secret = trim(file_get_contents($secretFile));
+        $secret = trim((string) file_get_contents($secretFile));
 
         // Validate secret
         if (empty($secret)) {
