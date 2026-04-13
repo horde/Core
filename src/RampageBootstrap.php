@@ -4,7 +4,7 @@ namespace Horde\Core;
 
 use Horde\Core\Middleware\AppFinder;
 use Horde\Core\Middleware\AppRouter;
-use Horde\Horde\Middleware\JwtSession;
+use Horde\Core\Middleware\JwtSession;
 use Horde\Http\RequestFactory;
 use Horde\Http\UriFactory;
 use Horde\Http\ResponseFactory;
