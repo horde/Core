@@ -125,8 +125,13 @@ class LdapPrefsService implements PrefsService
                 // No hordePerson entry, modify user entry directly
                 $entry = $ldap->getEntry($userDN);
 
-                // Add hordePerson objectClass if not present
-                $objectClasses = $entry->getValue('objectClass');
+                // Add hordePerson objectClass if not present.
+                // getValue() may return null if the entry has no
+                // objectClass attribute; default to empty array.
+                $objectClasses = $entry->getValue('objectClass') ?? [];
+                if (!is_array($objectClasses)) {
+                    $objectClasses = [$objectClasses];
+                }
                 if (!in_array('hordePerson', $objectClasses)) {
                     $objectClasses[] = 'hordePerson';
                     $entry->replace(['objectClass' => $objectClasses], false);

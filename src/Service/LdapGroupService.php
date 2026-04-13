@@ -75,7 +75,13 @@ class LdapGroupService implements GroupService
 
             $allGroups = [];
             foreach ($search as $entry) {
+                // getValue() returns null when the attribute is missing;
+                // skip entries without a group ID since GroupInfo requires
+                // a non-null string id.
                 $gid = $entry->getValue($this->gidAttr, 'single');
+                if ($gid === null) {
+                    continue;
+                }
                 $members = $entry->getValue($this->memberAttr);
                 $mail = $entry->getValue('mail', 'single');
 
@@ -411,7 +417,7 @@ class LdapGroupService implements GroupService
 
             $maxGid = 10000; // Start from 10000 for safety
             foreach ($search as $entry) {
-                $gid = (int) $entry->getValue('gidNumber', 'single');
+                $gid = (int) ($entry->getValue('gidNumber', 'single') ?? 0);
                 if ($gid > $maxGid) {
                     $maxGid = $gid;
                 }
