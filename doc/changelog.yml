@@ -1,4 +1,23 @@
 ---
+3.0.0-beta18:
+  api: 3.0.0-beta18
+  state:
+    release: beta
+    api: beta
+  date: 2026-04-13
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    feat: Use new OO matchResult and set as request attribute
+    fix: cast file_get_contents() to string before trim() for PHP 8.0+
+    refactor: Migrate JWT and generic controller related code from base/ to core/
+    fix: guard convertCharset() against null getContents() for PHP 8.1+
+    fix: guard foreach(glob()) against false for PHP 8.0+
+    fix(ldap): guard against null from Horde_Ldap_Entry::getValue() in LDAP services
+    fix(core): cast Horde_Url to string in legacy wrappers before forwarding to strict-typed methods
+    fix: Prefer Horde\Url\Url over Horde_Url
+    refactor: Use PSR-3 Logger and typed versions of delegated Horde::
 3.0.0-beta17:
   api: 3.0.0-beta17
   state:
