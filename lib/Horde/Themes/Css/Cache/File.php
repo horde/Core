@@ -107,7 +107,7 @@ class Horde_Themes_Css_Cache_File extends Horde_Themes_Css_Cache
         $curr_time -= $this->_params['lifetime'];
         $removed = 0;
 
-        foreach (glob($static_dir . '/*.css') as $file) {
+        foreach (glob($static_dir . '/*.css') ?: [] as $file) {
             if ($curr_time > filemtime($file)) {
                 @unlink($file);
                 ++$removed;

@@ -245,7 +245,7 @@ class Horde_Config
         }
 
         /* Parse additional config files. */
-        foreach (glob($path . '/conf.d/*.xml') as $additional) {
+        foreach (glob($path . '/conf.d/*.xml') ?: [] as $additional) {
             $dom = new DOMDocument();
             $dom->load($additional);
             $root = $dom->documentElement;
