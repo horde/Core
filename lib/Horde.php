@@ -216,7 +216,7 @@ class Horde
      */
     public static function signQueryString($queryString, $now = null)
     {
-        return Horde\Core\Horde::signQueryString($queryString ?? '', $now);
+        return Horde\Core\Horde::signQueryString((string) ($queryString ?? ''), $now);
     }
 
     /**
@@ -529,7 +529,7 @@ class Horde
             $title = $title2;
         }
         return Horde\Core\Horde::link(
-            $url ?? '',
+            (string) ($url ?? ''),
             (string) ($title ?? ''),
             (string) ($class ?? ''),
             (string) ($target ?? ''),
@@ -570,7 +570,7 @@ class Horde
         $attributes = []
     ) {
         return Horde\Core\Horde::linkTooltip(
-            $url ?? '',
+            (string) ($url ?? ''),
             (string) ($status ?? ''),
             (string) ($class ?? ''),
             (string) ($target ?? ''),
@@ -929,7 +929,7 @@ class Horde
      */
     public static function popupJs($url, $options = [])
     {
-        return Horde\Core\Horde::popupJs($url ?? '', is_array($options) ? $options : []);
+        return Horde\Core\Horde::popupJs((string) ($url ?? ''), is_array($options) ? $options : []);
     }
 
     /**
