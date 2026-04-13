@@ -18,6 +18,7 @@ use Horde_Controller;
 use Horde_Injector;
 use Horde\Routes\Mapper;
 use Horde\Routes\Matcher;
+use Horde\Routes\MatchResult;
 use Horde_String;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Horde\Exception\HordeException;
@@ -154,10 +155,20 @@ class AppRouter extends RampageRequestHandler implements MiddlewareInterface, Re
         // Match using PSR-7 Matcher (auto-populates environ from request)
         // @TODO Cache routes
         $matcher = new Matcher($this->mapper, $request);
-        $matchDict = $matcher->getMatchDict();
-        // Unwrap Horde_Support_Array to plain array for compatibility
-        $match = iterator_to_array($matchDict);
+        $matchResult = $matcher->getMatchResult();
+
+        // Build plain array for backward compatibility
+        $match = $matchResult !== null ? $matchResult->toArray() : [];
+
+        // Set the typed MatchResult as a request attribute
+        $request = $request->withAttribute('matchResult', $matchResult);
+        // Backward compat: also set the plain array as 'route'
         $request = $request->withAttribute('route', $match);
+
+        // Bind MatchResult in injector so controllers can type-hint it
+        if ($matchResult !== null) {
+            $this->injector->setInstance(MatchResult::class, $matchResult);
+        }
 
         // compatibility: if unset stack and HordeAuthType is 'NONE' set empty stack
         if (!isset($match['stack']) && ($match['HordeAuthType'] ?? null) === 'NONE') {
