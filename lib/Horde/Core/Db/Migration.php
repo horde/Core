@@ -116,7 +116,7 @@ class Horde_Core_Db_Migration
         // Loop through local framework checkouts.
         elseif ($basedir) {
             $path = $basedir . '/*/migration';
-            foreach (glob($path) as $dir) {
+            foreach (glob($path) ?: [] as $dir) {
                 try {
                     $package = Horde_Yaml::loadFile($dir . '/../.horde.yml');
                 } catch (Horde_Yaml_Exception $e) {
