@@ -53,7 +53,7 @@ class Horde_Core_HordeMap
                 'useMarkerLayer' => true,
             ],
             'driver' => 'Horde',
-            'geocoder' => $conf['maps']['geocoder'],
+            'geocoder' => $conf['maps']['geocoder'] ?? null,
             'jsuri' => $registry->get('jsuri', 'horde') . '/map/',
             'ssl' => $browser->usingSSLConnection(),
         ], $params);
@@ -61,13 +61,13 @@ class Horde_Core_HordeMap
         // If providers were not specified, use global. We don't merge them
         // above to allow overriding the global completely.
         if (empty($params['providers'])) {
-            $params['providers'] = $conf['maps']['providers'];
+            $params['providers'] = $conf['maps']['providers'] ?? [];
         }
 
         foreach ($params['providers'] as $layer) {
             switch ($layer) {
                 case 'Google':
-                    $params['conf']['apikeys']['google'] = $conf['api']['googlemaps'];
+                    $params['conf']['apikeys']['google'] = $conf['api']['googlemaps'] ?? '';
                     break;
             }
         }
@@ -75,7 +75,7 @@ class Horde_Core_HordeMap
         if (!empty($params['geocoder'])) {
             switch ($params['geocoder']) {
                 case 'Google':
-                    $params['conf']['apikeys']['google'] = $conf['api']['googlemaps'];
+                    $params['conf']['apikeys']['google'] = $conf['api']['googlemaps'] ?? '';
                     break;
             }
         }
