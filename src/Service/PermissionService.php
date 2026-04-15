@@ -17,6 +17,8 @@ declare(strict_types=1);
 namespace Horde\Core\Service;
 
 use Horde\Core\Service\Exception\PermissionNotFoundException;
+use Horde\Core\Factory\PermissionServiceFactory;
+use Horde\Injector\Attribute\Factory;
 
 /**
  * Permission service interface
@@ -32,6 +34,7 @@ use Horde\Core\Service\Exception\PermissionNotFoundException;
  * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
+#[Factory(factory: PermissionServiceFactory::class, method: 'create')]
 interface PermissionService
 {
     /**

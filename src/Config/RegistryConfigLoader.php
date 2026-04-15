@@ -18,6 +18,8 @@ namespace Horde\Core\Config;
 
 use RuntimeException;
 use stdClass;
+use Horde\Core\Factory\RegistryConfigLoaderFactory;
+use Horde\Injector\Attribute\Factory;
 
 /**
  * Registry config loader for Horde applications
@@ -38,6 +40,7 @@ use stdClass;
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
+#[Factory(factory: RegistryConfigLoaderFactory::class, method: 'create')]
 class RegistryConfigLoader
 {
     private ?RegistryState $cache = null;

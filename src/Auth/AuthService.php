@@ -18,6 +18,8 @@ namespace Horde\Core\Auth;
 
 use Horde_Auth_Base;
 use Horde_Auth_Exception;
+use Horde\Core\Factory\AuthServiceFactory;
+use Horde\Injector\Attribute\Factory;
 
 /**
  * Modern wrapper for Horde_Auth_Base with proper dependency injection
@@ -33,6 +35,7 @@ use Horde_Auth_Exception;
  * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
+#[Factory(factory: AuthServiceFactory::class, method: 'create')]
 class AuthService
 {
     /**

@@ -18,7 +18,9 @@ namespace Horde\Core\Service;
 
 use Horde\Core\Config\RegistryConfigLoader;
 use Horde\Core\Config\RegistryState;
+use Horde\Core\Factory\ApplicationServiceFactory;
 use Horde\Core\Util\VersionReader;
+use Horde\Injector\Attribute\Factory;
 
 /**
  * Application introspection service
@@ -34,6 +36,7 @@ use Horde\Core\Util\VersionReader;
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
+#[Factory(factory: ApplicationServiceFactory::class, method: 'create')]
 class ApplicationService
 {
     private RegistryState $registryState;

@@ -17,6 +17,8 @@ declare(strict_types=1);
 namespace Horde\Core\Service;
 
 use Horde_Ldap;
+use Horde\Core\Factory\HordeLdapServiceFactory;
+use Horde\Injector\Attribute\Factory;
 
 /**
  * LDAP service interface for Horde
@@ -29,6 +31,7 @@ use Horde_Ldap;
  * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
+#[Factory(factory: HordeLdapServiceFactory::class, method: 'create')]
 interface HordeLdapService
 {
     /**

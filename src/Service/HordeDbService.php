@@ -17,6 +17,8 @@ declare(strict_types=1);
 namespace Horde\Core\Service;
 
 use Horde_Db_Adapter;
+use Horde\Core\Factory\DbServiceFactory;
+use Horde\Injector\Attribute\Factory;
 
 /**
  * Database service interface for Horde
@@ -29,6 +31,7 @@ use Horde_Db_Adapter;
  * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
+#[Factory(factory: DbServiceFactory::class, method: 'create')]
 interface HordeDbService
 {
     /**

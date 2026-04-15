@@ -17,6 +17,8 @@ declare(strict_types=1);
 namespace Horde\Core\Config;
 
 use RuntimeException;
+use Horde\Core\Factory\ConfigLoaderFactory;
+use Horde\Injector\Attribute\Factory;
 
 /**
  * Config loader for Horde applications
@@ -33,6 +35,7 @@ use RuntimeException;
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
+#[Factory(factory: ConfigLoaderFactory::class, method: 'create')]
 class ConfigLoader
 {
     private array $cache = [];

@@ -18,6 +18,8 @@ namespace Horde\Core\Service;
 
 use Horde\Core\Service\Exception\GroupNotFoundException;
 use Horde\Core\Service\Exception\GroupExistsException;
+use Horde\Core\Factory\GroupServiceFactory;
+use Horde\Injector\Attribute\Factory;
 
 /**
  * Group service interface
@@ -29,6 +31,7 @@ use Horde\Core\Service\Exception\GroupExistsException;
  * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
+#[Factory(factory: GroupServiceFactory::class, method: 'create')]
 interface GroupService
 {
     /**

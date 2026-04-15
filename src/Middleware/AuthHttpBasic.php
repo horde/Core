@@ -13,6 +13,8 @@ use Horde_Registry;
 use Horde_Application;
 use Horde_Auth_Base;
 use Horde_Core_Auth_Application;
+use Horde\Core\Factory\AuthHttpBasicFactory;
+use Horde\Injector\Attribute\Factory;
 
 /**
  * AuthHttpHeader middleware
@@ -27,6 +29,7 @@ use Horde_Core_Auth_Application;
  * - HORDE_AUTHENTICATED_USER the uid, if authenticated
  *
  */
+#[Factory(factory: AuthHttpBasicFactory::class, method: 'create')]
 class AuthHttpBasic implements MiddlewareInterface
 {
     private $driver;

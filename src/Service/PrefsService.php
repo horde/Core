@@ -16,8 +16,10 @@ declare(strict_types=1);
 
 namespace Horde\Core\Service;
 
+use Horde\Core\Factory\PrefsServiceFactory;
+use Horde\Injector\Attribute\Factory;
+
 /**
- * Preferences service interface
  *
  * Provides access to user preferences storage backends.
  * Prefs are scoped by user AND application.
@@ -30,6 +32,7 @@ namespace Horde\Core\Service;
  * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
+#[Factory(factory: PrefsServiceFactory::class, method: 'create')]
 interface PrefsService
 {
     /**
