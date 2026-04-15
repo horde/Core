@@ -1,4 +1,16 @@
 ---
+3.0.0-beta19:
+  api: 3.0.0-beta19
+  state:
+    release: beta
+    api: beta
+  date: 2026-04-15
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    feat: Modern SessionHandlerFactory
+    feat: Add #[Factory] attribute to Core services and config classes
 3.0.0-beta18:
   api: 3.0.0-beta18
   state:
