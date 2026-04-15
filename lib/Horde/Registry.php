@@ -2620,6 +2620,10 @@ class Horde_Registry implements Horde_Shutdown_Task
             $out->proxy = false;
         }
 
+        // Strip null bytes and whitespace — PHP 8.x gethostbyaddr()
+        // throws ValueError on embedded null bytes.
+        $out->addr = trim(str_replace("\0", '', $out->addr));
+
         // Check registry setting for DNS resolution
         // Default to false (disabled) for performance
         $resolve = !empty($this->applications['horde']['resolve_hostnames']);
