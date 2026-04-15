@@ -232,49 +232,55 @@ class Horde_Core_Topbar
                     } catch (Horde_Exception_PushApp $e) {
                         // Ignore
                     } catch (Horde_Exception $e) {
-                        Horde::log($e, Horde_Log::ERR);
+                        Horde::log($e);
+                    } catch (Throwable $e) {
+                        Horde::log($e);
                     }
                     break;
 
                 default:
-                    /* Need to run the name through Horde's gettext since the
-                     * user's locale may not have been loaded when registry.php was
-                     * parsed, and the translations of the application names are
-                     * not in the Core package. */
-                    $name = strlen((string) ($params['name'] ?? '')) ? _($params['name']) : '';
+                    try {
+                        /* Need to run the name through Horde's gettext since the
+                         * user's locale may not have been loaded when registry.php was
+                         * parsed, and the translations of the application names are
+                         * not in the Core package. */
+                        $name = strlen((string) ($params['name'] ?? '')) ? _($params['name']) : '';
 
-                    /* Headings have no webroot; they're just containers for other
-                     * menu items. */
-                    if (isset($params['url'])) {
-                        $url = $params['url'];
-                    } elseif (($params['status'] == 'heading')
-                              || !isset($params['webroot'])) {
-                        $url = '';
-                    } else {
-                        $url = Horde::url($registry->getInitialPage($app), false, ['app' => $app]);
+                        /* Headings have no webroot; they're just containers for other
+                         * menu items. */
+                        if (isset($params['url'])) {
+                            $url = $params['url'];
+                        } elseif (($params['status'] == 'heading')
+                                  || !isset($params['webroot'])) {
+                            $url = '';
+                        } else {
+                            $url = Horde::url($registry->getInitialPage($app), false, ['app' => $app]);
+                        }
+
+                        $this->_tree->addNode([
+                            'id' => $app,
+                            'parent' => empty($params['menu_parent']) ? null : $params['menu_parent'],
+                            'label' => $name,
+                            'expanded' => false,
+                            'params' => [
+                                'icon' => strval(($params['icon']
+                                                  ?? $registry->get('icon', $app))),
+                                'class' => $params['class']
+                                    ?? ($app == $current
+                                       ? 'horde-point-center-active'
+                                       : 'horde-point-center'),
+                                'noarrow' => !empty($params['noarrow']),
+                                'onclick' => $params['onclick']
+                                    ?? null,
+                                'target' => $params['target']
+                                    ?? null,
+                                'url' => $url,
+                                'active' => ($app == $current),
+                            ],
+                        ]);
+                    } catch (Throwable $e) {
+                        Horde::log($e);
                     }
-
-                    $this->_tree->addNode([
-                        'id' => $app,
-                        'parent' => empty($params['menu_parent']) ? null : $params['menu_parent'],
-                        'label' => $name,
-                        'expanded' => false,
-                        'params' => [
-                            'icon' => strval(($params['icon']
-                                              ?? $registry->get('icon', $app))),
-                            'class' => $params['class']
-                                ?? ($app == $current
-                                   ? 'horde-point-center-active'
-                                   : 'horde-point-center'),
-                            'noarrow' => !empty($params['noarrow']),
-                            'onclick' => $params['onclick']
-                                ?? null,
-                            'target' => $params['target']
-                                ?? null,
-                            'url' => $url,
-                            'active' => ($app == $current),
-                        ],
-                    ]);
             }
         }
 

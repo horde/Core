@@ -17,10 +17,19 @@ use Horde\Core\Config\Driver\DriverRepository;
 use Horde\Core\Editor\TinymcePageBinder;
 use Horde\Core\Factory\ConfigMetadataProviderFactory;
 use Horde\Core\Factory\DriverRepositoryFactory;
+use Horde\Core\Factory\EventDispatcherFactory;
+use Horde\Core\Factory\HttpClientFactory;
+use Horde\Core\Factory\SimpleCacheFactory;
 use Horde\Core\Factory\TinymceFactory;
 use Horde\Core\Factory\TinymcePageBinderFactory;
 use Horde\Core\Horde;
 use Horde\Editor\Tinymce;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\EventDispatcher\ListenerProviderInterface;
+use Psr\Http\Client\ClientInterface as PsrHttpClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Log\LoggerInterface as PsrLoggerInterface;
+use Psr\SimpleCache\CacheInterface as SimpleCacheInterface;
 use NetDNS2\Exception as NetDNS2Exception;
 use Horde\Url\Url;
 use Horde\Util\Util;
@@ -482,11 +491,17 @@ class Horde_Registry implements Horde_Shutdown_Task
             'Horde\\Core\\Service\\PermissionService' => 'Horde\\Core\\Factory\\PermissionServiceFactory',
             Tinymce::class => TinymceFactory::class,
             TinymcePageBinder::class => TinymcePageBinderFactory::class,
+            EventDispatcherInterface::class => [EventDispatcherFactory::class, 'create'],
+            ListenerProviderInterface::class => [EventDispatcherFactory::class, 'createListenerProvider'],
+            SimpleCacheInterface::class => SimpleCacheFactory::class,
+            PsrHttpClientInterface::class => HttpClientFactory::class,
         ];
 
         /* Define implementations. */
         $implementations = [
             'Horde_Controller_ResponseWriter' => 'Horde_Controller_ResponseWriter_Web',
+            PsrLoggerInterface::class => Horde\Log\Logger::class,
+            RequestFactoryInterface::class => Horde\Http\RequestFactory::class,
         ];
 
         /* Setup injector. */
@@ -1259,6 +1274,9 @@ class Horde_Registry implements Horde_Shutdown_Task
             $result = call_user_func_array([$api, $call], empty($options['args']) ? [] : $options['args']);
         } catch (Horde_Exception $e) {
             $result = $e;
+        } catch (Throwable $e) {
+            Horde::debug($e);
+            $result = new Horde_Exception_Wrapped($e);
         }
 
         /* If we changed application context in the course of this
@@ -1268,7 +1286,7 @@ class Horde_Registry implements Horde_Shutdown_Task
         }
 
         if ($result instanceof Exception) {
-            throw $e;
+            throw $result;
         }
 
         return $result;

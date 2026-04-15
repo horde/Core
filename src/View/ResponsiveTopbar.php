@@ -24,6 +24,7 @@ namespace Horde\Core\View;
 use Horde\Core\Horde;
 use Horde_Perms;
 use Horde_Registry;
+use Throwable;
 
 /**
  * Responsive Topbar Renderer
@@ -114,19 +115,23 @@ class ResponsiveTopbar
                 continue;
             }
 
-            $appData = [
-                'name' => strlen($params['name'] ?? '') ? _($params['name']) : '',
-                'url' => (string) Horde::url($this->registry->getInitialPage($app), true, ['app' => $app]),
-                'icon' => $params['icon'] ?? $this->registry->get('icon', $app),
-                'app' => $app, // Add app identifier for CSS class
-            ];
+            try {
+                $appData = [
+                    'name' => strlen($params['name'] ?? '') ? _($params['name']) : '',
+                    'url' => (string) Horde::url($this->registry->getInitialPage($app), true, ['app' => $app]),
+                    'icon' => $params['icon'] ?? $this->registry->get('icon', $app),
+                    'app' => $app, // Add app identifier for CSS class
+                ];
 
-            // Add to all apps list (for hamburger menu)
-            $allAppsList[] = $appData;
+                // Add to all apps list (for hamburger menu)
+                $allAppsList[] = $appData;
 
-            // Top-level apps (no menu_parent) go to topbar
-            if (empty($params['menu_parent'])) {
-                $topLevelApps[] = $appData;
+                // Top-level apps (no menu_parent) go to topbar
+                if (empty($params['menu_parent'])) {
+                    $topLevelApps[] = $appData;
+                }
+            } catch (Throwable $e) {
+                Horde::log($e);
             }
         }
 
