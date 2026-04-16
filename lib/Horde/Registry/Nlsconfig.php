@@ -128,7 +128,7 @@ class Horde_Registry_Nlsconfig
         if (!$GLOBALS['session']->exists('horde', 'nls/valid_' . $lang)) {
             $valid = false;
             if (isset($this->languages[$lang])) {
-                $locale = setlocale(LC_ALL, 0);
+                $locale = setlocale(LC_ALL, '0');
                 if (setlocale(LC_ALL, $lang . '.UTF-8')) {
                     $valid = true;
                 }
