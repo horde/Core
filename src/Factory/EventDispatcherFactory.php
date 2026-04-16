@@ -21,6 +21,7 @@ use Horde\Injector\Injector;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Throwable;
 
 /**
  * Factory for PSR-14 EventDispatcher and ListenerProvider
@@ -58,7 +59,7 @@ class EventDispatcherFactory
 
         try {
             $logger = $injector->getInstance(LoggerInterface::class);
-        } catch (\Throwable) {
+        } catch (Throwable) {
             $logger = new NullLogger();
         }
 

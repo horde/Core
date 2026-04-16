@@ -467,6 +467,7 @@ class Horde_Registry implements Horde_Shutdown_Task
             'Horde_Template' => 'Horde_Core_Factory_Template',
             'Horde_Timezone' => 'Horde_Core_Factory_Timezone',
             'Horde_Token' => 'Horde_Core_Factory_Token',
+            Horde\Token\Token::class => Horde\Core\Factory\TokenServiceFactory::class,
             'Horde_Variables' => 'Horde_Core_Factory_Variables',
             'Horde_View' => 'Horde_Core_Factory_View',
             'Horde_View_Base' => 'Horde_Core_Factory_View',
@@ -549,6 +550,32 @@ class Horde_Registry implements Horde_Shutdown_Task
          * settings, but only if not running from the CLI */
         if (!isset($GLOBALS['cli'])) {
             set_time_limit($conf['max_exec_time']);
+        }
+
+        /* Optional injector profiling — activated by env var. */
+        if (getenv('HORDE_INJECTOR_PROFILE')) {
+            try {
+                $dispatcher = $injector->getInstance(
+                    EventDispatcherInterface::class
+                );
+                $provider = $injector->getInstance(
+                    ListenerProviderInterface::class
+                );
+                $collector = new \Horde\Injector\BindingMapCollector();
+                $provider->addListener($collector);
+                $injector->setEventDispatcher($dispatcher);
+
+                $dumpPath = getenv('HORDE_INJECTOR_PROFILE_PATH')
+                    ?: sys_get_temp_dir() . '/horde_injector_bindings.php';
+                Horde_Shutdown::add(
+                    new \Horde\Core\InjectorProfilingShutdownTask($injector, $dumpPath)
+                );
+            } catch (Throwable $e) {
+                Horde::log(
+                    'Injector profiling failed to initialize: ' . $e->getMessage(),
+                    Horde_Log::WARN
+                );
+            }
         }
 
         /* The basic framework is up and loaded, so set the init flag. */
