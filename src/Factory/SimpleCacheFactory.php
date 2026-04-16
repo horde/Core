@@ -28,6 +28,7 @@ use Horde_Db_Adapter;
 use Horde_HashTable_Base;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Throwable;
 
 /**
  * Factory for PSR-16 SimpleCache (Horde\Cache\Cache)
@@ -85,7 +86,7 @@ class SimpleCacheFactory
     {
         try {
             return $injector->getInstance(LoggerInterface::class);
-        } catch (\Throwable) {
+        } catch (Throwable) {
             return new NullLogger();
         }
     }
