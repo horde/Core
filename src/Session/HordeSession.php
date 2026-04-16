@@ -15,6 +15,7 @@ namespace Horde\Core\Session;
 
 use Closure;
 use DateTimeImmutable;
+use Horde\Injector\Attribute\Factory;
 use Horde\SessionHandler\DefaultSession;
 use Horde\SessionHandler\Exception\SessionException;
 use Horde\SessionHandler\SessionId;
@@ -32,6 +33,7 @@ use Horde\SessionHandler\SessionId;
  * Encryption closures are optional. Without them, encrypted read returns
  * raw values and encrypted write throws.
  */
+#[Factory(factory: HordeSessionFactory::class, method: 'create')]
 class HordeSession extends DefaultSession implements SessionMetaInterface, EncryptedValuesInterface
 {
     /** Internal key for session begin timestamp. */

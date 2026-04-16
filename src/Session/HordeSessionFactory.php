@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Horde\Core\Session;
 
 use Closure;
+use Horde\Injector\Injector;
 use Horde\SessionHandler\DefaultSessionFactory;
 use Horde\SessionHandler\Session;
 use Horde\SessionHandler\SessionId;
@@ -47,5 +48,20 @@ class HordeSessionFactory extends DefaultSessionFactory
     public function restore(SessionId $id, array $payload): Session
     {
         return new HordeSession($id, $payload, $this->encryptor, $this->decryptor);
+    }
+
+    /**
+     * DI factory method: wrap the current PHP session in a HordeSession.
+     *
+     * Called by the injector when HordeSession is requested via
+     * its #[Factory] attribute.  Encryption closures are not available
+     * through DI auto-wiring, so the returned session reads raw values.
+     */
+    public function create(Injector $injector): HordeSession
+    {
+        return new HordeSession(
+            new SessionId(session_id() ?: 'none'),
+            $_SESSION ?? [],
+        );
     }
 }
