@@ -1,6 +1,6 @@
 <?php
 
-namespace Horde\Core\Mock;
+namespace Horde\Core\Test\Mock;
 
 use Horde_Core_ActiveSync_Connector;
 
