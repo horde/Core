@@ -93,6 +93,7 @@ dependencies:
       horde/translation: ^3
       horde/url: ^3
       horde/util: ^3
+      horde/oauth: ^4
       horde/view: ^3
       php81_bc/strftime: ^0.7
     ext:
@@ -108,9 +109,14 @@ dependencies:
       sockets: '*'
   dev:
     composer:
+      horde/activesync: ^3
+      horde/kolab_server: ^3
+      horde/kolab_session: ^3
+      horde/ldap: ^3
+      horde/mongo: ^2
+      horde/routes: ^3
       horde/test: ^3
       horde/tree: ^3
-      horde/routes: ^3
       horde/vfs: ^3
 autoload:
   classmap:
