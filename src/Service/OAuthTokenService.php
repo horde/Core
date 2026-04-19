@@ -41,7 +41,7 @@ interface OAuthTokenService
      * @param string $userId Horde user ID
      * @param string $providerId Provider identifier (e.g. 'google', 'microsoft')
      * @return string The access token string
-     * @throws \Horde\Core\Service\Exception\OAuthTokenNotFoundException
+     * @throws Exception\OAuthTokenNotFoundException
      */
     public function getAccessToken(string $userId, string $providerId): string;
 
@@ -76,7 +76,7 @@ interface OAuthTokenService
      * @param string $userId Horde user ID
      * @param string $providerId Provider identifier
      * @return TokenSet The stored token set
-     * @throws \Horde\Core\Service\Exception\OAuthTokenNotFoundException
+     * @throws Exception\OAuthTokenNotFoundException
      */
     public function getTokenSet(string $userId, string $providerId): TokenSet;
 }

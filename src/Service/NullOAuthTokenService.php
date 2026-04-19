@@ -38,18 +38,14 @@ class NullOAuthTokenService implements OAuthTokenService
         );
     }
 
-    public function store(string $userId, string $providerId, TokenSet $tokens): void
-    {
-    }
+    public function store(string $userId, string $providerId, TokenSet $tokens): void {}
 
     public function hasTokens(string $userId, string $providerId): bool
     {
         return false;
     }
 
-    public function remove(string $userId, string $providerId): void
-    {
-    }
+    public function remove(string $userId, string $providerId): void {}
 
     public function getTokenSet(string $userId, string $providerId): TokenSet
     {
