@@ -19,11 +19,13 @@ use Horde\Core\Factory\ConfigMetadataProviderFactory;
 use Horde\Core\Factory\DriverRepositoryFactory;
 use Horde\Core\Factory\EventDispatcherFactory;
 use Horde\Core\Factory\HttpClientFactory;
+use Horde\Core\Factory\LoggerFactory;
 use Horde\Core\Factory\SimpleCacheFactory;
 use Horde\Core\Factory\TinymceFactory;
 use Horde\Core\Factory\TinymcePageBinderFactory;
 use Horde\Core\Horde;
 use Horde\Editor\Tinymce;
+use Horde\Log\Logger as HordeLogger;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Http\Client\ClientInterface as PsrHttpClientInterface;
@@ -475,7 +477,8 @@ class Horde_Registry implements Horde_Shutdown_Task
             'Net_DNS2_Resolver' => 'Horde_Core_Factory_Dns',
             'Text_LanguageDetect' => 'Horde_Core_Factory_LanguageDetect',
             Horde\Core\Middleware\AuthHttpBasic::class => Horde\Core\Factory\AuthHttpBasicFactory::class,
-            Horde\Log\Logger::class => Horde\Core\Factory\LoggerFactory::class,
+            HordeLogger::class => LoggerFactory::class,
+            PsrLoggerInterface::class => LoggerFactory::class,
             'Horde\\Horde\\Service\\JwtService' => 'Horde\\Horde\\Factory\\JwtServiceFactory',
             'Horde\\Horde\\Service\\AuthenticationService' => 'Horde\\Horde\\Factory\\AuthenticationServiceFactory',
             'Horde\\Core\\Config\\ConfigLoader' => 'Horde\\Core\\Factory\\ConfigLoaderFactory',
@@ -501,7 +504,6 @@ class Horde_Registry implements Horde_Shutdown_Task
         /* Define implementations. */
         $implementations = [
             'Horde_Controller_ResponseWriter' => 'Horde_Controller_ResponseWriter_Web',
-            PsrLoggerInterface::class => Horde\Log\Logger::class,
             RequestFactoryInterface::class => Horde\Http\RequestFactory::class,
         ];
 
