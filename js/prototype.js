@@ -7152,6 +7152,15 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
     event.memo = memo;
 
     element.dispatchEvent(event);
+
+    // Bridge: also fire a native CustomEvent so that vanilla
+    // addEventListener(eventName, ...) listeners can receive it.
+    element.dispatchEvent(new CustomEvent(eventName, {
+      bubbles: bubble,
+      cancelable: true,
+      detail: memo
+    }));
+
     return event;
   }
 
