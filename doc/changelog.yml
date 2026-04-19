@@ -1,4 +1,27 @@
 ---
+3.0.0-beta20:
+  api: 3.0.0-beta20
+  state:
+    release: beta
+    api: beta
+  date: 2026-04-19
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    docs: Explain how to compile a DI using Events
+    chore: metadata
+    fix: Both PSR-3 LoggerInterface and Horde's PSR-3 Logger should bind to factory
+    feat: Define an OauthTokenService interface and a NullOauthTokenService implementation
+    test: Refactor unit tests
+    feat: Patch prototype.js downstream to emit native events in parallel to prototype events when using .fire()
+    feat: Add bindings for modern token service and an optional event emitter in Injector itself
+    Fix setlocale to match requested type
+    feat: Allow autowiring the new HordeSession from attribute
+    fix: Harden topbar and registry against crashes from other apps when cycling through their integration points
+    feat: EventDispatcher, HttpClient and SimpleCache modern factories
+    fix: Strip 0 bytes from unserialized ip data in registry
+    fix: improve resilience against not-set scenarios.
 3.0.0-beta19:
   api: 3.0.0-beta19
   state:

@@ -37,7 +37,7 @@
         "config",
         "errorhandler"
     ],
-    "time": "2026-04-15",
+    "time": "2026-04-19",
     "repositories": [],
     "require": {
         "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || ^3 || ^2",
@@ -83,14 +83,20 @@
         "horde/translation": "^3 || dev-FRAMEWORK_6_0",
         "horde/url": "^3 || dev-FRAMEWORK_6_0",
         "horde/util": "^3 || dev-FRAMEWORK_6_0",
+        "horde/oauth": "^4 || dev-FRAMEWORK_6_0",
         "horde/view": "^3 || dev-FRAMEWORK_6_0",
         "php81_bc/strftime": "^0.7",
         "ext-session": "*"
     },
     "require-dev": {
+        "horde/activesync": "^3 || dev-FRAMEWORK_6_0",
+        "horde/kolab_server": "^3 || dev-FRAMEWORK_6_0",
+        "horde/kolab_session": "^3 || dev-FRAMEWORK_6_0",
+        "horde/ldap": "^3 || dev-FRAMEWORK_6_0",
+        "horde/mongo": "^2 || dev-FRAMEWORK_6_0",
+        "horde/routes": "^3 || dev-FRAMEWORK_6_0",
         "horde/test": "^3 || dev-FRAMEWORK_6_0",
         "horde/tree": "^3 || dev-FRAMEWORK_6_0",
-        "horde/routes": "^3 || dev-FRAMEWORK_6_0",
         "horde/vfs": "^3 || dev-FRAMEWORK_6_0"
     },
     "suggest": {
