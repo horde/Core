@@ -16,26 +16,30 @@ declare(strict_types=1);
 
 namespace Horde\Core\Factory;
 
-use Horde\Core\Service\NullOAuthTokenService;
-use Horde\Core\Service\OAuthTokenService;
+use Horde\Core\Config\ConfigLoader;
+use Horde\Secret\SecretManager;
 use Horde_Injector;
 
 /**
- * Factory for OAuthTokenService.
+ * Factory for SecretManager.
  *
- * Returns NullOAuthTokenService as a safe fallback. When a storage backend
- * is configured (e.g. 'sql'), the horde/base package overrides this binding
- * with its own factory that creates DefaultOAuthTokenService.
+ * Uses the persistent installation-wide secret_key from horde config,
+ * NOT the session-based cookie key used by legacy Horde_Secret.
  *
  * @category Horde
  * @package  Core
  * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
-class OAuthTokenServiceFactory
+class SecretManagerFactory
 {
-    public function create(Horde_Injector $injector): OAuthTokenService
+    public function create(Horde_Injector $injector): SecretManager
     {
-        return new NullOAuthTokenService();
+        $loader = $injector->getInstance(ConfigLoader::class);
+        $state = $loader->load('horde');
+
+        $key = $state->get('secret_key', '');
+
+        return SecretManager::create($key);
     }
 }
