@@ -15,6 +15,8 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+use Psr\Http\Message\UriInterface;
+
 class Horde_Core_Ui_Tabs extends Horde_Core_Ui_Widget
 {
     /**
@@ -27,16 +29,28 @@ class Horde_Core_Ui_Tabs extends Horde_Core_Ui_Widget
     /**
      * Adds a tab to the interface.
      *
-     * @param string $title    The text which appears on the tab.
-     * @param Horde_Url $link  The target page.
-     * @param mixed $params    Either a string value to set the tab variable to,
-     *                         or a hash of parameters. If an array, the tab
-     *                         variable can be set by the 'tabname' key.
+     * @param string $title             The text which appears on the tab.
+     * @param Horde_Url|Horde\Url\Url|UriInterface|Stringable|string $link
+     *                                  The target page.
+     * @param mixed $params             Either a string value to set the tab
+     *                                  variable to, or a hash of parameters.
+     *                                  If an array, the tab variable can be
+     *                                  set by the 'tabname' key.
+     *
+     * @throws InvalidArgumentException If $link cannot be converted to a URL.
      */
     public function addTab($title, $link, $params = [])
     {
         if (!is_array($params)) {
             $params = ['tabname' => $params];
+        }
+
+        if ($link instanceof Horde_Url) {
+            // Already the right type — use as-is.
+        } elseif (is_string($link) || $link instanceof Stringable || $link instanceof UriInterface) {
+            $link = new Horde_Url((string) $link);
+        } else {
+            throw new InvalidArgumentException('$link must be a Horde_Url, UriInterface, Stringable, or string; got ' . get_debug_type($link));
         }
 
         $this->_tabs[] = array_merge(
