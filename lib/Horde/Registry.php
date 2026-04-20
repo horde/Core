@@ -15,17 +15,22 @@
 use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Driver\DriverRepository;
 use Horde\Core\Editor\TinymcePageBinder;
+use Horde\Core\Factory\AuthBaseFactory;
 use Horde\Core\Factory\ConfigMetadataProviderFactory;
 use Horde\Core\Factory\DriverRepositoryFactory;
 use Horde\Core\Factory\EventDispatcherFactory;
 use Horde\Core\Factory\HttpClientFactory;
 use Horde\Core\Factory\LoggerFactory;
+use Horde\Core\Factory\OauthProviderConfigRepositoryFactory;
+use Horde\Core\Factory\SecretManagerFactory;
+use Horde\Core\Service\OauthProviderConfigRepository;
 use Horde\Core\Factory\SimpleCacheFactory;
 use Horde\Core\Factory\TinymceFactory;
 use Horde\Core\Factory\TinymcePageBinderFactory;
 use Horde\Core\Horde;
 use Horde\Editor\Tinymce;
 use Horde\Log\Logger as HordeLogger;
+use Horde\Secret\SecretManager;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Http\Client\ClientInterface as PsrHttpClientInterface;
@@ -437,6 +442,7 @@ class Horde_Registry implements Horde_Shutdown_Task
                 'getRequestConfiguration',
             ],
             'Horde_Core_Auth_Signup' => 'Horde_Core_Factory_AuthSignup',
+            'Horde_Auth_Base' => AuthBaseFactory::class,
             'Horde_Core_CssCache' => 'Horde_Core_Factory_CssCache',
             'Horde_Core_JavascriptCache' => 'Horde_Core_Factory_JavascriptCache',
             'Horde_Core_Perms' => 'Horde_Core_Factory_PermsCore',
@@ -446,6 +452,7 @@ class Horde_Registry implements Horde_Shutdown_Task
             'Horde_Editor' => 'Horde_Core_Factory_Editor',
             'Horde_ElasticSearch_Client' => 'Horde_Core_Factory_ElasticSearch',
             'Horde_Group' => 'Horde_Core_Factory_Group',
+            'Horde_Group_Base' => 'Horde_Core_Factory_Group',
             'Horde_HashTable' => 'Horde_Core_Factory_HashTable',
             'Horde_History' => 'Horde_Core_Factory_History',
             'Horde_Lock' => 'Horde_Core_Factory_Lock',
@@ -456,12 +463,15 @@ class Horde_Registry implements Horde_Shutdown_Task
             'Horde_Notification' => 'Horde_Core_Factory_Notification',
             'Horde_Notification_Handler' => 'Horde_Core_Factory_Notification',
             'Horde_Perms' => 'Horde_Core_Factory_Perms',
+            'Horde_Perms_Base' => 'Horde_Core_Factory_Perms',
             'Horde_Queue_Storage' => 'Horde_Core_Factory_QueueStorage',
             'Horde_Routes_Mapper' => 'Horde_Core_Factory_Mapper',
             Horde\Routes\Mapper::class => 'Horde_Core_Factory_Mapper',
             'Horde_Routes_Matcher' => 'Horde_Core_Factory_Matcher',
             'Horde_Secret' => 'Horde_Core_Factory_Secret',
             'Horde_Secret_Cbc' => 'Horde_Core_Factory_Secret_Cbc',
+            SecretManager::class => SecretManagerFactory::class,
+            OauthProviderConfigRepository::class => OauthProviderConfigRepositoryFactory::class,
             'Horde_Service_Facebook' => 'Horde_Core_Factory_Facebook',
             'Horde_Service_Twitter' => 'Horde_Core_Factory_Twitter',
             'Horde_Service_UrlShortener' => 'Horde_Core_Factory_UrlShortener',
