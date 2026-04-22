@@ -17,13 +17,74 @@ use Horde\Core\Config\Driver\DriverRepository;
 use Horde\Core\Editor\TinymcePageBinder;
 use Horde\Core\Factory\AuthBaseFactory;
 use Horde\Core\Factory\ConfigMetadataProviderFactory;
+use Horde\Core\Factory\DbAdapterFactory;
 use Horde\Core\Factory\DriverRepositoryFactory;
 use Horde\Core\Factory\EventDispatcherFactory;
 use Horde\Core\Factory\HttpClientFactory;
 use Horde\Core\Factory\LoggerFactory;
-use Horde\Core\Factory\OauthProviderConfigRepositoryFactory;
+use Horde\Core\Factory\AuthLinkRepositoryFactory;
+use Horde\Core\Factory\IdentityHistoryRepositoryFactory;
+use Horde\Core\Factory\IdentityRepositoryFactory;
+use Horde\Core\Factory\OAuthProviderConfigRepositoryFactory;
+use Horde\Core\Factory\OAuthAccessTokenRepositoryFactory;
+use Horde\Core\Factory\OAuthAuthorizationCodeRepositoryFactory;
+use Horde\Core\Factory\OAuthClientRepositoryFactory;
+use Horde\Core\Factory\OAuthConsentRepositoryFactory;
+use Horde\Core\Factory\OAuthRefreshTokenRepositoryFactory;
+use Horde\Core\Factory\OAuthScopeRepositoryFactory;
+use Horde\Core\Factory\OAuthSigningKeyFactory;
+use Horde\Core\Factory\OAuthClientAuthenticatorFactory;
+use Horde\Core\Factory\OAuthAccessTokenIssuerFactory;
+use Horde\Core\Factory\OAuthRefreshTokenIssuerFactory;
+use Horde\Core\Factory\OAuthAuthorizationCodeGrantFactory;
+use Horde\Core\Factory\OAuthClientCredentialsGrantFactory;
+use Horde\Core\Factory\OAuthRefreshTokenGrantFactory;
+use Horde\Core\Factory\OAuthTokenEndpointFactory;
+use Horde\Core\Factory\OAuthAuthorizationEndpointFactory;
+use Horde\Core\Factory\OAuthRevocationEndpointFactory;
+use Horde\Core\Factory\OAuthIntrospectionEndpointFactory;
+use Horde\Core\Factory\OAuthServerMetadataFactory;
+use Horde\Core\Factory\OAuthDiscoveryEndpointFactory;
+use Horde\Core\Factory\OAuthUserinfoEndpointFactory;
+use Horde\Core\Factory\OAuthJwksEndpointFactory;
+use Horde\Core\Factory\OAuthClaimsMapperFactory;
+use Horde\Core\Factory\OAuthScopeClaimsMappingFactory;
+use Horde\Core\Factory\OAuthIdTokenBuilderFactory;
+use Horde\Core\Factory\OAuthConsentMiddlewareFactory;
+use Horde\Core\Middleware\OAuthConsentMiddleware;
 use Horde\Core\Factory\SecretManagerFactory;
-use Horde\Core\Service\OauthProviderConfigRepository;
+use Horde\Core\Service\OAuthProviderConfigRepository;
+use Horde\Db\Adapter as DbAdapter;
+use Horde\Horde\Service\AuthLinkRepository;
+use Horde\Identity\IdentityHistoryRepository;
+use Horde\Identity\IdentityRepository;
+use Horde\OAuth\Server\Repository\AccessTokenRepository;
+use Horde\OAuth\Server\Repository\AuthorizationCodeRepository;
+use Horde\OAuth\Server\Repository\ClientRepository;
+use Horde\OAuth\Server\Repository\ConsentRepository;
+use Horde\OAuth\Server\Repository\RefreshTokenRepository;
+use Horde\OAuth\Server\Repository\ScopeRepository;
+use Horde\Jwt\Key\PrivateKey;
+use Horde\Jwt\Key\PublicKey;
+use Horde\Jwt\Signer\Rs256Signer;
+use Horde\Jwt\TokenEncoder;
+use Horde\OAuth\Oidc\ClaimsMapper;
+use Horde\OAuth\Oidc\Handler\DiscoveryEndpoint;
+use Horde\OAuth\Oidc\Handler\JwksEndpoint;
+use Horde\OAuth\Oidc\Handler\UserinfoEndpoint;
+use Horde\OAuth\Oidc\IdTokenBuilder;
+use Horde\OAuth\Oidc\ScopeClaimsMapping;
+use Horde\OAuth\Server\ClientAuthentication\ClientAuthenticatorChain;
+use Horde\OAuth\Server\Grant\AuthorizationCodeGrant;
+use Horde\OAuth\Server\Grant\ClientCredentialsGrant;
+use Horde\OAuth\Server\Grant\RefreshTokenGrant;
+use Horde\OAuth\Server\Handler\AuthorizationEndpoint;
+use Horde\OAuth\Server\Handler\IntrospectionEndpoint;
+use Horde\OAuth\Server\Handler\RevocationEndpoint;
+use Horde\OAuth\Server\Handler\TokenEndpoint;
+use Horde\OAuth\Server\ServerMetadata;
+use Horde\OAuth\Server\Token\AccessTokenIssuer;
+use Horde\OAuth\Server\Token\RefreshTokenIssuer;
 use Horde\Core\Factory\SimpleCacheFactory;
 use Horde\Core\Factory\TinymceFactory;
 use Horde\Core\Factory\TinymcePageBinderFactory;
@@ -35,6 +96,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Http\Client\ClientInterface as PsrHttpClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Horde\Http\RequestFactory;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Psr\SimpleCache\CacheInterface as SimpleCacheInterface;
 use NetDNS2\Exception as NetDNS2Exception;
@@ -471,7 +533,36 @@ class Horde_Registry implements Horde_Shutdown_Task
             'Horde_Secret' => 'Horde_Core_Factory_Secret',
             'Horde_Secret_Cbc' => 'Horde_Core_Factory_Secret_Cbc',
             SecretManager::class => SecretManagerFactory::class,
-            OauthProviderConfigRepository::class => OauthProviderConfigRepositoryFactory::class,
+            DbAdapter::class => DbAdapterFactory::class,
+            OAuthProviderConfigRepository::class => OAuthProviderConfigRepositoryFactory::class,
+            IdentityRepository::class => IdentityRepositoryFactory::class,
+            IdentityHistoryRepository::class => IdentityHistoryRepositoryFactory::class,
+            AuthLinkRepository::class => AuthLinkRepositoryFactory::class,
+            ClientRepository::class => OAuthClientRepositoryFactory::class,
+            AccessTokenRepository::class => OAuthAccessTokenRepositoryFactory::class,
+            RefreshTokenRepository::class => OAuthRefreshTokenRepositoryFactory::class,
+            AuthorizationCodeRepository::class => OAuthAuthorizationCodeRepositoryFactory::class,
+            ConsentRepository::class => OAuthConsentRepositoryFactory::class,
+            ScopeRepository::class => OAuthScopeRepositoryFactory::class,
+            PrivateKey::class => OAuthSigningKeyFactory::class,
+            ClientAuthenticatorChain::class => OAuthClientAuthenticatorFactory::class,
+            AccessTokenIssuer::class => OAuthAccessTokenIssuerFactory::class,
+            RefreshTokenIssuer::class => OAuthRefreshTokenIssuerFactory::class,
+            AuthorizationCodeGrant::class => OAuthAuthorizationCodeGrantFactory::class,
+            ClientCredentialsGrant::class => OAuthClientCredentialsGrantFactory::class,
+            RefreshTokenGrant::class => OAuthRefreshTokenGrantFactory::class,
+            TokenEndpoint::class => OAuthTokenEndpointFactory::class,
+            AuthorizationEndpoint::class => OAuthAuthorizationEndpointFactory::class,
+            RevocationEndpoint::class => OAuthRevocationEndpointFactory::class,
+            IntrospectionEndpoint::class => OAuthIntrospectionEndpointFactory::class,
+            ServerMetadata::class => OAuthServerMetadataFactory::class,
+            DiscoveryEndpoint::class => OAuthDiscoveryEndpointFactory::class,
+            ClaimsMapper::class => OAuthClaimsMapperFactory::class,
+            ScopeClaimsMapping::class => OAuthScopeClaimsMappingFactory::class,
+            UserinfoEndpoint::class => OAuthUserinfoEndpointFactory::class,
+            JwksEndpoint::class => OAuthJwksEndpointFactory::class,
+            IdTokenBuilder::class => OAuthIdTokenBuilderFactory::class,
+            OAuthConsentMiddleware::class => OAuthConsentMiddlewareFactory::class,
             'Horde_Service_Facebook' => 'Horde_Core_Factory_Facebook',
             'Horde_Service_Twitter' => 'Horde_Core_Factory_Twitter',
             'Horde_Service_UrlShortener' => 'Horde_Core_Factory_UrlShortener',
@@ -514,7 +605,7 @@ class Horde_Registry implements Horde_Shutdown_Task
         /* Define implementations. */
         $implementations = [
             'Horde_Controller_ResponseWriter' => 'Horde_Controller_ResponseWriter_Web',
-            RequestFactoryInterface::class => Horde\Http\RequestFactory::class,
+            RequestFactoryInterface::class => RequestFactory::class,
         ];
 
         /* Setup injector. */
@@ -1611,7 +1702,7 @@ class Horde_Registry implements Horde_Shutdown_Task
                 return Horde::url('services/twitter/', true);
         }
 
-        throw new BadFunctionCallException('Invalid service requested: ' . print_r(debug_backtrace(false), true));
+        throw new BadFunctionCallException('Invalid service requested: ' . $type);
     }
 
     /**
