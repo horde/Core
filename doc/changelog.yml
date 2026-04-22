@@ -1,4 +1,23 @@
 ---
+3.0.0-beta21:
+  api: 3.0.0-beta21
+  state:
+    release: beta
+    api: beta
+  date: 2026-04-22
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    feat: Register OAuth and Identity related factories
+    test: Cover new OO approach to legacy "dynamic" UI
+    test: Cover OAuth related repositories
+    refactor: Consolidate on OAuth rather than Oauth (lowercase)
+    feat: Add an IdentityRepositoryFactory
+    test: Cover NullOauthTokenRepository and NullOauthProvicerConfigRepository
+    feat: Oauth and auth related factory registrations in Registry's injector setup
+    feat: Horde Core UI Tabs now also natively supports Horde\Url\Url and PSR-7 Uris
+    feat: Add OAuth Token service and repository including factories
 3.0.0-beta20:
   api: 3.0.0-beta20
   state:
