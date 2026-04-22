@@ -18,7 +18,7 @@ namespace Horde\Core\Service;
 
 use Horde\Core\Factory\OAuthTokenServiceFactory;
 use Horde\Injector\Attribute\Factory;
-use Horde\Oauth\Client\TokenSet;
+use Horde\OAuth\Client\TokenSet;
 
 /**
  * Centralized OAuth2 token storage and retrieval.

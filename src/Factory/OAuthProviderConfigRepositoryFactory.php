@@ -16,19 +16,19 @@ declare(strict_types=1);
 
 namespace Horde\Core\Factory;
 
-use Horde\Core\Service\NullOauthProviderConfigRepository;
-use Horde\Core\Service\OauthProviderConfigRepository;
+use Horde\Core\Service\NullOAuthProviderConfigRepository;
+use Horde\Core\Service\OAuthProviderConfigRepository;
 use Horde\Db\Adapter;
-use Horde\Horde\Service\SqlOauthProviderConfigRepository;
+use Horde\Horde\Service\SqlOAuthProviderConfigRepository;
 use Horde\Secret\SecretManager;
 use Horde_Injector;
 use Throwable;
 
 /**
- * Factory for OauthProviderConfigRepository.
+ * Factory for OAuthProviderConfigRepository.
  *
- * Tries to build SqlOauthProviderConfigRepository when a DB adapter is
- * available. Falls back gracefully to NullOauthProviderConfigRepository
+ * Tries to build SqlOAuthProviderConfigRepository when a DB adapter is
+ * available. Falls back gracefully to NullOAuthProviderConfigRepository
  * when the DB or the SQL implementation class is unavailable.
  *
  * @category Horde
@@ -36,20 +36,26 @@ use Throwable;
  * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
-class OauthProviderConfigRepositoryFactory
+class OAuthProviderConfigRepositoryFactory
 {
-    public function create(Horde_Injector $injector): OauthProviderConfigRepository
+    public function create(Horde_Injector $injector): OAuthProviderConfigRepository
     {
-        if (class_exists(SqlOauthProviderConfigRepository::class)) {
+        if (class_exists(SqlOAuthProviderConfigRepository::class)) {
             try {
                 $db = $injector->getInstance(Adapter::class);
-                $secret = $injector->getInstance(SecretManager::class);
-                return new SqlOauthProviderConfigRepository($db, $secret);
             } catch (Throwable) {
-                return new NullOauthProviderConfigRepository();
+                return new NullOAuthProviderConfigRepository();
             }
+
+            try {
+                $secret = $injector->getInstance(SecretManager::class);
+            } catch (Throwable) {
+                $secret = null;
+            }
+
+            return new SqlOAuthProviderConfigRepository($db, $secret);
         }
 
-        return new NullOauthProviderConfigRepository();
+        return new NullOAuthProviderConfigRepository();
     }
 }

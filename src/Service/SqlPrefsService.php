@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Service;
 
+use Horde_Core_Prefs_Storage_Configuration;
 use Horde_Db_Adapter;
 use Horde_Prefs;
 use Horde_Prefs_Storage_Sql;
@@ -165,15 +166,16 @@ class SqlPrefsService implements PrefsService
      */
     private function createPrefs(string $uid, string $scope): Horde_Prefs
     {
-        // Create SQL storage backend
-        $storage = new Horde_Prefs_Storage_Sql($uid, [
+        $configDriver = new Horde_Core_Prefs_Storage_Configuration($uid);
+
+        $sqlDriver = new Horde_Prefs_Storage_Sql($uid, [
             'db' => $this->db,
             'table' => $this->table,
         ]);
 
-        // Create prefs object with storage
         return new Horde_Prefs($scope, [
-            $storage,
+            $configDriver,
+            $sqlDriver,
         ], [
             'user' => $uid,
         ]);

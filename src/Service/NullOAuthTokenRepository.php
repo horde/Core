@@ -17,7 +17,7 @@ declare(strict_types=1);
 namespace Horde\Core\Service;
 
 use Horde\Core\Service\Exception\OAuthTokenNotFoundException;
-use Horde\Oauth\Client\TokenSet;
+use Horde\OAuth\Client\TokenSet;
 
 /**
  * Null token repository — safe default when OAuth storage is not configured.

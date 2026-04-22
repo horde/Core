@@ -14,8 +14,16 @@ declare(strict_types=1);
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
 
-namespace Horde\Core\Service\Exception;
+namespace Horde\Core\Factory;
 
-use RuntimeException;
+use Horde\OAuth\Oidc\ClaimsMapper;
+use Horde\Horde\Service\IdentityOnlyClaimsMapper;
+use Horde_Injector;
 
-class OauthProviderConfigNotFoundException extends RuntimeException {}
+class OAuthClaimsMapperFactory
+{
+    public function create(Horde_Injector $injector): ClaimsMapper
+    {
+        return new IdentityOnlyClaimsMapper();
+    }
+}

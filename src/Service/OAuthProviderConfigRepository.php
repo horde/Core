@@ -16,7 +16,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Service;
 
-use Horde\Core\Factory\OauthProviderConfigRepositoryFactory;
+use Horde\Core\Factory\OAuthProviderConfigRepositoryFactory;
 use Horde\Injector\Attribute\Factory;
 
 /**
@@ -32,11 +32,11 @@ use Horde\Injector\Attribute\Factory;
  * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
-#[Factory(factory: OauthProviderConfigRepositoryFactory::class, method: 'create')]
-interface OauthProviderConfigRepository
+#[Factory(factory: OAuthProviderConfigRepositoryFactory::class, method: 'create')]
+interface OAuthProviderConfigRepository
 {
     /**
-     * @throws Exception\OauthProviderConfigNotFoundException
+     * @throws Exception\OAuthProviderConfigNotFoundException
      * @return array<string, mixed>
      */
     public function get(string $providerId): array;

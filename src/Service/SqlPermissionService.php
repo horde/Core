@@ -309,7 +309,7 @@ class SqlPermissionService implements PermissionService
     {
         try {
             $permBits = $this->backend->getPermissions($name, $user);
-            return $this->expandPermissionBits($permBits);
+            return $this->expandPermissionBits((int) $permBits);
         } catch (Horde_Perms_Exception $e) {
             return ['show' => false, 'read' => false, 'edit' => false, 'delete' => false];
         }

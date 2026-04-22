@@ -16,7 +16,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Service;
 
-use Horde\Core\Service\Exception\OauthProviderConfigNotFoundException;
+use Horde\Core\Service\Exception\OAuthProviderConfigNotFoundException;
 
 /**
  * Null provider config repository — safe default when no storage is configured.
@@ -28,11 +28,11 @@ use Horde\Core\Service\Exception\OauthProviderConfigNotFoundException;
  * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
-class NullOauthProviderConfigRepository implements OauthProviderConfigRepository
+class NullOAuthProviderConfigRepository implements OAuthProviderConfigRepository
 {
     public function get(string $providerId): array
     {
-        throw new OauthProviderConfigNotFoundException(
+        throw new OAuthProviderConfigNotFoundException(
             "No provider config for '{$providerId}'"
         );
     }
