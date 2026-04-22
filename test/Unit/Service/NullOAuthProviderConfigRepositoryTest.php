@@ -16,30 +16,30 @@ declare(strict_types=1);
 
 namespace Horde\Core\Test\Unit\Service;
 
-use Horde\Core\Service\Exception\OauthProviderConfigNotFoundException;
-use Horde\Core\Service\NullOauthProviderConfigRepository;
-use Horde\Core\Service\OauthProviderConfigRepository;
+use Horde\Core\Service\Exception\OAuthProviderConfigNotFoundException;
+use Horde\Core\Service\NullOAuthProviderConfigRepository;
+use Horde\Core\Service\OAuthProviderConfigRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(NullOauthProviderConfigRepository::class)]
-final class NullOauthProviderConfigRepositoryTest extends TestCase
+#[CoversClass(NullOAuthProviderConfigRepository::class)]
+final class NullOAuthProviderConfigRepositoryTest extends TestCase
 {
-    private NullOauthProviderConfigRepository $repository;
+    private NullOAuthProviderConfigRepository $repository;
 
     protected function setUp(): void
     {
-        $this->repository = new NullOauthProviderConfigRepository();
+        $this->repository = new NullOAuthProviderConfigRepository();
     }
 
     public function testImplementsInterface(): void
     {
-        self::assertInstanceOf(OauthProviderConfigRepository::class, $this->repository);
+        self::assertInstanceOf(OAuthProviderConfigRepository::class, $this->repository);
     }
 
     public function testGetThrows(): void
     {
-        $this->expectException(OauthProviderConfigNotFoundException::class);
+        $this->expectException(OAuthProviderConfigNotFoundException::class);
         $this->repository->get('google');
     }
 

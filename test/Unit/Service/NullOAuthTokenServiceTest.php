@@ -19,7 +19,7 @@ namespace Horde\Core\Test\Unit\Service;
 use Horde\Core\Service\Exception\OAuthTokenNotFoundException;
 use Horde\Core\Service\NullOAuthTokenService;
 use Horde\Core\Service\OAuthTokenService;
-use Horde\Oauth\Client\TokenSet;
+use Horde\OAuth\Client\TokenSet;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
