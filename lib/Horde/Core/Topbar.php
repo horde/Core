@@ -188,6 +188,16 @@ class Horde_Core_Topbar
             'url' => 'javascript:void(HordeCore.Growler.toggleLog());',
         ];
 
+        /* Add connected accounts link. */
+        if ($registry->getAuth()) {
+            $menu['connected_accounts'] = [
+                'menu_parent' => 'settings',
+                'name' => Horde_Core_Translation::t('Connected Accounts'),
+                'status' => 'active',
+                'url' => rtrim($registry->get('webroot', 'horde'), '/') . '/settings/oauth/',
+            ];
+        }
+
         /* Add problem link. */
         if ($registry->showService('problem')
             && ($problem_link = $registry->getServiceLink('problem', $current))) {

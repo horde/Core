@@ -211,9 +211,52 @@ class TopbarBuilder
     /** @return TopbarMenuNode[] */
     private function nestNodes(array $flatNodes): array
     {
-        $nodeMap = [];
+        // Collect parent→children relationships in mutable arrays first,
+        // then build immutable TopbarMenuNode objects bottom-up so each
+        // node is complete (with all descendants) before being placed
+        // into its parent's children array.
+        $childIds = [];
+        $roots = [];
         foreach ($flatNodes as $id => $data) {
-            $nodeMap[$id] = new TopbarMenuNode(
+            $parent = $data['parent'];
+            if ($parent !== null && isset($flatNodes[$parent])) {
+                $childIds[$parent][] = $id;
+            } else {
+                $roots[] = $id;
+            }
+        }
+
+        $built = [];
+        $this->buildNode($roots, $flatNodes, $childIds, $built);
+
+        $result = [];
+        foreach ($roots as $id) {
+            $result[] = $built[$id];
+        }
+        return $result;
+    }
+
+    /**
+     * Recursively build immutable nodes bottom-up.
+     *
+     * @param string[]                $ids      Node IDs to build at this level
+     * @param array<string, array>    $flat     The flat node data
+     * @param array<string, string[]> $childIds Parent→child ID mapping
+     * @param array<string, TopbarMenuNode> $built  Accumulator for built nodes
+     */
+    private function buildNode(array $ids, array $flat, array $childIds, array &$built): void
+    {
+        foreach ($ids as $id) {
+            $children = [];
+            if (!empty($childIds[$id])) {
+                $this->buildNode($childIds[$id], $flat, $childIds, $built);
+                foreach ($childIds[$id] as $childId) {
+                    $children[] = $built[$childId];
+                }
+            }
+
+            $data = $flat[$id];
+            $built[$id] = new TopbarMenuNode(
                 id: $data['id'],
                 label: $data['label'],
                 url: $data['url'],
@@ -221,39 +264,10 @@ class TopbarBuilder
                 target: $data['target'],
                 onclick: $data['onclick'],
                 active: $data['active'],
-                children: [],
+                children: $children,
                 noarrow: $data['noarrow'],
             );
         }
-
-        $roots = [];
-        foreach ($flatNodes as $id => $data) {
-            $parent = $data['parent'];
-            if ($parent !== null && isset($nodeMap[$parent])) {
-                $parentNode = $nodeMap[$parent];
-                $children = $parentNode->children;
-                $children[] = $nodeMap[$id];
-                $nodeMap[$parent] = new TopbarMenuNode(
-                    id: $parentNode->id,
-                    label: $parentNode->label,
-                    url: $parentNode->url,
-                    iconClass: $parentNode->iconClass,
-                    target: $parentNode->target,
-                    onclick: $parentNode->onclick,
-                    active: $parentNode->active,
-                    children: $children,
-                    noarrow: $parentNode->noarrow,
-                );
-            } else {
-                $roots[] = $id;
-            }
-        }
-
-        $result = [];
-        foreach ($roots as $id) {
-            $result[] = $nodeMap[$id];
-        }
-        return $result;
     }
 
     private function buildSettingsMenu(string $currentApp, bool $isAdmin, string $uid, array &$flatNodes): void
@@ -272,6 +286,21 @@ class TopbarBuilder
 
         $this->buildAdminMenu($isAdmin, $uid, $flatNodes);
         $this->buildPrefsMenu($currentApp, $isAdmin, $flatNodes);
+
+        if ($uid !== '') {
+            $webroot = rtrim($this->registry->get('webroot', 'horde'), '/');
+            $flatNodes['connected_accounts'] = [
+                'id' => 'connected_accounts',
+                'label' => _("Connected Accounts"),
+                'url' => $webroot . '/settings/oauth/',
+                'iconClass' => null,
+                'target' => null,
+                'onclick' => null,
+                'active' => false,
+                'noarrow' => false,
+                'parent' => 'settings',
+            ];
+        }
 
         $flatNodes['growlerlog'] = [
             'id' => 'growlerlog',
