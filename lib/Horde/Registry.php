@@ -86,12 +86,14 @@ use Horde\OAuth\Server\ServerMetadata;
 use Horde\OAuth\Server\Token\AccessTokenIssuer;
 use Horde\OAuth\Server\Token\RefreshTokenIssuer;
 use Horde\Core\Factory\SimpleCacheFactory;
+use Horde\Core\Factory\SessionHandlerFactory;
 use Horde\Core\Factory\TinymceFactory;
 use Horde\Core\Factory\TinymcePageBinderFactory;
 use Horde\Core\Horde;
 use Horde\Editor\Tinymce;
 use Horde\Log\Logger as HordeLogger;
 use Horde\Secret\SecretManager;
+use Horde\SessionHandler\SessionHandler;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Http\Client\ClientInterface as PsrHttpClientInterface;
@@ -567,6 +569,7 @@ class Horde_Registry implements Horde_Shutdown_Task
             'Horde_Service_Twitter' => 'Horde_Core_Factory_Twitter',
             'Horde_Service_UrlShortener' => 'Horde_Core_Factory_UrlShortener',
             'Horde_SessionHandler' => 'Horde_Core_Factory_SessionHandler',
+            SessionHandler::class => SessionHandlerFactory::class,
             'Horde_Template' => 'Horde_Core_Factory_Template',
             'Horde_Timezone' => 'Horde_Core_Factory_Timezone',
             'Horde_Token' => 'Horde_Core_Factory_Token',

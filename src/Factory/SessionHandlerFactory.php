@@ -19,6 +19,7 @@ use Horde\Core\Config\ConfigLoader;
 use Horde\Core\Config\State;
 use Horde\Core\Service\HordeDbService;
 use Horde\Core\Session\HordeSessionFactory;
+use Horde\SessionHandler\NativePhpSessionSerializer;
 use Horde\SessionHandler\SessionHandler;
 use Horde\SessionHandler\Storage\BuiltinBackend;
 use Horde\SessionHandler\Storage\FileBackend;
@@ -86,6 +87,7 @@ class SessionHandlerFactory
 
         return new SessionHandler(
             backend: $backend,
+            serializer: new NativePhpSessionSerializer(),
             sessionFactory: $this->createSessionFactory($injector),
             events: $this->getEventDispatcher($injector),
         );
@@ -104,11 +106,11 @@ class SessionHandlerFactory
      */
     private function createSqlBackend(Horde_Injector $injector, array $params): SqlBackend
     {
-        $dbService = $injector->getInstance(HordeDbService::class);
+        $db = $injector->getInstance(\Horde\Db\Adapter::class);
         $table = $params['table'] ?? 'horde_sessionhandler';
 
         return new SqlBackend(
-            db: $dbService->getAdapter(),
+            db: $db,
             table: $table,
         );
     }

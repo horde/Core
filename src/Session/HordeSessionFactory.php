@@ -54,7 +54,7 @@ class HordeSessionFactory extends DefaultSessionFactory
      * DI factory method: wrap the current PHP session in a HordeSession.
      *
      * Called by the injector when HordeSession is requested via
-     * its #[Factory] attribute.  Encryption closures are not available
+     * its #[Factory] attribute. Encryption closures are not available
      * through DI auto-wiring, so the returned session reads raw values.
      */
     public function create(Injector $injector): HordeSession
