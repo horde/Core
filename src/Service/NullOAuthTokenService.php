@@ -53,4 +53,9 @@ class NullOAuthTokenService implements OAuthTokenService
             "No OAuth tokens for user '{$userId}' / provider '{$providerId}'"
         );
     }
+
+    public function checkScopes(string $userId, string $providerId, WantedScopes $wanted): ScopeCheckResult
+    {
+        return ScopeCheckResult::NoToken;
+    }
 }

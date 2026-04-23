@@ -79,4 +79,12 @@ interface OAuthTokenService
      * @throws Exception\OAuthTokenNotFoundException
      */
     public function getTokenSet(string $userId, string $providerId): TokenSet;
+
+    /**
+     * Check whether a stored token covers all wanted scopes.
+     *
+     * Returns a three-state result distinguishing "sufficient",
+     * "insufficient" (token exists but lacks scopes), and "no token".
+     */
+    public function checkScopes(string $userId, string $providerId, WantedScopes $wanted): ScopeCheckResult;
 }
