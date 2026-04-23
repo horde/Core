@@ -55,8 +55,12 @@ use Horde\Core\Factory\OAuthFlowStoreFactory;
 use Horde\Core\Middleware\OAuthConsentMiddleware;
 use Horde\OAuth\Client\OAuthFlowStore;
 use Horde\Core\Factory\SecretManagerFactory;
+use Horde\Core\Service\OAuthHttpClientService;
 use Horde\Core\Service\OAuthProviderConfigRepository;
+use Horde\Core\Service\OAuthTokenService;
 use Horde\Db\Adapter as DbAdapter;
+use Horde\Horde\Factory\OAuthHttpClientServiceFactory as BaseOAuthHttpClientServiceFactory;
+use Horde\Horde\Factory\OAuthTokenServiceFactory as BaseOAuthTokenServiceFactory;
 use Horde\Horde\Service\AuthLinkRepository;
 use Horde\Identity\IdentityHistoryRepository;
 use Horde\Identity\IdentityRepository;
@@ -540,6 +544,8 @@ class Horde_Registry implements Horde_Shutdown_Task
             DbAdapter::class => DbAdapterFactory::class,
             OAuthProviderConfigRepository::class => OAuthProviderConfigRepositoryFactory::class,
             OAuthFlowStore::class => OAuthFlowStoreFactory::class,
+            OAuthTokenService::class => BaseOAuthTokenServiceFactory::class,
+            OAuthHttpClientService::class => BaseOAuthHttpClientServiceFactory::class,
             IdentityRepository::class => IdentityRepositoryFactory::class,
             IdentityHistoryRepository::class => IdentityHistoryRepositoryFactory::class,
             AuthLinkRepository::class => AuthLinkRepositoryFactory::class,
