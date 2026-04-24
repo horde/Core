@@ -16,7 +16,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Service;
 
-use Horde_Db_Adapter;
+use Horde\Db\Adapter;
 use Horde\Core\Factory\DbServiceFactory;
 use Horde\Injector\Attribute\Factory;
 
@@ -37,7 +37,7 @@ interface HordeDbService
     /**
      * Get database adapter
      *
-     * @return Horde_Db_Adapter Database adapter instance
+     * @return Adapter Database adapter instance
      */
-    public function getAdapter(): Horde_Db_Adapter;
+    public function getAdapter(): Adapter;
 }

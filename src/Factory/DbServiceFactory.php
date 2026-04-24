@@ -18,10 +18,11 @@ namespace Horde\Core\Factory;
 
 use Horde\Core\Service\StandardHordeDbService;
 use Horde\Core\Config\ConfigLoader;
-use Horde_Db_Adapter_Mysqli;
-use Horde_Db_Adapter_Pdo_Mysql;
-use Horde_Db_Adapter_Pdo_Pgsql;
-use Horde_Db_Adapter_Pdo_Sqlite;
+use Horde\Db\Adapter;
+use Horde\Db\Adapter\Mysqli;
+use Horde\Db\Adapter\Pdo\Mysql as PdoMysql;
+use Horde\Db\Adapter\Pdo\Pgsql as PdoPgsql;
+use Horde\Db\Adapter\Pdo\Sqlite as PdoSqlite;
 use Horde_Injector;
 use InvalidArgumentException;
 
@@ -44,7 +45,7 @@ class DbServiceFactory
     /**
      * Connection pool indexed by config signature
      *
-     * @var array<string, Horde_Db_Adapter>
+     * @var array<string, Adapter>
      */
     private array $adapters = [];
 
@@ -89,7 +90,7 @@ class DbServiceFactory
      * @param array $sqlConfig SQL configuration
      * @return Horde_Db_Adapter Database adapter
      */
-    protected function createAdapter(array $sqlConfig): \Horde_Db_Adapter
+    protected function createAdapter(array $sqlConfig): Adapter
     {
         $phptype = $sqlConfig['phptype'] ?? 'mysqli';
         $adapterClass = $this->getAdapterClass($phptype);
@@ -182,10 +183,10 @@ class DbServiceFactory
     private function getAdapterClass(string $phptype): string
     {
         return match ($phptype) {
-            'mysqli' => Horde_Db_Adapter_Mysqli::class,
-            'mysql' => Horde_Db_Adapter_Pdo_Mysql::class,
-            'pgsql' => Horde_Db_Adapter_Pdo_Pgsql::class,
-            'sqlite' => Horde_Db_Adapter_Pdo_Sqlite::class,
+            'mysqli' => Mysqli::class,
+            'mysql' => PdoMysql::class,
+            'pgsql' => PdoPgsql::class,
+            'sqlite' => PdoSqlite::class,
             default => throw new InvalidArgumentException("Unsupported phptype: $phptype"),
         };
     }

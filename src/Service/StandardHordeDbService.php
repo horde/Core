@@ -16,7 +16,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Service;
 
-use Horde_Db_Adapter;
+use Horde\Db\Adapter;
 
 /**
  * Standard database service implementation for Horde
@@ -34,18 +34,18 @@ class StandardHordeDbService implements HordeDbService
     /**
      * Constructor
      *
-     * @param Horde_Db_Adapter $adapter Database adapter instance
+     * @param Adapter $adapter Database adapter instance
      */
     public function __construct(
-        private Horde_Db_Adapter $adapter
+        private Adapter $adapter
     ) {}
 
     /**
      * Get database adapter
      *
-     * @return Horde_Db_Adapter Database adapter instance
+     * @return Adapter Database adapter instance
      */
-    public function getAdapter(): Horde_Db_Adapter
+    public function getAdapter(): Adapter
     {
         return $this->adapter;
     }
