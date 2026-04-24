@@ -520,6 +520,10 @@ class Horde
     /**
      * Do necessary escaping to output JSON.
      *
+     * @deprecated Use native json_encode() for data serialization, or
+     *             {@see \Horde\Core\Controller\JsonResponseTrait::jsonResponse()}
+     *             for controller responses.
+     *
      * @param mixed $data     The data to JSON-ify.
      * @param array $options  Additional options:
      *   - nodelimit: (bool) Don't add security delimiters?
@@ -810,6 +814,10 @@ class Horde
     /**
      * Returns an external link passed through the dereferrer to strip session
      * IDs from the referrer.
+     *
+     * Note: In PSR-style applications, prefer using `rel="noreferrer noopener"`
+     * on anchor tags and `Referrer-Policy` HTTP headers instead of a
+     * server-side dereferrer redirect.
      */
     public static function externalUrl(string $url, bool $tag = false): string
     {
@@ -830,6 +838,8 @@ class Horde
 
     /**
      * Returns an anchor tag with the relevant parameters.
+     *
+     * @deprecated Use {@see \Horde\Core\View\WidgetViewHelper::hordeLink()}.
      *
      * @param Url|string $url  The full URL to be linked to.
      * @param string $title          The link title/description.
@@ -889,6 +899,9 @@ class Horde
     /**
      * Uses DOM Tooltips to display the 'title' attribute for link() calls.
      *
+     * @deprecated Use {@see \Horde\Core\View\WidgetViewHelper::hordeLinkTooltip()}.
+     *             The controller is responsible for loading tooltips.js.
+     *
      * @return string  The full <a href> tag.
      */
     public static function linkTooltip(
@@ -929,6 +942,9 @@ class Horde
     /**
      * Returns an anchor sequence with the relevant parameters for a widget
      * with accesskey and text.
+     *
+     * @deprecated Use {@see \Horde\Core\View\WidgetViewHelper::hordeWidget()}
+     *             with an injected {@see \Horde\Core\View\AccessKeyTracker}.
      *
      * @return string  The full <a href>Title</a> sequence.
      */
@@ -1095,6 +1111,8 @@ class Horde
     /**
      * Returns an un-used access key from the label given.
      *
+     * @deprecated Use {@see \Horde\Core\View\AccessKeyTracker::acquire()}.
+     *
      * @return string  A single lower case character access key, or an empty
      *                 string if no key can be found.
      */
@@ -1147,6 +1165,8 @@ class Horde
 
     /**
      * Strips an access key from a label.
+     *
+     * @deprecated Use {@see \Horde\Core\View\AccessKeyTracker::strip()}.
      */
     public static function stripAccessKey(string $label): string
     {
@@ -1159,6 +1179,8 @@ class Horde
 
     /**
      * Highlights an access key in a label.
+     *
+     * @deprecated Use {@see \Horde\Core\View\AccessKeyTracker::highlight()}.
      */
     public static function highlightAccessKey(string $label, string $accessKey): string
     {
@@ -1184,6 +1206,8 @@ class Horde
     /**
      * Returns the appropriate "accesskey" and "title" attributes for an HTML
      * tag and the given label.
+     *
+     * @deprecated Use {@see \Horde\Core\View\AccessKeyTracker::getAccessKeyAndTitle()}.
      *
      * @return string|array  The title and accesskey attributes as a string,
      *                       or as an array if $return_array is true.
@@ -1214,6 +1238,9 @@ class Horde
     /**
      * Returns a label element including an access key for usage in
      * conjunction with a form field.
+     *
+     * @deprecated Use {@see \Horde\Core\View\WidgetViewHelper::hordeLabel()}
+     *             with an injected {@see \Horde\Core\View\AccessKeyTracker}.
      */
     public static function label(string $for, string $label, ?string $ak = null): string
     {
@@ -1233,6 +1260,8 @@ class Horde
     /**
      * Print inline javascript to output buffer after wrapping with necessary
      * javascript tags.
+     *
+     * @deprecated Use {@see \Horde\Core\PageOutput\AssetCollector::wrapInlineScript()}.
      */
     public static function wrapInlineScript(array $script): string
     {
@@ -1259,6 +1288,11 @@ class Horde
 
     /**
      * Output the javascript needed to call the popup JS function.
+     *
+     * Note: In modern applications, prefer declarative data attributes
+     * (e.g. `data-popup-url`) with a client-side event handler over
+     * inline onclick JS generation. The controller is responsible for
+     * loading the popup script package.
      *
      * @param string|Url $url  The page to load.
      * @param array $options         Additional options.
@@ -1334,6 +1368,9 @@ class Horde
 
     /**
      * Returns the sidebar for the current application.
+     *
+     * @deprecated Use {@see \Horde\Core\View\SidebarBuilder::build()} via
+     *             {@see \Horde\Core\View\SidebarBuilderFactory}.
      */
     public static function sidebar(?string $app = null): Horde_View_Sidebar
     {

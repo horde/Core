@@ -254,7 +254,7 @@ class AssetCollector
         return implode('', $parts);
     }
 
-    private function wrapInlineScript(array $scripts): string
+    public function wrapInlineScript(array $scripts): string
     {
         return '<script type="text/javascript">//<![CDATA[' . "\n"
             . implode('', $scripts)

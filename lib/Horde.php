@@ -237,7 +237,9 @@ class Horde
     /**
      * Do necessary escaping to output JSON.
      *
-     * @deprecated Use {@see Horde\Core\Horde::escapeJson()} instead.
+     * @deprecated Use native json_encode() for data serialization, or
+     *             {@see \Horde\Core\Controller\JsonResponseTrait::jsonResponse()}
+     *             for controller responses.
      *
      * @param mixed $data     The data to JSON-ify.
      * @param array $options  Additional options:
@@ -482,6 +484,8 @@ class Horde
      * IDs from the referrer.
      *
      * @deprecated Use {@see Horde\Core\Horde::externalUrl()} instead.
+     *             In PSR-style applications, prefer `rel="noreferrer noopener"`
+     *             on anchor tags and `Referrer-Policy` HTTP headers.
      *
      * @param string $url   The external URL to link to.
      * @param boolean $tag  If true, a complete <a> tag is returned, only the
@@ -497,7 +501,7 @@ class Horde
     /**
      * Returns an anchor tag with the relevant parameters
      *
-     * @deprecated Use {@see Horde\Core\Horde::link()} instead.
+     * @deprecated Use {@see \Horde\Core\View\WidgetViewHelper::hordeLink()}.
      *
      * @param Horde_Url|string $url  The full URL to be linked to.
      * @param string $title          The link title/description.
@@ -543,7 +547,8 @@ class Horde
     /**
      * Uses DOM Tooltips to display the 'title' attribute for link() calls.
      *
-     * @deprecated Use {@see Horde\Core\Horde::linkTooltip()} instead.
+     * @deprecated Use {@see \Horde\Core\View\WidgetViewHelper::hordeLinkTooltip()}.
+     *             The controller is responsible for loading tooltips.js.
      *
      * @param string $url        The full URL to be linked to
      * @param string $status     The JavaScript mouse-over string
@@ -585,7 +590,8 @@ class Horde
      * Returns an anchor sequence with the relevant parameters for a widget
      * with accesskey and text.
      *
-     * @deprecated Use {@see Horde\Core\Horde::widget()} instead.
+     * @deprecated Use {@see \Horde\Core\View\WidgetViewHelper::hordeWidget()}
+     *             with an injected {@see \Horde\Core\View\AccessKeyTracker}.
      *
      * @param array $params  A hash with widget options (other options will be
      *                       passed as attributes to the link tag):
@@ -763,7 +769,7 @@ class Horde
     /**
      * Returns an un-used access key from the label given.
      *
-     * @deprecated Use {@see Horde\Core\Horde::getAccessKey()} instead.
+     * @deprecated Use {@see \Horde\Core\View\AccessKeyTracker::acquire()}.
      *
      * @param string $label      The label to choose an access key from.
      * @param boolean $nocheck   Don't check if the access key already has been
@@ -787,7 +793,7 @@ class Horde
      * For multibyte charset strings the access key gets removed completely,
      * otherwise only the underscore gets removed.
      *
-     * @deprecated Use {@see Horde\Core\Horde::stripAccessKey()} instead.
+     * @deprecated Use {@see \Horde\Core\View\AccessKeyTracker::strip()}.
      *
      * @param string $label  The label containing an access key.
      *
@@ -801,7 +807,7 @@ class Horde
     /**
      * Highlights an access key in a label.
      *
-     * @deprecated Use {@see Horde\Core\Horde::highlightAccessKey()} instead.
+     * @deprecated Use {@see \Horde\Core\View\AccessKeyTracker::highlight()}.
      *
      * @param string $label      The label to highlight the access key in.
      * @param string $accessKey  The access key to highlight.
@@ -818,7 +824,7 @@ class Horde
      * Returns the appropriate "accesskey" and "title" attributes for an HTML
      * tag and the given label.
      *
-     * @deprecated Use {@see Horde\Core\Horde::getAccessKeyAndTitle()} instead.
+     * @deprecated Use {@see \Horde\Core\View\AccessKeyTracker::getAccessKeyAndTitle()}.
      *
      * @param string $label          The title of an HTML element
      * @param boolean $nocheck       Don't check if the access key already has
@@ -844,7 +850,8 @@ class Horde
      * Returns a label element including an access key for usage in conjuction
      * with a form field. User preferences regarding access keys are respected.
      *
-     * @deprecated Use {@see Horde\Core\Horde::label()} instead.
+     * @deprecated Use {@see \Horde\Core\View\WidgetViewHelper::hordeLabel()}
+     *             with an injected {@see \Horde\Core\View\AccessKeyTracker}.
      *
      * @param string $for    The form field's id attribute.
      * @param string $label  The label text.
@@ -862,7 +869,7 @@ class Horde
      * Print inline javascript to output buffer after wrapping with necessary
      * javascript tags.
      *
-     * @deprecated Use {@see Horde\Core\Horde::wrapInlineScript()} instead.
+     * @deprecated Use {@see \Horde\Core\PageOutput\AssetCollector::wrapInlineScript()}.
      *
      * @param array $script  The script to output.
      *
@@ -908,6 +915,8 @@ class Horde
      * Output the javascript needed to call the popup JS function.
      *
      * @deprecated Use {@see Horde\Core\Horde::popupJs()} instead.
+     *             In modern applications, prefer declarative data attributes
+     *             with a client-side event handler over inline onclick JS.
      *
      * @param string|Horde_Url $url  The page to load.
      * @param array $options         Additional options:
@@ -969,7 +978,8 @@ class Horde
     /**
      * Returns the sidebar for the current application.
      *
-     * @deprecated Use {@see Horde\Core\Horde::sidebar()} instead.
+     * @deprecated Use {@see \Horde\Core\View\SidebarBuilder::build()} via
+     *             {@see \Horde\Core\View\SidebarBuilderFactory}.
      *
      * @param string $app  The application to generate the menu for. Defaults
      *                     to the current app.
