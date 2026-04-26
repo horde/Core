@@ -148,6 +148,7 @@ The middleware stack populates request attributes your controller can
 read:
 
 ```php
+$app      = $request->getAttribute('app');                     // string — resolved by AppFinder
 $user     = $request->getAttribute('HORDE_AUTHENTICATED_USER'); // string|null
 $isGuest  = $request->getAttribute('HORDE_GUEST');              // bool
 $registry = $request->getAttribute('registry');                 // Horde_Registry
