@@ -1,4 +1,26 @@
 ---
+3.0.0-beta22:
+  api: 3.0.0-beta22
+  state:
+    release: beta
+    api: beta
+  date: 2026-04-26
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    docs: Upgrading from page entrypoint scripts to controllers
+    feat: Modern path and url builder based page helper
+    feat: UriBuilder
+    feat: PathBuilder abstraction
+    feat: Modern factory returns modern DB drivers which happen to have the Horde_Db_Adapter interface
+    feat: Alternatives to some static/magic "horde::" calls
+    test: horde/Core#90 cover DI registration
+    feat: horde/Core#90 Factory pr Service for provider-scoped AuthenticatedHttpClient
+    feat: OAuthTokenService scope-aware token retrieval horde/Core#89
+    feat: Add a factory for OAuth Flow storage
+    feat: Add Connected Accounts to settings menu
+    feat: OAuth related controllers use SessionHandler to get the relevant session from request.
 3.0.0-beta21:
   api: 3.0.0-beta21
   state:
