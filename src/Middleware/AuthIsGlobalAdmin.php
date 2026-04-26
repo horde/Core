@@ -4,38 +4,29 @@ declare(strict_types=1);
 
 namespace Horde\Core\Middleware;
 
-use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Horde_Registry;
-use Horde_Application;
-use Horde_Controller;
-use Horde_String;
-use Horde;
-use Horde\Core\UserPassport;
 
 /**
  * AuthIsGlobalAdmin middleware
  *
- * Purpose: Identify the session as global admin
- *
- * Sets Attributes:
- * - HORDE_GLOBAL_ADMIN if the user has that privilege
- *
+ * Sets the HORDE_GLOBAL_ADMIN request attribute when the authenticated
+ * user is in the admin list.  Relies on HORDE_AUTHENTICATED_USER being
+ * set by an earlier auth middleware (AuthHordeSession, AuthHttpBasic).
  */
 class AuthIsGlobalAdmin implements MiddlewareInterface
 {
-    private Horde_Registry $registry;
-    public function __construct(Horde_Registry $registry)
-    {
-        $this->registry = $registry;
-    }
+    /** @param string[] $admins Admin usernames from conf[auth][admins] */
+    public function __construct(
+        private readonly array $admins,
+    ) {}
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if ($this->registry->isAuthenticated() && $this->registry->isAdmin()) {
+        $user = $request->getAttribute('HORDE_AUTHENTICATED_USER');
+        if ($user !== null && in_array($user, $this->admins, true)) {
             $request = $request->withAttribute('HORDE_GLOBAL_ADMIN', true);
         } else {
             $request = $request->withoutAttribute('HORDE_GLOBAL_ADMIN');

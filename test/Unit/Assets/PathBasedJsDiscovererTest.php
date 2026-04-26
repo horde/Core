@@ -213,6 +213,11 @@ class PathBasedJsDiscovererTest extends TestCase
                 return $this;
             }
 
+            public function withQueryParams(array $params): static
+            {
+                return $this;
+            }
+
             public function withSlug(string $slug): static
             {
                 $clone = clone $this;

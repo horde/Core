@@ -14,6 +14,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
+use Horde\Core\Config\RegistryState;
 use Horde\Http\RequestFactory;
 use Horde\Http\UriFactory;
 use Horde\Http\StreamFactory;
@@ -59,10 +60,12 @@ class HordeCore implements MiddlewareInterface
         }
 
         $registry = $injector->getInstance('Horde_Registry');
+        $admins = $GLOBALS['conf']['auth']['admins'] ?? [];
         // First middleware should be ErrorFilter to catch all errors
-        $handler->addMiddleware(new ErrorFilter($registry, new ResponseFactory(), new StreamFactory()));
+        $handler->addMiddleware(new ErrorFilter($admins, new ResponseFactory(), new StreamFactory()));
         // Detect correct app
-        $handler->addMiddleware(new AppFinder($registry, new ResponseFactory(), new StreamFactory()));
+        $registryState = new RegistryState($registry->applications);
+        $handler->addMiddleware(new AppFinder($registryState, new ResponseFactory(), new StreamFactory()));
         // Find route inside detected app
         $handler->addMiddleware(new AppRouter($registry, $injector->get(Mapper::class), $injector));
 

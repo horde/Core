@@ -9,7 +9,6 @@ use Horde\Http\ResponseFactory;
 use Horde\Http\StreamFactory;
 use Horde_ErrorHandler;
 use Horde_Log;
-use Horde_Registry;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -19,36 +18,21 @@ use Throwable;
 /**
  * ErrorFilter middleware
  *
- * Purpose:
+ * Prevents ugly stack traces from reaching users or APIs.
+ * Shows detailed error info only to admin users.
+ * Reads HORDE_AUTHENTICATED_USER from request attributes and checks
+ * against the admin list from horde config.
  *
- * Prevent ugly stack traces from showing up to users or APIs.
- * Give meaningful feedback and logging.
- * Can handle errors early in setup
- * Can give more meaningful feedback on a fully setup environment
- *
- * Intended to run close to top of stack
- *
- * Requires Attributes:
- *
- * Sets Attributes:
- *
- *
+ * Intended to run close to top of stack.
  */
 class ErrorFilter implements MiddlewareInterface
 {
-    protected Horde_Registry $registry;
-    protected ResponseFactory $responseFactory;
-    protected StreamFactory $streamFactory;
-
+    /** @param string[] $admins Admin usernames from conf[auth][admins] */
     public function __construct(
-        Horde_Registry $registry,
-        ResponseFactory $responseFactory,
-        StreamFactory $streamFactory
-    ) {
-        $this->registry = $registry;
-        $this->responseFactory = $responseFactory;
-        $this->streamFactory = $streamFactory;
-    }
+        private readonly array $admins,
+        private readonly ResponseFactory $responseFactory,
+        private readonly StreamFactory $streamFactory,
+    ) {}
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -62,13 +46,14 @@ class ErrorFilter implements MiddlewareInterface
 
     protected function getErrorResponse(ServerRequestInterface $request, Throwable $throwable): ResponseInterface
     {
-        $isAdmin = $this->registry->isAdmin();
+        $user = $request->getAttribute('HORDE_AUTHENTICATED_USER');
+        $isAdmin = $user !== null && in_array($user, $this->admins, true);
+
         $acceptsJson = in_array('application/json', array_map(fn($val) => strtolower($val), $request->getHeader('Accept')));
         if ($acceptsJson) {
             return $this->getJsonResponse($throwable, $isAdmin);
-        } else {
-            return $this->getHtmlResponse($throwable, $isAdmin);
         }
+        return $this->getHtmlResponse($throwable, $isAdmin);
     }
 
     protected function getJsonResponse(Throwable $throwable, bool $isAdmin = false): ResponseInterface

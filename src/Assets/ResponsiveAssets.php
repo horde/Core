@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Assets;
 
-use Horde_Registry;
+use Horde\Core\Config\RegistryState;
 use Exception;
 
 /**
@@ -24,28 +24,22 @@ use Exception;
  */
 class ResponsiveAssets
 {
-    /**
-     * Registry instance
-     */
-    private Horde_Registry $registry;
-
-    /**
-     * Filesystem abstraction for testability
-     */
-    private ResponsiveAssetsFilesystem $filesystem;
-
-    /**
-     * Constructor
-     *
-     * @param Horde_Registry $registry Horde registry instance
-     * @param ResponsiveAssetsFilesystem|null $filesystem Filesystem implementation (for testing)
-     */
     public function __construct(
-        Horde_Registry $registry,
-        ?ResponsiveAssetsFilesystem $filesystem = null
-    ) {
-        $this->registry = $registry;
-        $this->filesystem = $filesystem ?? new ResponsiveAssetsFilesystemImpl();
+        private readonly RegistryState $registryState,
+        private readonly ResponsiveAssetsFilesystem $filesystem = new ResponsiveAssetsFilesystemImpl(),
+    ) {}
+
+    /**
+     * Look up a registry parameter for an app, falling back to horde.
+     */
+    private function getParam(string $parameter, string $app): ?string
+    {
+        $appConfig = $this->registryState->getApplication($app);
+        if ($appConfig !== null && isset($appConfig[$parameter])) {
+            return $appConfig[$parameter];
+        }
+        $hordeConfig = $this->registryState->getApplication('horde');
+        return $hordeConfig[$parameter] ?? null;
     }
 
     /**
@@ -57,35 +51,30 @@ class ResponsiveAssets
      * 3. Application default theme CSS (if exists and app != horde)
      * 4. Application selected theme CSS (if different from default and exists)
      *
+     * @param string $app Application name
      * @param string|null $theme Theme name (null = use preference)
-     * @param string|null $app Application name (null = current app)
      * @return array<string> Array of CSS URLs
      */
-    public function getCssUrls(?string $theme = null, ?string $app = null): array
+    public function getCssUrls(string $app, ?string $theme = null): array
     {
         $urls = [];
         $theme ??= $this->getThemePreference();
-        $app ??= $this->registry->getApp();
 
         $cssFiles = ['responsive.css'];
 
         foreach ($cssFiles as $file) {
-            // 1. Horde default theme (always load)
             if ($this->cssFileExists($file, 'default', 'horde')) {
                 $urls[] = $this->buildCssUrl($file, 'default', 'horde');
             }
 
-            // 2. Horde selected theme (cascade over default if different)
             if ($theme !== 'default' && $this->cssFileExists($file, $theme, 'horde')) {
                 $urls[] = $this->buildCssUrl($file, $theme, 'horde');
             }
 
-            // 3. App default theme (if app != horde)
             if ($app !== 'horde' && $this->cssFileExists($file, 'default', $app)) {
                 $urls[] = $this->buildCssUrl($file, 'default', $app);
             }
 
-            // 4. App selected theme (cascade over app default if different)
             if ($app !== 'horde' && $theme !== 'default' && $this->cssFileExists($file, $theme, $app)) {
                 $urls[] = $this->buildCssUrl($file, $theme, $app);
             }
@@ -97,26 +86,19 @@ class ResponsiveAssets
     /**
      * Get list of responsive JavaScript URLs to load
      *
-     * Returns URLs in cascade order with fallback to default theme:
-     * 1. Horde base JS
-     * 2. Application JS (if exists and app != horde)
-     *
+     * @param string $app Application name
      * @param array<string> $jsFiles List of JS filenames to load
-     * @param string|null $app Application name (null = current app)
      * @return array<string> Array of JS URLs
      */
-    public function getJsUrls(array $jsFiles = [], ?string $app = null): array
+    public function getJsUrls(string $app, array $jsFiles = []): array
     {
         $urls = [];
-        $app ??= $this->registry->getApp();
 
         foreach ($jsFiles as $file) {
-            // Check Horde base JS
             if ($this->jsFileExists($file, 'horde')) {
                 $urls[] = $this->buildJsUrl($file, 'horde');
             }
 
-            // Check app-specific JS (if not horde)
             if ($app !== 'horde' && $this->jsFileExists($file, $app)) {
                 $urls[] = $this->buildJsUrl($file, $app);
             }
@@ -138,46 +120,32 @@ class ResponsiveAssets
     /**
      * Get URL for a theme graphic (first-found-wins cascade)
      *
-     * Checks locations in most-specific-first order:
-     * 1. App selected theme:  themes/{app}/{theme}/graphics/{file}
-     * 2. App default theme:   themes/{app}/default/graphics/{file}
-     * 3. Horde selected theme: themes/horde/{theme}/graphics/{file}
-     * 4. Horde default theme: themes/horde/default/graphics/{file}
-     *
-     * Returns the URI of the first match, or empty string if none found.
-     *
-     * @param string      $file   Graphic filename (e.g. 'new.png' or 'mime/pdf.png')
-     * @param string|null $theme  Theme name (null = use preference)
-     * @param string|null $app    Application name (null = current app)
-     *
-     * @return string  URL to the graphic, or '' if not found
+     * @param string $file Graphic filename
+     * @param string $app Application name
+     * @param string|null $theme Theme name (null = use preference)
+     * @return string URL to the graphic, or '' if not found
      */
     public function getGraphicUrl(
         string $file,
+        string $app,
         ?string $theme = null,
-        ?string $app = null,
     ): string {
         $theme ??= $this->getThemePreference();
-        $app ??= $this->registry->getApp();
 
         $candidates = [];
 
-        // Most specific first — app theme override
         if ($app !== 'horde' && $theme !== 'default') {
             $candidates[] = ['theme' => $theme, 'app' => $app];
         }
 
-        // App default theme
         if ($app !== 'horde') {
             $candidates[] = ['theme' => 'default', 'app' => $app];
         }
 
-        // Horde selected theme
         if ($theme !== 'default') {
             $candidates[] = ['theme' => $theme, 'app' => 'horde'];
         }
 
-        // Horde default theme (ultimate fallback)
         $candidates[] = ['theme' => 'default', 'app' => 'horde'];
 
         foreach ($candidates as $candidate) {
@@ -199,8 +167,7 @@ class ResponsiveAssets
      */
     private function buildCssUrl(string $file, string $theme, string $app): string
     {
-        $themesUri = $this->registry->get('themesuri', $app);
-        return $themesUri . '/' . $theme . '/' . $file;
+        return $this->getParam('themesuri', $app) . '/' . $theme . '/' . $file;
     }
 
     /**
@@ -212,8 +179,7 @@ class ResponsiveAssets
      */
     private function buildJsUrl(string $file, string $app): string
     {
-        $jsUri = $this->registry->get('jsuri', $app);
-        return $jsUri . '/' . $file;
+        return $this->getParam('jsuri', $app) . '/' . $file;
     }
 
     /**
@@ -227,9 +193,11 @@ class ResponsiveAssets
     private function cssFileExists(string $filename, string $theme, string $app): bool
     {
         try {
-            $themesFs = $this->registry->get('themesfs', $app);
-            $filePath = $themesFs . '/' . $theme . '/' . $filename;
-            return $this->filesystem->fileExists($filePath);
+            $themesFs = $this->getParam('themesfs', $app);
+            if ($themesFs === null) {
+                return false;
+            }
+            return $this->filesystem->fileExists($themesFs . '/' . $theme . '/' . $filename);
         } catch (Exception $e) {
             return false;
         }
@@ -245,9 +213,11 @@ class ResponsiveAssets
     private function jsFileExists(string $filename, string $app): bool
     {
         try {
-            $jsFs = $this->registry->get('jsfs', $app);
-            $filePath = $jsFs . '/' . $filename;
-            return $this->filesystem->fileExists($filePath);
+            $jsFs = $this->getParam('jsfs', $app);
+            if ($jsFs === null) {
+                return false;
+            }
+            return $this->filesystem->fileExists($jsFs . '/' . $filename);
         } catch (Exception $e) {
             return false;
         }
@@ -263,8 +233,7 @@ class ResponsiveAssets
      */
     private function buildGraphicUrl(string $file, string $theme, string $app): string
     {
-        $themesUri = $this->registry->get('themesuri', $app);
-        return $themesUri . '/' . $theme . '/graphics/' . $file;
+        return $this->getParam('themesuri', $app) . '/' . $theme . '/graphics/' . $file;
     }
 
     /**
@@ -278,9 +247,11 @@ class ResponsiveAssets
     private function graphicFileExists(string $filename, string $theme, string $app): bool
     {
         try {
-            $themesFs = $this->registry->get('themesfs', $app);
-            $filePath = $themesFs . '/' . $theme . '/graphics/' . $filename;
-            return $this->filesystem->fileExists($filePath);
+            $themesFs = $this->getParam('themesfs', $app);
+            if ($themesFs === null) {
+                return false;
+            }
+            return $this->filesystem->fileExists($themesFs . '/' . $theme . '/graphics/' . $filename);
         } catch (Exception $e) {
             return false;
         }
