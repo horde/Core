@@ -23,6 +23,9 @@
  * @license  http://opensource.org/licenses/lgpl-2.1.php LGPL
  * @package  Core
  */
+
+use Horde\Core\Auth\CredentialCheckResult;
+
 class Horde_Core_Auth_Application extends Horde_Auth_Base
 {
     /**
@@ -125,6 +128,13 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
      */
     public function authenticate($userId, $credentials, $login = true)
     {
+        if (!$login) {
+            return $this->checkCredentials(
+                (string) $userId,
+                $credentials
+            ) === CredentialCheckResult::Valid;
+        }
+
         if (!strlen((string) ($credentials['password'] ?? ''))) {
             return false;
         }
@@ -149,6 +159,60 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
         }
 
         return $this->_setAuth();
+    }
+
+    /**
+     * Validate credentials without establishing a session or modifying
+     * any global state.
+     *
+     * Runs the preauthenticate hook and delegates to the underlying
+     * base driver (or the parent Horde_Auth_Base for non-horde apps).
+     * Lock checking and bad-login tracking in the base driver still
+     * apply.
+     *
+     * @param string $userId      The user ID to check.
+     * @param array  $credentials The credentials to check.
+     *
+     * @return CredentialCheckResult
+     */
+    public function checkCredentials(
+        string $userId,
+        array $credentials
+    ): CredentialCheckResult {
+        if (!strlen((string) ($credentials['password'] ?? ''))) {
+            return CredentialCheckResult::Invalid;
+        }
+
+        try {
+            [$userId, $credentials] = $this->runHook(
+                trim($userId),
+                $credentials,
+                'preauthenticate',
+                'authenticate'
+            );
+        } catch (Horde_Auth_Exception $e) {
+            return CredentialCheckResult::fromAuthReason(
+                $e->getCode() ?: Horde_Auth::REASON_FAILED
+            );
+        }
+
+        if ($this->_base) {
+            $result = $this->_base->authenticate($userId, $credentials, false);
+            $driver = $this->_base;
+        } else {
+            $result = parent::authenticate($userId, $credentials, false);
+            $driver = $this;
+        }
+
+        if (!$result) {
+            $errorCode = $driver->getError();
+            if ($errorCode === false) {
+                return CredentialCheckResult::Invalid;
+            }
+            return CredentialCheckResult::fromAuthReason((int) $errorCode);
+        }
+
+        return CredentialCheckResult::Valid;
     }
 
     /**
