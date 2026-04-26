@@ -214,6 +214,10 @@ class TopbarBuilderTest extends TestCase
         $builder = $this->createBuilder(registry: $registry, session: $session);
         $data = $builder->build();
 
-        $this->assertEmpty($data->menuTree);
+        // The heading with no children should be filtered out.
+        // The menuTree may still contain the always-present settings node.
+        foreach ($data->menuTree as $node) {
+            $this->assertNotSame('emptyheading', $node->id, 'Empty heading should be filtered out');
+        }
     }
 }

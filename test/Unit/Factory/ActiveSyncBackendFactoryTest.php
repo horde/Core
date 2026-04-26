@@ -20,7 +20,9 @@ namespace Horde\Core\Test\Unit\Factory;
 use Horde\Test\TestCase;
 use Horde\Http\ServerRequest;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Horde_Auth_Base;
 use Horde_Core_Factory_ActiveSyncBackend;
+use Horde_Core_Factory_Auth;
 use Horde_Injector;
 use Horde_Registry;
 use Horde_ActiveSync_State_Sql;
@@ -45,9 +47,12 @@ class ActiveSyncBackendFactoryTest extends TestCase
      */
     public function testFactoryPassesServerRequestToDriver(): void
     {
+        if (!class_exists('Horde_ActiveSync_State_Sql')) {
+            $this->markTestSkipped('horde/activesync not available');
+        }
+
         global $conf, $registry;
 
-        // Setup minimal global config
         $conf = [
             'activesync' => [
                 'emailsync' => false,
@@ -56,14 +61,15 @@ class ActiveSyncBackendFactoryTest extends TestCase
             ],
         ];
 
-        // Mock registry
         $registry = $this->getMockSkipConstructor(Horde_Registry::class);
         $registry->method('hasInterface')->willReturn(false);
 
-        // Mock injector
+        $mockAuth = $this->getMockSkipConstructor(Horde_Auth_Base::class);
+        $mockAuthFactory = $this->getMockSkipConstructor(Horde_Core_Factory_Auth::class);
+        $mockAuthFactory->method('create')->willReturn($mockAuth);
+
         $mockInjector = $this->getMockSkipConstructor(Horde_Injector::class);
 
-        // Setup ServerRequest in injector
         $serverRequest = new ServerRequest('POST', '/Microsoft-Server-ActiveSync');
         $mockInjector->method('get')
             ->willReturnCallback(function ($class) use ($serverRequest) {
@@ -78,19 +84,30 @@ class ActiveSyncBackendFactoryTest extends TestCase
                 }
                 throw new Horde_Exception_NotFound();
             });
+        $mockInjector->method('getInstance')
+            ->willReturnCallback(function ($class) use ($mockAuthFactory) {
+                if ($class === 'Horde_Core_Factory_Auth') {
+                    return $mockAuthFactory;
+                }
+                throw new Horde_Exception_NotFound();
+            });
 
-        $factory = new Horde_Core_Factory_ActiveSyncBackend($mockInjector);
-        $driver = $factory->create($mockInjector);
+        $GLOBALS['injector'] = $mockInjector;
 
-        $this->assertInstanceOf(Horde_Core_ActiveSync_Driver::class, $driver);
+        try {
+            $factory = new Horde_Core_Factory_ActiveSyncBackend($mockInjector);
+            $driver = $factory->create($mockInjector);
 
-        // Verify driver can access dependencies (getUser should work)
-        // Without authentication or GET params, should fall back to registry
-        $registry->expects($this->once())
-            ->method('getAuth')
-            ->willReturn('');
+            $this->assertInstanceOf(Horde_Core_ActiveSync_Driver::class, $driver);
 
-        $driver->getUser();
+            $registry->expects($this->once())
+                ->method('getAuth')
+                ->willReturn('');
+
+            $driver->getUser();
+        } finally {
+            unset($GLOBALS['injector']);
+        }
     }
 
     /**
@@ -98,9 +115,16 @@ class ActiveSyncBackendFactoryTest extends TestCase
      */
     public function testFactoryCreatesServerRequestFromGlobalsAsFallback(): void
     {
+        if (!function_exists('getallheaders')) {
+            $this->markTestSkipped('getallheaders() not available in CLI SAPI');
+        }
+
+        if (!class_exists('Horde_ActiveSync_State_Sql')) {
+            $this->markTestSkipped('horde/activesync not available');
+        }
+
         global $conf, $registry;
 
-        // Setup minimal global config
         $conf = [
             'activesync' => [
                 'emailsync' => false,
@@ -109,12 +133,14 @@ class ActiveSyncBackendFactoryTest extends TestCase
             ],
         ];
 
-        // Mock registry
         $registry = $this->getMockSkipConstructor(Horde_Registry::class);
         $registry->method('hasInterface')->willReturn(false);
         $registry->method('getAuth')->willReturn('test_user');
 
-        // Mock injector that doesn't have ServerRequest
+        $mockAuth = $this->getMockSkipConstructor(Horde_Auth_Base::class);
+        $mockAuthFactory = $this->getMockSkipConstructor(Horde_Core_Factory_Auth::class);
+        $mockAuthFactory->method('create')->willReturn($mockAuth);
+
         $mockInjector = $this->getMockSkipConstructor(Horde_Injector::class);
 
         $mockInjector->method('get')
@@ -130,11 +156,24 @@ class ActiveSyncBackendFactoryTest extends TestCase
                 }
                 throw new Horde_Exception_NotFound();
             });
+        $mockInjector->method('getInstance')
+            ->willReturnCallback(function ($class) use ($mockAuthFactory) {
+                if ($class === 'Horde_Core_Factory_Auth') {
+                    return $mockAuthFactory;
+                }
+                throw new Horde_Exception_NotFound();
+            });
 
-        $factory = new Horde_Core_Factory_ActiveSyncBackend($mockInjector);
-        $driver = $factory->create($mockInjector);
+        $GLOBALS['injector'] = $mockInjector;
 
-        $this->assertInstanceOf(Horde_Core_ActiveSync_Driver::class, $driver);
+        try {
+            $factory = new Horde_Core_Factory_ActiveSyncBackend($mockInjector);
+            $driver = $factory->create($mockInjector);
+
+            $this->assertInstanceOf(Horde_Core_ActiveSync_Driver::class, $driver);
+        } finally {
+            unset($GLOBALS['injector']);
+        }
     }
 
     /**
@@ -142,6 +181,10 @@ class ActiveSyncBackendFactoryTest extends TestCase
      */
     public function testFactoryPassesRegistryToDriver(): void
     {
+        if (!class_exists('Horde_ActiveSync_State_Sql')) {
+            $this->markTestSkipped('horde/activesync not available');
+        }
+
         global $conf, $registry;
 
         $conf = [
@@ -157,6 +200,10 @@ class ActiveSyncBackendFactoryTest extends TestCase
         $registry->expects($this->once())
             ->method('getAuth')
             ->willReturn('registry_user');
+
+        $mockAuth = $this->getMockSkipConstructor(Horde_Auth_Base::class);
+        $mockAuthFactory = $this->getMockSkipConstructor(Horde_Core_Factory_Auth::class);
+        $mockAuthFactory->method('create')->willReturn($mockAuth);
 
         $mockInjector = $this->getMockSkipConstructor(Horde_Injector::class);
 
@@ -174,11 +221,23 @@ class ActiveSyncBackendFactoryTest extends TestCase
                 }
                 throw new Horde_Exception_NotFound();
             });
+        $mockInjector->method('getInstance')
+            ->willReturnCallback(function ($class) use ($mockAuthFactory) {
+                if ($class === 'Horde_Core_Factory_Auth') {
+                    return $mockAuthFactory;
+                }
+                throw new Horde_Exception_NotFound();
+            });
 
-        $factory = new Horde_Core_Factory_ActiveSyncBackend($mockInjector);
-        $driver = $factory->create($mockInjector);
+        $GLOBALS['injector'] = $mockInjector;
 
-        // Verify registry is used
-        $this->assertEquals('registry_user', $driver->getUser());
+        try {
+            $factory = new Horde_Core_Factory_ActiveSyncBackend($mockInjector);
+            $driver = $factory->create($mockInjector);
+
+            $this->assertEquals('registry_user', $driver->getUser());
+        } finally {
+            unset($GLOBALS['injector']);
+        }
     }
 }

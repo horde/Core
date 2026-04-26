@@ -13,11 +13,15 @@ declare(strict_types=1);
 
 namespace Horde\Core\Test\Unit;
 
-use PHPUnit\Framework\TestCase;
+use Horde\Http\ServerRequest;
+use Horde\Http\Uri;
+use Horde\Test\TestCase;
+use Horde_Core_ActiveSync_Driver;
+use Horde_Date;
+use Horde_Registry;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use Horde\Core\Test\Mock\MockConnector;
 use Horde\Core\Test\Mock\MockIMPMailbox;
-use Horde_Date;
 
 /**
 * Unit tests for ActiveSync functionality in Core.
@@ -34,11 +38,20 @@ class ActiveSyncTest extends TestCase
     protected $_state;
     protected $_mailboxes;
     protected $_special;
+    protected $_serverRequest;
+    protected $_registry;
 
     public function setUp(): void
     {
         $this->_auth = $this->getMockSkipConstructor('Horde_Auth_Auto');
         $this->_state = $this->getMockSkipConstructor('Horde_ActiveSync_State_Sql');
+        $this->_serverRequest = new ServerRequest('POST', '/');
+        $this->_registry = $this->getMockSkipConstructor(Horde_Registry::class);
+    }
+
+    public function tearDown(): void
+    {
+        unset($GLOBALS['registry']);
     }
 
     public function _setupDeepStructure()
@@ -287,6 +300,15 @@ class ActiveSyncTest extends TestCase
 
     public function testGetFolderWithDeepFolderStructureAndPeriodDelimiter()
     {
+        if (!class_exists('Horde_Imap_Client_Mailbox')) {
+            $this->markTestSkipped('horde/imap_client not available');
+        }
+        $GLOBALS['registry'] = $this->_registry;
+        $this->_registry->method('hasInterface')->willReturn(false);
+
+        $mockDevice = $this->getMockSkipConstructor('Horde_ActiveSync_Device');
+        $mockDevice->multiplex = \Horde_ActiveSync_Device::MULTIPLEX;
+
         $this->_setupDeepStructure();
         $adapter = $this->getMockSkipConstructor('Horde_ActiveSync_Imap_Adapter');
         $adapter->expects($this->once())->method('getMailboxes')->will($this->returnValue($this->_mailboxes));
@@ -295,7 +317,10 @@ class ActiveSyncTest extends TestCase
             'state' => $this->_state,
             'connector' => new MockConnector(),
             'auth' => $this->_auth,
+            'serverrequest' => $this->_serverRequest,
+            'registry' => $this->_registry,
             'imap' => $adapter, ]);
+        $driver->setDevice($mockDevice);
         $folders = $driver->getFolders();
 
         // Test the EAS Type of each special folder
@@ -351,11 +376,20 @@ class ActiveSyncTest extends TestCase
 
     public function testGetFoldersWhenEmailSupportDisabled()
     {
+        $GLOBALS['registry'] = $this->_registry;
+        $this->_registry->method('hasInterface')->willReturn(false);
+
+        $mockDevice = $this->getMockSkipConstructor('Horde_ActiveSync_Device');
+        $mockDevice->multiplex = \Horde_ActiveSync_Device::MULTIPLEX;
+
         $driver = new Horde_Core_ActiveSync_Driver([
             'state' => $this->_state,
             'connector' => new MockConnector(),
             'auth' => $this->_auth,
+            'serverrequest' => $this->_serverRequest,
+            'registry' => $this->_registry,
             'imap' => false, ]);
+        $driver->setDevice($mockDevice);
 
         $folders = $driver->getFolders();
         $have = [
@@ -388,6 +422,15 @@ class ActiveSyncTest extends TestCase
 
     public function testGetFoldersWithForwardSlashDelimiter()
     {
+        if (!class_exists('Horde_Imap_Client_Mailbox')) {
+            $this->markTestSkipped('horde/imap_client not available');
+        }
+        $GLOBALS['registry'] = $this->_registry;
+        $this->_registry->method('hasInterface')->willReturn(false);
+
+        $mockDevice = $this->getMockSkipConstructor('Horde_ActiveSync_Device');
+        $mockDevice->multiplex = \Horde_ActiveSync_Device::MULTIPLEX;
+
         $this->_setUpMailTest();
         $adapter = $this->getMockSkipConstructor('Horde_ActiveSync_Imap_Adapter');
         $adapter->expects($this->once())->method('getMailboxes')->will($this->returnValue($this->_mailboxes));
@@ -396,7 +439,10 @@ class ActiveSyncTest extends TestCase
             'state' => $this->_state,
             'connector' => new MockConnector(),
             'auth' => $this->_auth,
+            'serverrequest' => $this->_serverRequest,
+            'registry' => $this->_registry,
             'imap' => $adapter, ]);
+        $driver->setDevice($mockDevice);
         $folders = $driver->getFolders();
         $have = [
             'Draft' => false,
@@ -447,14 +493,19 @@ class ActiveSyncTest extends TestCase
 
     public function testFbGeneration()
     {
+        $oldTz = date_default_timezone_get();
+        date_default_timezone_set('America/New_York');
+
         $connector = new MockConnector();
         $driver = new Horde_Core_ActiveSync_Driver([
             'state' => $this->_state,
             'connector' => $connector,
             'auth' => $this->_auth,
+            'serverrequest' => $this->_serverRequest,
+            'registry' => $this->_registry,
             'imap' => null, ]);
 
-        $fixture = new stdClass();
+        $fixture = new \stdClass();
         $fixture->s = '20130529';
         $fixture->e = '20130628';
         $fixture->b = [
@@ -468,13 +519,15 @@ class ActiveSyncTest extends TestCase
         $fb = $driver->buildFbString($fixture, $start, $end);
         $expected = '440000000000000000000000000000220000000000000000';
         $this->assertEquals($expected, $fb);
+
+        date_default_timezone_set($oldTz);
     }
 
     public function testGetUserReturnsAuthenticatedUser()
     {
-        $serverRequest = new \Horde\Http\ServerRequest('POST', '/');
+        $serverRequest = new ServerRequest('POST', '/');
         $connector = new MockConnector();
-        $mockRegistry = $this->getMockSkipConstructor('Horde_Registry');
+        $mockRegistry = $this->getMockSkipConstructor(Horde_Registry::class);
 
         $driver = new Horde_Core_ActiveSync_Driver([
             'state' => $this->_state,
@@ -485,18 +538,21 @@ class ActiveSyncTest extends TestCase
             'imap' => null,
         ]);
 
-        // Simulate authentication
-        $driver->authenticate('authenticated_user', 'password');
+        // Simulate authentication by setting _authUser via parent::authenticate()
+        // We cannot call $driver->authenticate() because it depends on globals.
+        // Instead, use reflection to set the protected _authUser property.
+        $ref = new \ReflectionProperty($driver, '_authUser');
+        $ref->setValue($driver, 'authenticated_user');
 
         $this->assertEquals('authenticated_user', $driver->getUser());
     }
 
     public function testGetUserFallsBackToGetParameter()
     {
-        $uri = new \Horde\Http\Uri('http://example.com/path?User=get_param_user');
-        $serverRequest = new \Horde\Http\ServerRequest('POST', $uri);
+        $serverRequest = (new ServerRequest('POST', '/'))
+            ->withQueryParams(['User' => 'get_param_user']);
         $connector = new MockConnector();
-        $mockRegistry = $this->getMockSkipConstructor('Horde_Registry');
+        $mockRegistry = $this->getMockSkipConstructor(Horde_Registry::class);
 
         $mockRegistry->expects($this->never())
             ->method('getAuth');
@@ -516,9 +572,9 @@ class ActiveSyncTest extends TestCase
 
     public function testGetUserFallsBackToRegistry()
     {
-        $serverRequest = new \Horde\Http\ServerRequest('POST', '/');
+        $serverRequest = new ServerRequest('POST', '/');
         $connector = new MockConnector();
-        $mockRegistry = $this->getMockSkipConstructor('Horde_Registry');
+        $mockRegistry = $this->getMockSkipConstructor(Horde_Registry::class);
 
         $mockRegistry->expects($this->once())
             ->method('getAuth')
@@ -539,10 +595,10 @@ class ActiveSyncTest extends TestCase
 
     public function testGetParameterOverridesRegistry()
     {
-        $uri = new \Horde\Http\Uri('http://example.com/path?User=get_param_user');
-        $serverRequest = new \Horde\Http\ServerRequest('POST', $uri);
+        $serverRequest = (new ServerRequest('POST', '/'))
+            ->withQueryParams(['User' => 'get_param_user']);
         $connector = new MockConnector();
-        $mockRegistry = $this->getMockSkipConstructor('Horde_Registry');
+        $mockRegistry = $this->getMockSkipConstructor(Horde_Registry::class);
 
         $mockRegistry->expects($this->never())
             ->method('getAuth');

@@ -374,6 +374,10 @@ class TopbarBuilder
             return;
         }
 
+        if (!is_array($adminList)) {
+            return;
+        }
+
         foreach ($adminList as $method => $val) {
             $permName = 'horde:administration:' . $method;
             $hasAccess = $isAdmin;
