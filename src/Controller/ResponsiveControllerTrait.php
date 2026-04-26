@@ -28,8 +28,10 @@ use Horde\Core\Assets\ResponsiveAssets;
 use Horde\Core\View\ResponsiveTemplateView;
 use Horde\Core\View\ResponsiveTopbar;
 use Horde_Registry;
+use LogicException;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 
@@ -43,27 +45,47 @@ use Psr\Http\Message\UriFactoryInterface;
  * - Redirect helpers
  * - Response factory access
  *
- * Usage:
+ * Controllers can provide the Horde_Registry in two ways:
+ *
+ * 1. Modern: pass the ServerRequestInterface to renderTemplate().
+ *    The registry is resolved from the request attribute set by
+ *    AppRouter middleware.  No getRegistry() override needed.
+ *
+ * 2. Legacy: override getRegistry() to return a constructor-injected
+ *    Horde_Registry.  The $request parameter is then optional.
+ *
+ * Usage (modern — no Horde_Registry in constructor):
  * <code>
- * class ResponsiveController implements RequestHandlerInterface
+ * class TaskController implements RequestHandlerInterface
  * {
  *     use ResponsiveControllerTrait;
  *
- *     protected function getAppName(): string
- *     {
- *         return _("Tasks");
- *     }
+ *     protected function getAppName(): string { return _("Tasks"); }
+ *     protected function getTemplateBasePath(): string { return NAG_TEMPLATES . '/responsive/'; }
  *
- *     protected function getTemplateBasePath(): string
- *     {
- *         return NAG_TEMPLATES . '/responsive/';
- *     }
- *
- *     private function index(ServerRequestInterface $request): ResponseInterface
+ *     public function handle(ServerRequestInterface $request): ResponseInterface
  *     {
  *         return $this->renderTemplate('browse.html.php', [
  *             'tasks' => $tasks,
- *         ]);
+ *         ], request: $request);
+ *     }
+ * }
+ * </code>
+ *
+ * Usage (legacy — existing controllers continue to work unchanged):
+ * <code>
+ * class TaskController implements RequestHandlerInterface
+ * {
+ *     use ResponsiveControllerTrait;
+ *
+ *     public function __construct(private Horde_Registry $registry, ...) {}
+ *     protected function getRegistry(): Horde_Registry { return $this->registry; }
+ *     protected function getAppName(): string { return _("Tasks"); }
+ *     protected function getTemplateBasePath(): string { return NAG_TEMPLATES . '/responsive/'; }
+ *
+ *     public function handle(ServerRequestInterface $request): ResponseInterface
+ *     {
+ *         return $this->renderTemplate('browse.html.php', ['tasks' => $tasks]);
  *     }
  * }
  * </code>
@@ -96,12 +118,19 @@ trait ResponsiveControllerTrait
     /**
      * Get Horde registry instance
      *
-     * Must be implemented by the using controller.
-     * Controller should provide registry via constructor injection.
+     * Legacy controllers override this to return a constructor-injected
+     * Horde_Registry.  Modern controllers leave the default and pass
+     * $request to renderTemplate() instead.
      *
      * @return Horde_Registry Registry instance
+     * @throws LogicException when not overridden and no $request available
      */
-    abstract protected function getRegistry(): Horde_Registry;
+    protected function getRegistry(): Horde_Registry
+    {
+        throw new LogicException(
+            static::class . ' must implement getRegistry() or pass $request to renderTemplate()'
+        );
+    }
 
     /**
      * Get PSR-7 URI factory instance
@@ -134,6 +163,23 @@ trait ResponsiveControllerTrait
     abstract protected function getStreamFactory(): StreamFactoryInterface;
 
     /**
+     * Resolve the Horde_Registry from a request attribute or getRegistry()
+     *
+     * Prefers the 'registry' attribute set by AppRouter middleware.
+     * Falls back to getRegistry() for legacy controllers.
+     */
+    private function resolveRegistry(?ServerRequestInterface $request = null): Horde_Registry
+    {
+        if ($request !== null) {
+            $registry = $request->getAttribute('registry');
+            if ($registry instanceof Horde_Registry) {
+                return $registry;
+            }
+        }
+        return $this->getRegistry();
+    }
+
+    /**
      * Render template with topbar and assets
      *
      * Automatically includes:
@@ -144,15 +190,19 @@ trait ResponsiveControllerTrait
      * @param string $template Template filename (e.g., 'browse.html.php')
      * @param array $data Template variables
      * @param array $extraJsFiles Additional JS files to load (optional)
+     * @param ServerRequestInterface|null $request Current request; when
+     *        provided the registry is resolved from the request attribute
+     *        and getRegistry() is not called.
      *
      * @return ResponseInterface HTTP response with rendered HTML
      */
     protected function renderTemplate(
         string $template,
         array $data,
-        array $extraJsFiles = []
+        array $extraJsFiles = [],
+        ?ServerRequestInterface $request = null,
     ): ResponseInterface {
-        $registry = $this->getRegistry();
+        $registry = $this->resolveRegistry($request);
         $responseFactory = $this->getResponseFactory();
 
         $data['cssUrls'] = $this->resolveCssUrls($registry);
@@ -166,8 +216,8 @@ trait ResponsiveControllerTrait
 
         $data['escape'] = [$view, 'escape'];
 
-        $data['url'] = function (string $path, array $params = []) {
-            return $this->buildUrl($path, $params);
+        $data['url'] = function (string $path, array $params = []) use ($request) {
+            return $this->buildUrl($path, $params, $request);
         };
 
         $view = new ResponsiveTemplateView($templatePath, $data);
@@ -247,19 +297,23 @@ trait ResponsiveControllerTrait
      *
      * @param string $path Path relative to app webroot (e.g., 'responsive/task/123')
      * @param array $params Optional query parameters
+     * @param ServerRequestInterface|null $request Current request (optional;
+     *        used to resolve the registry from request attributes)
      *
      * @return string Full URL string
      */
-    protected function buildUrl(string $path, array $params = []): string
-    {
-        $registry = $this->getRegistry();
+    protected function buildUrl(
+        string $path,
+        array $params = [],
+        ?ServerRequestInterface $request = null,
+    ): string {
+        $registry = $this->resolveRegistry($request);
         $uriFactory = $this->getUriFactory();
 
         $webroot = $registry->get('webroot', $registry->getApp());
         $uri = $uriFactory->createUri($webroot . '/' . ltrim($path, '/'));
 
         if (!empty($params)) {
-            // PSR-7 Uri is IMMUTABLE - with* methods return NEW instances
             $uri = $uri->withQuery(http_build_query($params));
         }
 

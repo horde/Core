@@ -154,6 +154,11 @@ class UriBuilder extends Uri implements UriBuilderInterface
         return $this->withPath($path);
     }
 
+    public function withQueryParams(array $params): static
+    {
+        return $this->withQuery(http_build_query($params));
+    }
+
     public function withSlug(string $slug): static
     {
         $currentPath = $this->getPath();

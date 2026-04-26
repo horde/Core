@@ -34,6 +34,8 @@ interface UriBuilderInterface extends UriInterface
 
     public function withNamedRoute(string $app, string $name, array $params = []): static;
 
+    public function withQueryParams(array $params): static;
+
     public function withSlug(string $slug): static;
 
     public function withPart(string $part): static;
