@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Test\Integration;
 
+use Horde\Core\Config\RegistryState;
 use Horde\Core\Middleware\AppFinder;
 use Horde\Core\Middleware\AppRouter;
 use Horde\Core\Middleware\AuthHordeSession;
@@ -185,7 +186,14 @@ class RampageIntegrationTest extends TestCase
         $appRouter = new AppRouter($registry, $router, $injector);
 
         // Create AppFinder
-        $appFinder = new AppFinder($registry, $this->responseFactory, $this->streamFactory);
+        $registryState = new RegistryState([
+            'testapp' => [
+                'status' => 'active',
+                'webroot' => '/testapp',
+                'fileroot' => $this->tempAppDir,
+            ],
+        ]);
+        $appFinder = new AppFinder($registryState, $this->responseFactory, $this->streamFactory);
 
         // Build full middleware stack
         $handler = new RampageRequestHandler(
@@ -303,7 +311,14 @@ class RampageIntegrationTest extends TestCase
         $appRouter = new AppRouter($registry, $router, $injector);
 
         // Create AppFinder
-        $appFinder = new AppFinder($registry, $this->responseFactory, $this->streamFactory);
+        $registryState = new RegistryState([
+            'testapp' => [
+                'status' => 'active',
+                'webroot' => '/testapp',
+                'fileroot' => $this->tempAppDir,
+            ],
+        ]);
+        $appFinder = new AppFinder($registryState, $this->responseFactory, $this->streamFactory);
 
         // Build full middleware stack
         $handler = new RampageRequestHandler(

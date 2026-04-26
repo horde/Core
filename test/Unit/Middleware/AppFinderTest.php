@@ -15,233 +15,145 @@ declare(strict_types=1);
 
 namespace Horde\Core\Test\Unit\Middleware;
 
-use Exception;
+use Horde\Core\Config\RegistryState;
 use Horde\Core\Middleware\AppFinder;
 use Horde\Http\ResponseFactory;
 use Horde\Http\StreamFactory;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
-use Horde_Registry;
 
 #[CoversClass(AppFinder::class)]
 class AppFinderTest extends TestCase
 {
     use SetUpTrait;
 
-    protected function getMiddleware()
+    private function buildState(array $apps, string $baseUrl): RegistryState
+    {
+        $definitions = [];
+        foreach ($apps as $app => $extra) {
+            if (is_int($app)) {
+                $app = $extra;
+                $extra = [];
+            }
+            $definitions[$app] = array_merge([
+                'status' => 'active',
+                'webroot' => $baseUrl . $app,
+            ], $extra);
+        }
+        return new RegistryState($definitions);
+    }
+
+    protected function getMiddleware(RegistryState $state): AppFinder
     {
         return new AppFinder(
-            $this->registry,
+            $state,
             new ResponseFactory(),
             new StreamFactory()
         );
     }
 
-    protected function getAssoc(array $list)
-    {
-        $assoc = [];
-        foreach ($list as $item) {
-            $assoc[$item] = [];
-        }
-        return $assoc;
-    }
-
-    /**
-     * This tests if the AppFinder finds a valid app in path
-     */
     public function testAppFound()
     {
         $baseUrl = 'https://example.ex/';
-        $app = 'bar';
-        $list = ['foobar', 'bla', 'foo', 'barfoo', 'bar'];
-        $requestUrl = $baseUrl . $app;
-        $registry = $this->createMock(Horde_Registry::class);
-        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
-        $request = $request->withAttribute('registry', $registry);
+        $state = $this->buildState(
+            ['foobar', 'bla', 'foo', 'barfoo', 'bar'],
+            $baseUrl
+        );
+        $request = $this->requestFactory->createServerRequest('GET', $baseUrl . 'bar');
 
-
-        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
-            return $baseUrl . $app;
-        });
-
-        $middleware = $this->getMiddleware();
+        $middleware = $this->getMiddleware($state);
         $middleware->process($request, $this->handler);
 
-        $foundApp = $this->recentlyHandledRequest->getAttribute('app');
-
-        $this->assertSame($app, $foundApp);
+        $this->assertSame('bar', $this->recentlyHandledRequest->getAttribute('app'));
     }
 
-    /**
-     * This tests if the Appfinder throws an exception if no app was found in path
-     */
     public function testNoValidAppInPath()
     {
         $baseUrl = 'https://example.ex/';
-        $app = 'amount';
-        $list = ['foobar', 'bla', 'foo', 'barfoo', 'bar'];
-        $requestUrl = $baseUrl . $app;
-        $registry = $this->createMock(Horde_Registry::class);
-        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
-        $request = $request->withAttribute('registry', $registry);
+        $state = $this->buildState(
+            ['foobar', 'bla', 'foo', 'barfoo', 'bar'],
+            $baseUrl
+        );
+        $request = $this->requestFactory->createServerRequest('GET', $baseUrl . 'amount');
 
-        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
-            return $baseUrl . $app;
-        });
-
-        $middleware = $this->getMiddleware();
-        //$this->expectException(Exception::class);
+        $middleware = $this->getMiddleware($state);
         $response = $middleware->process($request, $this->handler);
         $this->assertSame(404, $response->getStatusCode());
     }
 
-    /**
-     * This tests if the longest match path is the right app
-     */
     public function testLongestMatchPath()
     {
         $baseUrl = 'https://example.ex/';
-        $app = 'foobar';
-        $list = ['foobar', 'foo'];
-        $requestUrl = $baseUrl . $app;
-        $registry = $this->createMock(Horde_Registry::class);
-        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
-        $request = $request->withAttribute('registry', $registry);
+        $state = $this->buildState(['foobar', 'foo'], $baseUrl);
+        $request = $this->requestFactory->createServerRequest('GET', $baseUrl . 'foobar');
 
-        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
-            return $baseUrl . $app;
-        });
-
-        $middleware = $this->getMiddleware();
+        $middleware = $this->getMiddleware($state);
         $middleware->process($request, $this->handler);
 
-        $longestMatch = $this->recentlyHandledRequest->getAttribute('app');
-
-        $this->assertSame($app, $longestMatch);
+        $this->assertSame('foobar', $this->recentlyHandledRequest->getAttribute('app'));
     }
 
-    /**
-     * This tests the case when there are NO available apps
-     *
-     * Like the case of testNoAppFound() it will throw out the exception
-     */
     public function testNoAppAvailable()
     {
-        $baseUrl = 'https://example.ex/';
-        $app = 'amount';
-        $list = [];
-        $requestUrl = $baseUrl . $app;
-        $registry = $this->createMock(Horde_Registry::class);
-        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
-        $request = $request->withAttribute('registry', $registry);
+        $state = new RegistryState([]);
+        $request = $this->requestFactory->createServerRequest('GET', 'https://example.ex/amount');
 
-        $registry->expects($this->once())->method('listApps')->willReturn($list);
-        // get() not called when list is empty - no apps to check
-        $registry->expects($this->never())->method('get');
-
-        $middleware = $this->getMiddleware();
+        $middleware = $this->getMiddleware($state);
         $response = $middleware->process($request, $this->handler);
         $this->assertSame(404, $response->getStatusCode());
     }
 
-    /**
-     * This tests if the routerprefix attribute is set properly
-     */
     public function testRouterPrefixAttribute()
     {
         $baseUrl = 'https://example.ex/';
-        $app = 'barfoo';
-        $list = ['foobar', 'bla', 'foo', 'barfoo', 'bar'];
-        $requestUrl = $baseUrl . $app;
-        $registry = $this->createMock(Horde_Registry::class);
-        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
-        $request = $request->withAttribute('registry', $registry);
+        $state = $this->buildState(
+            ['foobar', 'bla', 'foo', 'barfoo', 'bar'],
+            $baseUrl
+        );
+        $request = $this->requestFactory->createServerRequest('GET', $baseUrl . 'barfoo');
 
-        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
-            return $baseUrl . $app;
-        });
-
-        $middleware = $this->getMiddleware();
+        $middleware = $this->getMiddleware($state);
         $middleware->process($request, $this->handler);
 
-        $routerPrefix = $this->recentlyHandledRequest->getAttribute('routerPrefix');
-
-        $this->assertSame('/barfoo', $routerPrefix);
+        $this->assertSame('/barfoo', $this->recentlyHandledRequest->getAttribute('routerPrefix'));
     }
 
-    /**
-     * This tests if the AppFinder will return the exception when the scheme is different
-     */
     public function testDifferntScheme()
     {
-        $baseUrl = 'https://example.ex/';
-        $baseUrlWithHttp = 'http://example.ex/';
-        $app = 'bar';
-        $list = ['foobar', 'bla', 'foo', 'barfoo', 'bar'];
-        $requestUrl = $baseUrl . $app;
-        $registry = $this->createMock(Horde_Registry::class);
-        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
-        $request = $request->withAttribute('registry', $registry);
+        $state = $this->buildState(
+            ['foobar', 'bla', 'foo', 'barfoo', 'bar'],
+            'http://example.ex/'
+        );
+        $request = $this->requestFactory->createServerRequest('GET', 'https://example.ex/bar');
 
-        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrlWithHttp) {
-            return $baseUrlWithHttp . $app;
-        });
-
-        $middleware = $this->getMiddleware();
-
+        $middleware = $this->getMiddleware($state);
         $response = $middleware->process($request, $this->handler);
         $this->assertSame(404, $response->getStatusCode());
     }
 
-    /**
-     * This tests if the AppFinder will return the exception when the host is different
-     */
     public function testDifferentHost()
     {
-        $baseUrl = 'https://example.ex/';
-        $baseUrlWithDifferentHost = 'http://test.ex/';
-        $app = 'bar';
-        $list = ['foobar', 'bla', 'foo', 'barfoo', 'bar'];
-        $requestUrl = $baseUrl . $app;
-        $registry = $this->createMock(Horde_Registry::class);
-        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
-        $request = $request->withAttribute('registry', $registry);
+        $state = $this->buildState(
+            ['foobar', 'bla', 'foo', 'barfoo', 'bar'],
+            'http://test.ex/'
+        );
+        $request = $this->requestFactory->createServerRequest('GET', 'https://example.ex/bar');
 
-        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrlWithDifferentHost) {
-            return $baseUrlWithDifferentHost . $app;
-        });
-
-        $middleware = $this->getMiddleware();
-
+        $middleware = $this->getMiddleware($state);
         $response = $middleware->process($request, $this->handler);
         $this->assertSame(404, $response->getStatusCode());
     }
 
-
-    /**
-     * This tests the case when the path is empty
-     */
     public function testEmptyPath()
     {
         $baseUrl = 'https://example.ex/';
-        $list = ['foobar', 'bla', 'foo', 'barfoo', 'bar'];
-        $requestUrl = $baseUrl;
-        $registry = $this->createMock(Horde_Registry::class);
-        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
-        $request = $request->withAttribute('registry', $registry);
+        $state = $this->buildState(
+            ['foobar', 'bla', 'foo', 'barfoo', 'bar'],
+            $baseUrl
+        );
+        $request = $this->requestFactory->createServerRequest('GET', $baseUrl);
 
-        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
-            return $baseUrl . $app;
-        });
-
-        $middleware = $this->getMiddleware();
+        $middleware = $this->getMiddleware($state);
         $response = $middleware->process($request, $this->handler);
         $this->assertSame(404, $response->getStatusCode());
     }
@@ -249,96 +161,82 @@ class AppFinderTest extends TestCase
     public function testFindAppBehindDifferentApp()
     {
         $baseUrl = 'https://example.ex/';
-        $list = ['foobar', 'bla', 'foo', 'barfoo', 'bar'];
-        $app = 'bla';
-        $requestUrl = $baseUrl . 'foo' . '/bla/xyz';
-        $registry = $this->createMock(Horde_Registry::class);
-        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
-        $request = $request->withAttribute('registry', $registry);
+        $state = $this->buildState([
+            'foobar',
+            'foo',
+            'barfoo',
+            'bar',
+            'bla' => ['webroot' => $baseUrl . 'foo/bla'],
+        ], $baseUrl);
+        $request = $this->requestFactory->createServerRequest('GET', $baseUrl . 'foo/bla/xyz');
 
-        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
-            if ($app === 'bla') {
-                return $baseUrl . 'foo' . '/bla';
-            } else {
-                return $baseUrl . $app;
-            }
-        });
-
-        $middleware = $this->getMiddleware();
+        $middleware = $this->getMiddleware($state);
         $middleware->process($request, $this->handler);
-        $foundApp = $this->recentlyHandledRequest->getAttribute('app');
 
-        $this->assertSame($app, $foundApp);
+        $this->assertSame('bla', $this->recentlyHandledRequest->getAttribute('app'));
     }
 
     public function testFindAppInDocRoot()
     {
         $baseUrl = 'https://example.ex/';
-        $list = ['foobar', 'bla', 'foo', 'barfoo', 'bar'];
-        $app = 'bla';
-        $requestUrl = $baseUrl;
-        $registry = $this->createMock(Horde_Registry::class);
-        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
-        $request = $request->withAttribute('registry', $registry);
+        $state = $this->buildState([
+            'foobar',
+            'foo',
+            'barfoo',
+            'bar',
+            'bla' => ['webroot' => $baseUrl],
+        ], $baseUrl);
+        $request = $this->requestFactory->createServerRequest('GET', $baseUrl);
 
-        $registry->expects($this->once())->method('listApps')->willReturn($this->getAssoc($list));
-        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
-            if ($app === 'bla') {
-                return $baseUrl;
-            } else {
-                return $baseUrl . $app;
-            }
-        });
-
-        $middleware = $this->getMiddleware();
+        $middleware = $this->getMiddleware($state);
         $middleware->process($request, $this->handler);
-        $foundApp = $this->recentlyHandledRequest->getAttribute('app');
 
-        $this->assertSame($app, $foundApp);
+        $this->assertSame('bla', $this->recentlyHandledRequest->getAttribute('app'));
     }
 
     public function testFindWebrootAlias()
     {
         $baseUrl = 'https://example.ex/';
-        $app = 'bar';
-        $requestUrl = $baseUrl . 'barV2';
-        $registry = $this->createMock(Horde_Registry::class);
-        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
-        $request = $request->withAttribute('registry', $registry);
-
-        $registry->expects($this->once())->method('listApps')->willReturn([
-            'foobar' => [],
-            'bar' => ['webroot_aliases' => [$baseUrl . '/barV2']],
+        $state = new RegistryState([
+            'foobar' => ['status' => 'active', 'webroot' => $baseUrl . 'foobar'],
+            'bar' => [
+                'status' => 'active',
+                'webroot' => $baseUrl . 'bar',
+                'webroot_aliases' => [$baseUrl . '/barV2'],
+            ],
         ]);
-        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
-            return $baseUrl . $app;
-        });
+        $request = $this->requestFactory->createServerRequest('GET', $baseUrl . 'barV2');
 
-        $middleware = $this->getMiddleware();
+        $middleware = $this->getMiddleware($state);
         $middleware->process($request, $this->handler);
-        $foundApp = $this->recentlyHandledRequest->getAttribute('app');
 
-        $this->assertSame($app, $foundApp);
+        $this->assertSame('bar', $this->recentlyHandledRequest->getAttribute('app'));
     }
 
     public function testDoNotFindWithoutAlias()
     {
         $baseUrl = 'https://example.ex/';
-        $requestUrl = $baseUrl . 'barV2';
-        $registry = $this->createMock(Horde_Registry::class);
-        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
-        $request = $request->withAttribute('registry', $registry);
-
-        $registry->expects($this->once())->method('listApps')->willReturn([
-            'foobar' => [],
-            'bar' => [],
+        $state = new RegistryState([
+            'foobar' => ['status' => 'active', 'webroot' => $baseUrl . 'foobar'],
+            'bar' => ['status' => 'active', 'webroot' => $baseUrl . 'bar'],
         ]);
-        $registry->expects($this->atLeastOnce())->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
-            return $baseUrl . $app;
-        });
+        $request = $this->requestFactory->createServerRequest('GET', $baseUrl . 'barV2');
 
-        $middleware = $this->getMiddleware();
+        $middleware = $this->getMiddleware($state);
+        $response = $middleware->process($request, $this->handler);
+        $this->assertSame(404, $response->getStatusCode());
+    }
+
+    public function testInactiveAppsAreSkipped()
+    {
+        $baseUrl = 'https://example.ex/';
+        $state = new RegistryState([
+            'foo' => ['status' => 'active', 'webroot' => $baseUrl . 'foo'],
+            'bar' => ['status' => 'inactive', 'webroot' => $baseUrl . 'bar'],
+        ]);
+        $request = $this->requestFactory->createServerRequest('GET', $baseUrl . 'bar');
+
+        $middleware = $this->getMiddleware($state);
         $response = $middleware->process($request, $this->handler);
         $this->assertSame(404, $response->getStatusCode());
     }

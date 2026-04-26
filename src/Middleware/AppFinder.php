@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Middleware;
 
-use Exception;
+use Horde\Core\Config\RegistryState;
 use Horde\Core\Horde;
 use Horde\Http\ResponseFactory;
 use Horde\Http\StreamFactory;
@@ -13,39 +13,24 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Horde_Log;
-use Horde_Registry;
 
 /**
  * AppFinder middleware
  *
- * Purpose:
- *
- * Scan through the Registry to find the correct app for the route
- * Setup attributes to enable the app-specific router middleware
- *
- * Requires Attributes:
+ * Scan through the RegistryState to find the correct app for the route.
+ * Sets request attributes to enable the app-specific router middleware.
  *
  * Sets Attributes:
  * - app
- * - prefix
- *
- *
+ * - routerPrefix
  */
 class AppFinder implements MiddlewareInterface
 {
-    private Horde_Registry $registry;
-    private ResponseFactory $responseFactory;
-    private StreamFactory $streamFactory;
-
     public function __construct(
-        Horde_Registry $registry,
-        ResponseFactory $responseFactory,
-        StreamFactory $streamFactory
-    ) {
-        $this->registry = $registry;
-        $this->responseFactory = $responseFactory;
-        $this->streamFactory = $streamFactory;
-    }
+        private readonly RegistryState $registryState,
+        private readonly ResponseFactory $responseFactory,
+        private readonly StreamFactory $streamFactory,
+    ) {}
     /**
      * Rebuild a path string to a common form
      *
@@ -88,26 +73,30 @@ class AppFinder implements MiddlewareInterface
      * - app lives in document root (https://webmail.foo.org is imp)
      * - app lives below horde but document root is another app
      *    eg https://webmail.foo.org where / is imp, /horde is horde, /horde/turba is turba
-     *
-     * @param ServerRequestInterface $request    Request object
-     * @param Horde_Registry  $registry    The Horde Registry
      */
-    protected function identifyApp(ServerRequestInterface $request, Horde_Registry $registry)
+    protected function identifyApp(ServerRequestInterface $request): array
     {
         $matches = [];
         $scheme = $request->getUri()->getScheme();
         $host = $request->getUri()->getHost();
         $path = $request->getUri()->getPath();
-        // listApps() would return empty on unauthenticated access
-        foreach ($registry->listApps(null, true, null) as $app => $config) {
+        $hordeConfig = $this->registryState->getApplication('horde');
+
+        foreach ($this->registryState->toArray() as $app => $config) {
+            $status = $config['status'] ?? 'inactive';
+            if (!in_array($status, ['active', 'notoolbar'])) {
+                continue;
+            }
+
             $default = [
                 'scheme' => $scheme,
                 'host' => $host,
                 'path' => '',
                 'app' => $app,
             ];
-            $webroots = [];
-            $webroots[] = $registry->get('webroot', $app);
+
+            $webroot = $config['webroot'] ?? $hordeConfig['webroot'] ?? null;
+            $webroots = $webroot !== null ? [$webroot] : [];
 
             $webrootAliases = $config['webroot_aliases'] ?? null;
             if (is_array($webrootAliases)) {
@@ -117,7 +106,6 @@ class AppFinder implements MiddlewareInterface
             foreach ($webroots as $webroot) {
                 $applicationUrl = array_merge($default, parse_url($webroot));
                 $appPath = $applicationUrl['path'] = $this->_normalize($applicationUrl['path']);
-                // sort out cases with wrong host or scheme
                 if ($scheme != $applicationUrl['scheme']) {
                     continue;
                 }
@@ -125,17 +113,15 @@ class AppFinder implements MiddlewareInterface
                     continue;
                 }
 
-                // does the path match at all?
                 if ($this->matchesAppPath($appPath, $path)) {
                     $matches[] = $applicationUrl;
                 }
             }
         }
-        // No matches, return early
+
         if (count($matches) == 0) {
-            return $matches;
+            return [];
         }
-        // Longest match path *should* always be the right app
         usort(
             $matches,
             function ($a, $b) {
@@ -175,11 +161,8 @@ class AppFinder implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $registry = $request->getAttribute('registry');
+        $found = $this->identifyApp($request);
 
-        $found = $this->identifyApp($request, $registry);
-
-        // If we still found no app, give up
         if (empty($found)) {
             $path = $request->getUri()->getPath();
             $msg = sprintf('No App found for path: %s', $path);

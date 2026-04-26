@@ -6,10 +6,9 @@ namespace Horde\Core\Test\Unit\Assets;
 
 use Horde\Core\Assets\ResponsiveAssets;
 use Horde\Core\Assets\ResponsiveAssetsFilesystem;
+use Horde\Core\Config\RegistryState;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
-use Horde_Registry;
-use Exception;
 use Horde_Prefs;
 
 /**
@@ -27,45 +26,38 @@ use Horde_Prefs;
 #[CoversClass(ResponsiveAssets::class)]
 class ResponsiveAssetsTest extends TestCase
 {
-    private $registryStub;
-    private $filesystemStub;
+    private ResponsiveAssetsFilesystem $filesystemStub;
 
     protected function setUp(): void
     {
-        $this->registryStub = $this->createStub(Horde_Registry::class);
         $this->filesystemStub = $this->createStub(ResponsiveAssetsFilesystem::class);
+    }
+
+    private function buildState(array $apps): RegistryState
+    {
+        return new RegistryState($apps);
     }
 
     public function testGetCssUrlsHordeOnly(): void
     {
-        // Setup registry stub
-        $this->registryStub->method('get')
-            ->willReturnCallback(function ($key, $app) {
-                if ($key === 'themesfs' && $app === 'horde') {
-                    return '/horde/themes';
-                }
-                if ($key === 'themesuri' && $app === 'horde') {
-                    return '/themes/horde';
-                }
-                return null;
-            });
+        $state = $this->buildState([
+            'horde' => [
+                'status' => 'active',
+                'webroot' => '/horde',
+                'fileroot' => '/horde',
+                'themesfs' => '/horde/themes',
+                'themesuri' => '/themes/horde',
+            ],
+        ]);
 
-        $this->registryStub->method('getApp')
-            ->willReturn('horde');
-
-        // Setup filesystem stub - file exists
         $this->filesystemStub->method('fileExists')
             ->willReturnCallback(function ($path) {
                 return $path === '/horde/themes/default/responsive.css';
             });
 
-        // Create assets helper
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $urls = $assets->getCssUrls('horde', 'default');
 
-        // Get CSS URLs
-        $urls = $assets->getCssUrls('default', 'horde');
-
-        // Verify
         $this->assertIsArray($urls);
         $this->assertCount(1, $urls);
         $this->assertEquals('/themes/horde/default/responsive.css', $urls[0]);
@@ -73,31 +65,27 @@ class ResponsiveAssetsTest extends TestCase
 
     public function testGetCssUrlsWithAppCascade(): void
     {
-        // Setup: Both horde and kronolith have responsive.css
-        $this->registryStub->method('get')
-            ->willReturnCallback(function ($key, $app) {
-                if ($key === 'themesfs') {
-                    return $app === 'horde' ? '/horde/themes' : '/kronolith/themes';
-                }
-                if ($key === 'themesuri') {
-                    return $app === 'horde' ? '/themes/horde' : '/themes/kronolith';
-                }
-                return null;
-            });
+        $state = $this->buildState([
+            'horde' => [
+                'status' => 'active',
+                'themesfs' => '/horde/themes',
+                'themesuri' => '/themes/horde',
+            ],
+            'kronolith' => [
+                'status' => 'active',
+                'themesfs' => '/kronolith/themes',
+                'themesuri' => '/themes/kronolith',
+            ],
+        ]);
 
-        $this->registryStub->method('getApp')
-            ->willReturn('kronolith');
-
-        // Both files exist
         $this->filesystemStub->method('fileExists')
             ->willReturnCallback(function ($path) {
                 return str_contains($path, 'responsive.css');
             });
 
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
-        $urls = $assets->getCssUrls('default', 'kronolith');
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $urls = $assets->getCssUrls('kronolith', 'default');
 
-        // Verify cascade order: horde first, app second
         $this->assertCount(2, $urls);
         $this->assertEquals('/themes/horde/default/responsive.css', $urls[0]);
         $this->assertEquals('/themes/kronolith/default/responsive.css', $urls[1]);
@@ -105,81 +93,68 @@ class ResponsiveAssetsTest extends TestCase
 
     public function testGetCssUrlsFileNotFound(): void
     {
-        // Setup: File doesn't exist
+        $state = $this->buildState([
+            'horde' => [
+                'status' => 'active',
+                'themesfs' => '/horde/themes',
+                'themesuri' => '/themes/horde',
+            ],
+        ]);
+
         $this->filesystemStub->method('fileExists')
             ->willReturn(false);
 
-        $this->registryStub->method('get')
-            ->willReturn('/horde/themes');
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $urls = $assets->getCssUrls('horde', 'default');
 
-        $this->registryStub->method('getApp')
-            ->willReturn('horde');
-
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
-        $urls = $assets->getCssUrls('default', 'horde');
-
-        // No URLs returned when files don't exist
         $this->assertEmpty($urls);
     }
 
     public function testGetCssUrlsOnlyAppFileExists(): void
     {
-        // Setup: Only app file exists, not horde base
-        $this->registryStub->method('get')
-            ->willReturnCallback(function ($key, $app) {
-                if ($key === 'themesfs') {
-                    return $app === 'horde' ? '/horde/themes' : '/kronolith/themes';
-                }
-                if ($key === 'themesuri') {
-                    return $app === 'horde' ? '/themes/horde' : '/themes/kronolith';
-                }
-                return null;
-            });
+        $state = $this->buildState([
+            'horde' => [
+                'status' => 'active',
+                'themesfs' => '/horde/themes',
+                'themesuri' => '/themes/horde',
+            ],
+            'kronolith' => [
+                'status' => 'active',
+                'themesfs' => '/kronolith/themes',
+                'themesuri' => '/themes/kronolith',
+            ],
+        ]);
 
-        $this->registryStub->method('getApp')
-            ->willReturn('kronolith');
-
-        // Only kronolith file exists
         $this->filesystemStub->method('fileExists')
             ->willReturnCallback(function ($path) {
                 return str_contains($path, '/kronolith/');
             });
 
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
-        $urls = $assets->getCssUrls('default', 'kronolith');
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $urls = $assets->getCssUrls('kronolith', 'default');
 
-        // Only app URL returned
         $this->assertCount(1, $urls);
         $this->assertEquals('/themes/kronolith/default/responsive.css', $urls[0]);
     }
 
     public function testGetJsUrlsHordeOnly(): void
     {
-        // Setup registry mock
-        $this->registryStub->method('get')
-            ->willReturnCallback(function ($key, $app) {
-                if ($key === 'jsfs' && $app === 'horde') {
-                    return '/horde/js';
-                }
-                if ($key === 'jsuri' && $app === 'horde') {
-                    return '/js/horde';
-                }
-                return null;
-            });
+        $state = $this->buildState([
+            'horde' => [
+                'status' => 'active',
+                'jsfs' => '/horde/js',
+                'jsuri' => '/js/horde',
+            ],
+        ]);
 
-        $this->registryStub->method('getApp')
-            ->willReturn('horde');
-
-        // File exists
         $this->filesystemStub->method('fileExists')
             ->willReturnCallback(function ($path) {
                 return $path === '/horde/js/login-form.js';
             });
 
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
-        $urls = $assets->getJsUrls(['login-form.js'], 'horde');
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $urls = $assets->getJsUrls('horde', ['login-form.js']);
 
-        // Verify
         $this->assertIsArray($urls);
         $this->assertCount(1, $urls);
         $this->assertEquals('/js/horde/login-form.js', $urls[0]);
@@ -187,29 +162,25 @@ class ResponsiveAssetsTest extends TestCase
 
     public function testGetJsUrlsWithAppCascade(): void
     {
-        // Setup: Both horde and kronolith have calendar.js
-        $this->registryStub->method('get')
-            ->willReturnCallback(function ($key, $app) {
-                if ($key === 'jsfs') {
-                    return $app === 'horde' ? '/horde/js' : '/kronolith/js';
-                }
-                if ($key === 'jsuri') {
-                    return $app === 'horde' ? '/js/horde' : '/js/kronolith';
-                }
-                return null;
-            });
+        $state = $this->buildState([
+            'horde' => [
+                'status' => 'active',
+                'jsfs' => '/horde/js',
+                'jsuri' => '/js/horde',
+            ],
+            'kronolith' => [
+                'status' => 'active',
+                'jsfs' => '/kronolith/js',
+                'jsuri' => '/js/kronolith',
+            ],
+        ]);
 
-        $this->registryStub->method('getApp')
-            ->willReturn('kronolith');
-
-        // Both files exist
         $this->filesystemStub->method('fileExists')
             ->willReturn(true);
 
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
-        $urls = $assets->getJsUrls(['calendar.js'], 'kronolith');
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $urls = $assets->getJsUrls('kronolith', ['calendar.js']);
 
-        // Verify cascade: horde first, app second
         $this->assertCount(2, $urls);
         $this->assertEquals('/js/horde/calendar.js', $urls[0]);
         $this->assertEquals('/js/kronolith/calendar.js', $urls[1]);
@@ -217,29 +188,20 @@ class ResponsiveAssetsTest extends TestCase
 
     public function testGetJsUrlsMultipleFiles(): void
     {
-        // Setup
-        $this->registryStub->method('get')
-            ->willReturnCallback(function ($key, $app) {
-                if ($key === 'jsfs') {
-                    return '/horde/js';
-                }
-                if ($key === 'jsuri') {
-                    return '/js/horde';
-                }
-                return null;
-            });
+        $state = $this->buildState([
+            'horde' => [
+                'status' => 'active',
+                'jsfs' => '/horde/js',
+                'jsuri' => '/js/horde',
+            ],
+        ]);
 
-        $this->registryStub->method('getApp')
-            ->willReturn('horde');
-
-        // All files exist
         $this->filesystemStub->method('fileExists')
             ->willReturn(true);
 
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
-        $urls = $assets->getJsUrls(['file1.js', 'file2.js', 'file3.js'], 'horde');
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $urls = $assets->getJsUrls('horde', ['file1.js', 'file2.js', 'file3.js']);
 
-        // All URLs returned
         $this->assertCount(3, $urls);
         $this->assertEquals('/js/horde/file1.js', $urls[0]);
         $this->assertEquals('/js/horde/file2.js', $urls[1]);
@@ -248,22 +210,22 @@ class ResponsiveAssetsTest extends TestCase
 
     public function testGetJsUrlsEmptyArray(): void
     {
-        $this->registryStub->method('getApp')
-            ->willReturn('horde');
+        $state = $this->buildState([
+            'horde' => ['status' => 'active'],
+        ]);
 
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
-        $urls = $assets->getJsUrls([], 'horde');
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $urls = $assets->getJsUrls('horde', []);
 
-        // No JS files requested, empty array returned
         $this->assertEmpty($urls);
     }
 
     public function testGetTheme(): void
     {
-        // No preferences set, should return 'default'
         $GLOBALS['prefs'] = null;
+        $state = $this->buildState(['horde' => ['status' => 'active']]);
 
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
         $theme = $assets->getTheme();
 
         $this->assertEquals('default', $theme);
@@ -271,7 +233,6 @@ class ResponsiveAssetsTest extends TestCase
 
     public function testGetThemeWithPreference(): void
     {
-        // Stub preferences
         $prefsStub = $this->createStub(Horde_Prefs::class);
         $prefsStub->method('getValue')
             ->willReturnCallback(function ($key) {
@@ -279,240 +240,240 @@ class ResponsiveAssetsTest extends TestCase
             });
 
         $GLOBALS['prefs'] = $prefsStub;
+        $state = $this->buildState(['horde' => ['status' => 'active']]);
 
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
         $theme = $assets->getTheme();
 
         $this->assertEquals('dark', $theme);
 
-        // Cleanup
         unset($GLOBALS['prefs']);
     }
 
-    public function testCssFileExistsHandlesException(): void
+    public function testCssUrlsWithMissingRegistryParam(): void
     {
-        // Registry throws exception
-        $this->registryStub->method('get')
-            ->willThrowException(new Exception('Registry error'));
+        $state = $this->buildState([
+            'horde' => ['status' => 'active'],
+        ]);
 
-        $this->registryStub->method('getApp')
-            ->willReturn('horde');
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $urls = $assets->getCssUrls('horde', 'default');
 
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
-        $urls = $assets->getCssUrls('default', 'horde');
-
-        // Should gracefully handle exception and return empty array
         $this->assertEmpty($urls);
     }
 
-    public function testJsFileExistsHandlesException(): void
+    public function testJsUrlsWithMissingRegistryParam(): void
     {
-        // Registry throws exception
-        $this->registryStub->method('get')
-            ->willThrowException(new Exception('Registry error'));
+        $state = $this->buildState([
+            'horde' => ['status' => 'active'],
+        ]);
 
-        $this->registryStub->method('getApp')
-            ->willReturn('horde');
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $urls = $assets->getJsUrls('horde', ['test.js']);
 
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
-        $urls = $assets->getJsUrls(['test.js'], 'horde');
-
-        // Should gracefully handle exception and return empty array
         $this->assertEmpty($urls);
     }
 
     public function testGetGraphicUrlAppThemeFirst(): void
     {
-        // App selected theme graphic exists → return it immediately
-        $this->registryStub->method('get')
-            ->willReturnCallback(function ($key, $app) {
-                if ($key === 'themesfs') {
-                    return $app === 'horde' ? '/horde/themes' : '/jonah/themes';
-                }
-                if ($key === 'themesuri') {
-                    return $app === 'horde' ? '/themes/horde' : '/themes/jonah';
-                }
-                return null;
-            });
+        $state = $this->buildState([
+            'horde' => [
+                'status' => 'active',
+                'themesfs' => '/horde/themes',
+                'themesuri' => '/themes/horde',
+            ],
+            'jonah' => [
+                'status' => 'active',
+                'themesfs' => '/jonah/themes',
+                'themesuri' => '/themes/jonah',
+            ],
+        ]);
 
-        $this->registryStub->method('getApp')
-            ->willReturn('jonah');
-
-        // Only app selected theme file exists
         $this->filesystemStub->method('fileExists')
             ->willReturnCallback(function ($path) {
                 return $path === '/jonah/themes/dark/graphics/new.png';
             });
 
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
-        $url = $assets->getGraphicUrl('new.png', 'dark', 'jonah');
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $url = $assets->getGraphicUrl('new.png', 'jonah', 'dark');
 
         $this->assertEquals('/themes/jonah/dark/graphics/new.png', $url);
     }
 
     public function testGetGraphicUrlFallsToAppDefault(): void
     {
-        // App selected theme missing → fall back to app default theme
-        $this->registryStub->method('get')
-            ->willReturnCallback(function ($key, $app) {
-                if ($key === 'themesfs') {
-                    return $app === 'horde' ? '/horde/themes' : '/jonah/themes';
-                }
-                if ($key === 'themesuri') {
-                    return $app === 'horde' ? '/themes/horde' : '/themes/jonah';
-                }
-                return null;
-            });
-
-        $this->registryStub->method('getApp')
-            ->willReturn('jonah');
+        $state = $this->buildState([
+            'horde' => [
+                'status' => 'active',
+                'themesfs' => '/horde/themes',
+                'themesuri' => '/themes/horde',
+            ],
+            'jonah' => [
+                'status' => 'active',
+                'themesfs' => '/jonah/themes',
+                'themesuri' => '/themes/jonah',
+            ],
+        ]);
 
         $this->filesystemStub->method('fileExists')
             ->willReturnCallback(function ($path) {
                 return $path === '/jonah/themes/default/graphics/new.png';
             });
 
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
-        $url = $assets->getGraphicUrl('new.png', 'dark', 'jonah');
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $url = $assets->getGraphicUrl('new.png', 'jonah', 'dark');
 
         $this->assertEquals('/themes/jonah/default/graphics/new.png', $url);
     }
 
     public function testGetGraphicUrlFallsToHordeTheme(): void
     {
-        // No app graphic → fall back to horde selected theme
-        $this->registryStub->method('get')
-            ->willReturnCallback(function ($key, $app) {
-                if ($key === 'themesfs') {
-                    return $app === 'horde' ? '/horde/themes' : '/jonah/themes';
-                }
-                if ($key === 'themesuri') {
-                    return $app === 'horde' ? '/themes/horde' : '/themes/jonah';
-                }
-                return null;
-            });
-
-        $this->registryStub->method('getApp')
-            ->willReturn('jonah');
+        $state = $this->buildState([
+            'horde' => [
+                'status' => 'active',
+                'themesfs' => '/horde/themes',
+                'themesuri' => '/themes/horde',
+            ],
+            'jonah' => [
+                'status' => 'active',
+                'themesfs' => '/jonah/themes',
+                'themesuri' => '/themes/jonah',
+            ],
+        ]);
 
         $this->filesystemStub->method('fileExists')
             ->willReturnCallback(function ($path) {
                 return $path === '/horde/themes/dark/graphics/edit.png';
             });
 
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
-        $url = $assets->getGraphicUrl('edit.png', 'dark', 'jonah');
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $url = $assets->getGraphicUrl('edit.png', 'jonah', 'dark');
 
         $this->assertEquals('/themes/horde/dark/graphics/edit.png', $url);
     }
 
     public function testGetGraphicUrlFallsToHordeDefault(): void
     {
-        // Nothing else found → horde default theme as ultimate fallback
-        $this->registryStub->method('get')
-            ->willReturnCallback(function ($key, $app) {
-                if ($key === 'themesfs') {
-                    return $app === 'horde' ? '/horde/themes' : '/jonah/themes';
-                }
-                if ($key === 'themesuri') {
-                    return $app === 'horde' ? '/themes/horde' : '/themes/jonah';
-                }
-                return null;
-            });
-
-        $this->registryStub->method('getApp')
-            ->willReturn('jonah');
+        $state = $this->buildState([
+            'horde' => [
+                'status' => 'active',
+                'themesfs' => '/horde/themes',
+                'themesuri' => '/themes/horde',
+            ],
+            'jonah' => [
+                'status' => 'active',
+                'themesfs' => '/jonah/themes',
+                'themesuri' => '/themes/jonah',
+            ],
+        ]);
 
         $this->filesystemStub->method('fileExists')
             ->willReturnCallback(function ($path) {
                 return $path === '/horde/themes/default/graphics/edit.png';
             });
 
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
-        $url = $assets->getGraphicUrl('edit.png', 'default', 'jonah');
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $url = $assets->getGraphicUrl('edit.png', 'jonah', 'default');
 
         $this->assertEquals('/themes/horde/default/graphics/edit.png', $url);
     }
 
     public function testGetGraphicUrlReturnsEmptyWhenNotFound(): void
     {
-        $this->registryStub->method('get')
-            ->willReturnCallback(function ($key, $app) {
-                if ($key === 'themesfs') {
-                    return '/themes-fs/' . $app;
-                }
-                if ($key === 'themesuri') {
-                    return '/themes/' . $app;
-                }
-                return null;
-            });
+        $state = $this->buildState([
+            'horde' => [
+                'status' => 'active',
+                'themesfs' => '/themes-fs/horde',
+                'themesuri' => '/themes/horde',
+            ],
+            'jonah' => [
+                'status' => 'active',
+                'themesfs' => '/themes-fs/jonah',
+                'themesuri' => '/themes/jonah',
+            ],
+        ]);
 
-        $this->registryStub->method('getApp')
-            ->willReturn('jonah');
-
-        // No files exist
         $this->filesystemStub->method('fileExists')
             ->willReturn(false);
 
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
-        $url = $assets->getGraphicUrl('missing.png', 'default', 'jonah');
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $url = $assets->getGraphicUrl('missing.png', 'jonah', 'default');
 
         $this->assertSame('', $url);
     }
 
     public function testGetGraphicUrlHordeAppSkipsAppCandidates(): void
     {
-        // When app is 'horde', only horde candidates are checked
-        $this->registryStub->method('get')
-            ->willReturnCallback(function ($key, $app) {
-                if ($key === 'themesfs') {
-                    return '/horde/themes';
-                }
-                if ($key === 'themesuri') {
-                    return '/themes/horde';
-                }
-                return null;
-            });
-
-        $this->registryStub->method('getApp')
-            ->willReturn('horde');
+        $state = $this->buildState([
+            'horde' => [
+                'status' => 'active',
+                'themesfs' => '/horde/themes',
+                'themesuri' => '/themes/horde',
+            ],
+        ]);
 
         $this->filesystemStub->method('fileExists')
             ->willReturnCallback(function ($path) {
                 return $path === '/horde/themes/default/graphics/logo.png';
             });
 
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
-        $url = $assets->getGraphicUrl('logo.png', 'default', 'horde');
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $url = $assets->getGraphicUrl('logo.png', 'horde', 'default');
 
         $this->assertEquals('/themes/horde/default/graphics/logo.png', $url);
     }
 
     public function testGetGraphicUrlSubdirectory(): void
     {
-        // Supports subdirectories like 'mime/pdf.png'
-        $this->registryStub->method('get')
-            ->willReturnCallback(function ($key, $app) {
-                if ($key === 'themesfs') {
-                    return '/jonah/themes';
-                }
-                if ($key === 'themesuri') {
-                    return '/themes/jonah';
-                }
-                return null;
-            });
-
-        $this->registryStub->method('getApp')
-            ->willReturn('jonah');
+        $state = $this->buildState([
+            'horde' => [
+                'status' => 'active',
+                'themesfs' => '/horde/themes',
+                'themesuri' => '/themes/horde',
+            ],
+            'jonah' => [
+                'status' => 'active',
+                'themesfs' => '/jonah/themes',
+                'themesuri' => '/themes/jonah',
+            ],
+        ]);
 
         $this->filesystemStub->method('fileExists')
             ->willReturnCallback(function ($path) {
                 return $path === '/jonah/themes/default/graphics/mime/pdf.png';
             });
 
-        $assets = new ResponsiveAssets($this->registryStub, $this->filesystemStub);
-        $url = $assets->getGraphicUrl('mime/pdf.png', 'default', 'jonah');
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $url = $assets->getGraphicUrl('mime/pdf.png', 'jonah', 'default');
 
         $this->assertEquals('/themes/jonah/default/graphics/mime/pdf.png', $url);
+    }
+
+    public function testGetParamFallsBackToHorde(): void
+    {
+        $state = $this->buildState([
+            'horde' => [
+                'status' => 'active',
+                'jsfs' => '/horde/js',
+                'jsuri' => '/js/horde',
+            ],
+            'nag' => [
+                'status' => 'active',
+            ],
+        ]);
+
+        $this->filesystemStub->method('fileExists')
+            ->willReturnCallback(function ($path) {
+                return $path === '/horde/js/test.js';
+            });
+
+        $assets = new ResponsiveAssets($state, $this->filesystemStub);
+        $urls = $assets->getJsUrls('nag', ['test.js']);
+
+        // Both horde and nag resolve to horde's jsuri (nag has no jsfs/jsuri,
+        // so getParam falls back to horde for both)
+        $this->assertCount(2, $urls);
+        $this->assertEquals('/js/horde/test.js', $urls[0]);
+        $this->assertEquals('/js/horde/test.js', $urls[1]);
     }
 }

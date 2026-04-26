@@ -25,6 +25,7 @@ use Horde\Core\Assets\CssDiscoverer;
 use Horde\Core\Assets\CssDiscoveryRequest;
 use Horde\Core\Assets\JsDiscoverer;
 use Horde\Core\Assets\ResponsiveAssets;
+use Horde\Core\Config\RegistryState;
 use Horde\Core\View\ResponsiveTemplateView;
 use Horde\Core\View\ResponsiveTopbar;
 use Horde_Registry;
@@ -203,10 +204,11 @@ trait ResponsiveControllerTrait
         ?ServerRequestInterface $request = null,
     ): ResponseInterface {
         $registry = $this->resolveRegistry($request);
+        $app = $request?->getAttribute('app') ?? $registry->getApp();
         $responseFactory = $this->getResponseFactory();
 
-        $data['cssUrls'] = $this->resolveCssUrls($registry);
-        $data['jsUrls'] = $this->resolveJsUrls($registry, $extraJsFiles);
+        $data['cssUrls'] = $this->resolveCssUrls($registry, $app);
+        $data['jsUrls'] = $this->resolveJsUrls($registry, $extraJsFiles, $app);
 
         $responsiveTopbar = new ResponsiveTopbar($registry, $this->getAppName());
         $data['topbarHtml'] = $responsiveTopbar->render();
@@ -230,13 +232,13 @@ trait ResponsiveControllerTrait
     }
 
     /** @return string[] */
-    private function resolveCssUrls(Horde_Registry $registry): array
+    private function resolveCssUrls(Horde_Registry $registry, string $app): array
     {
         if (method_exists($this, 'getCssDiscoverer')) {
             $discoverer = $this->getCssDiscoverer();
             $request = new CssDiscoveryRequest(
                 files: ['responsive.css'],
-                app: $registry->getApp(),
+                app: $app,
                 subView: 'responsive',
             );
             $urls = [];
@@ -246,19 +248,18 @@ trait ResponsiveControllerTrait
             return $urls;
         }
 
-        $responsiveAssets = new ResponsiveAssets($registry);
-        return $responsiveAssets->getCssUrls();
+        $responsiveAssets = new ResponsiveAssets(new RegistryState($registry->applications));
+        return $responsiveAssets->getCssUrls($app);
     }
 
     /**
      * @param string[] $extraJsFiles
      * @return string[]
      */
-    private function resolveJsUrls(Horde_Registry $registry, array $extraJsFiles): array
+    private function resolveJsUrls(Horde_Registry $registry, array $extraJsFiles, string $app): array
     {
         if (method_exists($this, 'getJsDiscoverer')) {
             $discoverer = $this->getJsDiscoverer();
-            $app = $registry->getApp();
             $jsUrls = [];
 
             foreach (['responsive-topbar.js'] as $file) {
@@ -281,11 +282,11 @@ trait ResponsiveControllerTrait
             return $jsUrls;
         }
 
-        $responsiveAssets = new ResponsiveAssets($registry);
+        $responsiveAssets = new ResponsiveAssets(new RegistryState($registry->applications));
         $jsFiles = array_merge(['responsive-topbar.js'], $extraJsFiles);
         return array_merge(
-            $responsiveAssets->getJsUrls($jsFiles, 'horde'),
-            $responsiveAssets->getJsUrls(['responsive.js'])
+            $responsiveAssets->getJsUrls('horde', $jsFiles),
+            $responsiveAssets->getJsUrls($app, ['responsive.js'])
         );
     }
 
@@ -308,9 +309,10 @@ trait ResponsiveControllerTrait
         ?ServerRequestInterface $request = null,
     ): string {
         $registry = $this->resolveRegistry($request);
+        $app = $request?->getAttribute('app') ?? $registry->getApp();
         $uriFactory = $this->getUriFactory();
 
-        $webroot = $registry->get('webroot', $registry->getApp());
+        $webroot = $registry->get('webroot', $app);
         $uri = $uriFactory->createUri($webroot . '/' . ltrim($path, '/'));
 
         if (!empty($params)) {
