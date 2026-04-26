@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Test\Unit\Topbar;
 
+use Horde\Core\Assets\JsDiscoverer;
 use Horde\Core\PageOutput\AssetCollector;
 use Horde\Core\Topbar\TopbarData;
 use Horde\Core\Topbar\TopbarMenuNode;
@@ -33,7 +34,10 @@ class TopbarRendererTest extends TestCase
     protected function setUp(): void
     {
         $this->collector = new AssetCollector();
-        $this->renderer = new TopbarRenderer($this->collector);
+        $jsDiscoverer = $this->createMock(JsDiscoverer::class);
+        $jsDiscoverer->method('resolve')->willReturn(null);
+        $jsDiscoverer->method('resolveMany')->willReturn([]);
+        $this->renderer = new TopbarRenderer($this->collector, $jsDiscoverer);
     }
 
     private function minimalData(): TopbarData

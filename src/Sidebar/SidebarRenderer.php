@@ -16,7 +16,9 @@ declare(strict_types=1);
 
 namespace Horde\Core\Sidebar;
 
+use Horde\Core\Assets\JsDiscoverer;
 use Horde\Core\PageOutput\AssetCollector;
+use Horde\Injector\Attribute\Factory;
 
 /**
  * Renders SidebarData to an HTML string for the traditional desktop sidebar.
@@ -26,21 +28,17 @@ use Horde\Core\PageOutput\AssetCollector;
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
+#[Factory(factory: SidebarRendererFactory::class, method: 'create')]
 class SidebarRenderer
 {
     public function __construct(
         private readonly AssetCollector $assetCollector,
+        private readonly JsDiscoverer $jsDiscoverer,
     ) {}
 
     public function render(SidebarData $data): string
     {
-        $hasHeaders = false;
-        foreach ($data->containers as $container) {
-            if ($container->header !== null) {
-                $hasHeaders = true;
-                break;
-            }
-        }
+        $this->registerScripts($data);
 
         $html = '</div>' . "\n" . '</div>' . "\n\n";
 
@@ -67,6 +65,39 @@ class SidebarRenderer
         $html .= '</div>' . "\n";
 
         return $html;
+    }
+
+    private function registerScripts(SidebarData $data): void
+    {
+        $uri = $this->jsDiscoverer->resolve('sidebar.js', 'horde');
+        if ($uri !== null) {
+            $this->assetCollector->addScript($uri);
+        }
+
+        $hasHeaders = false;
+        foreach ($data->containers as $container) {
+            if ($container->header !== null) {
+                $hasHeaders = true;
+                break;
+            }
+        }
+        if ($hasHeaders) {
+            $uri = $this->jsDiscoverer->resolve('scriptaculous/effects.js', 'horde');
+            if ($uri !== null) {
+                $this->assetCollector->addScript($uri);
+            }
+        }
+
+        $this->assetCollector->addJsVar('HordeSidebar.text', [
+            'collapse' => 'Collapse',
+            'expand' => 'Expand',
+        ]);
+
+        $conf = $GLOBALS['conf'] ?? [];
+        $this->assetCollector->addJsVar('HordeSidebar.opts', [
+            'cookieDomain' => $conf['cookie']['domain'] ?? '',
+            'cookiePath' => $conf['cookie']['path'] ?? '/',
+        ]);
     }
 
     private function renderNewButton(SidebarButton $button): string

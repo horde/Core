@@ -116,8 +116,12 @@ class TopbarBuilderTest extends TestCase
 
         $prefs = $this->createMock(PrefsService::class);
         $prefs->method('getValue')
-            ->with('testuser', 'horde', 'sidebar_width')
-            ->willReturn('250');
+            ->willReturnCallback(function ($uid, $app, $key) {
+                if ($key === 'sidebar_width') {
+                    return '250';
+                }
+                return null;
+            });
 
         $builder = $this->createBuilder(registry: $registry, prefs: $prefs, session: $session);
         $data = $builder->build();

@@ -16,7 +16,9 @@ declare(strict_types=1);
 
 namespace Horde\Core\Topbar;
 
+use Horde\Core\Assets\JsDiscoverer;
 use Horde\Core\PageOutput\AssetCollector;
+use Horde\Injector\Attribute\Factory;
 use Stringable;
 
 /**
@@ -27,14 +29,18 @@ use Stringable;
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
+#[Factory(factory: TopbarRendererFactory::class, method: 'create')]
 class TopbarRenderer
 {
     public function __construct(
         private readonly AssetCollector $assetCollector,
+        private readonly JsDiscoverer $jsDiscoverer,
     ) {}
 
     public function render(TopbarData $data): string
     {
+        $this->registerScripts($data);
+
         if (!empty($data->jsConfig)) {
             $this->assetCollector->addJsVar('HordeTopbar.conf', $data->jsConfig);
         }
@@ -44,6 +50,26 @@ class TopbarRenderer
         $html .= $this->renderBodyWrappers($data);
 
         return $html;
+    }
+
+    private function registerScripts(TopbarData $data): void
+    {
+        $scripts = $this->jsDiscoverer->resolveMany([
+            'topbar.js',
+            'date/date.js',
+        ], 'horde');
+        foreach ($scripts as $uri) {
+            if ($uri !== null) {
+                $this->assetCollector->addScript($uri);
+            }
+        }
+
+        if ($data->searchConfig?->hasMenu) {
+            $uri = $this->jsDiscoverer->resolve('form_ghost.js', 'horde');
+            if ($uri !== null) {
+                $this->assetCollector->addScript($uri);
+            }
+        }
     }
 
     private function renderMenubar(TopbarData $data): string

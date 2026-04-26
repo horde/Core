@@ -18,6 +18,4 @@ namespace Horde\Core\Path;
 
 use Horde\Exception\HordeRuntimeException;
 
-class PathNormalizationException extends HordeRuntimeException
-{
-}
+class PathNormalizationException extends HordeRuntimeException {}

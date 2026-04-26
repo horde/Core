@@ -16,9 +16,12 @@ declare(strict_types=1);
 
 namespace Horde\Core\Path;
 
+use Horde\Core\Factory\PathBuilderFactory;
+use Horde\Injector\Attribute\Factory;
 use SplFileInfo;
 use Stringable;
 
+#[Factory(factory: PathBuilderFactory::class, method: 'create')]
 interface PathBuilderInterface extends Stringable
 {
     public function withComponentRoot(): static;

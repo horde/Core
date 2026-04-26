@@ -15,6 +15,7 @@ use Horde\Core\Service\PrefsService;
 use Horde\Core\Session\HordeSession;
 use Horde_Injector;
 use Horde_Registry;
+use Throwable;
 
 class AccessKeyTrackerFactory
 {
@@ -28,14 +29,14 @@ class AccessKeyTrackerFactory
             if ($uid !== '') {
                 $accessKeysEnabled = (bool) $prefs->getValue($uid, 'horde', 'widget_accesskey');
             }
-        } catch (\Throwable) {
+        } catch (Throwable) {
         }
 
         $multibyte = false;
         try {
             $registry = $injector->getInstance(Horde_Registry::class);
             $multibyte = !empty($registry->nlsconfig->curr_multibyte);
-        } catch (\Throwable) {
+        } catch (Throwable) {
         }
 
         return new AccessKeyTracker($accessKeysEnabled, $multibyte);

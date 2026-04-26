@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\PageOutput;
 
+use Horde\Core\Assets\JsDiscoverer;
 use Horde\Core\Service\PrefsService;
 use Horde\Core\Session\HordeSession;
 use Horde_Injector;
@@ -37,6 +38,7 @@ class ViewModeConfiguratorFactory
             $injector->getInstance(Horde_Registry::class),
             $injector->getInstance(PrefsService::class),
             $injector->getInstance(HordeSession::class),
+            $injector->getInstance(JsDiscoverer::class),
         );
     }
 }

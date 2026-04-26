@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Test\Unit\Sidebar;
 
+use Horde\Core\Assets\JsDiscoverer;
 use Horde\Core\PageOutput\AssetCollector;
 use Horde\Core\Sidebar\SidebarButton;
 use Horde\Core\Sidebar\SidebarContainer;
@@ -35,7 +36,10 @@ class SidebarRendererTest extends TestCase
     protected function setUp(): void
     {
         $this->collector = new AssetCollector();
-        $this->renderer = new SidebarRenderer($this->collector);
+        $jsDiscoverer = $this->createMock(JsDiscoverer::class);
+        $jsDiscoverer->method('resolve')->willReturn(null);
+        $jsDiscoverer->method('resolveMany')->willReturn([]);
+        $this->renderer = new SidebarRenderer($this->collector, $jsDiscoverer);
     }
 
     public function testRenderEmptySidebar(): void

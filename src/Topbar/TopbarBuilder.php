@@ -79,6 +79,14 @@ class TopbarBuilder
             }
         }
 
+        $jsConfig = array_filter([
+            'URI_AJAX' => $this->getServiceLinkUrl('ajax', 'horde'),
+            'app' => $currentApp,
+            'format' => $this->translateDateFormat($uid),
+            'hash' => md5(serialize($menuTree)),
+            'refresh' => $this->getMenuRefreshTime($uid),
+        ]);
+
         return new TopbarData(
             portalUrl: $portalUrl,
             version: $version,
@@ -88,6 +96,7 @@ class TopbarBuilder
             loginUrl: $loginUrl,
             date: $date,
             sidebarWidth: $sidebarWidth,
+            jsConfig: $jsConfig,
             subinfo: $subinfo,
         );
     }
@@ -582,5 +591,43 @@ class TopbarBuilder
         } catch (Exception) {
             return null;
         }
+    }
+
+    private function getServiceLinkUrl(string $service, ?string $app = null): string
+    {
+        try {
+            $link = $app !== null
+                ? $this->registry->getServiceLink($service, $app)
+                : $this->registry->getServiceLink($service);
+            return $link !== false ? (string) $link : '';
+        } catch (Exception) {
+            return '';
+        }
+    }
+
+    private function translateDateFormat(string $uid): string
+    {
+        $format = '';
+        if ($uid !== '') {
+            $format = $this->prefs->getValue($uid, 'horde', 'date_format') ?? '';
+        }
+        if ($format === '') {
+            $format = '%x';
+        }
+
+        $from = ['%e', '%-d', '%d', '%a', '%A', '%-m', '%m', '%h', '%b', '%B', '%y', '%Y'];
+        $to = [' d', 'd', 'dd', 'ddd', 'dddd', 'M', 'MM', 'MMM', 'MMM', 'MMMM', 'yy', 'yyyy'];
+
+        return str_replace($from, $to, $format);
+    }
+
+    private function getMenuRefreshTime(string $uid): int
+    {
+        if ($uid === '') {
+            return 0;
+        }
+        $val = $this->prefs->getValue($uid, 'horde', 'menu_refresh_time');
+
+        return $val !== null ? (int) $val : 0;
     }
 }

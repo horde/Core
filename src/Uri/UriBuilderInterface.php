@@ -16,9 +16,12 @@ declare(strict_types=1);
 
 namespace Horde\Core\Uri;
 
+use Horde\Core\Factory\UriBuilderFactory;
+use Horde\Injector\Attribute\Factory;
 use Horde\Url\Url;
 use Psr\Http\Message\UriInterface;
 
+#[Factory(factory: UriBuilderFactory::class, method: 'create')]
 interface UriBuilderInterface extends UriInterface
 {
     public function withAppWebroot(string $app): static;

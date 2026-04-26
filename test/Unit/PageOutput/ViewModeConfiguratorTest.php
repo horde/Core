@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Test\Unit\PageOutput;
 
+use Horde\Core\Assets\JsDiscoverer;
 use Horde\Core\PageOutput\AssetCollector;
 use Horde\Core\PageOutput\ViewMode;
 use Horde\Core\PageOutput\ViewModeConfigurator;
@@ -33,12 +34,25 @@ class ViewModeConfiguratorTest extends TestCase
         ?Horde_Registry $registry = null,
         ?PrefsService $prefs = null,
         ?HordeSession $session = null,
+        ?JsDiscoverer $jsDiscoverer = null,
     ): ViewModeConfigurator {
         $registry ??= $this->createMock(Horde_Registry::class);
         $prefs ??= $this->createMock(PrefsService::class);
         $session ??= $this->createMock(HordeSession::class);
+        if ($jsDiscoverer === null) {
+            $jsDiscoverer = $this->createMock(JsDiscoverer::class);
+            $jsDiscoverer->method('resolve')->willReturnCallback(
+                fn(string $file) => '/js/' . $file
+            );
+            $jsDiscoverer->method('resolveMany')->willReturnCallback(
+                fn(array $files) => array_combine(
+                    $files,
+                    array_map(fn($f) => '/js/' . $f, $files)
+                )
+            );
+        }
 
-        return new ViewModeConfigurator($registry, $prefs, $session);
+        return new ViewModeConfigurator($registry, $prefs, $session, $jsDiscoverer);
     }
 
     public function testBasicModeAddsPrototypeAndHorde(): void

@@ -21,6 +21,9 @@ declare(strict_types=1);
 
 namespace Horde\Core\Controller;
 
+use Horde\Core\Assets\CssDiscoverer;
+use Horde\Core\Assets\CssDiscoveryRequest;
+use Horde\Core\Assets\JsDiscoverer;
 use Horde\Core\Assets\ResponsiveAssets;
 use Horde\Core\View\ResponsiveTemplateView;
 use Horde\Core\View\ResponsiveTopbar;
@@ -152,44 +155,88 @@ trait ResponsiveControllerTrait
         $registry = $this->getRegistry();
         $responseFactory = $this->getResponseFactory();
 
-        // Create helpers
-        $responsiveAssets = new ResponsiveAssets($registry);
-        $responsiveTopbar = new ResponsiveTopbar($registry, $this->getAppName());
+        $data['cssUrls'] = $this->resolveCssUrls($registry);
+        $data['jsUrls'] = $this->resolveJsUrls($registry, $extraJsFiles);
 
-        // Render topbar
+        $responsiveTopbar = new ResponsiveTopbar($registry, $this->getAppName());
         $data['topbarHtml'] = $responsiveTopbar->render();
 
-        // Add asset URLs
-        $data['cssUrls'] = $responsiveAssets->getCssUrls();
-
-        // Build JS file list
-        $jsFiles = array_merge(['responsive-topbar.js'], $extraJsFiles);
-        $data['jsUrls'] = array_merge(
-            $responsiveAssets->getJsUrls($jsFiles, 'horde'),
-            $responsiveAssets->getJsUrls(['responsive.js'])
-        );
-
-        // Render template
         $templatePath = $this->getTemplateBasePath() . $template;
         $view = new ResponsiveTemplateView($templatePath, $data);
 
-        // Add escape helper for templates
         $data['escape'] = [$view, 'escape'];
 
-        // Add URL builder helper for templates (PSR-7 Uri pattern)
         $data['url'] = function (string $path, array $params = []) {
             return $this->buildUrl($path, $params);
         };
 
-        // Re-create view with helpers
         $view = new ResponsiveTemplateView($templatePath, $data);
 
-        // Create response
         $response = $responseFactory->createResponse(200)
             ->withHeader('Content-Type', 'text/html; charset=UTF-8');
         $response->getBody()->write($view->render());
 
         return $response;
+    }
+
+    /** @return string[] */
+    private function resolveCssUrls(Horde_Registry $registry): array
+    {
+        if (method_exists($this, 'getCssDiscoverer')) {
+            $discoverer = $this->getCssDiscoverer();
+            $request = new CssDiscoveryRequest(
+                files: ['responsive.css'],
+                app: $registry->getApp(),
+                subView: 'responsive',
+            );
+            $urls = [];
+            foreach ($discoverer->discover($request) as $entry) {
+                $urls[] = $entry->uri;
+            }
+            return $urls;
+        }
+
+        $responsiveAssets = new ResponsiveAssets($registry);
+        return $responsiveAssets->getCssUrls();
+    }
+
+    /**
+     * @param string[] $extraJsFiles
+     * @return string[]
+     */
+    private function resolveJsUrls(Horde_Registry $registry, array $extraJsFiles): array
+    {
+        if (method_exists($this, 'getJsDiscoverer')) {
+            $discoverer = $this->getJsDiscoverer();
+            $app = $registry->getApp();
+            $jsUrls = [];
+
+            foreach (['responsive-topbar.js'] as $file) {
+                $uri = $discoverer->resolve($file, 'horde');
+                if ($uri !== null) {
+                    $jsUrls[] = $uri;
+                }
+            }
+            foreach ($extraJsFiles as $file) {
+                $uri = $discoverer->resolve($file, $app !== 'horde' ? $app : 'horde');
+                if ($uri !== null) {
+                    $jsUrls[] = $uri;
+                }
+            }
+            $uri = $discoverer->resolve('responsive.js', $app);
+            if ($uri !== null) {
+                $jsUrls[] = $uri;
+            }
+
+            return $jsUrls;
+        }
+
+        $responsiveAssets = new ResponsiveAssets($registry);
+        $jsFiles = array_merge(['responsive-topbar.js'], $extraJsFiles);
+        return array_merge(
+            $responsiveAssets->getJsUrls($jsFiles, 'horde'),
+            $responsiveAssets->getJsUrls(['responsive.js'])
+        );
     }
 
     /**

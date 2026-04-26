@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\PageOutput;
 
+use Horde\Core\Assets\JsDiscoverer;
 use Horde\Core\Service\PrefsService;
 use Horde\Core\Session\HordeSession;
 use Horde\Injector\Attribute\Factory;
@@ -40,6 +41,7 @@ class ViewModeConfigurator
         private readonly Horde_Registry $registry,
         private readonly PrefsService $prefs,
         private readonly HordeSession $session,
+        private readonly JsDiscoverer $jsDiscoverer,
     ) {}
 
     public function configure(AssetCollector $collector, ViewMode $mode): void
@@ -53,25 +55,38 @@ class ViewModeConfigurator
 
     private function addBasicScripts(AssetCollector $collector): void
     {
-        $jsUri = $this->registry->get('jsuri', 'horde');
-
-        $collector->addScript($jsUri . '/prototype.js');
-        $collector->addScript($jsUri . '/horde.js');
+        $scripts = $this->jsDiscoverer->resolveMany([
+            'prototype.js',
+            'horde.js',
+        ], 'horde');
+        foreach ($scripts as $uri) {
+            if ($uri !== null) {
+                $collector->addScript($uri);
+            }
+        }
 
         $uid = $this->session->getAuthId() ?? '';
         if ($uid !== '' && $this->prefs->getValue($uid, 'horde', 'widget_accesskey')) {
-            $collector->addScript($jsUri . '/accesskeys.js');
+            $uri = $this->jsDiscoverer->resolve('accesskeys.js', 'horde');
+            if ($uri !== null) {
+                $collector->addScript($uri);
+            }
         }
     }
 
     private function addDynamicScripts(AssetCollector $collector): void
     {
-        $jsUri = $this->registry->get('jsuri', 'horde');
-
-        $collector->addScript($jsUri . '/hordecore.js');
-        $collector->addScript($jsUri . '/growler.js');
-        $collector->addScript($jsUri . '/scriptaculous/effects.js');
-        $collector->addScript($jsUri . '/scriptaculous/sound.js');
+        $scripts = $this->jsDiscoverer->resolveMany([
+            'hordecore.js',
+            'growler.js',
+            'scriptaculous/effects.js',
+            'scriptaculous/sound.js',
+        ], 'horde');
+        foreach ($scripts as $uri) {
+            if ($uri !== null) {
+                $collector->addScript($uri);
+            }
+        }
 
         $app = $this->registry->getApp();
         $uid = $this->session->getAuthId() ?? '';
