@@ -100,6 +100,7 @@ use Horde\OAuth\Server\Repository\ScopeRepository;
 use Horde\OAuth\Server\ServerMetadata;
 use Horde\OAuth\Server\Token\AccessTokenIssuer;
 use Horde\OAuth\Server\Token\RefreshTokenIssuer;
+use Horde\Routes\Mapper as HordeRoutesMapper;
 use Horde\Secret\SecretManager;
 use Horde\SessionHandler\SessionHandler;
 use Horde\Http\RequestFactory;
@@ -153,7 +154,7 @@ class DefaultInjectorBindings implements InjectorBindings
             'Horde_Perms_Base' => 'Horde_Core_Factory_Perms',
             'Horde_Queue_Storage' => 'Horde_Core_Factory_QueueStorage',
             'Horde_Routes_Mapper' => 'Horde_Core_Factory_Mapper',
-            \Horde\Routes\Mapper::class => 'Horde_Core_Factory_Mapper',
+            HordeRoutesMapper::class => 'Horde_Core_Factory_Mapper',
             'Horde_Routes_Matcher' => 'Horde_Core_Factory_Matcher',
             'Horde_Secret' => 'Horde_Core_Factory_Secret',
             'Horde_Secret_Cbc' => 'Horde_Core_Factory_Secret_Cbc',

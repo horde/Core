@@ -19,7 +19,6 @@ namespace Horde\Core\Test\Unit\ActiveSync;
 
 use Horde\Test\TestCase;
 use Horde\Http\ServerRequest;
-use Horde\Http\Uri;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Horde_Core_ActiveSync_Driver;
 use Horde_Core_ActiveSync_Auth;
@@ -55,7 +54,6 @@ class DriverGetUserTest extends TestCase
 
         $mockConnector = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Connector::class);
         $mockAuth = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Auth::class);
-        $mockAuth->method('authenticate')->willReturn(true);
         $mockState = $this->getMockSkipConstructor('Horde_ActiveSync_State_Sql');
         $mockRegistry = $this->getMockSkipConstructor(Horde_Registry::class);
 
@@ -67,8 +65,9 @@ class DriverGetUserTest extends TestCase
             'state' => $mockState,
         ]);
 
-        // Simulate authentication - this sets _authUser in parent
-        $result = $driver->authenticate('authenticated_user', 'password');
+        // Set _authUser via reflection (authenticate() requires global $injector/$conf)
+        $ref = new \ReflectionProperty($driver, '_authUser');
+        $ref->setValue($driver, 'authenticated_user');
 
         $this->assertEquals('authenticated_user', $driver->getUser());
     }
@@ -82,8 +81,8 @@ class DriverGetUserTest extends TestCase
             $this->markTestSkipped('horde/activesync not available');
         }
 
-        $uri = new Uri('http://example.com/path?User=get_param_user&DeviceId=123');
-        $serverRequest = new ServerRequest('POST', $uri);
+        $serverRequest = (new ServerRequest('POST', '/'))
+            ->withQueryParams(['User' => 'get_param_user', 'DeviceId' => '123']);
 
         $mockConnector = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Connector::class);
         $mockAuth = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Auth::class);
@@ -146,12 +145,11 @@ class DriverGetUserTest extends TestCase
             $this->markTestSkipped('horde/activesync not available');
         }
 
-        $uri = new Uri('http://example.com/path?User=get_param_user');
-        $serverRequest = new ServerRequest('POST', $uri);
+        $serverRequest = (new ServerRequest('POST', '/'))
+            ->withQueryParams(['User' => 'get_param_user']);
 
         $mockConnector = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Connector::class);
         $mockAuth = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Auth::class);
-        $mockAuth->method('authenticate')->willReturn(true);
         $mockState = $this->getMockSkipConstructor('Horde_ActiveSync_State_Sql');
         $mockRegistry = $this->getMockSkipConstructor(Horde_Registry::class);
 
@@ -163,8 +161,9 @@ class DriverGetUserTest extends TestCase
             'state' => $mockState,
         ]);
 
-        // Authenticate, should ignore GET parameter
-        $driver->authenticate('authenticated_user', 'password');
+        // Set _authUser via reflection
+        $ref = new \ReflectionProperty($driver, '_authUser');
+        $ref->setValue($driver, 'authenticated_user');
 
         $this->assertEquals('authenticated_user', $driver->getUser());
     }
@@ -178,8 +177,8 @@ class DriverGetUserTest extends TestCase
             $this->markTestSkipped('horde/activesync not available');
         }
 
-        $uri = new Uri('http://example.com/path?User=get_param_user');
-        $serverRequest = new ServerRequest('POST', $uri);
+        $serverRequest = (new ServerRequest('POST', '/'))
+            ->withQueryParams(['User' => 'get_param_user']);
 
         $mockConnector = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Connector::class);
         $mockAuth = $this->getMockSkipConstructor(Horde_Core_ActiveSync_Auth::class);

@@ -106,7 +106,8 @@ class SessionHandlerFactory
      */
     private function createSqlBackend(Horde_Injector $injector, array $params): SqlBackend
     {
-        $db = $injector->getInstance(\Horde\Db\Adapter::class);
+        $dbService = $injector->getInstance(HordeDbService::class);
+        $db = $dbService->getAdapter();
         $table = $params['table'] ?? 'horde_sessionhandler';
 
         return new SqlBackend(

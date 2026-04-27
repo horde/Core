@@ -137,6 +137,10 @@ class RampageIntegrationTest extends TestCase
         // Mock injector
         $injector = $this->createMock(Horde_Injector::class);
 
+        // Make has() return true so AppRouter skips config loader setup
+        // (which requires the HORDE_CONFIG_BASE constant)
+        $injector->method('has')->willReturn(true);
+
         // Track middleware execution
         $middlewaresExecuted = [];
 
@@ -268,6 +272,10 @@ class RampageIntegrationTest extends TestCase
 
         // Mock injector
         $injector = $this->createMock(Horde_Injector::class);
+
+        // Make has() return true so AppRouter skips config loader setup
+        // (which requires the HORDE_CONFIG_BASE constant)
+        $injector->method('has')->willReturn(true);
 
         // Track middleware execution
         $middlewaresExecuted = [];
