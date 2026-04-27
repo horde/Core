@@ -22,6 +22,7 @@ use Horde\Core\Config\Driver\DriverRepository;
 use Horde\Core\Editor\TinymcePageBinder;
 use Horde\Core\Factory\ApiRegistryFactory;
 use Horde\Core\Factory\AuthBaseFactory;
+use Horde\Core\Factory\AuthIsGlobalAdminFactory;
 use Horde\Core\Factory\ConfigMetadataProviderFactory;
 use Horde\Core\Factory\DbAdapterFactory;
 use Horde\Core\Factory\DriverRepositoryFactory;
@@ -63,7 +64,10 @@ use Horde\Core\Factory\SessionHandlerFactory;
 use Horde\Core\Factory\SimpleCacheFactory;
 use Horde\Core\Factory\TinymceFactory;
 use Horde\Core\Factory\TinymcePageBinderFactory;
+use Horde\Core\Middleware\AuthIsGlobalAdmin;
 use Horde\Core\Middleware\OAuthConsentMiddleware;
+use Horde\Core\Uri\RegistryRouteMapperProvider;
+use Horde\Core\Uri\RouteMapperProvider;
 use Horde\Core\Service\OAuthHttpClientService;
 use Horde\Core\Service\OAuthProviderConfigRepository;
 use Horde\Core\Service\OAuthTokenService;
@@ -192,6 +196,7 @@ class DefaultInjectorBindings implements InjectorBindings
             JwksEndpoint::class => OAuthJwksEndpointFactory::class,
             IdTokenBuilder::class => OAuthIdTokenBuilderFactory::class,
             OAuthConsentMiddleware::class => OAuthConsentMiddlewareFactory::class,
+            AuthIsGlobalAdmin::class => AuthIsGlobalAdminFactory::class,
             'Horde_Service_Facebook' => 'Horde_Core_Factory_Facebook',
             'Horde_Service_Twitter' => 'Horde_Core_Factory_Twitter',
             'Horde_Service_UrlShortener' => 'Horde_Core_Factory_UrlShortener',
@@ -235,6 +240,7 @@ class DefaultInjectorBindings implements InjectorBindings
         $implementations = [
             'Horde_Controller_ResponseWriter' => 'Horde_Controller_ResponseWriter_Web',
             RequestFactoryInterface::class => RequestFactory::class,
+            RouteMapperProvider::class => RegistryRouteMapperProvider::class,
         ];
 
         foreach ($factories as $key => $val) {

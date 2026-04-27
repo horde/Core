@@ -84,6 +84,7 @@ dependencies:
       horde/pack: ^2
       horde/perms: ^3
       horde/prefs: ^3
+      horde/rpc: ^3
       horde/secret: ^3
       horde/serialize: ^3
       horde/sessionhandler: ^3
