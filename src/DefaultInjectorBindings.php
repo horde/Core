@@ -16,10 +16,13 @@ declare(strict_types=1);
 
 namespace Horde\Core;
 
+use Horde\Core\Api\ApiRegistry;
 use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Driver\DriverRepository;
 use Horde\Core\Editor\TinymcePageBinder;
+use Horde\Core\Factory\ApiRegistryFactory;
 use Horde\Core\Factory\AuthBaseFactory;
+use Horde\Core\Factory\AuthIsGlobalAdminFactory;
 use Horde\Core\Factory\ConfigMetadataProviderFactory;
 use Horde\Core\Factory\DbAdapterFactory;
 use Horde\Core\Factory\DriverRepositoryFactory;
@@ -61,7 +64,10 @@ use Horde\Core\Factory\SessionHandlerFactory;
 use Horde\Core\Factory\SimpleCacheFactory;
 use Horde\Core\Factory\TinymceFactory;
 use Horde\Core\Factory\TinymcePageBinderFactory;
+use Horde\Core\Middleware\AuthIsGlobalAdmin;
 use Horde\Core\Middleware\OAuthConsentMiddleware;
+use Horde\Core\Uri\RegistryRouteMapperProvider;
+use Horde\Core\Uri\RouteMapperProvider;
 use Horde\Core\Service\OAuthHttpClientService;
 use Horde\Core\Service\OAuthProviderConfigRepository;
 use Horde\Core\Service\OAuthTokenService;
@@ -98,6 +104,7 @@ use Horde\OAuth\Server\Repository\ScopeRepository;
 use Horde\OAuth\Server\ServerMetadata;
 use Horde\OAuth\Server\Token\AccessTokenIssuer;
 use Horde\OAuth\Server\Token\RefreshTokenIssuer;
+use Horde\Routes\Mapper as HordeRoutesMapper;
 use Horde\Secret\SecretManager;
 use Horde\SessionHandler\SessionHandler;
 use Horde\Http\RequestFactory;
@@ -127,6 +134,7 @@ class DefaultInjectorBindings implements InjectorBindings
             ],
             'Horde_Core_Auth_Signup' => 'Horde_Core_Factory_AuthSignup',
             'Horde_Auth_Base' => AuthBaseFactory::class,
+            ApiRegistry::class => ApiRegistryFactory::class,
             'Horde_Core_CssCache' => 'Horde_Core_Factory_CssCache',
             'Horde_Core_JavascriptCache' => 'Horde_Core_Factory_JavascriptCache',
             'Horde_Core_Perms' => 'Horde_Core_Factory_PermsCore',
@@ -150,7 +158,7 @@ class DefaultInjectorBindings implements InjectorBindings
             'Horde_Perms_Base' => 'Horde_Core_Factory_Perms',
             'Horde_Queue_Storage' => 'Horde_Core_Factory_QueueStorage',
             'Horde_Routes_Mapper' => 'Horde_Core_Factory_Mapper',
-            \Horde\Routes\Mapper::class => 'Horde_Core_Factory_Mapper',
+            HordeRoutesMapper::class => 'Horde_Core_Factory_Mapper',
             'Horde_Routes_Matcher' => 'Horde_Core_Factory_Matcher',
             'Horde_Secret' => 'Horde_Core_Factory_Secret',
             'Horde_Secret_Cbc' => 'Horde_Core_Factory_Secret_Cbc',
@@ -188,6 +196,7 @@ class DefaultInjectorBindings implements InjectorBindings
             JwksEndpoint::class => OAuthJwksEndpointFactory::class,
             IdTokenBuilder::class => OAuthIdTokenBuilderFactory::class,
             OAuthConsentMiddleware::class => OAuthConsentMiddlewareFactory::class,
+            AuthIsGlobalAdmin::class => AuthIsGlobalAdminFactory::class,
             'Horde_Service_Facebook' => 'Horde_Core_Factory_Facebook',
             'Horde_Service_Twitter' => 'Horde_Core_Factory_Twitter',
             'Horde_Service_UrlShortener' => 'Horde_Core_Factory_UrlShortener',
@@ -231,6 +240,7 @@ class DefaultInjectorBindings implements InjectorBindings
         $implementations = [
             'Horde_Controller_ResponseWriter' => 'Horde_Controller_ResponseWriter_Web',
             RequestFactoryInterface::class => RequestFactory::class,
+            RouteMapperProvider::class => RegistryRouteMapperProvider::class,
         ];
 
         foreach ($factories as $key => $val) {
