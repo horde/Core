@@ -1,0 +1,168 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Horde\Core\Api;
+
+use Horde\Rpc\Dispatch\ApiCallContext;
+use Horde\Rpc\Dispatch\ApiProviderInterface;
+use Horde\Rpc\Dispatch\MethodDescriptor;
+use Horde\Rpc\Dispatch\MethodInvokerInterface;
+use Horde\Rpc\Dispatch\Result;
+use InvalidArgumentException;
+use RuntimeException;
+
+/**
+ * Copyright 2026 The Horde Project (http://www.horde.org/)
+ *
+ * See the enclosed file LICENSE for license information (LGPL). If you
+ * did not receive this file, see http://www.horde.org/licenses/lgpl21.
+ */
+class ApiRegistry implements ApiProviderInterface, MethodInvokerInterface
+{
+    /** @var array<string, ApiProviderInterface&MethodInvokerInterface> */
+    private array $providers = [];
+
+    /** @var array<string, array<string, ApiProviderInterface&MethodInvokerInterface>> */
+    private array $appProviders = [];
+
+    /**
+     * @param ApiProviderInterface&MethodInvokerInterface $provider
+     */
+    public function registerProvider(
+        string $interface,
+        ApiProviderInterface&MethodInvokerInterface $provider,
+        ?string $app = null,
+    ): void {
+        $this->providers[$interface] = $provider;
+        if ($app !== null) {
+            $this->appProviders[$app][$interface] = $provider;
+        }
+    }
+
+    public function hasMethod(string $method, ?ApiCallContext $context = null): bool
+    {
+        $parts = $this->splitMethod($method);
+        if ($parts === null) {
+            return false;
+        }
+        [$interface, $localMethod] = $parts;
+        $provider = $this->providers[$interface] ?? null;
+        if ($provider === null) {
+            return false;
+        }
+
+        return $provider->hasMethod($localMethod, $context);
+    }
+
+    public function getMethodDescriptor(string $method, ?ApiCallContext $context = null): ?MethodDescriptor
+    {
+        $parts = $this->splitMethod($method);
+        if ($parts === null) {
+            return null;
+        }
+        [$interface, $localMethod] = $parts;
+        $provider = $this->providers[$interface] ?? null;
+        if ($provider === null) {
+            return null;
+        }
+        $descriptor = $provider->getMethodDescriptor($localMethod, $context);
+        if ($descriptor === null) {
+            return null;
+        }
+
+        return new MethodDescriptor(
+            name: $interface . '.' . $descriptor->name,
+            description: $descriptor->description,
+            parameters: $descriptor->parameters,
+            returnType: $descriptor->returnType,
+            permissions: $descriptor->permissions,
+        );
+    }
+
+    /**
+     * @return list<MethodDescriptor>
+     */
+    public function listMethods(?ApiCallContext $context = null): array
+    {
+        $all = [];
+        foreach ($this->providers as $interface => $provider) {
+            foreach ($provider->listMethods($context) as $descriptor) {
+                $all[] = new MethodDescriptor(
+                    name: $interface . '.' . $descriptor->name,
+                    description: $descriptor->description,
+                    parameters: $descriptor->parameters,
+                    returnType: $descriptor->returnType,
+                    permissions: $descriptor->permissions,
+                );
+            }
+        }
+
+        return $all;
+    }
+
+    public function invoke(string $method, array $params, ?ApiCallContext $context = null): Result
+    {
+        $parts = $this->splitMethod($method);
+        if ($parts === null) {
+            throw new InvalidArgumentException(
+                sprintf('Method string must contain a dot separator: "%s"', $method)
+            );
+        }
+        [$interface, $localMethod] = $parts;
+        $provider = $this->providers[$interface] ?? null;
+        if ($provider === null) {
+            throw new RuntimeException(
+                sprintf('No provider registered for interface "%s"', $interface)
+            );
+        }
+
+        return $provider->invoke($localMethod, $params, $context);
+    }
+
+    public function invokeExplicit(
+        string $app,
+        string $interface,
+        string $method,
+        array $params,
+        ?ApiCallContext $context = null,
+    ): Result {
+        $provider = $this->appProviders[$app][$interface] ?? null;
+        if ($provider === null) {
+            throw new RuntimeException(
+                sprintf('No provider registered for app "%s" interface "%s"', $app, $interface)
+            );
+        }
+
+        return $provider->invoke($method, $params, $context);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getInterfaces(): array
+    {
+        return array_keys($this->providers);
+    }
+
+    /**
+     * @return (ApiProviderInterface&MethodInvokerInterface)|null
+     */
+    public function getProviderForInterface(string $interface): ApiProviderInterface|MethodInvokerInterface|null
+    {
+        return $this->providers[$interface] ?? null;
+    }
+
+    /**
+     * @return array{string, string}|null
+     */
+    private function splitMethod(string $method): ?array
+    {
+        $dotPos = strpos($method, '.');
+        if ($dotPos === false) {
+            return null;
+        }
+
+        return [substr($method, 0, $dotPos), substr($method, $dotPos + 1)];
+    }
+}

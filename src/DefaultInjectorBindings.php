@@ -16,9 +16,11 @@ declare(strict_types=1);
 
 namespace Horde\Core;
 
+use Horde\Core\Api\ApiRegistry;
 use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Driver\DriverRepository;
 use Horde\Core\Editor\TinymcePageBinder;
+use Horde\Core\Factory\ApiRegistryFactory;
 use Horde\Core\Factory\AuthBaseFactory;
 use Horde\Core\Factory\ConfigMetadataProviderFactory;
 use Horde\Core\Factory\DbAdapterFactory;
@@ -127,6 +129,7 @@ class DefaultInjectorBindings implements InjectorBindings
             ],
             'Horde_Core_Auth_Signup' => 'Horde_Core_Factory_AuthSignup',
             'Horde_Auth_Base' => AuthBaseFactory::class,
+            ApiRegistry::class => ApiRegistryFactory::class,
             'Horde_Core_CssCache' => 'Horde_Core_Factory_CssCache',
             'Horde_Core_JavascriptCache' => 'Horde_Core_Factory_JavascriptCache',
             'Horde_Core_Perms' => 'Horde_Core_Factory_PermsCore',
