@@ -37,16 +37,8 @@
         "config",
         "errorhandler"
     ],
-    "time": "2026-04-26",
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../Rpc",
-            "options": {
-                "symlink": true
-            }
-        }
-    ],
+    "time": "2026-04-27",
+    "repositories": [],
     "require": {
         "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || ^3 || ^2",
         "php": "^7.4 || ^8",
@@ -82,7 +74,7 @@
         "horde/pack": "^2 || dev-FRAMEWORK_6_0",
         "horde/perms": "^3 || dev-FRAMEWORK_6_0",
         "horde/prefs": "^3 || dev-FRAMEWORK_6_0",
-        "horde/rpc": "*@dev",
+        "horde/rpc": "^3 || dev-FRAMEWORK_6_0",
         "horde/secret": "^3 || dev-FRAMEWORK_6_0",
         "horde/serialize": "^3 || dev-FRAMEWORK_6_0",
         "horde/sessionhandler": "^3 || dev-FRAMEWORK_6_0",
@@ -131,8 +123,6 @@
             "Horde\\Core\\Test\\": "test/"
         }
     },
-    "minimum-stability": "alpha",
-    "prefer-stable": true,
     "config": {
         "allow-plugins": {
             "horde/horde-installer-plugin": true

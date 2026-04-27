@@ -1,4 +1,26 @@
 ---
+3.0.0-beta23:
+  api: 3.0.0-beta23
+  state:
+    release: beta
+    api: beta
+  date: 2026-04-27
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    fix: String cast addcslashes
+    Merge pull request #95 from horde/feat/api-registry
+    feat: Wire up modern RPC Api Registry Factory
+    Merge branch 'FRAMEWORK_6_0' into feat/api-registry
+    feat: Modern RPC & Inter-App API
+    docs: Document check auth feature from #33
+    feat: issue horde/core#33 Allow checking credentials without login
+    refactor(registry): Evolve to a format more independent of legacy stack
+    docs: AppFinder populates app attribute, eliminating many calls to registry->getApp()
+    refactor: Factor out InjectorBindings from legacy registry and rewire helpers
+    docs: AppFinder populates app attribute, eliminating many calls to registry->getApp()
+    refactor: Factor out InjectorBindings from legacy registry and rewire helpers
 3.0.0-beta22:
   api: 3.0.0-beta22
   state:
