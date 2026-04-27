@@ -1315,7 +1315,7 @@ class Horde
                 $options['params'] = [];
             }
             foreach (array_merge($url->parameters, $options['params']) as $key => $val) {
-                $options['params'][$key] = addcslashes($val, '"');
+                $options['params'][$key] = addcslashes((string) $val, '"');
             }
         }
 
