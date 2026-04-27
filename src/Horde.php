@@ -597,41 +597,35 @@ class Horde
     {
         global $conf;
 
-        if ($type !== null) {
-            $type = HordeString::lower($type);
-        }
-
-        if (is_array($backend)) {
-            $c = ArrayUtils::getElement($conf, $backend);
-        } elseif (isset($conf[$backend])) {
-            $c = $conf[$backend];
+        if ($type === null) {
+            $confType = [];
         } else {
-            $c = null;
+            $type = HordeString::lower($type);
+            $confType = $conf[$type] ?? [];
         }
 
-        if ($c !== null && isset($c['params'])) {
-            $c['params']['umask'] = $conf['umask'];
+        $c = ArrayUtils::getElement($conf, $backend);
 
-            $result = ($type !== null && isset($conf[$type]))
-                ? array_merge($conf[$type], $c['params'])
-                : $c['params'];
+        if (is_array($c)) {
+            $params = $c['params'] ?? null;
+            if (is_array($params)) {
+                $params['umask'] = $conf['umask'];
 
-            if ((!isset($c['params']['driverconfig'])
-                 || $c['params']['driverconfig'] != 'horde')
-                && $type !== null && $type === 'sql') {
-                if (($c['params']['protocol'] ?? null) === 'unix') {
-                    unset($result['hostspec'], $result['port']);
-                } else {
-                    unset($result['socket']);
+                $result = array_merge($confType, $params);
+
+                if ($type === 'sql' && ($params['driverconfig'] ?? null) !== 'horde') {
+                    if (($params['protocol'] ?? null) === 'unix') {
+                        unset($result['hostspec'], $result['port']);
+                    } else {
+                        unset($result['socket']);
+                    }
                 }
-            }
 
-            return $result;
+                return $result;
+            }
         }
 
-        return ($type !== null && isset($conf[$type]))
-            ? $conf[$type]
-            : [];
+        return $confType;
     }
 
     /**
