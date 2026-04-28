@@ -22,6 +22,9 @@ use Horde_Registry;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use Horde\Core\Test\Mock\MockConnector;
 use Horde\Core\Test\Mock\MockIMPMailbox;
+use Horde_ActiveSync_Device;
+use ReflectionProperty;
+use stdClass;
 
 /**
 * Unit tests for ActiveSync functionality in Core.
@@ -307,7 +310,7 @@ class ActiveSyncTest extends TestCase
         $this->_registry->method('hasInterface')->willReturn(false);
 
         $mockDevice = $this->getMockSkipConstructor('Horde_ActiveSync_Device');
-        $mockDevice->multiplex = \Horde_ActiveSync_Device::MULTIPLEX;
+        $mockDevice->multiplex = Horde_ActiveSync_Device::MULTIPLEX;
 
         $this->_setupDeepStructure();
         $adapter = $this->getMockSkipConstructor('Horde_ActiveSync_Imap_Adapter');
@@ -380,7 +383,7 @@ class ActiveSyncTest extends TestCase
         $this->_registry->method('hasInterface')->willReturn(false);
 
         $mockDevice = $this->getMockSkipConstructor('Horde_ActiveSync_Device');
-        $mockDevice->multiplex = \Horde_ActiveSync_Device::MULTIPLEX;
+        $mockDevice->multiplex = Horde_ActiveSync_Device::MULTIPLEX;
 
         $driver = new Horde_Core_ActiveSync_Driver([
             'state' => $this->_state,
@@ -429,7 +432,7 @@ class ActiveSyncTest extends TestCase
         $this->_registry->method('hasInterface')->willReturn(false);
 
         $mockDevice = $this->getMockSkipConstructor('Horde_ActiveSync_Device');
-        $mockDevice->multiplex = \Horde_ActiveSync_Device::MULTIPLEX;
+        $mockDevice->multiplex = Horde_ActiveSync_Device::MULTIPLEX;
 
         $this->_setUpMailTest();
         $adapter = $this->getMockSkipConstructor('Horde_ActiveSync_Imap_Adapter');
@@ -505,7 +508,7 @@ class ActiveSyncTest extends TestCase
             'registry' => $this->_registry,
             'imap' => null, ]);
 
-        $fixture = new \stdClass();
+        $fixture = new stdClass();
         $fixture->s = '20130529';
         $fixture->e = '20130628';
         $fixture->b = [
@@ -541,7 +544,7 @@ class ActiveSyncTest extends TestCase
         // Simulate authentication by setting _authUser via parent::authenticate()
         // We cannot call $driver->authenticate() because it depends on globals.
         // Instead, use reflection to set the protected _authUser property.
-        $ref = new \ReflectionProperty($driver, '_authUser');
+        $ref = new ReflectionProperty($driver, '_authUser');
         $ref->setValue($driver, 'authenticated_user');
 
         $this->assertEquals('authenticated_user', $driver->getUser());

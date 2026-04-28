@@ -402,7 +402,7 @@ trait ResponsiveControllerTrait
      *
      * Helper for safely getting query parameters.
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $request Request object
+     * @param ServerRequestInterface $request Request object
      * @param string $name Parameter name
      * @param mixed $default Default value if not set
      *
@@ -419,7 +419,7 @@ trait ResponsiveControllerTrait
      *
      * Helper for safely getting POST parameters.
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $request Request object
+     * @param ServerRequestInterface $request Request object
      * @param string $name Parameter name
      * @param mixed $default Default value if not set
      *
@@ -439,7 +439,7 @@ trait ResponsiveControllerTrait
      *
      * Helper for getting route parameters set by the router.
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $request Request object
+     * @param ServerRequestInterface $request Request object
      * @param string $name Parameter name
      * @param mixed $default Default value if not set
      *
@@ -454,7 +454,7 @@ trait ResponsiveControllerTrait
     /**
      * Check if request is POST
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $request Request object
+     * @param ServerRequestInterface $request Request object
      *
      * @return bool True if POST request
      */
@@ -466,7 +466,7 @@ trait ResponsiveControllerTrait
     /**
      * Check if request is GET
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $request Request object
+     * @param ServerRequestInterface $request Request object
      *
      * @return bool True if GET request
      */

@@ -25,6 +25,7 @@ use Horde_Core_ActiveSync_Auth;
 use Horde_Core_ActiveSync_Connector;
 use Horde_Registry;
 use InvalidArgumentException;
+use ReflectionProperty;
 
 /**
  * Unit tests for Horde_Core_ActiveSync_Driver::getUser() priority logic
@@ -66,7 +67,7 @@ class DriverGetUserTest extends TestCase
         ]);
 
         // Set _authUser via reflection (authenticate() requires global $injector/$conf)
-        $ref = new \ReflectionProperty($driver, '_authUser');
+        $ref = new ReflectionProperty($driver, '_authUser');
         $ref->setValue($driver, 'authenticated_user');
 
         $this->assertEquals('authenticated_user', $driver->getUser());
@@ -162,7 +163,7 @@ class DriverGetUserTest extends TestCase
         ]);
 
         // Set _authUser via reflection
-        $ref = new \ReflectionProperty($driver, '_authUser');
+        $ref = new ReflectionProperty($driver, '_authUser');
         $ref->setValue($driver, 'authenticated_user');
 
         $this->assertEquals('authenticated_user', $driver->getUser());
