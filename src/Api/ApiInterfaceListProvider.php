@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Api;
 
-use Horde\Rpc\Dispatch\ApiProviderInterface;
+use Horde\Rpc\Dispatch\ApiProvider;
 
 /**
  * Copyright 2026 The Horde Project (http://www.horde.org/)
@@ -15,7 +15,7 @@ use Horde\Rpc\Dispatch\ApiProviderInterface;
 interface ApiInterfaceListProvider
 {
     /**
-     * @return array<string, class-string<ApiProviderInterface>>
+     * @return array<string, class-string<ApiProvider>>
      */
     public function getApiInterfaceList(): array;
 }

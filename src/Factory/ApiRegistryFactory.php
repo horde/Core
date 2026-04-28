@@ -7,8 +7,8 @@ namespace Horde\Core\Factory;
 use Horde\Core\Api\ApiInterfaceListProvider;
 use Horde\Core\Api\ApiRegistry;
 use Horde\Core\Config\RegistryConfigLoader;
-use Horde\Rpc\Dispatch\ApiProviderInterface;
-use Horde\Rpc\Dispatch\MethodInvokerInterface;
+use Horde\Rpc\Dispatch\ApiProvider;
+use Horde\Rpc\Dispatch\MethodInvoker;
 use Horde_Injector;
 use Throwable;
 
@@ -50,7 +50,7 @@ class ApiRegistryFactory
                 } catch (Throwable) {
                     continue;
                 }
-                if ($provider instanceof ApiProviderInterface && $provider instanceof MethodInvokerInterface) {
+                if ($provider instanceof ApiProvider && $provider instanceof MethodInvoker) {
                     $registry->registerProvider($interface, $provider, $appName);
                 }
             }

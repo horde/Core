@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Horde\Core\Test\Unit\Api;
 
 use Horde\Rpc\Dispatch\ApiCallContext;
-use Horde\Rpc\Dispatch\ApiProviderInterface;
+use Horde\Rpc\Dispatch\ApiProvider;
 use Horde\Rpc\Dispatch\MethodDescriptor;
-use Horde\Rpc\Dispatch\MethodInvokerInterface;
+use Horde\Rpc\Dispatch\MethodInvoker;
 use Horde\Rpc\Dispatch\Result;
 
-class StubProvider implements ApiProviderInterface, MethodInvokerInterface
+class StubProvider implements ApiProvider, MethodInvoker
 {
     /** @var array<string, callable> */
     private array $methods;

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Horde\Core\Api;
 
 use Horde\Rpc\Dispatch\ApiCallContext;
-use Horde\Rpc\Dispatch\ApiProviderInterface;
+use Horde\Rpc\Dispatch\ApiProvider;
 use Horde\Rpc\Dispatch\MethodDescriptor;
-use Horde\Rpc\Dispatch\MethodInvokerInterface;
+use Horde\Rpc\Dispatch\MethodInvoker;
 use Horde\Rpc\Dispatch\Result;
 use InvalidArgumentException;
 use RuntimeException;
@@ -18,20 +18,20 @@ use RuntimeException;
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
  */
-class ApiRegistry implements ApiProviderInterface, MethodInvokerInterface
+class ApiRegistry implements ApiProvider, MethodInvoker
 {
-    /** @var array<string, ApiProviderInterface&MethodInvokerInterface> */
+    /** @var array<string, ApiProvider&MethodInvoker> */
     private array $providers = [];
 
-    /** @var array<string, array<string, ApiProviderInterface&MethodInvokerInterface>> */
+    /** @var array<string, array<string, ApiProvider&MethodInvoker>> */
     private array $appProviders = [];
 
     /**
-     * @param ApiProviderInterface&MethodInvokerInterface $provider
+     * @param ApiProvider&MethodInvoker $provider
      */
     public function registerProvider(
         string $interface,
-        ApiProviderInterface&MethodInvokerInterface $provider,
+        ApiProvider&MethodInvoker $provider,
         ?string $app = null,
     ): void {
         $this->providers[$interface] = $provider;
@@ -146,9 +146,9 @@ class ApiRegistry implements ApiProviderInterface, MethodInvokerInterface
     }
 
     /**
-     * @return (ApiProviderInterface&MethodInvokerInterface)|null
+     * @return (ApiProvider&MethodInvoker)|null
      */
-    public function getProviderForInterface(string $interface): ApiProviderInterface|MethodInvokerInterface|null
+    public function getProviderForInterface(string $interface): ApiProvider|MethodInvoker|null
     {
         return $this->providers[$interface] ?? null;
     }
