@@ -17,17 +17,27 @@ declare(strict_types=1);
 namespace Horde\Core;
 
 use Horde\Core\Api\ApiRegistry;
+use Horde\Core\Auth\AuthService;
+use Horde\Core\Config\ConfigLoader;
 use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Driver\DriverRepository;
+use Horde\Core\Config\RegistryConfigLoader;
 use Horde\Core\Editor\TinymcePageBinder;
 use Horde\Core\Factory\ApiRegistryFactory;
+use Horde\Core\Factory\ApplicationServiceFactory;
 use Horde\Core\Factory\AuthBaseFactory;
 use Horde\Core\Factory\AuthIsGlobalAdminFactory;
+use Horde\Core\Factory\AuthServiceFactory;
+use Horde\Core\Factory\ConfigLoaderFactory;
 use Horde\Core\Factory\ConfigMetadataProviderFactory;
 use Horde\Core\Factory\DbAdapterFactory;
+use Horde\Core\Factory\DbServiceFactory;
 use Horde\Core\Factory\DriverRepositoryFactory;
 use Horde\Core\Factory\EventDispatcherFactory;
+use Horde\Core\Factory\GroupServiceFactory;
+use Horde\Core\Factory\HordeLdapServiceFactory;
 use Horde\Core\Factory\HttpClientFactory;
+use Horde\Core\Factory\IdentityServiceFactory;
 use Horde\Core\Factory\LoggerFactory;
 use Horde\Core\Factory\AuthLinkRepositoryFactory;
 use Horde\Core\Factory\IdentityHistoryRepositoryFactory;
@@ -59,6 +69,9 @@ use Horde\Core\Factory\OAuthScopeClaimsMappingFactory;
 use Horde\Core\Factory\OAuthIdTokenBuilderFactory;
 use Horde\Core\Factory\OAuthConsentMiddlewareFactory;
 use Horde\Core\Factory\OAuthFlowStoreFactory;
+use Horde\Core\Factory\PermissionServiceFactory;
+use Horde\Core\Factory\PrefsServiceFactory;
+use Horde\Core\Factory\RegistryConfigLoaderFactory;
 use Horde\Core\Factory\SecretManagerFactory;
 use Horde\Core\Factory\SessionHandlerFactory;
 use Horde\Core\Factory\SimpleCacheFactory;
@@ -66,16 +79,27 @@ use Horde\Core\Factory\TinymceFactory;
 use Horde\Core\Factory\TinymcePageBinderFactory;
 use Horde\Core\Middleware\AuthIsGlobalAdmin;
 use Horde\Core\Middleware\OAuthConsentMiddleware;
-use Horde\Core\Uri\RegistryRouteMapperProvider;
-use Horde\Core\Uri\RouteMapperProvider;
+use Horde\Core\Service\ApplicationService;
+use Horde\Core\Service\GroupService;
+use Horde\Core\Service\HordeDbService;
+use Horde\Core\Service\HordeLdapService;
+use Horde\Core\Service\IdentityService;
 use Horde\Core\Service\OAuthHttpClientService;
 use Horde\Core\Service\OAuthProviderConfigRepository;
 use Horde\Core\Service\OAuthTokenService;
+use Horde\Core\Service\PermissionService;
+use Horde\Core\Service\PrefsService;
+use Horde\Core\Uri\RegistryRouteMapperProvider;
+use Horde\Core\Uri\RouteMapperProvider;
 use Horde\Db\Adapter as DbAdapter;
 use Horde\Editor\Tinymce;
+use Horde\Horde\Factory\AuthenticationServiceFactory;
+use Horde\Horde\Factory\JwtServiceFactory;
 use Horde\Horde\Factory\OAuthHttpClientServiceFactory as BaseOAuthHttpClientServiceFactory;
 use Horde\Horde\Factory\OAuthTokenServiceFactory as BaseOAuthTokenServiceFactory;
+use Horde\Horde\Service\AuthenticationService;
 use Horde\Horde\Service\AuthLinkRepository;
+use Horde\Horde\Service\JwtService;
 use Horde\Identity\IdentityHistoryRepository;
 use Horde\Identity\IdentityRepository;
 use Horde\Jwt\Key\PrivateKey;
@@ -107,7 +131,9 @@ use Horde\OAuth\Server\Token\RefreshTokenIssuer;
 use Horde\Routes\Mapper as HordeRoutesMapper;
 use Horde\Secret\SecretManager;
 use Horde\SessionHandler\SessionHandler;
+use Horde\Token\Token;
 use Horde\Http\RequestFactory;
+use Horde\Util\Variables;
 use Horde_Injector;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
@@ -205,7 +231,7 @@ class DefaultInjectorBindings implements InjectorBindings
             'Horde_Template' => 'Horde_Core_Factory_Template',
             'Horde_Timezone' => 'Horde_Core_Factory_Timezone',
             'Horde_Token' => 'Horde_Core_Factory_Token',
-            \Horde\Token\Token::class => Factory\TokenServiceFactory::class,
+            Token::class => Factory\TokenServiceFactory::class,
             'Horde_Variables' => 'Horde_Core_Factory_Variables',
             'Horde_View' => 'Horde_Core_Factory_View',
             'Horde_View_Base' => 'Horde_Core_Factory_View',
@@ -215,20 +241,20 @@ class DefaultInjectorBindings implements InjectorBindings
             Middleware\AuthHttpBasic::class => Factory\AuthHttpBasicFactory::class,
             HordeLogger::class => LoggerFactory::class,
             PsrLoggerInterface::class => LoggerFactory::class,
-            'Horde\\Horde\\Service\\JwtService' => 'Horde\\Horde\\Factory\\JwtServiceFactory',
-            'Horde\\Horde\\Service\\AuthenticationService' => 'Horde\\Horde\\Factory\\AuthenticationServiceFactory',
-            'Horde\\Core\\Config\\ConfigLoader' => 'Horde\\Core\\Factory\\ConfigLoaderFactory',
+            JwtService::class => JwtServiceFactory::class,
+            AuthenticationService::class => AuthenticationServiceFactory::class,
+            ConfigLoader::class => ConfigLoaderFactory::class,
             DriverRepository::class => DriverRepositoryFactory::class,
             ConfigMetadataProvider::class => ConfigMetadataProviderFactory::class,
-            'Horde\\Core\\Service\\HordeDbService' => 'Horde\\Core\\Factory\\DbServiceFactory',
-            'Horde\\Core\\Service\\PrefsService' => 'Horde\\Core\\Factory\\PrefsServiceFactory',
-            'Horde\\Core\\Service\\IdentityService' => 'Horde\\Core\\Factory\\IdentityServiceFactory',
-            'Horde\\Core\\Service\\GroupService' => 'Horde\\Core\\Factory\\GroupServiceFactory',
-            'Horde\\Core\\Config\\RegistryConfigLoader' => 'Horde\\Core\\Factory\\RegistryConfigLoaderFactory',
-            'Horde\\Core\\Service\\ApplicationService' => 'Horde\\Core\\Factory\\ApplicationServiceFactory',
-            'Horde\\Core\\Auth\\AuthService' => 'Horde\\Core\\Factory\\AuthServiceFactory',
-            'Horde\\Core\\Service\\HordeLdapService' => 'Horde\\Core\\Factory\\HordeLdapServiceFactory',
-            'Horde\\Core\\Service\\PermissionService' => 'Horde\\Core\\Factory\\PermissionServiceFactory',
+            HordeDbService::class => DbServiceFactory::class,
+            PrefsService::class => PrefsServiceFactory::class,
+            IdentityService::class => IdentityServiceFactory::class,
+            GroupService::class => GroupServiceFactory::class,
+            RegistryConfigLoader::class => RegistryConfigLoaderFactory::class,
+            ApplicationService::class => ApplicationServiceFactory::class,
+            AuthService::class => AuthServiceFactory::class,
+            HordeLdapService::class => HordeLdapServiceFactory::class,
+            PermissionService::class => PermissionServiceFactory::class,
             Tinymce::class => TinymceFactory::class,
             TinymcePageBinder::class => TinymcePageBinderFactory::class,
             EventDispatcherInterface::class => [EventDispatcherFactory::class, 'create'],
@@ -254,9 +280,9 @@ class DefaultInjectorBindings implements InjectorBindings
         }
 
         $injector->bindClosure(
-            \Horde\Util\Variables::class,
+            Variables::class,
             function () {
-                return \Horde\Util\Variables::getDefaultVariables();
+                return Variables::getDefaultVariables();
             }
         );
     }
