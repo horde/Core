@@ -42,10 +42,10 @@ It lives in three packages:
 
 ### Core interfaces (horde/Rpc)
 
-**`ApiProviderInterface`** method discovery (introspection only):
+**`ApiProvider`** method discovery (introspection only):
 
 ```php
-interface ApiProviderInterface
+interface ApiProvider
 {
     public function hasMethod(string $method, ?ApiCallContext $context = null): bool;
     public function getMethodDescriptor(string $method, ?ApiCallContext $context = null): ?MethodDescriptor;
@@ -53,10 +53,10 @@ interface ApiProviderInterface
 }
 ```
 
-**`MethodInvokerInterface`** method execution:
+**`MethodInvoker`** method execution:
 
 ```php
-interface MethodInvokerInterface
+interface MethodInvoker
 {
     public function invoke(string $method, array $params, ?ApiCallContext $context = null): Result;
 }
@@ -103,7 +103,7 @@ $result = new Result($value);
 ### The central registry (horde/Core)
 
 `ApiRegistry` aggregates all per-app providers into one place. It implements
-both `ApiProviderInterface` and `MethodInvokerInterface` itself, so it can
+both `ApiProvider` and `MethodInvoker` itself, so it can
 be used as the single entry point for any transport.
 
 Method names at the registry level use **dot notation**: `interface.method`.
@@ -148,8 +148,8 @@ ApiRegistry::class => ApiRegistryFactory::class,
    `ApiInterfaceListProvider`
 3. Call `getApiInterfaceList()` to get the `interface → providerClass` map
 4. Instantiate each provider via the injector
-5. Register providers that implement both `ApiProviderInterface` and
-   `MethodInvokerInterface`
+5. Register providers that implement both `ApiProvider` and
+   `MethodInvoker`
 
 Apps that have no modern API or fail to instantiate are silently skipped.
 The registry starts empty and fills up as providers are discovered.
@@ -193,12 +193,12 @@ namespace Horde\Content\Api;
 
 use Content_Tagger;
 use Horde\Rpc\Dispatch\ApiCallContext;
-use Horde\Rpc\Dispatch\ApiProviderInterface;
+use Horde\Rpc\Dispatch\ApiProvider;
 use Horde\Rpc\Dispatch\MethodDescriptor;
-use Horde\Rpc\Dispatch\MethodInvokerInterface;
+use Horde\Rpc\Dispatch\MethodInvoker;
 use Horde\Rpc\Dispatch\Result;
 
-class TaggerProvider implements ApiProviderInterface, MethodInvokerInterface
+class TaggerProvider implements ApiProvider, MethodInvoker
 {
     private readonly array $descriptors;
 
@@ -287,8 +287,8 @@ HTTP Request
  - JsonRpcHandler (PSR-15 middleware)
     - Codec (decode JSON-RPC envelope)
       - Dispatcher (route to provider/invoker)
-        - ApiProviderInterface.hasMethod()
-        - MethodInvokerInterface.invoke()
+        - ApiProvider.hasMethod()
+        - MethodInvoker.invoke()
       - Codec (encode JSON-RPC response)
  - HTTP Response
 ```
@@ -353,6 +353,124 @@ Both systems run independently in the same installation:
 The modern system does not replace or wrap the legacy system. They are
 parallel paths. Migration happens per-interface: an app adds a modern
 provider alongside its legacy API, then consumers switch at their own pace.
+
+## AJAX transport
+
+The Horde Dynamic UI communicates with the server through an AJAX layer
+built on `HordeCore.js`. This transport is distinct from JSON-RPC — it uses
+its own request/response envelope and its own URL conventions.
+
+### URL forms
+
+**Two-form (legacy):** `/services/ajax.php/{app}/{action}`
+
+The original URL pattern. Session auth only. The controller creates a
+legacy `Horde_Core_Ajax_Application` via factory, calls `doAction()`, and
+wraps the result in the HordeCore envelope. Existing apps continue to use
+this form unchanged.
+
+**Three-form (modern):** `/services/ajax.php/{app}/ajax/{interface.method}`
+
+New URL pattern for direct `ApiRegistry` dispatch. Supports dual auth
+(JWT + session). The controller bypasses the legacy Application entirely:
+it builds an `ApiCallContext` from request attributes, calls
+`$apiRegistry->invoke($qualifiedMethod, $params, $context)`, and wraps
+`Result->value` in the envelope.
+
+The three-form path is intended for new providers that want direct
+dispatch without legacy handler registration. Nothing calls it yet in
+production — it is additive infrastructure.
+
+### Response envelope
+
+Both forms return the same JSON envelope, wrapped in an XSSI prevention
+prefix:
+
+```
+/*-secure-{"response": ..., "msgs": [...], "tasks": {...}}*/
+```
+
+| Field | Content |
+|-------|---------|
+| `response` | Action return value (any JSON-serializable data) |
+| `msgs` | Notification messages drained from the handler stack |
+| `tasks` | Unsolicited task data keyed by `app:taskname` |
+
+The `HordeCoreEnvelopeBuilder` (in `horde/Core`) produces this envelope
+as a PSR-7 response. It is a pure data transformer with no globals.
+
+When `jsonhtml=1` is passed, the response body is HTML-entity-encoded
+(legacy pattern for iframe-based uploads in older browsers).
+
+### Authentication and CSRF
+
+The two-form route uses `AuthHordeSession` middleware only — matching the
+behaviour of the `services/ajax.php` script. CSRF token validation happens
+inside the `Horde_Core_Ajax_Application` constructor via
+`$session->checkToken()`.
+
+The three-form route uses a layered middleware stack:
+
+1. `JwtAuthMiddleware` — sets `auth_type=jwt` and `jwt_user_id` on the
+   request if a valid Bearer token is present
+2. `AuthHordeSession` — sets `HORDE_AUTHENTICATED_USER` from session
+3. `DemandAuthenticatedUser` — rejects if neither auth succeeded
+4. `ConditionalCsrfMiddleware` — skips CSRF for JWT (Bearer tokens are
+   not auto-sent by browsers), enforces for session auth
+
+This dual-auth model lets the same endpoint serve both traditional
+browser sessions and headless JWT clients.
+
+### Action resolution order (doAction)
+
+When the two-form path dispatches through `doAction()`, the resolution
+order is:
+
+1. **Legacy handlers** — registered via `addHandler()` in the app's
+   `_init()`. First handler that `has($action)` wins.
+2. **ApiRegistry fallback** — if the app's `Horde\{App}\Api` class
+   implements `ApiInterfaceListProvider`, iterate its declared interfaces
+   looking for one that exposes the action. First match invokes via
+   `$apiRegistry->invoke()`.
+3. **Application hooks** — `ajaxaction_handle` hook, then deprecated
+   `ajaxaction` hook.
+4. **Error** — throws if nothing handles the action.
+
+The ApiRegistry fallback (step 2) is additive: legacy handlers always win
+in resolution order. The fallback only activates for actions that would
+otherwise reach the hooks or error out. This allows providers to be
+gradually introduced alongside existing handlers without changing
+behaviour.
+
+The fallback is wrapped in try/catch — if the `ApiRegistry` is not wired
+(e.g. in a minimal installation), dispatch silently skips to hooks.
+
+### Migrating a handler action to a provider
+
+To move an action from a legacy handler to a modern provider:
+
+1. Create a provider class implementing `ApiProvider` and
+   `MethodInvoker` (see "Writing a provider" above)
+2. Register the interface in the app's `src/Api.php`
+3. Remove the method from the legacy handler
+4. The action now resolves through the ApiRegistry fallback (two-form) or
+   direct dispatch (three-form)
+
+Since the handler is checked first, adding a provider alongside an
+existing handler is safe — the handler continues to win until removed.
+
+### Provider parameters from AJAX
+
+When invoked through the two-form fallback, providers receive parameters
+as a flat associative array derived from `iterator_to_array($vars)`. This
+matches the form data that HordeCore.js sends.
+
+When invoked through the three-form path, providers receive parameters
+merged from query string and parsed request body — same flat array, but
+built from the PSR-7 request directly.
+
+Providers should accept named parameters via the `$params` array rather
+than positional arguments when supporting the AJAX transport.
 
 ## Package boundaries
 
