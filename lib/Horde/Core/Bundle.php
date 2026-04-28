@@ -1,6 +1,7 @@
 <?php
 
 use Horde\Util\Util;
+use Horde\Util\Variables;
 
 /**
  * Base class for the Horde bundle API.
@@ -133,14 +134,14 @@ abstract class Horde_Core_Bundle
     /**
      * Asks for the administrator settings.
      */
-    abstract protected function _configAuth(Horde_Variables $vars);
+    abstract protected function _configAuth(Horde_Variables|Variables $vars);
 
     /**
      * Writes the current configuration to the conf.php file.
      *
      * @throws Horde_Exception
      */
-    public function writeConfig(Horde_Variables $vars)
+    public function writeConfig(Horde_Variables|Variables $vars)
     {
         $this->_cli->writeln();
         echo 'Writing main configuration file...';

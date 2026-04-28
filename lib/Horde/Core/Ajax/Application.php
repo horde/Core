@@ -16,6 +16,8 @@
  * @property string $app  The current application
  * @property Horde_Variables $vars  The Variables object.
  */
+use Horde\Util\Variables;
+
 abstract class Horde_Core_Ajax_Application
 {
     /**
@@ -56,7 +58,7 @@ abstract class Horde_Core_Ajax_Application
     /**
      * The request variables.
      *
-     * @var Horde_Variables
+     * @var Horde_Variables|Variables
      */
     protected $_vars;
 
@@ -64,7 +66,7 @@ abstract class Horde_Core_Ajax_Application
      * Constructor.
      *
      * @param string $app            The application name.
-     * @param Horde_Variables $vars  Form/request data.
+     * @param Horde_Variables|Variables $vars  Form/request data.
      * @param string $action         The AJAX action to perform.
      * @param string $token          Session token.
      *

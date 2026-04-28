@@ -1,6 +1,7 @@
 <?php
 
 use Horde\Util\Util;
+use Horde\Util\Variables;
 
 /**
  * The Horde_Core_Ui_VarRenderer_html:: class renders variables to HTML.
@@ -998,8 +999,8 @@ function %s()
      * Used in admin/user and possibly more places
      *
      * @param Horde_Form $form
-     * @param Horde_Variables $var
-     * @param Horde_Variables $vars
+     * @param Horde_Variables|Variables $var
+     * @param Horde_Variables|Variables $vars
      * @return void
      */
     protected function _renderVarInput_passwordconfirm($form, &$var, &$vars)

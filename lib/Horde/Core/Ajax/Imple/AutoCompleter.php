@@ -12,6 +12,8 @@
  * @package  Core
  */
 
+use Horde\Util\Variables;
+
 /**
  * Attach an auto completer to a HTML element.
  *
@@ -53,7 +55,7 @@ abstract class Horde_Core_Ajax_Imple_AutoCompleter extends Horde_Core_Ajax_Imple
 
     /**
      */
-    protected function _handle(Horde_Variables $vars)
+    protected function _handle(Horde_Variables|Variables $vars)
     {
         // Avoid errors if 'input' isn't set and short-circuit empty searches.
         if (!isset($vars->input)) {

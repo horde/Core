@@ -14,6 +14,8 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+use Horde\Util\Variables;
+
 abstract class Horde_Core_Ui_Widget
 {
     /**
@@ -62,7 +64,7 @@ abstract class Horde_Core_Ui_Widget
      *
      * @param string $name           The name of the variable which will
      *                               track this UI widget's state.
-     * @param Horde_Variables $vars  A Horde_Variables:: object.
+     * @param Horde_Variables|Variables $vars  A Horde_Variables:: object.
      * @param array $config          The widget's configuration.
      */
     public function __construct($name, $vars, $config = [])

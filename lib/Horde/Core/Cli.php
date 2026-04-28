@@ -12,12 +12,14 @@
  * @author  Jan Schneider <jan@horde.org>
  * @package Core
  */
+use Horde\Util\Variables;
+
 class Horde_Core_Cli extends Horde_Cli
 {
     /**
      * Shows a prompt for a single configuration setting.
      *
-     * @param Horde_Variables $vars  This is going to be populated with the
+     * @param Horde_Variables|Variables $vars  This is going to be populated with the
      *                               answers.
      * @param string $prefix         The current prefix for $name.
      * @param string $name           The name of the configuration setting.

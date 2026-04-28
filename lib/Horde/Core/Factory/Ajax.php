@@ -24,13 +24,15 @@
  * @author   Michael Slusarz <slusarz@horde.org>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
+use Horde\Util\Variables;
+
 class Horde_Core_Factory_Ajax extends Horde_Core_Factory_Base
 {
     /**
      * Return a Horde_Core_Ajax_Application instance.
      *
      * @param string $app            The application name.
-     * @param Horde_Variables $vars  Form/request data.
+     * @param Horde_Variables|Variables $vars  Form/request data.
      * @param string $action         The AJAX action to perform.
      * @param string $token          Session token.
      *

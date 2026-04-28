@@ -1,6 +1,7 @@
 <?php
 
 use Horde\Util\Util;
+use Horde\Util\Variables;
 
 /**
  * The Horde_Core_Perms_Ui class provides UI methods for the Horde permissions
@@ -179,7 +180,7 @@ class Horde_Core_Perms_Ui
     /**
      * Set an existing vars object to use for the edit form.
      *
-     * @param Horde_Variables $vars  An existing Horde_Variables object to
+     * @param Horde_Variables|Variables $vars  An existing Horde_Variables object to
      *                               use.
      */
     public function setVars($vars)

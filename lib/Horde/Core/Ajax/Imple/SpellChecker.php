@@ -13,6 +13,7 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+use Horde\Util\Variables;
 use Horde\Core\Horde;
 
 class Horde_Core_Ajax_Imple_SpellChecker extends Horde_Core_Ajax_Imple
@@ -86,7 +87,7 @@ class Horde_Core_Ajax_Imple_SpellChecker extends Horde_Core_Ajax_Imple
      * Form variables used:
      *   - input
      */
-    protected function _handle(Horde_Variables $vars)
+    protected function _handle(Horde_Variables|Variables $vars)
     {
         global $injector;
 

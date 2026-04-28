@@ -13,6 +13,8 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+use Horde\Util\Variables;
+
 class Horde_Core_Ajax_Imple_Geocoder_Geonames extends Horde_Core_Ajax_Imple
 {
     /**
@@ -34,7 +36,7 @@ class Horde_Core_Ajax_Imple_Geocoder_Geonames extends Horde_Core_Ajax_Imple
      *
      * @throws Horde_Exception
      */
-    protected function _handle(Horde_Variables $vars)
+    protected function _handle(Horde_Variables|Variables $vars)
     {
         if ($vars->location) {
             $url = new Horde_Url('https://secure.geonames.org/searchJSON');

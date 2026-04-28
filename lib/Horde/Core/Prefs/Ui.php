@@ -2,6 +2,7 @@
 
 use Horde\Core\Horde;
 use Horde\Util\Util;
+use Horde\Util\Variables;
 
 /**
  * Copyright 2001-2026 Horde LLC (http://www.horde.org/)
@@ -99,7 +100,7 @@ class Horde_Core_Prefs_Ui
     /**
      * Constructor.
      *
-     * @param Horde_Variables $vars  Form variables.
+     * @param Horde_Variables|Variables $vars  Form variables.
      */
     public function __construct($vars)
     {

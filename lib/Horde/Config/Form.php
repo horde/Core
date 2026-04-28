@@ -13,6 +13,8 @@
  * @category Horde
  * @package  Core
  */
+use Horde\Util\Variables;
+
 class Horde_Config_Form extends Horde_Form
 {
     /**
@@ -25,7 +27,7 @@ class Horde_Config_Form extends Horde_Form
     /**
      * Contains the Horde_Variables object of this form.
      *
-     * @var Horde_Variables
+     * @var Horde_Variables|Variables
      */
     protected $_vars;
 
@@ -40,7 +42,7 @@ class Horde_Config_Form extends Horde_Form
     /**
      * Constructor.
      *
-     * @param Horde_Variables &$vars  The variables object of this form.
+     * @param Horde_Variables|Variables &$vars  The variables object of this form.
      * @param string $app             The name of the application that this
      *                                configuration form is for.
      * @param boolean $fillvars       Whether to fill the $vars object with

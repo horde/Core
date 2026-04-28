@@ -13,6 +13,8 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+use Horde\Util\Variables;
+
 abstract class Horde_Core_Ajax_Imple
 {
     /**
@@ -103,11 +105,11 @@ abstract class Horde_Core_Ajax_Imple
     /**
      * Imple handler.
      *
-     * @param Horde_Variables $vars  A variables object.
+     * @param Horde_Variables|Variables $vars  A variables object.
      *
      * @return mixed  Data to return to the browser.
      */
-    public function handle(Horde_Variables $vars)
+    public function handle(Horde_Variables|Variables $vars)
     {
         if (isset($vars->imple_submit)) {
             $submit = Horde_Serialize::unserialize($vars->imple_submit, Horde_Serialize::JSON);
@@ -201,10 +203,10 @@ abstract class Horde_Core_Ajax_Imple
     /**
      * Imple handler.
      *
-     * @param Horde_Variables $vars  A variables object.
+     * @param Horde_Variables|Variables $vars  A variables object.
      *
      * @return mixed  Data to return to the browser.
      */
-    abstract protected function _handle(Horde_Variables $vars);
+    abstract protected function _handle(Horde_Variables|Variables $vars);
 
 }

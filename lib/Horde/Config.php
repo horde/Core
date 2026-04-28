@@ -20,6 +20,7 @@ use Horde\Core\Config\Legacy\LegacyConfigAdapter;
 use Horde\Core\Horde;
 use Horde\Injector\Injector;
 use Horde\Util\Util;
+use Horde\Util\Variables;
 
 class Horde_Config
 {
@@ -316,7 +317,7 @@ class Horde_Config
      * Generates and writes the content of the application's configuration
      * file.
      *
-     * @param Horde_Variables $formvars  The processed configuration form
+     * @param Horde_Variables|Variables $formvars  The processed configuration form
      *                                   data.
      * @param string $php                The content of the generated
      *                                   configuration file.
@@ -358,7 +359,7 @@ class Horde_Config
     /**
      * Generates the content of the application's configuration file.
      *
-     * @param Horde_Variables $formvars  The processed configuration form
+     * @param Horde_Variables|Variables $formvars  The processed configuration form
      *                                   data.
      * @param array $custom_conf         Any settings that shall be included
      *                                   in the generated configuration.
@@ -395,7 +396,7 @@ class Horde_Config
      *                                   be translated to keys of the $conf
      *                                   array in the generated configuration
      *                                   file.
-     * @param Horde_Variables $formvars  The processed configuration form
+     * @param Horde_Variables|Variables $formvars  The processed configuration form
      *                                   data.
      */
     protected function _generatePHPConfig($section, $prefix, $formvars)

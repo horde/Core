@@ -14,6 +14,7 @@
  */
 
 use Horde\Backup;
+use Horde\Util\Variables;
 
 /**
  * Default class for the Horde Application API.
@@ -344,7 +345,7 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      * IMPORTANT: Applications providing this method MUST implement
      * authentication/permission checking themselves!
      *
-     * @param Horde_Variables $vars  Form variables provided to download
+     * @param Horde_Variables|Variables $vars  Form variables provided to download
      *                               script. The filename is available in
      *                               the 'filename' parameter.
      *
@@ -357,7 +358,7 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      *   - type: (string) MIME type to send (default:
      *           application/octet-stream).
      */
-    public function download(Horde_Variables $vars)
+    public function download(Horde_Variables|Variables $vars)
     {
         return [];
     }

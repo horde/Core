@@ -14,6 +14,8 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+use Horde\Util\Variables;
+
 abstract class Horde_Core_Ajax_Imple_InPlaceEditor extends Horde_Core_Ajax_Imple
 {
     /**
@@ -98,7 +100,7 @@ abstract class Horde_Core_Ajax_Imple_InPlaceEditor extends Horde_Core_Ajax_Imple
 
     /**
      */
-    protected function _handle(Horde_Variables $vars)
+    protected function _handle(Horde_Variables|Variables $vars)
     {
         $data = (!$vars->load && (!isset($vars->input) || !isset($vars->id)))
             ? ''
@@ -110,6 +112,6 @@ abstract class Horde_Core_Ajax_Imple_InPlaceEditor extends Horde_Core_Ajax_Imple
     /**
      * @return mixed  Raw data to return to in-place-editor.
      */
-    abstract protected function _handleEdit(Horde_Variables $vars);
+    abstract protected function _handleEdit(Horde_Variables|Variables $vars);
 
 }

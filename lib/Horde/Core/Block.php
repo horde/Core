@@ -193,7 +193,7 @@ abstract class Horde_Core_Block
      * needed so code is executed in the scope of the application the
      * block originated from.
      *
-     * @param Horde_Variables $vars
+     * @param Horde_Variables|Variables $vars
      *
      * @return string  The block's content.
      */
@@ -208,7 +208,7 @@ abstract class Horde_Core_Block
      *
      * @todo For Horde 6 this should be abstract.
      *
-     * @param  Horde_Variables $vars
+     * @param  Horde_Variables|Variables $vars
      *
      * @return string
      */
@@ -220,11 +220,11 @@ abstract class Horde_Core_Block
     /**
      * The data to send on an AJAX update request.
      *
-     * @param Horde_Variables $vars  The form variables for the request.
+     * @param Horde_Variables|Variables $vars  The form variables for the request.
      *
      * @return string  Update data.
      */
-    public function getAjaxUpdate(Horde_Variables $vars)
+    public function getAjaxUpdate(Horde_Variables|Variables $vars)
     {
         return $this->_call('_ajaxUpdate', '', $vars);
     }
@@ -232,11 +232,11 @@ abstract class Horde_Core_Block
     /**
      * Returns this block's content for AJAX updates.
      *
-     * @param Horde_Variables $vars  The form variables for the request.
+     * @param Horde_Variables|Variables $vars  The form variables for the request.
      *
      * @return string  The update content.
      */
-    protected function _ajaxUpdate(Horde_Variables $vars)
+    protected function _ajaxUpdate(Horde_Variables|Variables $vars)
     {
         return '';
     }
