@@ -1,4 +1,23 @@
 ---
+3.0.0-beta24:
+  api: 3.0.0-beta24
+  state:
+    release: beta
+    api: beta
+  date: 2026-04-29
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    feat: VersionCheck Service and factory for modern Hashtables
+    feat: Modern translation handler service capable of handling ICU and decoupled from globals
+    docs: Document Core Greenfield best practices and add the Interapp RPC aspects of Ajax handler
+    refactor: Drop the Interface suffix, it was a mistake
+    refactor: Make Horde_Core_Ajax_Application a mere shell for Horde\Core\Ajax\Application
+    refactor: Allow Horde\Util\Variables in most places Horde_Variables is accepted
+    refactor(DefaultInjectorBindings): Prefer "use" statements over FQCN in PSR-4 names
+    feat: Envelope Builder for modernized Ajax Framework
+    feat: Conditional CSRF Middleware
 3.0.0-beta23:
   api: 3.0.0-beta23
   state:
