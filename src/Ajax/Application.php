@@ -138,9 +138,7 @@ abstract class Application
     /**
      * Application initialization code.
      */
-    protected function _init()
-    {
-    }
+    protected function _init() {}
 
     /**
      */
