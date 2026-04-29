@@ -18,6 +18,4 @@
  */
 use Horde\Core\Ajax\Application;
 
-abstract class Horde_Core_Ajax_Application extends Application
-{
-}
+abstract class Horde_Core_Ajax_Application extends Application {}
