@@ -20,6 +20,13 @@
  * The data is attempted to be removed at the end of the session, so there is
  * no guarantee of persistence across sessions.
  *
+ * NOTE: This is a session-scoped temp file manager, not a caching or
+ * data-structure use case. It abuses the HashTable_Vfs class hierarchy to get
+ * key-based get/set/delete semantics over VFS file storage with automatic
+ * session-bound cleanup. The modern Horde\HashTable\ interfaces (PSR-4 in
+ * src/) do not cover this pattern. When modernizing, replace with a dedicated
+ * TempFileStore service that wraps VFS directly.
+ *
  * @author    Michael Slusarz <slusarz@horde.org>
  * @category  Horde
  * @copyright 2014-2017 Horde LLC
