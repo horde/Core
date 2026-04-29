@@ -26,6 +26,8 @@ use Horde\Core\Service\VersionCheck\VersionService;
 use Horde\Injector\Injector;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
 use Throwable;
 
@@ -77,10 +79,24 @@ class VersionServiceFactory
 
         try {
             $cache = $injector->getInstance(CacheInterface::class);
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            $logger = $this->getLogger($injector);
+            $logger->warning(
+                'VersionServiceFactory: SimpleCache unavailable, falling back to NullCache. '
+                . 'Version check results will not be cached. Reason: ' . $e->getMessage()
+            );
             $cache = new Cache(new NullStorage());
         }
 
         return new PackagistAvailableSource($httpClient, $requestFactory, $cache);
+    }
+
+    private function getLogger(Injector $injector): LoggerInterface
+    {
+        try {
+            return $injector->getInstance(LoggerInterface::class);
+        } catch (Throwable) {
+            return new NullLogger();
+        }
     }
 }
