@@ -23,6 +23,13 @@
  * features in combination with the cleanup and simplicity features of
  * HashTable.
  *
+ * NOTE: This class is a session-scoped temp file manager that borrows the
+ * HashTable key-based API shape. It is NOT a caching or data-structure use
+ * case. The modern Horde\HashTable\ interfaces (PSR-4 in src/) intentionally
+ * do not include a VFS driver — this functionality should eventually be
+ * replaced by a dedicated TempFileStore service that operates on VFS directly
+ * without inheriting from the HashTable class hierarchy.
+ *
  * @author    Michael Slusarz <slusarz@horde.org>
  * @category  Horde
  * @copyright 2014-2017 Horde LLC

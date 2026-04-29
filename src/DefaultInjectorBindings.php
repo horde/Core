@@ -35,6 +35,7 @@ use Horde\Core\Factory\DbServiceFactory;
 use Horde\Core\Factory\DriverRepositoryFactory;
 use Horde\Core\Factory\EventDispatcherFactory;
 use Horde\Core\Factory\GroupServiceFactory;
+use Horde\Core\Factory\HashTableFactory;
 use Horde\Core\Factory\HordeLdapServiceFactory;
 use Horde\Core\Factory\HttpClientFactory;
 use Horde\Core\Factory\IdentityServiceFactory;
@@ -77,6 +78,7 @@ use Horde\Core\Factory\SessionHandlerFactory;
 use Horde\Core\Factory\SimpleCacheFactory;
 use Horde\Core\Factory\TinymceFactory;
 use Horde\Core\Factory\TinymcePageBinderFactory;
+use Horde\Core\Factory\VersionServiceFactory;
 use Horde\Core\Middleware\AuthIsGlobalAdmin;
 use Horde\Core\Middleware\OAuthConsentMiddleware;
 use Horde\Core\Service\ApplicationService;
@@ -89,10 +91,14 @@ use Horde\Core\Service\OAuthProviderConfigRepository;
 use Horde\Core\Service\OAuthTokenService;
 use Horde\Core\Service\PermissionService;
 use Horde\Core\Service\PrefsService;
+use Horde\Core\Service\VersionCheck\VersionService;
 use Horde\Core\Uri\RegistryRouteMapperProvider;
 use Horde\Core\Uri\RouteMapperProvider;
 use Horde\Db\Adapter as DbAdapter;
 use Horde\Editor\Tinymce;
+use Horde\HashTable\HashTable;
+use Horde\HashTable\LockableHashTable;
+use Horde\HashTable\RedisHashTable;
 use Horde\Horde\Factory\AuthenticationServiceFactory;
 use Horde\Horde\Factory\JwtServiceFactory;
 use Horde\Horde\Factory\OAuthHttpClientServiceFactory as BaseOAuthHttpClientServiceFactory;
@@ -133,12 +139,16 @@ use Horde\Secret\SecretManager;
 use Horde\SessionHandler\SessionHandler;
 use Horde\Token\Token;
 use Horde\Http\RequestFactory;
+use Horde\Http\ResponseFactory;
+use Horde\Http\StreamFactory;
 use Horde\Util\Variables;
 use Horde_Injector;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Http\Client\ClientInterface as PsrHttpClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Psr\SimpleCache\CacheInterface as SimpleCacheInterface;
 
@@ -172,6 +182,9 @@ class DefaultInjectorBindings implements InjectorBindings
             'Horde_Group' => 'Horde_Core_Factory_Group',
             'Horde_Group_Base' => 'Horde_Core_Factory_Group',
             'Horde_HashTable' => 'Horde_Core_Factory_HashTable',
+            HashTable::class => HashTableFactory::class,
+            LockableHashTable::class => [HashTableFactory::class, 'createLockable'],
+            RedisHashTable::class => [HashTableFactory::class, 'createRedis'],
             'Horde_History' => 'Horde_Core_Factory_History',
             'Horde_Lock' => 'Horde_Core_Factory_Lock',
             'Horde_Log_Logger' => 'Horde_Core_Factory_Logger',
@@ -255,6 +268,7 @@ class DefaultInjectorBindings implements InjectorBindings
             AuthService::class => AuthServiceFactory::class,
             HordeLdapService::class => HordeLdapServiceFactory::class,
             PermissionService::class => PermissionServiceFactory::class,
+            VersionService::class => VersionServiceFactory::class,
             Tinymce::class => TinymceFactory::class,
             TinymcePageBinder::class => TinymcePageBinderFactory::class,
             EventDispatcherInterface::class => [EventDispatcherFactory::class, 'create'],
@@ -266,6 +280,8 @@ class DefaultInjectorBindings implements InjectorBindings
         $implementations = [
             'Horde_Controller_ResponseWriter' => 'Horde_Controller_ResponseWriter_Web',
             RequestFactoryInterface::class => RequestFactory::class,
+            ResponseFactoryInterface::class => ResponseFactory::class,
+            StreamFactoryInterface::class => StreamFactory::class,
             RouteMapperProvider::class => RegistryRouteMapperProvider::class,
         ];
 

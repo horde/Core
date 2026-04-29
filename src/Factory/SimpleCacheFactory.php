@@ -23,9 +23,9 @@ use Horde\Cache\NullStorage;
 use Horde\Cache\SqlStorage;
 use Horde\Core\Config\ConfigLoader;
 use Horde\Core\Config\State;
+use Horde\HashTable\HashTable;
 use Horde\Injector\Injector;
 use Horde_Db_Adapter;
-use Horde_HashTable_Base;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Throwable;
@@ -133,7 +133,7 @@ class SimpleCacheFactory
 
     private function createHashtableStorage(Injector $injector, LoggerInterface $logger): HashtableStorage
     {
-        $hashtable = $injector->getInstance(Horde_HashTable_Base::class);
+        $hashtable = $injector->get(HashTable::class);
 
         return new HashtableStorage(hashtable: $hashtable, logger: $logger);
     }
