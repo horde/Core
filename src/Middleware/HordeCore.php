@@ -61,8 +61,10 @@ class HordeCore implements MiddlewareInterface
 
         $registry = $injector->getInstance('Horde_Registry');
         $admins = $GLOBALS['conf']['auth']['admins'] ?? [];
+        $errorFilter = new ErrorFilter($admins, new ResponseFactory(), new StreamFactory());
+        $injector->setInstance(ErrorFilter::class, $errorFilter);
         // First middleware should be ErrorFilter to catch all errors
-        $handler->addMiddleware(new ErrorFilter($admins, new ResponseFactory(), new StreamFactory()));
+        $handler->addMiddleware($errorFilter);
         // Detect correct app
         $registryState = new RegistryState($registry->applications);
         $handler->addMiddleware(new AppFinder($registryState, new ResponseFactory(), new StreamFactory()));
