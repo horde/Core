@@ -99,6 +99,8 @@ dependencies:
       horde/oauth: ^4
       horde/view: ^3
       php81_bc/strftime: ^0.7
+      psr/simple-cache-implementation: ^3
+      psr/simple-cache: ^3
     ext:
       session: '*'
   optional:
