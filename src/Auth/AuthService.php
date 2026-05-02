@@ -3,197 +3,214 @@
 declare(strict_types=1);
 
 /**
- * Copyright 2026 The Horde Project (http://www.horde.org/)
+ * Copyright 2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
  *
- * @category Horde
- * @package  Core
- * @author   Ralf Lang <ralf.lang@ralf-lang.de>
- * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
+ * @license http://www.horde.org/licenses/lgpl21 LGPL-2.1
  */
 
 namespace Horde\Core\Auth;
 
-use Horde_Auth_Base;
-use Horde_Auth_Exception;
+use Horde\Auth\AccessDecision;
+use Horde\Auth\AccessPolicy;
+use Horde\Auth\AuthResultFail;
+use Horde\Auth\AuthResultSuccess;
+use Horde\Auth\CredentialProvider;
+use Horde\Auth\UserDirectory;
+use Horde\Auth\UserEntry;
+use Horde\Auth\UserLifecycleManager;
 use Horde\Core\Factory\AuthServiceFactory;
+use Horde\Horde\Service\AuthLink;
 use Horde\Injector\Attribute\Factory;
 
 /**
- * Modern wrapper for Horde_Auth_Base with proper dependency injection
+ * Core authentication service orchestrating credential validation,
+ * access policy, and identity resolution.
  *
- * Provides capability detection, consistent API, and eliminates
- * reliance on global state in modern controllers.
- *
- * Wraps any Horde_Auth_Base implementation (Horde_Core_Auth_Application,
- * Horde_Auth_Sql, Horde_Auth_Ldap, etc.)
- *
- * @category Horde
- * @package  Core
- * @author   Ralf Lang <ralf.lang@ralf-lang.de>
- * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
+ * This is the main entry point for authentication in Horde. It
+ * composes a CredentialProvider, AccessPolicy, and IdentityBridgeService
+ * to produce a full AuthenticationOutcome.
  */
 #[Factory(factory: AuthServiceFactory::class, method: 'create')]
 class AuthService
 {
-    /**
-     * Constructor
-     *
-     * @param Horde_Auth_Base $auth Legacy auth backend instance
-     */
     public function __construct(
-        private Horde_Auth_Base $auth
+        private readonly CredentialProvider $provider,
+        private readonly AccessPolicy $policy,
+        private readonly IdentityBridgeService $identityBridge,
     ) {}
 
     /**
-     * Check if backend supports user listing
+     * Full authentication flow: policy → credentials → identity resolution.
      *
-     * Tests capability by attempting to call listUsers() and catching
-     * the "Unsupported" exception thrown by base implementation.
+     * Returns an AuthenticationOutcome carrying the identity ID on success,
+     * or denial/failure details otherwise.
+     */
+    public function authenticate(string $userId, array $credentials): AuthenticationOutcome
+    {
+        $preDecision = $this->policy->preAuth($userId);
+        if ($preDecision->isDenied()) {
+            return AuthenticationOutcome::denied($preDecision);
+        }
+
+        $result = $this->provider->validate($userId, $credentials);
+
+        $postDecision = $this->policy->postAuth($userId, $result);
+        if ($postDecision->isDenied()) {
+            return AuthenticationOutcome::denied($postDecision, $result);
+        }
+
+        if ($result instanceof AuthResultFail) {
+            return AuthenticationOutcome::failed($result);
+        }
+
+        $identity = $this->identityBridge->resolveOrCreate(
+            $result->getBackend(),
+            $result->getNativeKey(),
+            $result->get('mail'),
+            $result->get('displayName'),
+        );
+
+        $policyForOutcome = $postDecision->requiresAction() ? $postDecision : null;
+
+        return AuthenticationOutcome::success($result, $identity->id, $policyForOutcome);
+    }
+
+    /**
+     * Credential check without identity resolution or session creation.
      *
-     * @return bool True if backend supports listing
+     * Suitable for HTTP Basic auth, token validation, or any context
+     * where only credential validity matters.
+     */
+    public function checkCredentials(string $userId, array $credentials): CredentialCheckResult
+    {
+        $outcome = $this->authenticate($userId, $credentials);
+
+        return $outcome->toCredentialCheckResult();
+    }
+
+    /**
+     * Check if the underlying provider supports user listing.
      */
     public function supportsListing(): bool
     {
-        try {
-            $this->auth->listUsers();
-            return true;
-        } catch (Horde_Auth_Exception $e) {
-            if (str_contains($e->getMessage(), 'Unsupported')) {
-                return false;
-            }
-            // Re-throw unexpected errors (e.g., connection failures)
-            throw $e;
-        }
+        return $this->provider instanceof UserDirectory;
     }
 
     /**
-     * List all users
+     * List all users from the provider's user directory.
      *
-     * Returns array of usernames from auth backend.
-     *
-     * @param bool $sort Sort the users alphabetically
-     * @return string[] Array of usernames
+     * @param bool $sort Sort the users alphabetically by userId
+     * @return string[] Array of user IDs
      * @throws AuthNotSupportedException If backend doesn't support listing
-     * @throws Horde_Auth_Exception On backend errors
      */
     public function listUsers(bool $sort = false): array
     {
-        try {
-            return $this->auth->listUsers($sort);
-        } catch (Horde_Auth_Exception $e) {
-            if (str_contains($e->getMessage(), 'Unsupported')) {
-                throw new AuthNotSupportedException(
-                    'Auth backend does not support user listing'
-                );
-            }
-            throw $e;
+        if (!$this->provider instanceof UserDirectory) {
+            throw new AuthNotSupportedException(
+                'Auth backend does not support user listing'
+            );
         }
+
+        $userIds = [];
+        foreach ($this->provider->list() as $entry) {
+            $userIds[] = $entry->getUserId();
+        }
+
+        if ($sort) {
+            sort($userIds);
+        }
+
+        return $userIds;
     }
 
     /**
-     * Check if user exists
+     * Check if user exists in the provider's user directory.
      *
-     * @param string $username Username to check
-     * @return bool True if user exists
-     * @throws Horde_Auth_Exception On backend errors
+     * @throws AuthNotSupportedException If backend doesn't support user lookup
      */
     public function exists(string $username): bool
     {
-        return $this->auth->exists($username);
+        if (!$this->provider instanceof UserDirectory) {
+            throw new AuthNotSupportedException(
+                'Auth backend does not support user lookup'
+            );
+        }
+
+        return $this->provider->exists($username);
     }
 
     /**
-     * Update user password
+     * Create a new user in the provider backend.
      *
-     * @param string $username Username to update
-     * @param string $newPassword New password
-     * @return void
-     * @throws Horde_Auth_Exception On backend errors or if user doesn't exist
-     */
-    public function updatePassword(string $username, string $newPassword): void
-    {
-        $this->auth->updateUser($username, $username, [
-            'password' => $newPassword,
-        ]);
-    }
-
-    /**
-     * Create new user
-     *
-     * @param string $username Username for new user
-     * @param array $credentials User credentials and attributes
-     *                          Required: 'password'
-     *                          Optional: 'email', 'full_name', etc.
-     * @return void
-     * @throws Horde_Auth_Exception On backend errors or if user exists
+     * @throws AuthNotSupportedException If backend doesn't support user creation
      */
     public function createUser(string $username, array $credentials): void
     {
-        $this->auth->addUser($username, $credentials);
+        if (!$this->provider instanceof UserLifecycleManager) {
+            throw new AuthNotSupportedException(
+                'Auth backend does not support user creation'
+            );
+        }
+
+        $this->provider->addUser($username, $credentials);
     }
 
     /**
-     * Delete user
+     * Delete a user from the provider backend.
      *
-     * @param string $username Username to delete
-     * @return void
-     * @throws Horde_Auth_Exception On backend errors
+     * @throws AuthNotSupportedException If backend doesn't support user deletion
      */
     public function deleteUser(string $username): void
     {
-        $this->auth->removeUser($username);
+        if (!$this->provider instanceof UserLifecycleManager) {
+            throw new AuthNotSupportedException(
+                'Auth backend does not support user deletion'
+            );
+        }
+
+        $this->provider->removeUser($username);
     }
 
     /**
-     * Authenticate user credentials
+     * Search users in the provider's user directory.
      *
-     * @param string $username Username to authenticate
-     * @param string $password Password to verify
-     * @return bool True if credentials valid
-     * @throws Horde_Auth_Exception On backend errors
-     */
-    public function authenticate(string $username, string $password): bool
-    {
-        return $this->auth->authenticate($username, [
-            'password' => $password,
-        ]);
-    }
-
-    /**
-     * Search users by substring
-     *
-     * @param string $search Search term
-     * @return string[] Array of matching usernames
+     * @return string[] Array of matching user IDs
      * @throws AuthNotSupportedException If backend doesn't support searching
-     * @throws Horde_Auth_Exception On backend errors
      */
     public function searchUsers(string $search): array
     {
-        try {
-            return $this->auth->searchUsers($search);
-        } catch (Horde_Auth_Exception $e) {
-            if (str_contains($e->getMessage(), 'Unsupported')) {
-                throw new AuthNotSupportedException(
-                    'Auth backend does not support user searching'
-                );
-            }
-            throw $e;
+        if (!$this->provider instanceof UserDirectory) {
+            throw new AuthNotSupportedException(
+                'Auth backend does not support user searching'
+            );
         }
+
+        $userIds = [];
+        foreach ($this->provider->search($search) as $entry) {
+            $userIds[] = $entry->getUserId();
+        }
+
+        return $userIds;
     }
 
     /**
-     * Get underlying auth backend instance
+     * Get the underlying credential provider.
      *
-     * Provides escape hatch for operations not yet wrapped by this service.
-     * Use sparingly - prefer adding methods to AuthService instead.
-     *
-     * @return Horde_Auth_Base
+     * Escape hatch for operations not yet wrapped by this service.
      */
-    public function getBackend(): Horde_Auth_Base
+    public function getProvider(): CredentialProvider
     {
-        return $this->auth;
+        return $this->provider;
+    }
+
+    /**
+     * Get the identity bridge service for direct identity operations.
+     */
+    public function getIdentityBridge(): IdentityBridgeService
+    {
+        return $this->identityBridge;
     }
 }

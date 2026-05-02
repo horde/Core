@@ -3,23 +3,20 @@
 declare(strict_types=1);
 
 /**
- * Copyright 2026 The Horde Project (http://www.horde.org/)
+ * Copyright 2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
  *
- * @category Horde
- * @package  Core
- * @author   Ralf Lang <ralf.lang@ralf-lang.de>
- * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
+ * @license http://www.horde.org/licenses/lgpl21 LGPL-2.1
  */
 
 namespace Horde\Core\Middleware;
 
+use Horde\Core\Auth\AuthService;
 use Horde\Core\Auth\CredentialCheckResult;
 use Horde\Core\Factory\CheckCredentialsFactory;
 use Horde\Injector\Attribute\Factory;
-use Horde_Core_Auth_Application;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -36,7 +33,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 class CheckCredentials implements MiddlewareInterface
 {
     public function __construct(
-        private Horde_Core_Auth_Application $auth,
+        private readonly AuthService $authService,
     ) {}
 
     public function process(
@@ -64,7 +61,7 @@ class CheckCredentials implements MiddlewareInterface
 
             [$user, $password] = $parts;
 
-            $result = $this->auth->checkCredentials($user, [
+            $result = $this->authService->checkCredentials($user, [
                 'password' => $password,
             ]);
 

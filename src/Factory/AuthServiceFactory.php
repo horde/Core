@@ -3,123 +3,148 @@
 declare(strict_types=1);
 
 /**
- * Copyright 2026 The Horde Project (http://www.horde.org/)
+ * Copyright 2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
  *
- * @category Horde
- * @package  Core
- * @author   Ralf Lang <ralf.lang@ralf-lang.de>
- * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
+ * @license http://www.horde.org/licenses/lgpl21 LGPL-2.1
  */
 
 namespace Horde\Core\Factory;
 
+use Closure;
+use Horde\Auth\AccessPolicy;
+use Horde\Auth\CredentialProvider;
+use Horde\Auth\Imap;
+use Horde\Auth\Ldap;
+use Horde\Auth\Policy\CompoundPolicy;
+use Horde\Auth\Policy\LockoutPolicy;
+use Horde\Auth\Policy\NullPolicy;
+use Horde\Auth\Sql;
 use Horde\Core\Auth\AuthService;
-use Horde\Core\Service\HordeDbService;
+use Horde\Core\Auth\CredentialProviderRegistry;
+use Horde\Core\Auth\IdentityBridgeService;
 use Horde\Core\Config\ConfigLoader;
-use Horde_Auth_Sql;
-use Horde_Core_Auth_Application;
+use Horde\Core\Service\HordeDbService;
+use Horde\Imap\Client\ConnectionConfig;
+use Horde\Imap\Client\SecureMode;
 use Horde_Injector;
-use Horde_Log_Logger;
+use Horde_Ldap;
 use RuntimeException;
 
 /**
- * Factory for creating AuthService with proper backend
- *
- * Creates auth service from configuration without globals.
- * Mirrors legacy Horde_Core_Factory_Auth behavior:
- * - Returns Horde_Core_Auth_Application wrapping base driver
- * - For 'horde' app: creates base driver (Horde_Auth_Sql, etc)
- * - Wraps in Application auth for hooks and app-specific features
- *
- * Currently implemented:
- * - 'sql': SQL authentication (Horde_Auth_Sql)
- * - 'auto': Defaults to SQL
- *
- * TODO: Implement additional drivers as needed:
- * - 'ldap': LDAP authentication (Horde_Core_Auth_Ldap)
- * - 'msad': Microsoft Active Directory (Horde_Core_Auth_Msad)
- * - 'composite': Multi-backend auth (Horde_Core_Auth_Composite)
- * - 'application': App-specific auth (other apps, not horde)
- * - 'shibboleth', 'x509', 'imsp', etc.
- *
- * @category Horde
- * @package  Core
- * @author   Ralf Lang <ralf.lang@ralf-lang.de>
- * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
+ * Factory for creating AuthService with configured backend, policy, and
+ * identity bridge from application configuration.
  */
 class AuthServiceFactory
 {
-    /**
-     * Create AuthService instance
-     *
-     * Returns Horde_Core_Auth_Application wrapping the configured
-     * base auth driver, matching legacy factory behavior.
-     *
-     * @param Horde_Injector $injector Dependency injector
-     * @return AuthService Auth service with configured backend
-     * @throws RuntimeException If driver unsupported
-     */
     public function create(Horde_Injector $injector): AuthService
     {
         $loader = $injector->getInstance(ConfigLoader::class);
         $state = $loader->load('horde');
 
-        $driver = $state->get('auth.driver', 'auto');
+        $driver = $state->get('auth.driver', 'sql');
         $params = $state->get('auth.params', []);
 
-        // Get dependencies
-        $dbService = $injector->getInstance(HordeDbService::class);
-        $logger = $injector->getInstance(Horde_Log_Logger::class);
+        $provider = $this->buildProvider($driver, $params, $injector);
+        $policy = $this->buildPolicy($params, $injector);
+        $identityBridge = $injector->getInstance(IdentityBridgeService::class);
 
-        // Create base driver based on config
-        $baseDriver = match ($driver) {
-            'sql' => $this->createSqlBackend($params, $dbService, $logger),
-            'auto' => $this->createSqlBackend($params, $dbService, $logger),
-            default => throw new RuntimeException("Unsupported auth driver: $driver (TODO: implement)"),
-        };
-
-        // Wrap in Horde_Core_Auth_Application (matches legacy factory)
-        $authApp = new Horde_Core_Auth_Application([
-            'app' => 'horde',
-            'base' => $baseDriver,
-            'logger' => $logger,
-        ]);
-
-        return new AuthService($authApp);
+        return new AuthService($provider, $policy, $identityBridge);
     }
 
-    /**
-     * Create SQL authentication backend
-     *
-     * Matches legacy factory behavior (Core/Factory/Auth.php lines 169-173):
-     * - Gets DB adapter from Horde_Core_Factory_Db
-     * - Creates Horde_Auth_Sql with adapter and params
-     * - Adds logger and default_user from registry
-     *
-     * @param array $params Auth configuration parameters
-     * @param HordeDbService $dbService Database service
-     * @param Horde_Log_Logger $logger Logger instance
-     * @return Horde_Auth_Sql SQL auth backend instance
-     */
-    private function createSqlBackend(
-        array $params,
-        HordeDbService $dbService,
-        Horde_Log_Logger $logger
-    ): Horde_Auth_Sql {
-        $authParams = [
-            'db' => $dbService->getAdapter(),
-            'table' => $params['table'] ?? 'horde_users',
-            'username_field' => $params['username_field'] ?? 'user_uid',
-            'password_field' => $params['password_field'] ?? 'user_pass',
-            'encryption' => $params['encryption'] ?? 'ssha',
-            'show_encryption' => $params['show_encryption'] ?? false,
-            'logger' => $logger,
-            // Note: default_user and count_bad_logins/login_block handled by Application wrapper
-        ];
+    private function buildProvider(string $driver, array $params, Horde_Injector $injector): CredentialProvider
+    {
+        return match ($driver) {
+            'sql', 'auto' => $this->createSqlProvider($params, $injector),
+            'ldap' => $this->createLdapProvider($params, $injector),
+            'imap' => $this->createImapProvider($params, $injector),
+            'composite' => $this->createCompositeProvider($params, $injector),
+            default => throw new RuntimeException("Unsupported auth driver: $driver"),
+        };
+    }
 
-        return new Horde_Auth_Sql($authParams);
+    private function buildPolicy(array $params, Horde_Injector $injector): AccessPolicy
+    {
+        $loginBlock = $params['login_block'] ?? false;
+
+        if (!$loginBlock) {
+            return new NullPolicy();
+        }
+
+        $storageFactory = new AuthStorageFactory();
+        $tracker = $storageFactory->createAttemptTracker($injector);
+        $lockManager = $storageFactory->createLockManager($injector);
+
+        $maxAttempts = (int) ($params['max_login_attempts'] ?? 5);
+        $lockDuration = (int) ($params['lock_duration'] ?? 900);
+
+        $lockout = new LockoutPolicy($tracker, $lockManager, $maxAttempts, $lockDuration);
+
+        return new CompoundPolicy($lockout);
+    }
+
+    private function createSqlProvider(array $params, Horde_Injector $injector): Sql
+    {
+        $dbService = $injector->getInstance(HordeDbService::class);
+
+        return new Sql(
+            db: $dbService->getAdapter(),
+            table: $params['table'] ?? 'horde_users',
+            usernameField: $params['username_field'] ?? 'user_uid',
+            passwordField: $params['password_field'] ?? 'user_pass',
+            encryption: $params['encryption'] ?? 'crypt-blowfish',
+            showEncryption: $params['show_encryption'] ?? false,
+        );
+    }
+
+    private function createLdapProvider(array $params, Horde_Injector $injector): Ldap
+    {
+        $ldap = $injector->getInstance(Horde_Ldap::class);
+
+        return new Ldap(
+            ldap: $ldap,
+            baseDn: $params['basedn'] ?? '',
+            uidAttribute: $params['uid'] ?? 'uid',
+            objectClass: (array) ($params['objectclass'] ?? ['posixAccount']),
+            activeDirectory: $params['ad'] ?? false,
+            filter: $params['filter'] ?? null,
+        );
+    }
+
+    private function createImapProvider(array $params, Horde_Injector $injector): Imap
+    {
+        $hostspec = $params['hostspec'] ?? 'localhost';
+        $port = isset($params['port']) ? (int) $params['port'] : null;
+        $secure = match ($params['secure'] ?? 'none') {
+            'ssl', 'tls' => SecureMode::Tls,
+            'starttls' => SecureMode::StartTls,
+            default => SecureMode::None,
+        };
+
+        $clientFactory = $injector->getInstance('Horde_Imap_Client_Factory');
+
+        return new Imap(
+            clientFactory: $clientFactory,
+            hostspec: $hostspec,
+            secure: $secure,
+            port: $port,
+        );
+    }
+
+    private function createCompositeProvider(array $params, Horde_Injector $injector): CredentialProviderRegistry
+    {
+        $providers = [];
+
+        foreach (($params['drivers'] ?? []) as $subDriver => $subParams) {
+            $providers[] = $this->buildProvider($subDriver, $subParams, $injector);
+        }
+
+        if (empty($providers)) {
+            throw new RuntimeException('Composite auth driver requires at least one sub-driver in params.drivers');
+        }
+
+        return new CredentialProviderRegistry(...$providers);
     }
 }
