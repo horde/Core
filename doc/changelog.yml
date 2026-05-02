@@ -1,4 +1,18 @@
 ---
+3.0.0-beta25:
+  api: 3.0.0-beta25
+  state:
+    release: beta
+    api: beta
+  date: 2026-05-02
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    feat: Wire up new auth service and identity bridge but do not switch over yet
+    fix: ErrorFilter instantiation.
+    chore: Add simple cache dependency more explicitly.
+    feat: Log when catching errors
 3.0.0-beta24:
   api: 3.0.0-beta24
   state:
