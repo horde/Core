@@ -94,7 +94,7 @@ class Horde_Core_Ui_VarRenderer
     public function render($form, $var, $vars, $isInput = false)
     {
         $state = '_renderVar' . ($isInput ? 'Input' : 'Display');
-        $method = $state . '_' . $var->type->getTypeName();
+        $method = $state . '_' . $var->getTypeName();
         if (!method_exists($this, $method)) {
             $method = $state . 'Default';
         }
