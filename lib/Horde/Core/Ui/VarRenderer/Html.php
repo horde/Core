@@ -41,8 +41,8 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
     protected function _renderVarInput_number($form, &$var, &$vars)
     {
         $value = (string) $var->getValue($vars);
-        if ($var->type->getProperty('fraction')) {
-            $value = sprintf('%01.' . $var->type->getProperty('fraction') . 'f', $value);
+        if ($var->getProperty('fraction')) {
+            $value = sprintf('%01.' . $var->getProperty('fraction') . 'f', $value);
         }
         $linfo = Horde_Nls::getLocaleInfo();
         /* Only if there is a mon_decimal_point do the
@@ -94,12 +94,12 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
 
     protected function _renderVarInput_text($form, &$var, &$vars)
     {
-        $maxlength = $var->type->getMaxLength();
+        $maxlength = $var->getMaxLength();
         return sprintf(
             '<input type="text" name="%s" id="%s" size="%s" value="%s" %s%s%s />',
             htmlspecialchars((string) $var->getVarName()),
             $this->_genID($var->getVarName(), false),
-            $var->type->getSize(),
+            $var->getSize(),
             htmlspecialchars((string) $var->getValue($vars)),
             $var->isDisabled() ? ' disabled="disabled" ' : '',
             empty($maxlength) ? '' : ' maxlength="' . $maxlength . '"',
@@ -135,7 +135,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
             '<input type="text" name="%s" id="%s" size="%s" value="%s" %s%s />',
             htmlspecialchars((string) $var->getVarName()),
             $this->_genID($var->getVarName(), false),
-            $var->type->getSize(),
+            $var->getSize(),
             htmlspecialchars((string) $var->getValue($vars)),
             $var->isDisabled() ? ' disabled="disabled" ' : '',
             $this->_getActionScripts($form, $var)
@@ -187,7 +187,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
     protected function _renderVarInput_image($form, &$var, &$vars)
     {
         $html = '';
-        $image = $var->type->getImage($vars, $var);
+        $image = $var->getImage($vars);
         $varname = $this->_genID($var->getVarName(), false);
 
         $GLOBALS['injector']->getInstance('Horde_PageOutput')->addScriptFile('image.js', 'horde');
@@ -199,15 +199,15 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
                 '<input type="hidden" name="%s" id="%s" value="%s" />',
                 htmlspecialchars((string) $var->getVarName()) . '[hash]',
                 $this->_genID($var->getVarName() . '[hash]', false),
-                $var->type->getRandomId()
+                $var->getRandomId()
             );
         }
 
         /* Output MAX_FILE_SIZE parameter to limit large files. */
-        if ($var->type->getProperty('max_filesize')) {
+        if ($var->getProperty('max_filesize')) {
             $html .= sprintf(
                 '<input type="hidden" name="MAX_FILE_SIZE" value="%d" />',
-                $var->type->getProperty('max_filesize')
+                $var->getProperty('max_filesize')
             );
         }
 
@@ -219,7 +219,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
         );
 
         /* Output the button to upload/reset the image. */
-        if ($var->type->getProperty('show_upload')) {
+        if ($var->getProperty('show_upload')) {
             $html .= '&nbsp;';
             $html .= sprintf(
                 '<input class="button" name="%s" id="%s" type="submit" value="%s" /> ',
@@ -299,7 +299,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
             $html .= Horde::link('#', Horde_Core_Translation::t('Fix ratio'), '', '', 'src=getResizeSrc(\'' . $img->copy()->add('a', 'resize') . '\', \'' . $varname . '\', \'1\');showImage(src, \'_p_' . $varname . '\', true);') . Horde_Themes_Image::tag('ratio.png', ['alt' => Horde_Core_Translation::t('Fix ratio')]) . '</a>';
 
             /* Keep also original if it has been requested. */
-            if ($var->type->getProperty('show_keeporig')) {
+            if ($var->getProperty('show_keeporig')) {
                 $html .= sprintf(
                     '<input type="checkbox" class="checkbox" name="%s" id="%s"%s />%s' . "\n",
                     htmlspecialchars((string) $var->getVarName()) . '[keep_orig]',
@@ -325,29 +325,29 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
             '<textarea name="%s" id="%s" cols="%s" rows="%s"%s%s>%s</textarea>',
             htmlspecialchars((string) $var->getVarName()),
             $this->_genID($var->getVarName(), false),
-            (int) $var->type->getCols(),
-            (int) $var->type->getRows(),
+            (int) $var->getCols(),
+            (int) $var->getRows(),
             $this->_getActionScripts($form, $var),
             $var->isDisabled() ? ' disabled="disabled"' : '',
             htmlspecialchars((string) $var->getValue($vars))
         );
 
-        if ($var->type->hasHelper('rte')) {
+        if ($var->hasHelper('rte')) {
             $GLOBALS['injector']->getInstance('Horde_Editor')->initialize(
                 ['id' => $this->_genID($var->getVarName(), false),
-                    'relativelinks' => $var->type->hasHelper('relativelinks'),
+                    'relativelinks' => $var->hasHelper('relativelinks'),
                     'config' => ['extraPlugins' => 'syntaxhighlight']]
             );
         }
 
-        if ($var->type->hasHelper() && $browser->hasFeature('javascript')) {
+        if ($var->hasHelper() && $browser->hasFeature('javascript')) {
             $html .= '<br /><table cellspacing="0"><tr><td>';
             $imgId = $this->_genID($var->getVarName(), false) . 'ehelper';
 
             $page_output = $GLOBALS['injector']->getInstance('Horde_PageOutput');
             $page_output->addScriptFile('open_html_helper.js', 'horde');
 
-            if ($var->type->hasHelper('emoticons')) {
+            if ($var->hasHelper('emoticons')) {
                 $filter = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->create('emoticons');
                 $icon_list = [];
 
@@ -376,8 +376,8 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
             '<textarea name="%s" id="%s" cols="%s" rows="%s"%s%s>%s</textarea>',
             htmlspecialchars((string) $var->getVarName()),
             $this->_genID($var->getVarName(), false),
-            (int) $var->type->getCols(),
-            (int) $var->type->getRows(),
+            (int) $var->getCols(),
+            (int) $var->getRows(),
             $this->_getActionScripts($form, $var),
             $var->isDisabled() ? ' disabled="disabled"' : '',
             htmlspecialchars((string) $var->getValue($vars))
@@ -390,8 +390,8 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
             '<textarea name="%s" id="%s" cols="%s" rows="%s"%s%s>%s</textarea>',
             htmlspecialchars((string) $var->getVarName()),
             $this->_genID($var->getVarName(), false),
-            (int) $var->type->getCols(),
-            (int) $var->type->getRows(),
+            (int) $var->getCols(),
+            (int) $var->getRows(),
             $this->_getActionScripts($form, $var),
             $var->isDisabled() ? ' disabled="disabled"' : '',
             htmlspecialchars((string) $var->getValue($vars))
@@ -442,7 +442,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
 
     protected function _renderVarInput_hourminutesecond($form, &$var, &$vars)
     {
-        $time = $var->type->getTimeParts($var->getValue($vars));
+        $time = $var->getTimeParts($var->getValue($vars));
 
         /* Output hours. */
         $hours = ['' => Horde_Core_Translation::t('hh')];
@@ -472,7 +472,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
         );
 
         /* Return if seconds are not required. */
-        if (!$var->type->getProperty('show_seconds')) {
+        if (!$var->getProperty('show_seconds')) {
             return $html;
         }
 
@@ -508,35 +508,35 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
             11 => Horde_Core_Translation::t('November'),
             12 => Horde_Core_Translation::t('December')];
         $dates['year'] = ['' => Horde_Core_Translation::t('YYYY')];
-        if ($var->type->getProperty('start_year') > $var->type->getProperty('end_year')) {
-            for ($i = $var->type->getProperty('start_year'); $i >= $var->type->getProperty('end_year'); $i--) {
+        if ($var->getProperty('start_year') > $var->getProperty('end_year')) {
+            for ($i = $var->getProperty('start_year'); $i >= $var->getProperty('end_year'); $i--) {
                 $dates['year'][$i] = $i;
             }
         } else {
-            for ($i = $var->type->getProperty('start_year'); $i <= $var->type->getProperty('end_year'); $i++) {
+            for ($i = $var->getProperty('start_year'); $i <= $var->getProperty('end_year'); $i++) {
                 $dates['year'][$i] = $i;
             }
         }
         return sprintf(
             '<select name="%s" id="%s"%s>%s</select>',
-            $var->type->getMonthVar($var),
-            $var->type->getMonthVar($var),
+            $var->getMonthVar($var),
+            $var->getMonthVar($var),
             $this->_getActionScripts($form, $var),
-            $this->selectOptions($dates['month'], $vars->get($var->type->getMonthVar($var)))
+            $this->selectOptions($dates['month'], $vars->get($var->getMonthVar($var)))
         )
             . sprintf(
                 '<select name="%s" id="%s"%s>%s</select>',
-                $var->type->getYearVar($var),
-                $var->type->getYearVar($var),
+                $var->getYearVar($var),
+                $var->getYearVar($var),
                 $this->_getActionScripts($form, $var),
-                $this->selectOptions($dates['year'], $vars->get($var->type->getYearVar($var)))
+                $this->selectOptions($dates['year'], $vars->get($var->getYearVar($var)))
             );
     }
 
     protected function _renderVarInput_monthdayyear($form, &$var, &$vars)
     {
         try {
-            $date = $var->type->getDateParts($var->getValue($vars));
+            $date = $var->getDateParts($var->getValue($vars));
         } catch (Horde_Date_Exception $e) {
             return $this->_renderVarInput_basic($form, $var, $vars);
         }
@@ -574,12 +574,12 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
             $dates['day'][$i] = $i;
         }
         $dates['year'] = ['' => Horde_Core_Translation::t('YYYY')];
-        if ($var->type->getProperty('start_year') > $var->type->getProperty('end_year')) {
-            for ($i = $var->type->getProperty('start_year'); $i >= $var->type->getProperty('end_year'); $i--) {
+        if ($var->getProperty('start_year') > $var->getProperty('end_year')) {
+            for ($i = $var->getProperty('start_year'); $i >= $var->getProperty('end_year'); $i--) {
                 $dates['year'][$i] = $i;
             }
         } else {
-            for ($i = $var->type->getProperty('start_year'); $i <= $var->type->getProperty('end_year'); $i++) {
+            for ($i = $var->getProperty('start_year'); $i <= $var->getProperty('end_year'); $i++) {
                 $dates['year'][$i] = $i;
             }
         }
@@ -597,7 +597,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
             );
         }
 
-        if ($var->type->getProperty('picker')
+        if ($var->getProperty('picker')
             && $GLOBALS['browser']->hasFeature('javascript')) {
             Horde_Core_Ui_JsCalendar::init();
             $imgId = $this->_genID($var->getVarName(), false) . 'goto';
@@ -620,7 +620,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
         if (!$var->isRequired()) {
             $html .= '<li><label><input type="radio" id="' . $this->_genID($var->getVarName(), false) . '" name="' . htmlspecialchars((string) $var->getVarName()) . '" value=""' . (!$value ? ' checked="checked"' : '') . ' /> ' . Horde_Core_Translation::t('No Sound') . '</label></li>';
         }
-        foreach ($var->type->getSounds() as $sound) {
+        foreach ($var->getSounds() as $sound) {
             $sound = htmlspecialchars((string) $sound);
             $html .= '<li><label><input type="radio" id="' . $this->_genID($var->getVarName(), false) . '" name="' . htmlspecialchars((string) $var->getVarName()) . '" value="' . $sound . '"' . ($value == $sound ? ' checked="checked"' : '') . ' />' . $sound . '</label>'
                 . ' <embed autostart="false" src="' . Horde_Themes::sound($sound) . '" /></li>';
@@ -661,7 +661,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
 
     protected function _renderVarInput_sorter($form, &$var, &$vars)
     {
-        $instance = $var->type->getProperty('instance');
+        $instance = $var->getProperty('instance');
 
         $page = $GLOBALS['injector']->getInstance('Horde_PageOutput');
         $page->addScriptFile('sorter.js', 'horde');
@@ -670,17 +670,17 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
                 '%1$s = new Horde_Form_Sorter(\'%1$s\', \'%2$s\', \'%3$s\');%1$s.setHidden();',
                 $instance,
                 $this->_genID($var->getVarName(), false),
-                $var->type->getHeader()
+                $var->getHeader()
             )
         );
 
         return '<input type="hidden" name="' . htmlspecialchars((string) $var->getVarName())
             . '[array]" value="" ' . $this->_genID($var->getVarName() . '_array') . '/>'
             . '<select class="leftFloat" multiple="multiple" size="'
-            . (int) $var->type->getSize() . '" name="' . htmlspecialchars((string) $var->getVarName())
+            . (int) $var->getSize() . '" name="' . htmlspecialchars((string) $var->getVarName())
             . '[list]" onchange="' . $instance . '.deselectHeader();" '
             . $this->_genID($var->getVarName() . '_list') . '>'
-            . $var->type->getOptions($var->getValue($vars)) . '</select><div class="leftFloat">'
+            . $var->getOptions($var->getValue($vars)) . '</select><div class="leftFloat">'
             . Horde::link('#', Horde_Core_Translation::t('Move up'), '', '', $instance . '.moveColumnUp(); return false;') . Horde_Themes_Image::tag('nav/up.png', ['alt' => Horde_Core_Translation::t('Move up')]) . '</a><br />'
             . Horde::link('#', Horde_Core_Translation::t('Move up'), '', '', $instance . '.moveColumnDown(); return false;') . Horde_Themes_Image::tag('nav/down.png', ['alt' => Horde_Core_Translation::t('Move down')]) . '</a></div>';
     }
@@ -690,10 +690,10 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
         $GLOBALS['injector']->getInstance('Horde_PageOutput')->addScriptFile('form_assign.js', 'horde');
 
         $name = htmlspecialchars((string) $var->getVarName());
-        $size = $var->type->getSize();
-        $width = $var->type->getWidth();
-        $lhdr = (bool) $var->type->getHeader(0);
-        $rhdr = (bool) $var->type->getHeader(1);
+        $size = $var->getSize();
+        $width = $var->getWidth();
+        $lhdr = (bool) $var->getHeader(0);
+        $rhdr = (bool) $var->getHeader(1);
         $this->_addOnLoadJavascript('Horde_Form_Assign.setField(\'' . $form->getName() . '\', \'' . $var->getVarName() . '\');');
 
         return '<input type="hidden" name="' . $name . '__values" />'
@@ -705,7 +705,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
                 $width,
                 $lhdr ? ' onchange="Horde_Form_Assign.deselectHeaders(\'' . $form->getName() . '\', \'' . $var->getVarName() . '\', 0);"' : ''
             )
-            . $var->type->getOptions(0, $form->getName(), $var->getVarName())
+            . $var->getOptions(0, $form->getName(), $var->getVarName())
             . '</select></td><td>'
             . '<a href="#" onclick="Horde_Form_Assign.move(\'' . $form->getName() . '\', \'' . $var->getVarName() . '\', 0); return false;">'
             . Horde_Themes_Image::tag('rhand.png', ['alt' => Horde_Core_Translation::t('Add')])
@@ -720,7 +720,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
                 $width,
                 $rhdr ? ' onchange="Horde_Form_Assign.deselectHeaders(\'' . $form->getName() . '\', \'' . $var->getVarName() . '\', 1);"' : ''
             )
-            . $var->type->getOptions(1, $form->getName(), $var->getVarName())
+            . $var->getOptions(1, $form->getName(), $var->getVarName())
             . '</select></td></tr></table>';
     }
 
@@ -732,7 +732,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
     protected function _renderVarInput_enum($form, &$var, &$vars)
     {
         $values = $var->getValues();
-        $prompt = $var->type->getPrompt();
+        $prompt = $var->getPrompt();
         $htmlchars = $var->getOption('htmlchars');
         if (!empty($prompt)) {
             $prompt = '<option value="">' . ($htmlchars ? $prompt : htmlspecialchars((string) $prompt)) . '</option>';
@@ -752,7 +752,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
         $varname = $var->getVarName();
         $hvarname = htmlspecialchars((string) $varname);
         $values = $var->getValues();
-        $prompts = $var->type->getPrompts();
+        $prompts = $var->getPrompts();
         $selected = $var->getValue($vars);
         /* If passing a non-array value need to get the keys. */
         if (!is_array($selected)) {
@@ -813,7 +813,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
         }
         return sprintf(
             '<select multiple="multiple" size="%s" name="%s[]" %s>%s</select>',
-            (int) $var->type->size,
+            (int) $var->size,
             htmlspecialchars((string) $var->getVarName()),
             $this->_getActionScripts($form, $var),
             $this->_multiSelectOptions($values, $selected)
@@ -845,7 +845,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
             $this->_getActionScripts($form, $var)
         );
 
-        if ($var->type->getProperty('checkAll')) {
+        if ($var->getProperty('checkAll')) {
             $form_name = $form->getName();
             $var_name = $var->getVarName() . '[]';
             $function_name = 'select' . $form_name . $var->getVarName();
@@ -902,8 +902,8 @@ function %s()
             htmlspecialchars((string) $var->getVarName()),
             $this->_genID($var->getVarName(), false),
             htmlspecialchars((string) $var->getValue($vars)),
-            $var->type->getSize() ? ' size="' . $var->type->getSize() . '"' : '',
-            $var->type->allowMulti() ? ' multiple="multiple"' : '',
+            $var->getSize() ? ' size="' . $var->getSize() . '"' : '',
+            $var->allowMulti() ? ' multiple="multiple"' : '',
             $this->_getActionScripts($form, $var)
         );
     }
@@ -912,10 +912,10 @@ function %s()
     {
         $varname   = $var->getVarName();
         $var_array = $var->getValue($vars);
-        $cols      = $var->type->getCols();
-        $rows      = $var->type->getRows();
-        $matrix    = $var->type->getMatrix();
-        $new_input = $var->type->getNewInput();
+        $cols      = $var->getCols();
+        $rows      = $var->getRows();
+        $matrix    = $var->getMatrix();
+        $new_input = $var->getNewInput();
 
         $html = '<table cellspacing="0"><tr>';
 
@@ -1102,7 +1102,7 @@ function obrowserCallback(name, oid)
             '<input type="text" name="%s" id="%s" size="%s" value="%s" />',
             htmlspecialchars((string) $var->getVarName()),
             $this->_genID($var->getVarName(), false),
-            strlen($var->type->getText()),
+            strlen($var->getText()),
             htmlspecialchars((string) $var->getValue($vars))
         )
             . '<br />' . Horde_Core_Translation::t('Enter the letters below:') . '<br />'
@@ -1115,7 +1115,7 @@ function obrowserCallback(name, oid)
             '<input type="text" name="%s" id="%s" size="%s" value="%s" />',
             htmlspecialchars((string) $var->getVarName()),
             $this->_genID($var->getVarName(), false),
-            strlen($var->type->getText()),
+            strlen($var->getText()),
             htmlspecialchars((string) $var->getValue($vars))
         )
             . '<br />' . Horde_Core_Translation::t('Enter the letters below:') . '<br />'
@@ -1138,18 +1138,18 @@ function obrowserCallback(name, oid)
     {
         $email_val = $var->getValue($vars);
 
-        if ($var->type->getProperty('link_compose')) {
+        if ($var->getProperty('link_compose')) {
             $addrs = $GLOBALS['injector']->getInstance('Horde_Mail_Rfc822')->parseAddressList($email_val, [
-                'limit' => $var->type->getProperty('allow_multi') ? 0 : 1,
+                'limit' => $var->getProperty('allow_multi') ? 0 : 1,
             ]);
 
             $link = '';
             foreach ($addrs as $addr) {
-                $display_email = $var->type->getProperty('strip_domain')
+                $display_email = $var->getProperty('strip_domain')
                     ? $addr->mailbox . ' (at) ' . str_replace('.', ' (dot) ', $addr->host)
                     : $addr->bare_address;
 
-                $addr->personal = $var->type->getProperty('link_name');
+                $addr->personal = $var->getProperty('link_name');
                 $address = $addr->writeAddress(true);
 
                 try {
@@ -1168,12 +1168,12 @@ function obrowserCallback(name, oid)
             return $link;
         } else {
             $addrs = $GLOBALS['injector']->getInstance('Horde_Mail_Rfc822')->parseAddressList($email_val, [
-                'limit' => $var->type->getProperty('allow_multi') ? 0 : 1,
+                'limit' => $var->getProperty('allow_multi') ? 0 : 1,
             ]);
 
             $display = [];
             foreach ($addrs as $addr) {
-                $display_email = $var->type->getProperty('strip_domain')
+                $display_email = $var->getProperty('strip_domain')
                     ? $addr->mailbox . ' (at) ' . str_replace('.', ' (dot) ', $addr->host)
                     : $addr->bare_address;
                 $display[] = htmlspecialchars((string) $display_email);
@@ -1280,7 +1280,7 @@ function obrowserCallback(name, oid)
         $image = $var->getValue($vars);
 
         /* Check if existing image data is being loaded. */
-        $image = $var->type->loadImageData($image);
+        $image = $var->loadImageData($image);
 
         if (empty($image['img'])) {
             return '';
@@ -1341,7 +1341,7 @@ function obrowserCallback(name, oid)
             return '';
         }
 
-        $info = $var->type->parse($address);
+        $info = $var->parse($address);
 
         $google_icon = 'map.png';
         if (!empty($info['country'])) {
@@ -1451,7 +1451,7 @@ function obrowserCallback(name, oid)
             return '';
         }
         return '<pre>'
-            . $GLOBALS['injector']->getInstance('Horde_Core_Factory_Crypt')->create('Pgp', $var->type->getPGPParams())->pgpPrettyKey($key)
+            . $GLOBALS['injector']->getInstance('Horde_Core_Factory_Crypt')->create('Pgp', $var->getPGPParams())->pgpPrettyKey($key)
             . '</pre>';
     }
 
@@ -1464,7 +1464,7 @@ function obrowserCallback(name, oid)
         try {
             return $GLOBALS['injector']
                 ->getInstance('Horde_Core_Factory_Crypt')
-                ->create('Smime', $var->type->getSMIMEParams())
+                ->create('Smime', $var->getSMIMEParams())
                 ->certToHTML($cert);
         } catch (Horde_Crypt_Exception $e) {
             return $e->getMessage();
@@ -1478,13 +1478,13 @@ function obrowserCallback(name, oid)
 
     protected function _renderVarDisplay_date($form, &$var, &$vars)
     {
-        return htmlspecialchars((string) $var->type->getFormattedTime($var->getValue($vars)));
+        return htmlspecialchars((string) $var->getFormattedTime($var->getValue($vars)));
     }
 
     protected function _renderVarDisplay_hourminutesecond($form, &$var, &$vars)
     {
-        $time = $var->type->getTimeParts($var->getValue($vars));
-        if (!$var->type->getProperty('show_seconds')) {
+        $time = $var->getTimeParts($var->getValue($vars));
+        if (!$var->getProperty('show_seconds')) {
             return (int) $time['hour'] . ':' . sprintf('%02d', (int) $time['minute']);
         } else {
             return (int) $time['hour'] . ':' . sprintf('%02d', (int) $time['minute']) . ':' . sprintf('%02d', (int) $time['second']);
@@ -1503,7 +1503,7 @@ function obrowserCallback(name, oid)
              && !empty($date['month']) && !empty($date['day']))
             || (!is_array($date) && !empty($date) && $date != '0000-00-00')) {
             try {
-                return $var->type->formatDate($date);
+                return $var->formatDate($date);
             } catch (Horde_Date_Exception $e) {
                 return $date;
             }
@@ -1515,12 +1515,12 @@ function obrowserCallback(name, oid)
     {
         $value = $var->getValue($vars);
         try {
-            $html = htmlspecialchars((string) $var->type->formatDate($value));
+            $html = htmlspecialchars((string) $var->formatDate($value));
         } catch (Horde_Date_Exception $e) {
             return $value;
         }
 
-        if (!$var->type->emptyDateArray($value)) {
+        if (!$var->emptyDateArray($value)) {
             $html .= (new Horde_Form_Type_date())->getAgo($value);
         }
         return $html;
@@ -1536,12 +1536,12 @@ function obrowserCallback(name, oid)
 
     protected function _renderVarDisplay_invalid($form, &$var, &$vars)
     {
-        return '<span class="form-error">' . htmlspecialchars((string) $var->type->getMessage()) . '</span>';
+        return '<span class="form-error">' . htmlspecialchars((string) $var->getMessage()) . '</span>';
     }
 
     protected function _renderVarDisplay_link($form, &$var, &$vars)
     {
-        $values = $var->type->values;
+        $values = $var->values;
         if (!isset($values[0])) {
             $values = [$values];
         }
@@ -1588,12 +1588,12 @@ function obrowserCallback(name, oid)
             $figlet = new Text_Figlet();
         }
 
-        $result = $figlet->loadFont($var->type->getFont());
+        $result = $figlet->loadFont($var->getFont());
         if (is_a($result, 'PEAR_Error')) {
             return $result->getMessage();
         }
 
-        return '<pre>' . $figlet->lineEcho($var->type->getText()) . '</pre>';
+        return '<pre>' . $figlet->lineEcho($var->getText()) . '</pre>';
     }
 
     protected function _renderVarDisplay_captcha($form, &$var, &$vars)
@@ -1607,15 +1607,15 @@ function obrowserCallback(name, oid)
         $image = $captcha->init(
             150,
             60,
-            $var->type->getText(),
-            ['font_path' => dirname($var->type->getFont()) . '/',
-                'font_file' => basename($var->type->getFont())]
+            $var->getText(),
+            ['font_path' => dirname($var->getFont()) . '/',
+                'font_file' => basename($var->getFont())]
         );
         if (is_a($image, 'PEAR_Error')) {
             return $image->getMessage();
         }
 
-        $cid = hash('md5', $var->type->getText());
+        $cid = hash('md5', $var->getText());
         $cache = $GLOBALS['injector']->getInstance('Horde_Cache');
 
         $cache->set($cid, serialize(['data' => $captcha->getCAPTCHAAsJPEG(),
@@ -1634,7 +1634,7 @@ function obrowserCallback(name, oid)
             '<input type="hidden" name="%s" id="%s" value="%s" />',
             'selectlist_selectid',
             'selectlist_selectid',
-            $var->type->getProperty('selectid')
+            $var->getProperty('selectid')
         )
             . sprintf('<input type="hidden" name="%s" id="%s" />', 'actionID', 'actionID')
 
@@ -1643,19 +1643,19 @@ function obrowserCallback(name, oid)
                 '<input type="hidden" name="%s" id="%s" value="%s" />',
                 htmlspecialchars((string) $var->getVarName()),
                 $this->_genID($var->getVarName(), false),
-                $var->type->getProperty('selectid')
+                $var->getProperty('selectid')
             );
 
         /* Open window link. */
-        $param = [$var->type->getProperty('link_text'),
-            $var->type->getProperty('link_style'),
+        $param = [$var->getProperty('link_text'),
+            $var->getProperty('link_style'),
             $form->getName(),
-            $var->type->getProperty('icon'),
-            $var->type->getProperty('selectid')];
+            $var->getProperty('icon'),
+            $var->getProperty('selectid')];
         $html .= $GLOBALS['registry']->call('files/selectlistLink', $param) . "<br />\n";
 
-        if ($var->type->getProperty('selectid')) {
-            $param = [$var->type->getProperty('selectid')];
+        if ($var->getProperty('selectid')) {
+            $param = [$var->getProperty('selectid')];
             $files = $GLOBALS['registry']->call('files/selectlistResults', $param);
             if ($files) {
                 $html .= '<ol>';

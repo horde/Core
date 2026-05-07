@@ -14,7 +14,7 @@ class Horde_Core_Ui_VarRenderer_TablesetHtml extends Horde_Core_Ui_VarRenderer_H
 {
     protected function _renderVarInput_tableset($form, &$var, &$vars)
     {
-        $header = $var->type->getHeader();
+        $header = $var->getHeader();
         $name   = $var->getVarName();
         $values = $var->getValues();
         $form_name = $form->getName();
@@ -94,7 +94,7 @@ function %s()
 
     protected function _renderVarDisplay_tableset($form, &$var, &$vars)
     {
-        $header = $var->type->getHeader();
+        $header = $var->getHeader();
         $name   = $var->getVarName();
         $values = $var->getValues();
         $checkedValues = $var->getValue($vars);
