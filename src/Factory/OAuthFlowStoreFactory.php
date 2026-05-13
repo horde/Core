@@ -22,11 +22,11 @@ use Horde\Core\Service\HordeDbService;
 use Horde\OAuth\Client\FileOAuthFlowStore;
 use Horde\OAuth\Client\OAuthFlowStore;
 use Horde\Horde\Service\SqlOAuthFlowStore;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthFlowStoreFactory
 {
-    public function create(Horde_Injector $injector): OAuthFlowStore
+    public function create(Injector $injector): OAuthFlowStore
     {
         $loader = $injector->getInstance(ConfigLoader::class);
         $state = $loader->load('horde');
@@ -48,7 +48,7 @@ class OAuthFlowStoreFactory
         return new FileOAuthFlowStore($dir, $prefix);
     }
 
-    private function createSqlStore(Horde_Injector $injector, array $params): SqlOAuthFlowStore
+    private function createSqlStore(Injector $injector, array $params): SqlOAuthFlowStore
     {
         $dbService = $injector->getInstance(HordeDbService::class);
         $table = !empty($params['table']) ? $params['table'] : 'horde_oauth_flows';

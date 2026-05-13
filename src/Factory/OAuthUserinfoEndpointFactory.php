@@ -21,11 +21,11 @@ use Horde\OAuth\Oidc\Handler\UserinfoEndpoint;
 use Horde\OAuth\Oidc\ScopeClaimsMapping;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthUserinfoEndpointFactory
 {
-    public function create(Horde_Injector $injector): UserinfoEndpoint
+    public function create(Injector $injector): UserinfoEndpoint
     {
         return new UserinfoEndpoint(
             $injector->getInstance(ClaimsMapper::class),

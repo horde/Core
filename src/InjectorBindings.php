@@ -16,9 +16,9 @@ declare(strict_types=1);
 
 namespace Horde\Core;
 
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 interface InjectorBindings
 {
-    public function register(Horde_Injector $injector): void;
+    public function register(Injector $injector): void;
 }

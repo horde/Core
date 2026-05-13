@@ -19,7 +19,7 @@ namespace Horde\Core\Factory;
 use Horde\Core\Config\ConfigLoader;
 use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Vhost;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Exception;
 
 /**
@@ -37,10 +37,10 @@ class ConfigLoaderFactory
     /**
      * Create ConfigLoader instance
      *
-     * @param Horde_Injector $injector Dependency injector
+     * @param Injector $injector Dependency injector
      * @return ConfigLoader Global config loader for all apps
      */
-    public function create(Horde_Injector $injector): ConfigLoader
+    public function create(Injector $injector): ConfigLoader
     {
         // Try to get metadata provider if available
         $metadataProvider = null;

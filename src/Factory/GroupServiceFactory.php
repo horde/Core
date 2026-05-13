@@ -18,7 +18,7 @@ namespace Horde\Core\Factory;
 
 use Horde\Core\Service\GroupService;
 use Horde\Core\Service\SqlGroupService;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 /**
  * Factory for creating GroupService instances
@@ -36,10 +36,10 @@ class GroupServiceFactory
     /**
      * Create GroupService instance
      *
-     * @param Horde_Injector $injector Dependency injector
+     * @param Injector $injector Dependency injector
      * @return GroupService Group service instance
      */
-    public function create(Horde_Injector $injector): GroupService
+    public function create(Injector $injector): GroupService
     {
         // Get the legacy Horde_Group instance (already configured via Horde_Core_Factory_Group)
         $groupBackend = $injector->getInstance('Horde_Group');

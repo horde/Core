@@ -19,7 +19,7 @@ use Horde\Core\Config\ConfigLoader;
 use Horde\Db\Adapter;
 use Horde\Horde\Service\AuthLinkRepository;
 use Horde\Horde\Service\SqlAuthLinkRepository;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Throwable;
 
 /**
@@ -30,7 +30,7 @@ use Throwable;
  */
 class AuthLinkRepositoryFactory
 {
-    public function create(Horde_Injector $injector): AuthLinkRepository
+    public function create(Injector $injector): AuthLinkRepository
     {
         try {
             $db = $injector->getInstance(Adapter::class);

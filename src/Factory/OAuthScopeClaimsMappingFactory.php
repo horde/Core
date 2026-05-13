@@ -17,11 +17,11 @@ declare(strict_types=1);
 namespace Horde\Core\Factory;
 
 use Horde\OAuth\Oidc\ScopeClaimsMapping;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthScopeClaimsMappingFactory
 {
-    public function create(Horde_Injector $injector): ScopeClaimsMapping
+    public function create(Injector $injector): ScopeClaimsMapping
     {
         return new ScopeClaimsMapping();
     }

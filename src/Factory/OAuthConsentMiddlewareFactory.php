@@ -20,7 +20,7 @@ use Horde\Core\Middleware\OAuthConsentMiddleware;
 use Horde\Core\Session\HordeSession;
 use Horde\OAuth\Server\Handler\AuthorizationEndpoint;
 use Horde\OAuth\Server\Repository\ConsentRepository;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Horde_Notification_Handler;
 use Horde_PageOutput;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -28,7 +28,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 class OAuthConsentMiddlewareFactory
 {
-    public function create(Horde_Injector $injector): OAuthConsentMiddleware
+    public function create(Injector $injector): OAuthConsentMiddleware
     {
         return new OAuthConsentMiddleware(
             $injector->getInstance(AuthorizationEndpoint::class),

@@ -21,7 +21,7 @@ use Horde\Core\Service\OAuthProviderConfigRepository;
 use Horde\Db\Adapter;
 use Horde\Horde\Service\SqlOAuthProviderConfigRepository;
 use Horde\Secret\SecretManager;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Throwable;
 
 /**
@@ -38,7 +38,7 @@ use Throwable;
  */
 class OAuthProviderConfigRepositoryFactory
 {
-    public function create(Horde_Injector $injector): OAuthProviderConfigRepository
+    public function create(Injector $injector): OAuthProviderConfigRepository
     {
         if (class_exists(SqlOAuthProviderConfigRepository::class)) {
             try {

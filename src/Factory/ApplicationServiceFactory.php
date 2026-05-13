@@ -18,7 +18,7 @@ namespace Horde\Core\Factory;
 
 use Horde\Core\Config\RegistryConfigLoader;
 use Horde\Core\Service\ApplicationService;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 /**
  * Factory for ApplicationService
@@ -30,7 +30,7 @@ use Horde_Injector;
  */
 class ApplicationServiceFactory
 {
-    public function create(Horde_Injector $injector): ApplicationService
+    public function create(Injector $injector): ApplicationService
     {
         $registryLoader = $injector->getInstance(RegistryConfigLoader::class);
         return new ApplicationService($registryLoader);

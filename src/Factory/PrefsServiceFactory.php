@@ -21,7 +21,7 @@ use Horde\Core\Service\PrefsService;
 use Horde\Core\Service\SqlPrefsService;
 use Horde\Core\Service\NullPrefsService;
 use Horde\Core\Service\HordeDbService;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use RuntimeException;
 
 /**
@@ -87,11 +87,11 @@ class PrefsServiceFactory
     /**
      * Create PrefsService instance
      *
-     * @param Horde_Injector $injector Dependency injector
+     * @param Injector $injector Dependency injector
      * @return PrefsService Prefs service instance
      * @throws RuntimeException If driver unsupported
      */
-    public function create(Horde_Injector $injector): PrefsService
+    public function create(Injector $injector): PrefsService
     {
         $loader = $injector->getInstance(ConfigLoader::class);
         $state = $loader->load('horde');
@@ -109,11 +109,11 @@ class PrefsServiceFactory
     /**
      * Create SQL prefs backend
      *
-     * @param Horde_Injector $injector Dependency injector
+     * @param Injector $injector Dependency injector
      * @param array $params Prefs configuration parameters
      * @return SqlPrefsService SQL prefs service
      */
-    private function createSqlBackend(Horde_Injector $injector, array $params): SqlPrefsService
+    private function createSqlBackend(Injector $injector, array $params): SqlPrefsService
     {
         // Get DB service (supports 'horde:prefs' pattern in future)
         $dbService = $injector->getInstance(HordeDbService::class);

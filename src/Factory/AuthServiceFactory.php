@@ -29,7 +29,7 @@ use Horde\Core\Config\ConfigLoader;
 use Horde\Core\Service\HordeDbService;
 use Horde\Imap\Client\ConnectionConfig;
 use Horde\Imap\Client\SecureMode;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Horde_Ldap;
 use RuntimeException;
 
@@ -39,7 +39,7 @@ use RuntimeException;
  */
 class AuthServiceFactory
 {
-    public function create(Horde_Injector $injector): AuthService
+    public function create(Injector $injector): AuthService
     {
         $loader = $injector->getInstance(ConfigLoader::class);
         $state = $loader->load('horde');
@@ -54,7 +54,7 @@ class AuthServiceFactory
         return new AuthService($provider, $policy, $identityBridge);
     }
 
-    private function buildProvider(string $driver, array $params, Horde_Injector $injector): CredentialProvider
+    private function buildProvider(string $driver, array $params, Injector $injector): CredentialProvider
     {
         return match ($driver) {
             'sql', 'auto' => $this->createSqlProvider($params, $injector),
@@ -65,7 +65,7 @@ class AuthServiceFactory
         };
     }
 
-    private function buildPolicy(array $params, Horde_Injector $injector): AccessPolicy
+    private function buildPolicy(array $params, Injector $injector): AccessPolicy
     {
         $loginBlock = $params['login_block'] ?? false;
 
@@ -85,7 +85,7 @@ class AuthServiceFactory
         return new CompoundPolicy($lockout);
     }
 
-    private function createSqlProvider(array $params, Horde_Injector $injector): Sql
+    private function createSqlProvider(array $params, Injector $injector): Sql
     {
         $dbService = $injector->getInstance(HordeDbService::class);
 
@@ -99,7 +99,7 @@ class AuthServiceFactory
         );
     }
 
-    private function createLdapProvider(array $params, Horde_Injector $injector): Ldap
+    private function createLdapProvider(array $params, Injector $injector): Ldap
     {
         $ldap = $injector->getInstance(Horde_Ldap::class);
 
@@ -113,7 +113,7 @@ class AuthServiceFactory
         );
     }
 
-    private function createImapProvider(array $params, Horde_Injector $injector): Imap
+    private function createImapProvider(array $params, Injector $injector): Imap
     {
         $hostspec = $params['hostspec'] ?? 'localhost';
         $port = isset($params['port']) ? (int) $params['port'] : null;
@@ -133,7 +133,7 @@ class AuthServiceFactory
         );
     }
 
-    private function createCompositeProvider(array $params, Horde_Injector $injector): CredentialProviderRegistry
+    private function createCompositeProvider(array $params, Injector $injector): CredentialProviderRegistry
     {
         $providers = [];
 

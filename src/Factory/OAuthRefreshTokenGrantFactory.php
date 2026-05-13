@@ -22,11 +22,11 @@ use Horde\OAuth\Server\Repository\RefreshTokenRepository;
 use Horde\OAuth\Server\Repository\ScopeRepository;
 use Horde\OAuth\Server\Token\AccessTokenIssuer;
 use Horde\OAuth\Server\Token\RefreshTokenIssuer;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthRefreshTokenGrantFactory
 {
-    public function create(Horde_Injector $injector): RefreshTokenGrant
+    public function create(Injector $injector): RefreshTokenGrant
     {
         return new RefreshTokenGrant(
             $injector->getInstance(RefreshTokenRepository::class),

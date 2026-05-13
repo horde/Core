@@ -9,7 +9,7 @@ use Horde\Core\Api\ApiRegistry;
 use Horde\Core\Config\RegistryConfigLoader;
 use Horde\Rpc\Dispatch\ApiProvider;
 use Horde\Rpc\Dispatch\MethodInvoker;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Throwable;
 
 /**
@@ -20,7 +20,7 @@ use Throwable;
  */
 class ApiRegistryFactory
 {
-    public function create(Horde_Injector $injector): ApiRegistry
+    public function create(Injector $injector): ApiRegistry
     {
         $registry = new ApiRegistry();
         $registryLoader = $injector->getInstance(RegistryConfigLoader::class);

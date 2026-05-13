@@ -19,7 +19,7 @@ namespace Horde\Core\Factory;
 use Horde\Core\Config\ConfigLoader;
 use Horde\Core\Service\NullOAuthTokenRepository;
 use Horde\Core\Service\OAuthTokenRepository;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 /**
  * Factory for OAuthTokenRepository.
@@ -34,7 +34,7 @@ use Horde_Injector;
  */
 class OAuthTokenRepositoryFactory
 {
-    public function create(Horde_Injector $injector): OAuthTokenRepository
+    public function create(Injector $injector): OAuthTokenRepository
     {
         $loader = $injector->getInstance(ConfigLoader::class);
         $state = $loader->load('horde');

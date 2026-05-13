@@ -18,7 +18,7 @@ namespace Horde\Core\Factory;
 
 use Horde\Core\Config\RegistryConfigLoader;
 use Horde\Core\Config\Vhost;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 /**
  * Factory for RegistryConfigLoader
@@ -30,7 +30,7 @@ use Horde_Injector;
  */
 class RegistryConfigLoaderFactory
 {
-    public function create(Horde_Injector $injector): RegistryConfigLoader
+    public function create(Injector $injector): RegistryConfigLoader
     {
         $configBase = defined('HORDE_CONFIG_BASE') ? HORDE_CONFIG_BASE : '/etc/horde';
         $vendorBase = defined('HORDE_BASE') ? HORDE_BASE : __DIR__ . '/../../../';

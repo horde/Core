@@ -20,12 +20,12 @@ use Horde\Db\Adapter;
 use Horde\Horde\Service\SqlOAuthAuthorizationCodeRepository;
 use Horde\OAuth\Server\Repository\AuthorizationCodeRepository;
 use Horde\OAuth\Server\Repository\InMemory\InMemoryAuthorizationCodeRepository;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Throwable;
 
 class OAuthAuthorizationCodeRepositoryFactory
 {
-    public function create(Horde_Injector $injector): AuthorizationCodeRepository
+    public function create(Injector $injector): AuthorizationCodeRepository
     {
         if (class_exists(SqlOAuthAuthorizationCodeRepository::class)) {
             try {

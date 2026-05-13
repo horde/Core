@@ -19,7 +19,7 @@ namespace Horde\Core\Factory;
 use Horde\Core\Service\StandardHordeLdapService;
 use Horde\Core\Config\ConfigLoader;
 use Horde_Cache;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Horde_Ldap;
 use Exception;
 use RuntimeException;
@@ -50,12 +50,12 @@ class HordeLdapServiceFactory
     /**
      * Create LDAP service from configuration
      *
-     * @param Horde_Injector $injector Dependency injector
+     * @param Injector $injector Dependency injector
      * @param string $serviceId Service identifier ('horde', 'horde:groups', etc.)
      * @return StandardHordeLdapService LDAP service instance
      * @throws RuntimeException If no LDAP configuration found
      */
-    public function create(Horde_Injector $injector, string $serviceId = 'horde'): StandardHordeLdapService
+    public function create(Injector $injector, string $serviceId = 'horde'): StandardHordeLdapService
     {
         $loader = $injector->getInstance(ConfigLoader::class);
 
@@ -103,10 +103,10 @@ class HordeLdapServiceFactory
      * Extracted for testability - can be overridden in tests.
      *
      * @param array $ldapConfig LDAP configuration
-     * @param Horde_Injector $injector Dependency injector
+     * @param Injector $injector Dependency injector
      * @return Horde_Ldap LDAP adapter
      */
-    protected function createAdapter(array $ldapConfig, Horde_Injector $injector): Horde_Ldap
+    protected function createAdapter(array $ldapConfig, Injector $injector): Horde_Ldap
     {
         // Add optional cache if available
         try {

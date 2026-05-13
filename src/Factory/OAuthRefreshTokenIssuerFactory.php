@@ -18,11 +18,11 @@ namespace Horde\Core\Factory;
 
 use Horde\OAuth\Server\Repository\RefreshTokenRepository;
 use Horde\OAuth\Server\Token\RefreshTokenIssuer;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthRefreshTokenIssuerFactory
 {
-    public function create(Horde_Injector $injector): RefreshTokenIssuer
+    public function create(Injector $injector): RefreshTokenIssuer
     {
         $conf = $GLOBALS['conf'] ?? [];
         $oauthConf = $conf['oauth_server'] ?? [];

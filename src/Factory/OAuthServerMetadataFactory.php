@@ -17,11 +17,11 @@ declare(strict_types=1);
 namespace Horde\Core\Factory;
 
 use Horde\OAuth\Server\ServerMetadata;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthServerMetadataFactory
 {
-    public function create(Horde_Injector $injector): ServerMetadata
+    public function create(Injector $injector): ServerMetadata
     {
         $conf = $GLOBALS['conf'] ?? [];
         $oauthConf = $conf['oauth_server'] ?? [];

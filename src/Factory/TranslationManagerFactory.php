@@ -17,7 +17,7 @@ declare(strict_types=1);
 namespace Horde\Core\Factory;
 
 use Horde\Core\Translation\TranslationManager;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Horde_Registry;
 use Exception;
 
@@ -38,11 +38,11 @@ class TranslationManagerFactory
     /**
      * Create and preload a TranslationManager.
      *
-     * @param Horde_Injector $injector  The dependency injector.
+     * @param Injector $injector  The dependency injector.
      *
      * @return TranslationManager  Preloaded with all app domains.
      */
-    public function create(Horde_Injector $injector): TranslationManager
+    public function create(Injector $injector): TranslationManager
     {
         $manager = new TranslationManager();
         $registry = $injector->getInstance(Horde_Registry::class);

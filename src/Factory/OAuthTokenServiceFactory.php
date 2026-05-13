@@ -18,7 +18,7 @@ namespace Horde\Core\Factory;
 
 use Horde\Core\Service\NullOAuthTokenService;
 use Horde\Core\Service\OAuthTokenService;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 /**
  * Factory for OAuthTokenService.
@@ -34,7 +34,7 @@ use Horde_Injector;
  */
 class OAuthTokenServiceFactory
 {
-    public function create(Horde_Injector $injector): OAuthTokenService
+    public function create(Injector $injector): OAuthTokenService
     {
         return new NullOAuthTokenService();
     }

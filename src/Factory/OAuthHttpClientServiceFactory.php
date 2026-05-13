@@ -18,7 +18,7 @@ namespace Horde\Core\Factory;
 
 use Horde\Core\Service\NullOAuthHttpClientService;
 use Horde\Core\Service\OAuthHttpClientService;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 /**
  * Default factory returning NullOAuthHttpClientService.
@@ -28,7 +28,7 @@ use Horde_Injector;
  */
 class OAuthHttpClientServiceFactory
 {
-    public function create(Horde_Injector $injector): OAuthHttpClientService
+    public function create(Injector $injector): OAuthHttpClientService
     {
         return new NullOAuthHttpClientService();
     }

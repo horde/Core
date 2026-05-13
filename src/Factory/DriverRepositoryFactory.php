@@ -50,7 +50,7 @@ use Horde\Core\Config\Driver\Sql\MySQLDriver;
 use Horde\Core\Config\Driver\Sql\OracleDriver;
 use Horde\Core\Config\Driver\Sql\PostgreSQLDriver;
 use Horde\Core\Config\Driver\Sql\SQLiteDriver;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 /**
  * Factory for DriverRepository.
@@ -66,7 +66,7 @@ use Horde_Injector;
 class DriverRepositoryFactory
 {
     public function __construct(
-        private readonly Horde_Injector $injector,
+        private readonly Injector $injector,
     ) {}
 
     /**

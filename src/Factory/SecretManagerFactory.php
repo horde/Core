@@ -18,7 +18,7 @@ namespace Horde\Core\Factory;
 
 use Horde\Core\Config\ConfigLoader;
 use Horde\Secret\SecretManager;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 /**
  * Factory for SecretManager.
@@ -33,7 +33,7 @@ use Horde_Injector;
  */
 class SecretManagerFactory
 {
-    public function create(Horde_Injector $injector): SecretManager
+    public function create(Injector $injector): SecretManager
     {
         $loader = $injector->getInstance(ConfigLoader::class);
         $state = $loader->load('horde');

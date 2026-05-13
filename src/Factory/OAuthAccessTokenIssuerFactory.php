@@ -20,11 +20,11 @@ use Horde\Jwt\Signer\Rs256Signer;
 use Horde\Jwt\TokenEncoder;
 use Horde\OAuth\Server\Repository\AccessTokenRepository;
 use Horde\OAuth\Server\Token\AccessTokenIssuer;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthAccessTokenIssuerFactory
 {
-    public function create(Horde_Injector $injector): AccessTokenIssuer
+    public function create(Injector $injector): AccessTokenIssuer
     {
         $conf = $GLOBALS['conf'] ?? [];
         $oauthConf = $conf['oauth_server'] ?? [];

@@ -28,7 +28,7 @@ use Horde\SessionHandler\Storage\SqlBackend;
 use Horde\SessionHandler\Storage\StackBackend;
 use Horde_HashTable_Base;
 use Horde_HashTable_Lock;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Horde_Secret;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use RuntimeException;
@@ -53,11 +53,11 @@ class SessionHandlerFactory
     /**
      * Create SessionHandler instance
      *
-     * @param Horde_Injector $injector Dependency injector
+     * @param Injector $injector Dependency injector
      * @return SessionHandler Configured session handler
      * @throws RuntimeException If driver is unsupported
      */
-    public function create(Horde_Injector $injector): SessionHandler
+    public function create(Injector $injector): SessionHandler
     {
         $loader = $injector->getInstance(ConfigLoader::class);
         $state = $loader->load('horde');
@@ -104,7 +104,7 @@ class SessionHandlerFactory
     /**
      * @param array<string, mixed> $params
      */
-    private function createSqlBackend(Horde_Injector $injector, array $params): SqlBackend
+    private function createSqlBackend(Injector $injector, array $params): SqlBackend
     {
         $dbService = $injector->getInstance(HordeDbService::class);
         $db = $dbService->getAdapter();
@@ -119,7 +119,7 @@ class SessionHandlerFactory
     /**
      * @param array<string, mixed> $params
      */
-    private function createHashtableBackend(Horde_Injector $injector, array $params): HashtableBackend
+    private function createHashtableBackend(Injector $injector, array $params): HashtableBackend
     {
         $ht = $injector->getInstance('Horde_HashTable');
 
@@ -166,7 +166,7 @@ class SessionHandlerFactory
             || (bool) $state->get('sessionhandler.memcache', false);
     }
 
-    private function createSessionFactory(Horde_Injector $injector): HordeSessionFactory
+    private function createSessionFactory(Injector $injector): HordeSessionFactory
     {
         $encryptor = null;
         $decryptor = null;
@@ -187,7 +187,7 @@ class SessionHandlerFactory
         );
     }
 
-    private function getEventDispatcher(Horde_Injector $injector): ?EventDispatcherInterface
+    private function getEventDispatcher(Injector $injector): ?EventDispatcherInterface
     {
         try {
             $dispatcher = $injector->getInstance(EventDispatcherInterface::class);

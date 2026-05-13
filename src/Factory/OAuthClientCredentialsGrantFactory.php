@@ -19,11 +19,11 @@ namespace Horde\Core\Factory;
 use Horde\OAuth\Server\Grant\ClientCredentialsGrant;
 use Horde\OAuth\Server\Repository\ScopeRepository;
 use Horde\OAuth\Server\Token\AccessTokenIssuer;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthClientCredentialsGrantFactory
 {
-    public function create(Horde_Injector $injector): ClientCredentialsGrant
+    public function create(Injector $injector): ClientCredentialsGrant
     {
         return new ClientCredentialsGrant(
             $injector->getInstance(AccessTokenIssuer::class),

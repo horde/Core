@@ -18,11 +18,11 @@ namespace Horde\Core\Factory;
 
 use Horde\OAuth\Oidc\ClaimsMapper;
 use Horde\Horde\Service\IdentityOnlyClaimsMapper;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthClaimsMapperFactory
 {
-    public function create(Horde_Injector $injector): ClaimsMapper
+    public function create(Injector $injector): ClaimsMapper
     {
         return new IdentityOnlyClaimsMapper();
     }

@@ -21,11 +21,11 @@ use Horde\Jwt\TokenEncoder;
 use Horde\OAuth\Oidc\ClaimsMapper;
 use Horde\OAuth\Oidc\IdTokenBuilder;
 use Horde\OAuth\Oidc\ScopeClaimsMapping;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthIdTokenBuilderFactory
 {
-    public function create(Horde_Injector $injector): IdTokenBuilder
+    public function create(Injector $injector): IdTokenBuilder
     {
         $conf = $GLOBALS['conf'] ?? [];
         $oauthConf = $conf['oauth_server'] ?? [];

@@ -20,12 +20,12 @@ use Horde\Db\Adapter;
 use Horde\Horde\Service\SqlOAuthAccessTokenRepository;
 use Horde\OAuth\Server\Repository\AccessTokenRepository;
 use Horde\OAuth\Server\Repository\InMemory\InMemoryAccessTokenRepository;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Throwable;
 
 class OAuthAccessTokenRepositoryFactory
 {
-    public function create(Horde_Injector $injector): AccessTokenRepository
+    public function create(Injector $injector): AccessTokenRepository
     {
         if (class_exists(SqlOAuthAccessTokenRepository::class)) {
             try {
