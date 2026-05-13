@@ -6,6 +6,10 @@
  * @author   Michael J. Rubinsky <mrubinsk@horde.org>
  * @category Horde
  * @package  Core
+ *
+ * @deprecated Creates V1 API client using OAuth 1.0a and Horde_Controller_Request.
+ *             A replacement based on Horde\Service\Twitter\V2 (PSR-18) and
+ *             Horde OAuth2 is needed.
  */
 class Horde_Core_Factory_Twitter extends Horde_Core_Factory_Injector
 {
