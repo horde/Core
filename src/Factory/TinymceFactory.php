@@ -16,7 +16,7 @@ declare(strict_types=1);
 namespace Horde\Core\Factory;
 
 use Horde\Editor\Tinymce;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 /**
  * Factory for Tinymce editor driver.
@@ -27,7 +27,7 @@ use Horde_Injector;
  */
 class TinymceFactory
 {
-    public function create(Horde_Injector $injector): Tinymce
+    public function create(Injector $injector): Tinymce
     {
         return new Tinymce();
     }

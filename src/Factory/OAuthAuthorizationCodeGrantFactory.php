@@ -21,11 +21,11 @@ use Horde\OAuth\Server\Repository\AuthorizationCodeRepository;
 use Horde\OAuth\Server\Repository\ScopeRepository;
 use Horde\OAuth\Server\Token\AccessTokenIssuer;
 use Horde\OAuth\Server\Token\RefreshTokenIssuer;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthAuthorizationCodeGrantFactory
 {
-    public function create(Horde_Injector $injector): AuthorizationCodeGrant
+    public function create(Injector $injector): AuthorizationCodeGrant
     {
         return new AuthorizationCodeGrant(
             $injector->getInstance(AuthorizationCodeRepository::class),

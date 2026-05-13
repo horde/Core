@@ -20,12 +20,12 @@ use Horde\Db\Adapter;
 use Horde\Horde\Service\SqlOAuthConsentRepository;
 use Horde\OAuth\Server\Repository\ConsentRepository;
 use Horde\OAuth\Server\Repository\InMemory\InMemoryConsentRepository;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Throwable;
 
 class OAuthConsentRepositoryFactory
 {
-    public function create(Horde_Injector $injector): ConsentRepository
+    public function create(Injector $injector): ConsentRepository
     {
         if (class_exists(SqlOAuthConsentRepository::class)) {
             try {

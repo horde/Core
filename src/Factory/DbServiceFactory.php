@@ -23,7 +23,7 @@ use Horde\Db\Adapter\Mysqli;
 use Horde\Db\Adapter\Pdo\Mysql as PdoMysql;
 use Horde\Db\Adapter\Pdo\Pgsql as PdoPgsql;
 use Horde\Db\Adapter\Pdo\Sqlite as PdoSqlite;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use InvalidArgumentException;
 
 /**
@@ -52,12 +52,12 @@ class DbServiceFactory
     /**
      * Create database service from configuration
      *
-     * @param Horde_Injector $injector Dependency injector
+     * @param Injector $injector Dependency injector
      * @param string $serviceId Service identifier ('horde', 'horde:perms', etc.)
      * @return StandardHordeDbService Database service instance
      * @throws InvalidArgumentException If phptype unsupported
      */
-    public function create(Horde_Injector $injector, string $serviceId = 'horde'): StandardHordeDbService
+    public function create(Injector $injector, string $serviceId = 'horde'): StandardHordeDbService
     {
         $loader = $injector->getInstance(ConfigLoader::class);
         $state = $loader->load('horde');

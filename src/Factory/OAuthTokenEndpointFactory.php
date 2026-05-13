@@ -23,11 +23,11 @@ use Horde\OAuth\Server\Grant\RefreshTokenGrant;
 use Horde\OAuth\Server\Handler\TokenEndpoint;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthTokenEndpointFactory
 {
-    public function create(Horde_Injector $injector): TokenEndpoint
+    public function create(Injector $injector): TokenEndpoint
     {
         return new TokenEndpoint(
             $injector->getInstance(ClientAuthenticatorChain::class),

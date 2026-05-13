@@ -19,7 +19,7 @@ namespace Horde\Core\Factory;
 use Horde\Core\Service\LdapPrefsService;
 use Horde\Core\Service\HordeLdapService;
 use Horde\Core\Config\ConfigLoader;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use RuntimeException;
 
 /**
@@ -35,11 +35,11 @@ class LdapPrefsServiceFactory
     /**
      * Create LDAP prefs service from configuration
      *
-     * @param Horde_Injector $injector Dependency injector
+     * @param Injector $injector Dependency injector
      * @return LdapPrefsService LDAP prefs service instance
      * @throws RuntimeException If configuration invalid
      */
-    public function create(Horde_Injector $injector): LdapPrefsService
+    public function create(Injector $injector): LdapPrefsService
     {
         $loader = $injector->getInstance(ConfigLoader::class);
         $config = $loader->load('horde');

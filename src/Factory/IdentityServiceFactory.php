@@ -18,7 +18,7 @@ namespace Horde\Core\Factory;
 
 use Horde\Core\Service\IdentityService;
 use Horde\Core\Service\PrefsService;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 /**
  * Factory for IdentityService
@@ -35,10 +35,10 @@ class IdentityServiceFactory
     /**
      * Create IdentityService instance
      *
-     * @param Horde_Injector $injector Dependency injector
+     * @param Injector $injector Dependency injector
      * @return IdentityService Identity service instance
      */
-    public function create(Horde_Injector $injector): IdentityService
+    public function create(Injector $injector): IdentityService
     {
         $prefsService = $injector->getInstance(PrefsService::class);
         return new IdentityService($prefsService);

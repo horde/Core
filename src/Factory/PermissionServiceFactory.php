@@ -23,7 +23,7 @@ use Horde\Core\Service\GroupService;
 use Horde\Core\Config\ConfigLoader;
 use Horde_Perms_Sql;
 use Horde_Perms_Null;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Horde_Cache;
 use Horde_Log_Logger;
 use RuntimeException;
@@ -47,11 +47,11 @@ class PermissionServiceFactory
     /**
      * Create PermissionService instance
      *
-     * @param Horde_Injector $injector Dependency injector
+     * @param Injector $injector Dependency injector
      * @return PermissionService Permission service with configured backend
      * @throws RuntimeException If driver unsupported
      */
-    public function create(Horde_Injector $injector): PermissionService
+    public function create(Injector $injector): PermissionService
     {
         $loader = $injector->getInstance(ConfigLoader::class);
         $state = $loader->load('horde');
@@ -73,12 +73,12 @@ class PermissionServiceFactory
      * - System-wide horde connection (driverconfig='horde')
      * - Service-specific connection (custom DB params)
      *
-     * @param Horde_Injector $injector Dependency injector
+     * @param Injector $injector Dependency injector
      * @param array $params Permission configuration parameters
      * @return SqlPermissionService SQL permission service
      */
     private function createSqlBackend(
-        Horde_Injector $injector,
+        Injector $injector,
         array $params
     ): SqlPermissionService {
         // Get database connection via DbServiceFactory with pooling

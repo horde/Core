@@ -20,7 +20,7 @@ use Horde\Db\Adapter;
 use Horde\Horde\Service\SqlIdentityHistoryRepository;
 use Horde\Identity\IdentityHistoryRepository;
 use Horde\Identity\InMemoryIdentityHistoryRepository;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Throwable;
 
 /**
@@ -30,7 +30,7 @@ use Throwable;
  */
 class IdentityHistoryRepositoryFactory
 {
-    public function create(Horde_Injector $injector): IdentityHistoryRepository
+    public function create(Injector $injector): IdentityHistoryRepository
     {
         if (class_exists(SqlIdentityHistoryRepository::class)) {
             try {

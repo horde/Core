@@ -18,7 +18,7 @@ use Horde\Auth\LoginAttemptTracker;
 use Horde\Core\Auth\Storage\HistoryAttemptTracker;
 use Horde\Core\Auth\Storage\HordeLockAdapter;
 use Horde_History;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Horde_Lock;
 
 /**
@@ -26,14 +26,14 @@ use Horde_Lock;
  */
 class AuthStorageFactory
 {
-    public function createLockManager(Horde_Injector $injector): LockManager
+    public function createLockManager(Injector $injector): LockManager
     {
         $lock = $injector->getInstance(Horde_Lock::class);
 
         return new HordeLockAdapter($lock);
     }
 
-    public function createAttemptTracker(Horde_Injector $injector): LoginAttemptTracker
+    public function createAttemptTracker(Injector $injector): LoginAttemptTracker
     {
         $history = $injector->getInstance(Horde_History::class);
 

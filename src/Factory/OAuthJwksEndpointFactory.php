@@ -20,11 +20,11 @@ use Horde\Jwt\Key\PublicKey;
 use Horde\OAuth\Oidc\Handler\JwksEndpoint;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthJwksEndpointFactory
 {
-    public function create(Horde_Injector $injector): JwksEndpoint
+    public function create(Injector $injector): JwksEndpoint
     {
         $conf = $GLOBALS['conf'] ?? [];
         $oauthConf = $conf['oauth_server'] ?? [];

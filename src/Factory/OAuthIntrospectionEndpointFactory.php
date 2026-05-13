@@ -22,11 +22,11 @@ use Horde\OAuth\Server\Repository\AccessTokenRepository;
 use Horde\OAuth\Server\Repository\RefreshTokenRepository;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthIntrospectionEndpointFactory
 {
-    public function create(Horde_Injector $injector): IntrospectionEndpoint
+    public function create(Injector $injector): IntrospectionEndpoint
     {
         return new IntrospectionEndpoint(
             $injector->getInstance(ClientAuthenticatorChain::class),

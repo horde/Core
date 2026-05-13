@@ -19,7 +19,7 @@ namespace Horde\Core\Factory;
 use Horde;
 use Horde\Token\Token;
 use Horde\Token\TokenConfig;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Horde_String;
 use Horde_Support_Randomid;
 
@@ -41,7 +41,7 @@ use Horde_Support_Randomid;
  */
 class TokenServiceFactory
 {
-    public function create(Horde_Injector $injector): Token
+    public function create(Injector $injector): Token
     {
         global $conf, $session;
 

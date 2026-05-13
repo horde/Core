@@ -20,11 +20,11 @@ use Horde\OAuth\Oidc\Handler\DiscoveryEndpoint;
 use Horde\OAuth\Server\ServerMetadata;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthDiscoveryEndpointFactory
 {
-    public function create(Horde_Injector $injector): DiscoveryEndpoint
+    public function create(Injector $injector): DiscoveryEndpoint
     {
         return new DiscoveryEndpoint(
             $injector->getInstance(ServerMetadata::class),

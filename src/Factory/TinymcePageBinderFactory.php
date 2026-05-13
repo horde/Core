@@ -17,7 +17,7 @@ namespace Horde\Core\Factory;
 
 use Horde\Core\Editor\TinymcePageBinder;
 use Horde\Editor\Tinymce;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 /**
  * Factory for TinymcePageBinder.
@@ -28,7 +28,7 @@ use Horde_Injector;
  */
 class TinymcePageBinderFactory
 {
-    public function create(Horde_Injector $injector): TinymcePageBinder
+    public function create(Injector $injector): TinymcePageBinder
     {
         return new TinymcePageBinder(
             $injector->getInstance(Tinymce::class),

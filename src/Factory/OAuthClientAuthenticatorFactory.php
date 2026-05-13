@@ -20,11 +20,11 @@ use Horde\OAuth\Server\ClientAuthentication\ClientAuthenticatorChain;
 use Horde\OAuth\Server\ClientAuthentication\ClientSecretBasic;
 use Horde\OAuth\Server\ClientAuthentication\ClientSecretPost;
 use Horde\OAuth\Server\Repository\ClientRepository;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthClientAuthenticatorFactory
 {
-    public function create(Horde_Injector $injector): ClientAuthenticatorChain
+    public function create(Injector $injector): ClientAuthenticatorChain
     {
         return new ClientAuthenticatorChain(
             $injector->getInstance(ClientRepository::class),

@@ -23,7 +23,7 @@ use Horde\Db\Adapter\Pdo\Mysql as PdoMysql;
 use Horde\Db\Adapter\Pdo\Pgsql as PdoPgsql;
 use Horde\Db\Adapter\Pdo\Sqlite as PdoSqlite;
 use Horde\Db\Adapter\Oci8 as ModernOci8;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Horde_String;
 use Horde_Exception;
 use Throwable;
@@ -38,7 +38,7 @@ class DbAdapterFactory
         'oci8' => ModernOci8::class,
     ];
 
-    public function create(Horde_Injector $injector): Adapter
+    public function create(Injector $injector): Adapter
     {
         $config = Horde::getDriverConfig('', 'sql');
 

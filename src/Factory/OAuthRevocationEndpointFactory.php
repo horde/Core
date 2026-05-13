@@ -22,11 +22,11 @@ use Horde\OAuth\Server\Repository\AccessTokenRepository;
 use Horde\OAuth\Server\Repository\RefreshTokenRepository;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthRevocationEndpointFactory
 {
-    public function create(Horde_Injector $injector): RevocationEndpoint
+    public function create(Injector $injector): RevocationEndpoint
     {
         return new RevocationEndpoint(
             $injector->getInstance(ClientAuthenticatorChain::class),

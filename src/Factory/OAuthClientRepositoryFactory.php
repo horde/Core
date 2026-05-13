@@ -20,12 +20,12 @@ use Horde\Db\Adapter;
 use Horde\Horde\Service\SqlOAuthClientRepository;
 use Horde\OAuth\Server\Repository\ClientRepository;
 use Horde\OAuth\Server\Repository\InMemory\InMemoryClientRepository;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Throwable;
 
 class OAuthClientRepositoryFactory
 {
-    public function create(Horde_Injector $injector): ClientRepository
+    public function create(Injector $injector): ClientRepository
     {
         if (class_exists(SqlOAuthClientRepository::class)) {
             try {

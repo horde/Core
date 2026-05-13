@@ -21,12 +21,12 @@ use Horde\Jwt\Key\PublicKey;
 use Horde\Jwt\Signer\Rs256Signer;
 use Horde\Jwt\TokenEncoder;
 use Horde\Horde\Service\CryptoKeyManager;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Horde\Exception\HordeRuntimeException;
 
 class OAuthSigningKeyFactory
 {
-    public function create(Horde_Injector $injector): PrivateKey
+    public function create(Injector $injector): PrivateKey
     {
         $conf = $GLOBALS['conf'] ?? [];
         $oauthConf = $conf['oauth_server'] ?? [];

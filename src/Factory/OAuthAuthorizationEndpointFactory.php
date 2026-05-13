@@ -22,11 +22,11 @@ use Horde\OAuth\Server\Repository\ClientRepository;
 use Horde\OAuth\Server\Repository\ScopeRepository;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class OAuthAuthorizationEndpointFactory
 {
-    public function create(Horde_Injector $injector): AuthorizationEndpoint
+    public function create(Injector $injector): AuthorizationEndpoint
     {
         return new AuthorizationEndpoint(
             $injector->getInstance(ClientRepository::class),

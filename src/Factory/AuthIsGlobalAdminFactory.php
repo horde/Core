@@ -17,11 +17,11 @@ namespace Horde\Core\Factory;
 
 use Horde\Core\Config\ConfigLoader;
 use Horde\Core\Middleware\AuthIsGlobalAdmin;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class AuthIsGlobalAdminFactory
 {
-    public function create(Horde_Injector $injector): AuthIsGlobalAdmin
+    public function create(Injector $injector): AuthIsGlobalAdmin
     {
         $loader = $injector->getInstance(ConfigLoader::class);
         $state = $loader->load('horde');

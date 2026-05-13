@@ -15,11 +15,11 @@ namespace Horde\Core\Factory;
 
 use Horde\Core\Auth\AuthService;
 use Horde\Core\Middleware\CheckCredentials;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 class CheckCredentialsFactory
 {
-    public function create(Horde_Injector $injector): CheckCredentials
+    public function create(Injector $injector): CheckCredentials
     {
         $authService = $injector->getInstance(AuthService::class);
 

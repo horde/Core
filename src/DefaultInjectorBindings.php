@@ -33,6 +33,7 @@ use Horde\Core\Factory\ConfigMetadataProviderFactory;
 use Horde\Core\Factory\DbAdapterFactory;
 use Horde\Core\Factory\DbServiceFactory;
 use Horde\Core\Factory\DriverRepositoryFactory;
+use Horde\Core\Factory\ErrorFilterFactory;
 use Horde\Core\Factory\EventDispatcherFactory;
 use Horde\Core\Factory\GroupServiceFactory;
 use Horde\Core\Factory\HashTableFactory;
@@ -80,6 +81,7 @@ use Horde\Core\Factory\TinymceFactory;
 use Horde\Core\Factory\TinymcePageBinderFactory;
 use Horde\Core\Factory\VersionServiceFactory;
 use Horde\Core\Middleware\AuthIsGlobalAdmin;
+use Horde\Core\Middleware\ErrorFilter;
 use Horde\Core\Middleware\OAuthConsentMiddleware;
 use Horde\Core\Service\ApplicationService;
 use Horde\Core\Service\GroupService;
@@ -142,7 +144,7 @@ use Horde\Http\RequestFactory;
 use Horde\Http\ResponseFactory;
 use Horde\Http\StreamFactory;
 use Horde\Util\Variables;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Http\Client\ClientInterface as PsrHttpClientInterface;
@@ -154,7 +156,7 @@ use Psr\SimpleCache\CacheInterface as SimpleCacheInterface;
 
 class DefaultInjectorBindings implements InjectorBindings
 {
-    public function register(Horde_Injector $injector): void
+    public function register(Injector $injector): void
     {
         $factories = [
             'Horde_ActiveSyncBackend' => 'Horde_Core_Factory_ActiveSyncBackend',
@@ -236,6 +238,7 @@ class DefaultInjectorBindings implements InjectorBindings
             IdTokenBuilder::class => OAuthIdTokenBuilderFactory::class,
             OAuthConsentMiddleware::class => OAuthConsentMiddlewareFactory::class,
             AuthIsGlobalAdmin::class => AuthIsGlobalAdminFactory::class,
+            ErrorFilter::class => ErrorFilterFactory::class,
             'Horde_Service_Facebook' => 'Horde_Core_Factory_Facebook',
             'Horde_Service_Twitter' => 'Horde_Core_Factory_Twitter',
             'Horde_Service_UrlShortener' => 'Horde_Core_Factory_UrlShortener',

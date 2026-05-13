@@ -20,12 +20,12 @@ use Horde\Db\Adapter;
 use Horde\Horde\Service\SqlOAuthRefreshTokenRepository;
 use Horde\OAuth\Server\Repository\InMemory\InMemoryRefreshTokenRepository;
 use Horde\OAuth\Server\Repository\RefreshTokenRepository;
-use Horde_Injector;
+use Horde\Injector\Injector;
 use Throwable;
 
 class OAuthRefreshTokenRepositoryFactory
 {
-    public function create(Horde_Injector $injector): RefreshTokenRepository
+    public function create(Injector $injector): RefreshTokenRepository
     {
         if (class_exists(SqlOAuthRefreshTokenRepository::class)) {
             try {

@@ -19,7 +19,7 @@ namespace Horde\Core\Factory;
 
 use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Driver\DriverRepository;
-use Horde_Injector;
+use Horde\Injector\Injector;
 
 /**
  * Factory for ConfigMetadataProvider.
@@ -35,7 +35,7 @@ use Horde_Injector;
 class ConfigMetadataProviderFactory
 {
     public function __construct(
-        private readonly Horde_Injector $injector,
+        private readonly Injector $injector,
     ) {}
 
     /**
