@@ -3229,7 +3229,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     public function versionCallback(Horde_ActiveSync $server)
     {
         $credentials = new Horde_ActiveSync_Credentials($server);
-        $authUsername = !empty($credentials->username)
+        $authUsername = ($credentials->username !== false && $credentials->username !== '')
             ? (string) $credentials->username
             : null;
         if ($authUsername === null) {
