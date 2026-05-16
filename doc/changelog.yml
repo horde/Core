@@ -732,6 +732,25 @@
     [rla] Adapt schema migrations to work in new H6 installation layout.
     [rla] Added injectable wrapper around Config to reduce globals access.
     [rla] With Marco Abbrancati: Upgraded test cases for phpunit 9.x utility.
+3.0.0-RC1:
+  api: 3.0.0-RC1
+  state:
+    release: RC
+    api: RC
+  date: 2026-05-16
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    Fix authentication username check in versionCallback
+    feat: RedirectToLogin now honors guest READ permission
+    refactor: Transition to Horde\Injector\Injector and a lean middleware stack
+    docs: Mark this old-style service as deprecated
+    refactor: Improve getDriverConfig()
+    Merge pull request #100 from horde/fix/migration_Forms_V3
+    Refactor variable method calls in Html.php
+    Fix header retrieval in tableset rendering
+    Fix method call to get variable type name
 2.31.15:
   api: 2.31.0
   state:
