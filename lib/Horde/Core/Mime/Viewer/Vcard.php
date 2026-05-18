@@ -166,7 +166,7 @@ class Horde_Core_Mime_Viewer_Vcard extends Horde_Mime_Viewer_Base
                 $birthday = new Horde_Date($birthdays[0]);
                 $html .= $this->_row(
                     Horde_Core_Translation::t('Birthday'),
-                    $birthday->strftime($prefs->getValue('date_format'))
+                    $birthday->format($prefs->getValue('date_format'), new \Horde\Date\Formatter\IcuFormatter(), $GLOBALS['language'] ?? 'en_US')
                 );
             } catch (Horde_Icalendar_Exception $e) {
             }
