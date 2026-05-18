@@ -50,15 +50,18 @@ class RedirectToLogin implements MiddlewareInterface
         $user = $request->getAttribute('HORDE_AUTHENTICATED_USER');
         $app = $request->getAttribute('app');
 
+        // Admins bypass all permission checks
+        if ($user && $this->registry->isAdmin(['user' => $user])) {
+            return $handler->handle($request);
+        }
+
         // Check app-level read permission if PermissionService is available
         if ($this->permissionService !== null && $app) {
             if ($this->permissionService->exists($app)) {
-                // Pass empty string for guests — backend returns guest permissions
                 $checkUser = $user ?: '';
                 if (!$this->permissionService->hasPermission($app, $checkUser, ['read'])) {
                     return $this->redirectToLogin($request);
                 }
-                // Permission granted — allow through even if not authenticated (guest read)
                 return $handler->handle($request);
             }
         }
