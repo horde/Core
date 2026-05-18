@@ -52,7 +52,7 @@ class StrftimeFinding implements JsonSerializable
         public readonly string $field,
         public readonly string $location,
         public readonly string $strftime,
-        public readonly string|array $icu,
+        public readonly string $icu,
         public readonly string $confidence,
     ) {
         if (!in_array($confidence, [self::CONFIDENCE_HIGH, self::CONFIDENCE_MEDIUM, self::CONFIDENCE_LOW], true)) {
@@ -61,28 +61,12 @@ class StrftimeFinding implements JsonSerializable
     }
 
     /**
-     * Check if ICU pattern is locale-specific
-     *
-     * @return bool True if pattern depends on user locale
-     */
-    public function isLocaleSpecific(): bool
-    {
-        return is_array($this->icu);
-    }
-
-    /**
      * Get ICU pattern as string
      *
-     * For locale-specific patterns, returns a description.
-     * For concrete patterns, returns the pattern itself.
-     *
-     * @return string ICU pattern or description
+     * @return string ICU pattern
      */
     public function getIcuString(): string
     {
-        if (is_array($this->icu)) {
-            return '[locale-specific: ' . implode(', ', array_keys($this->icu)) . ']';
-        }
         return $this->icu;
     }
 
