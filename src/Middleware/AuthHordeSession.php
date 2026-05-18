@@ -37,7 +37,8 @@ class AuthHordeSession implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if ($this->registry->isAuthenticated()) {
+        $isAuth = $this->registry->isAuthenticated();
+        if ($isAuth) {
             $request = $request->withAttribute('HORDE_AUTHENTICATED_USER', $this->registry->getAuth());
             $request = $request->withoutAttribute('HORDE_GUEST');
         } else {
