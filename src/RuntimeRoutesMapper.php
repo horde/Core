@@ -131,24 +131,30 @@ class RuntimeRoutesMapper extends Mapper
     /**
      * Prefix secondary route paths with the current app webroot.
      *
-     * buildRoute() already prefixes the primary URI; withSecondaryRoute() paths
-     * are app-relative and must receive the same prefix for routematch().
+     * buildRoute() already prefixes the primary URI; secondary paths added via
+     * withSecondaryRoute() are app-relative and need the same prefix for
+     * routematch(). We build the RouteBuilder here, prefix secondary Route
+     * objects, and pass the final array to the parent.
      */
     public function addRoute(RouteBuilder|Route|array $routeOrBuilder): void
     {
-        if ($routeOrBuilder instanceof RouteBuilder && $this->currentAppPrefix !== '') {
-            $routeOrBuilder->prefixSecondaryPaths($this->currentAppPrefix);
+        if ($this->currentAppPrefix === '') {
+            parent::addRoute($routeOrBuilder);
+            return;
         }
 
-        parent::addRoute($routeOrBuilder);
-    }
+        if ($routeOrBuilder instanceof RouteBuilder) {
+            $routeOrBuilder = $routeOrBuilder->build();
+        }
 
-    /**
-     * Prefix legacy addSecondary() paths with the current app webroot.
-     */
-    public function addSecondary(string $path, string $namedRoute): void
-    {
-        parent::addSecondary($this->prefixAppPath($path), $namedRoute);
+        $routes = is_array($routeOrBuilder) ? $routeOrBuilder : [$routeOrBuilder];
+        foreach ($routes as $route) {
+            if ($route->secondary && !str_starts_with($route->routePath, $this->currentAppPrefix)) {
+                $route->routePath = $this->currentAppPrefix . '/' . ltrim($route->routePath, '/');
+            }
+        }
+
+        parent::addRoute($routes);
     }
 
     /**
@@ -235,14 +241,5 @@ class RuntimeRoutesMapper extends Mapper
             'scheme' => null,
             'port' => null,
         ];
-    }
-
-    private function prefixAppPath(string $path): string
-    {
-        if ($this->currentAppPrefix === '') {
-            return $path;
-        }
-
-        return $this->currentAppPrefix . '/' . ltrim($path, '/');
     }
 }
