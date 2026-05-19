@@ -1,4 +1,5 @@
 <?php
+use Horde\Injector\Injector;
 
 /**
  * @category Horde
@@ -15,7 +16,7 @@ class Horde_Core_Factory_Notification extends Horde_Core_Factory_Injector
 
     /**
      */
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         global $registry;
 

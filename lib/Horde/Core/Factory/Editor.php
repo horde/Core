@@ -1,4 +1,5 @@
 <?php
+use Horde\Injector\Injector;
 
 /**
  * A Horde_Injector:: based Horde_Editor:: factory.
@@ -32,7 +33,7 @@ class Horde_Core_Factory_Editor extends Horde_Core_Factory_Injector
      * @return Horde_Editor  The singleton editor instance.
      * @throws Horde_Editor_Exception
      */
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         return $injector->getInstance('Horde_Core_Editor_Ckeditor');
     }

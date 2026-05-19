@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Injector\Injector;
+
 /**
  * Factory for creating Horde_SessionHandler objects.
  *
@@ -26,7 +28,7 @@ class Horde_Core_Factory_SessionHandler extends Horde_Core_Factory_Injector
      *                                      instance.
      * @throws Horde_SessionHandler_Exception
      */
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         global $conf;
 

@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Injector\Injector;
+
 /**
  * A Horde_Injector:: based Horde_Imsp:: factory.
  *
@@ -35,16 +37,16 @@ class Horde_Core_Factory_Imsp extends Horde_Core_Factory_Base
 
     /**
      *
-     * @var Horde_Injector
+     * @var Horde_Injector|Injector
      */
     protected $_injector;
 
     /**
      * Constructor
      *
-     * @param Horde_Injector $injector
+     * @param Horde_Injector|Injector $injector
      */
-    public function __construct(Horde_Injector $injector)
+    public function __construct(Horde_Injector|Injector $injector)
     {
         $this->_injector = $injector;
     }

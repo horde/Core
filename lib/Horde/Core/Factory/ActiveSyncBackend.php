@@ -1,4 +1,5 @@
 <?php
+use Horde\Injector\Injector;
 
 use Horde\Http\ServerRequest;
 use Horde\Injector\NotFoundException as InjectorNotFoundException;
@@ -9,7 +10,7 @@ use Horde\Injector\NotFoundException as InjectorNotFoundException;
  */
 class Horde_Core_Factory_ActiveSyncBackend extends Horde_Core_Factory_Injector
 {
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         global $conf, $registry;
 

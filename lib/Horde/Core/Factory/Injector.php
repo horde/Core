@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Injector\Injector;
+
 /**
  * The abstract Horde injector class.
  *
@@ -32,6 +34,6 @@ abstract class Horde_Core_Factory_Injector extends Horde_Core_Factory_Base
     /**
      * @throws Horde_Exception
      */
-    abstract public function create(Horde_Injector $injector);
+    abstract public function create(Horde_Injector|Injector $injector);
 
 }

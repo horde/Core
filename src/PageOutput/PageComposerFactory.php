@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Horde\Core\PageOutput;
 
 use Horde_Injector;
+use Horde\Injector\Injector;
 
 /**
  * Factory for PageComposer.
@@ -28,7 +29,7 @@ use Horde_Injector;
  */
 class PageComposerFactory
 {
-    public function create(Horde_Injector $injector): PageComposer
+    public function create(Horde_Injector|Injector $injector): PageComposer
     {
         return new PageComposer(
             $injector->getInstance(AssetCollector::class),

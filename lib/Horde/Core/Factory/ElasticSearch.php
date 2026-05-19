@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Injector\Injector;
+
 /**
  * A Horde_Injector:: based Horde_ElasticSearch_Client:: factory.
  *
@@ -29,12 +31,12 @@ class Horde_Core_Factory_ElasticSearch extends Horde_Core_Factory_Injector
     /**
      * Return the Horde_ElasticSearch_Client instance.
      *
-     * @param Horde_Injector $injector
+     * @param Horde_Injector|Injector $injector
      *
      * @return Horde_ElasticSearch_Client  The elasticsearch client
      * @throws Horde_Editor_Exception
      */
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         return new Horde_ElasticSearch_Client('http://localhost:9200/', $injector->getInstance('Horde_Http_Client'));
     }

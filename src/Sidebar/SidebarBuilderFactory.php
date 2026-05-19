@@ -18,6 +18,7 @@ namespace Horde\Core\Sidebar;
 
 use Horde\Core\Service\PrefsService;
 use Horde_Injector;
+use Horde\Injector\Injector;
 use Horde_Registry;
 
 /**
@@ -30,7 +31,7 @@ use Horde_Registry;
  */
 class SidebarBuilderFactory
 {
-    public function create(Horde_Injector $injector): SidebarBuilder
+    public function create(Horde_Injector|Injector $injector): SidebarBuilder
     {
         return new SidebarBuilder(
             $injector->getInstance(Horde_Registry::class),

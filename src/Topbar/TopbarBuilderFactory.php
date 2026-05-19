@@ -20,6 +20,7 @@ use Horde\Core\Service\PermissionService;
 use Horde\Core\Service\PrefsService;
 use Horde\Core\Session\HordeSession;
 use Horde_Injector;
+use Horde\Injector\Injector;
 use Horde_Registry;
 
 /**
@@ -32,7 +33,7 @@ use Horde_Registry;
  */
 class TopbarBuilderFactory
 {
-    public function create(Horde_Injector $injector): TopbarBuilder
+    public function create(Horde_Injector|Injector $injector): TopbarBuilder
     {
         return new TopbarBuilder(
             $injector->getInstance(Horde_Registry::class),

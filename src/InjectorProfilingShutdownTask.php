@@ -17,6 +17,7 @@ namespace Horde\Core;
 
 use Horde;
 use Horde_Injector;
+use Horde\Injector\Injector;
 use Horde_Log;
 use Horde_Shutdown_Task;
 use Horde\Injector\BindingMapWriter;
@@ -34,7 +35,7 @@ use Horde\Injector\BindingMapWriter;
 class InjectorProfilingShutdownTask implements Horde_Shutdown_Task
 {
     public function __construct(
-        private readonly Horde_Injector $injector,
+        private readonly Horde_Injector|Injector $injector,
         private readonly string $outputPath,
     ) {}
 

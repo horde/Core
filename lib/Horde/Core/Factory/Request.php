@@ -1,4 +1,5 @@
 <?php
+use Horde\Injector\Injector;
 
 /**
  * @category Horde
@@ -6,7 +7,7 @@
  */
 class Horde_Core_Factory_Request extends Horde_Core_Factory_Injector
 {
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         $request = new Horde_Controller_Request_Http();
         $request->setPath($_SERVER['REDIRECT_URL'] ?? $_SERVER['REQUEST_URI']);

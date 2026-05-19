@@ -1,4 +1,5 @@
 <?php
+use Horde\Injector\Injector;
 
 /**
  * Copyright 2013-2026 Horde LLC (http://www.horde.org/)
@@ -31,7 +32,7 @@ class Horde_Core_Factory_MailBase extends Horde_Core_Factory_Injector
      * @return Horde_Mail_Transport  The singleton instance.
      * @throws Horde_Exception
      */
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         return $injector->getInstance('Horde_Core_Factory_Mail')->create();
     }

@@ -1,4 +1,5 @@
 <?php
+use Horde\Injector\Injector;
 
 /**
  * A Horde_Injector based Horde_Timezone factory.
@@ -18,7 +19,7 @@ class Horde_Core_Factory_Timezone extends Horde_Core_Factory_Injector
     /**
      * @throws Horde_Exception
      */
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         if (empty($GLOBALS['conf']['timezone']['location'])) {
             throw new Horde_Exception('Timezone database location is not configured');

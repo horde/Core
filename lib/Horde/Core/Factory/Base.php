@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Injector\Injector;
+
 /**
  * The abstract Horde factory class.
  *
@@ -32,16 +34,16 @@ class Horde_Core_Factory_Base
     /**
      * The injector.
      *
-     * @var Horde_Injector
+     * @var Horde_Injector|Injector
      */
     protected $_injector;
 
     /**
      * Constructor.
      *
-     * @param Horde_Injector $injector  The injector to use.
+     * @param Horde_Injector|Injector $injector  The injector to use.
      */
-    public function __construct(Horde_Injector $injector)
+    public function __construct(Horde_Injector|Injector $injector)
     {
         $this->_injector = $injector;
     }

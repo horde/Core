@@ -14,12 +14,13 @@ namespace Horde\Core\View;
 use Horde\Core\Service\PrefsService;
 use Horde\Core\Session\HordeSession;
 use Horde_Injector;
+use Horde\Injector\Injector;
 use Horde_Registry;
 use Throwable;
 
 class AccessKeyTrackerFactory
 {
-    public function create(Horde_Injector $injector): AccessKeyTracker
+    public function create(Horde_Injector|Injector $injector): AccessKeyTracker
     {
         $accessKeysEnabled = true;
         try {

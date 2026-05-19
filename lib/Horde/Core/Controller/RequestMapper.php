@@ -12,6 +12,7 @@
  * @package  Core
  */
 
+use Horde\Injector\Injector;
 use Horde\Routes\Mapper;
 
 /**
@@ -153,11 +154,11 @@ class Horde_Core_Controller_RequestMapper
      *
      * Finally check authentication if required
      *
-     * @param Horde_Injector $injector The Dependency Injector
+     * @param Horde_Injector|Injector $injector The Dependency Injector
      *
      * @return Horde_Controller_RequestConfiguration The found config
      */
-    public function getRequestConfiguration(Horde_Injector $injector)
+    public function getRequestConfiguration(Horde_Injector|Injector $injector)
     {
         $request = $injector->getInstance('Horde_Controller_Request');
         $requestServer = $_SERVER['SERVER_NAME'];

@@ -1,4 +1,5 @@
 <?php
+use Horde\Injector\Injector;
 
 /**
  * Copyright 2013-2026 Horde LLC (http://www.horde.org/)
@@ -22,7 +23,7 @@
  */
 class Horde_Core_Factory_DavStorage extends Horde_Core_Factory_Injector
 {
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         $driver = $GLOBALS['conf']['davstorage']['driver'];
         $params = Horde::getDriverConfig('davstorage', $driver);

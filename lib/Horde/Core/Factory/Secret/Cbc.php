@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Injector\Injector;
+
 /**
  * @todo  Replace Horde_Core_Factory_Secret with this class.
  *
@@ -8,7 +10,7 @@
  */
 class Horde_Core_Factory_Secret_Cbc extends Horde_Core_Factory_Injector
 {
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         global $conf;
 

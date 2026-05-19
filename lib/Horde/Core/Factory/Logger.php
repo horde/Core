@@ -1,4 +1,5 @@
 <?php
+use Horde\Injector\Injector;
 
 /**
  * @category Horde
@@ -29,7 +30,7 @@ class Horde_Core_Factory_Logger extends Horde_Core_Factory_Injector
 
     /**
      */
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         // Get LoggerConfig service (autowired by injector)
         if ($this->config === null) {

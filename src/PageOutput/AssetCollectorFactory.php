@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Horde\Core\PageOutput;
 
 use Horde_Injector;
+use Horde\Injector\Injector;
 
 /**
  * Factory for AssetCollector.
@@ -28,7 +29,7 @@ use Horde_Injector;
  */
 class AssetCollectorFactory
 {
-    public function create(Horde_Injector $injector): AssetCollector
+    public function create(Horde_Injector|Injector $injector): AssetCollector
     {
         return new AssetCollector();
     }

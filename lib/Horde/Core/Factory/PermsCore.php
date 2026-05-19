@@ -1,4 +1,5 @@
 <?php
+use Horde\Injector\Injector;
 
 /**
  * Copyright 2011-2026 Horde LLC (http://www.horde.org/)
@@ -18,7 +19,7 @@ class Horde_Core_Factory_PermsCore extends Horde_Core_Factory_Injector
      * @return Horde_Perms_Core  The newly created concrete instance.
      * @throws Horde_Perms_Exception
      */
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         return new Horde_Core_Perms(
             $injector->getInstance('Horde_Registry'),

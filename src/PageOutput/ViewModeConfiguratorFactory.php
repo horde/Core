@@ -20,6 +20,7 @@ use Horde\Core\Assets\JsDiscoverer;
 use Horde\Core\Service\PrefsService;
 use Horde\Core\Session\HordeSession;
 use Horde_Injector;
+use Horde\Injector\Injector;
 use Horde_Registry;
 
 /**
@@ -32,7 +33,7 @@ use Horde_Registry;
  */
 class ViewModeConfiguratorFactory
 {
-    public function create(Horde_Injector $injector): ViewModeConfigurator
+    public function create(Horde_Injector|Injector $injector): ViewModeConfigurator
     {
         return new ViewModeConfigurator(
             $injector->getInstance(Horde_Registry::class),

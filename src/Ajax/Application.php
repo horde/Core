@@ -31,6 +31,7 @@ use Horde_Core_Ajax_Response_HordeCore;
 use Horde_Exception;
 use Horde_Exception_HookNotSet;
 use Horde_Injector;
+use Horde\Injector\Injector;
 use Horde_Registry;
 use Horde_Variables;
 use InvalidArgumentException;
@@ -314,7 +315,7 @@ abstract class Application
      * the app has no modern Api class, so legacy hook dispatch can
      * proceed.
      *
-     * @param Horde_Injector $injector
+     * @param Horde_Injector|Injector $injector
      *
      * @return mixed|null  The provider result value, or null if not handled.
      */

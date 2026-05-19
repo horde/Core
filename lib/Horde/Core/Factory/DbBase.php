@@ -1,4 +1,5 @@
 <?php
+use Horde\Injector\Injector;
 
 /**
  * @category Horde
@@ -13,7 +14,7 @@ class Horde_Core_Factory_DbBase extends Horde_Core_Factory_Injector
      * @return Horde_Db_Adapter
      * @throws Horde_Exception
      */
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         return $injector->getInstance('Horde_Core_Factory_Db')->create('horde');
     }

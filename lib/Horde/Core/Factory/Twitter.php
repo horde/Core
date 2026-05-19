@@ -1,4 +1,5 @@
 <?php
+use Horde\Injector\Injector;
 
 /**
  * Binder for creating Horde_Service_Twitter objects.
@@ -13,7 +14,7 @@
  */
 class Horde_Core_Factory_Twitter extends Horde_Core_Factory_Injector
 {
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         global $conf;
 

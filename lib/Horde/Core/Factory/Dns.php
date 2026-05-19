@@ -1,4 +1,5 @@
 <?php
+use Horde\Injector\Injector;
 
 use NetDNS2\Resolver;
 use NetDNS2\Exception as DnsException;
@@ -9,7 +10,7 @@ use NetDNS2\Exception as DnsException;
  */
 class Horde_Core_Factory_Dns extends Horde_Core_Factory_Injector
 {
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         if (!class_exists('NetDNS2\Resolver')) {
             return null;

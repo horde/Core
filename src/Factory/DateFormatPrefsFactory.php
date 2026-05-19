@@ -18,6 +18,7 @@ namespace Horde\Core\Factory;
 
 use Horde\Core\Prefs\DateFormatPrefs;
 use Horde_Injector;
+use Horde\Injector\Injector;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -31,7 +32,7 @@ use Psr\Log\NullLogger;
  */
 class DateFormatPrefsFactory
 {
-    public function create(Horde_Injector $injector): DateFormatPrefs
+    public function create(Horde_Injector|Injector $injector): DateFormatPrefs
     {
         $logger = null;
         try {

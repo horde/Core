@@ -1,4 +1,5 @@
 <?php
+use Horde\Injector\Injector;
 
 /**
  * Factory for creating Horde_Lock objects
@@ -17,7 +18,7 @@ class Horde_Core_Factory_Lock extends Horde_Core_Factory_Injector
      * @return Horde_Lock  The newly created concrete instance.
      * @throws Horde_Exception
      */
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         global $conf;
 

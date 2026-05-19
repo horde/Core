@@ -19,6 +19,7 @@ namespace Horde\Core\Sidebar;
 use Horde\Core\Service\PermissionService;
 use Horde\Core\Service\PrefsService;
 use Horde_Injector;
+use Horde\Injector\Injector;
 use Horde_Registry;
 
 /**
@@ -31,7 +32,7 @@ use Horde_Registry;
  */
 class AdminSidebarPanelFactory
 {
-    public function create(Horde_Injector $injector): AdminSidebarPanel
+    public function create(Horde_Injector|Injector $injector): AdminSidebarPanel
     {
         return new AdminSidebarPanel(
             $injector->getInstance(Horde_Registry::class),

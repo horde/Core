@@ -1,4 +1,5 @@
 <?php
+use Horde\Injector\Injector;
 
 /**
  * A Horde_Injector:: based Horde_Cache:: factory.
@@ -41,7 +42,7 @@ class Horde_Core_Factory_Cache extends Horde_Core_Factory_Injector
      * @return Horde_Cache  Cache object.
      * @throws Horde_Cache_Exception
      */
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         global $conf;
 

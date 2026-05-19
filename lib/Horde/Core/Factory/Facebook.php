@@ -1,4 +1,5 @@
 <?php
+use Horde\Injector\Injector;
 
 /**
  * @category Horde
@@ -9,7 +10,7 @@ class Horde_Core_Factory_Facebook extends Horde_Core_Factory_Injector
     /**
      * @throws Horde_Exception
      */
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         global $conf;
 
