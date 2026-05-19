@@ -732,6 +732,27 @@
     [rla] Adapt schema migrations to work in new H6 installation layout.
     [rla] Added injectable wrapper around Config to reduce globals access.
     [rla] With Marco Abbrancati: Upgraded test cases for phpunit 9.x utility.
+3.0.0-RC2:
+  api: 3.0.0-RC2
+  state:
+    release: RC
+    api: RC
+  date: 2026-05-19
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    refactor: Simplify fix by Torben on withSecondaryRoute
+    Implement route path prefixing for secondary routes
+    fix: Harden handling of session_cache_limiter key against not-defined
+    refactor: Allow modern injector in all factories
+    fix: Always cast to string before trying to trim
+    fix: Cast to string before emitting a log
+    Merge pull request #105 from horde/fix/permission-aware-redirect
+    refactor(strftime): Migrate to native usage of IntlDateFormatter and DateTime
+    refactor(middleware): extract isAuthenticated to local variable in AuthHordeSession
+    fix(middleware): admin users bypass permission checks in RedirectToLogin
+    Add unit tests for versionCallback method
 3.0.0-RC1:
   api: 3.0.0-RC1
   state:
