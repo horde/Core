@@ -19,6 +19,8 @@ namespace Horde\Core;
 use Horde\Core\Config\RegistryState;
 use Horde\Routes\FluentRouteBuilder;
 use Horde\Routes\Mapper;
+use Horde\Routes\Route;
+use Horde\Routes\RouteBuilder;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -127,6 +129,29 @@ class RuntimeRoutesMapper extends Mapper
     }
 
     /**
+     * Prefix secondary route paths with the current app webroot.
+     *
+     * buildRoute() already prefixes the primary URI; withSecondaryRoute() paths
+     * are app-relative and must receive the same prefix for routematch().
+     */
+    public function addRoute(RouteBuilder|Route|array $routeOrBuilder): void
+    {
+        if ($routeOrBuilder instanceof RouteBuilder && $this->currentAppPrefix !== '') {
+            $routeOrBuilder->prefixSecondaryPaths($this->currentAppPrefix);
+        }
+
+        parent::addRoute($routeOrBuilder);
+    }
+
+    /**
+     * Prefix legacy addSecondary() paths with the current app webroot.
+     */
+    public function addSecondary(string $path, string $namedRoute): void
+    {
+        parent::addSecondary($this->prefixAppPath($path), $namedRoute);
+    }
+
+    /**
      * Load routes from all active apps in RegistryState.
      */
     public function loadAllApps(): void
@@ -210,5 +235,14 @@ class RuntimeRoutesMapper extends Mapper
             'scheme' => null,
             'port' => null,
         ];
+    }
+
+    private function prefixAppPath(string $path): string
+    {
+        if ($this->currentAppPrefix === '') {
+            return $path;
+        }
+
+        return $this->currentAppPrefix . '/' . ltrim($path, '/');
     }
 }
