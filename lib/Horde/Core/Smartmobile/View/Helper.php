@@ -60,10 +60,11 @@ class Horde_Core_Smartmobile_View_Helper extends Horde_View_Helper_Base
         }
 
         if (!empty($params['logout']) && $registry->showService('logout')) {
-            // Use modern logout endpoint (no token required)
-            $logout = $registry->get('webroot', 'horde') . '/auth/logout';
+            $logout = $registry->getLogoutUrl([
+                'reason' => Horde_Auth::REASON_LOGOUT,
+            ])->setRaw(false);
             $out .= '<a class="smartmobile-logout ui-btn-right" href="'
-                . htmlspecialchars($logout)
+                . htmlspecialchars((string) $logout)
                 . '" data-ajax="false" data-theme="e" data-icon="delete">'
                 . Horde_Core_Translation::t('Log out') . '</a>';
         }
