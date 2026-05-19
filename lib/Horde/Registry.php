@@ -1277,6 +1277,7 @@ class Horde_Registry implements Horde_Shutdown_Task
         } catch (Horde_Exception $e) {
             $result = $e;
         } catch (Throwable $e) {
+            Horde::log($e, Horde_Log::ERR);
             Horde::debug($e);
             $result = new Horde_Exception_Wrapped($e);
         }
@@ -2642,7 +2643,7 @@ class Horde_Registry implements Horde_Shutdown_Task
 
         // Strip null bytes and whitespace — PHP 8.x gethostbyaddr()
         // throws ValueError on embedded null bytes.
-        $out->addr = trim(str_replace("\0", '', $out->addr));
+        $out->addr = trim(str_replace("\0", '', (string) $out->addr));
 
         // Check registry setting for DNS resolution
         // Default to false (disabled) for performance
