@@ -582,15 +582,15 @@ class Horde_Registry implements Horde_Shutdown_Task
             /* Never start a session if the session flags include
                SESSION_NONE. */
             $GLOBALS['session'] = $session = new Horde_Session_Null();
-            $session->setup(true, $args['session_cache_limiter']);
+            $session->setup(true, $args['session_cache_limiter'] ?? null);
         } elseif ((PHP_SAPI === 'cli')
                   || (empty($_SERVER['SERVER_NAME'])
                    && ((PHP_SAPI === 'cgi') || (PHP_SAPI === 'cgi-fcgi')))) {
             $GLOBALS['session'] = $session = new Horde_Session();
-            $session->setup(false, $args['session_cache_limiter']);
+            $session->setup(false, $args['session_cache_limiter'] ?? null);
         } else {
             $GLOBALS['session'] = $session = new Horde_Session();
-            $session->setup(true, $args['session_cache_limiter']);
+            $session->setup(true, $args['session_cache_limiter'] ?? null);
             if ($session_flags & self::SESSION_READONLY) {
                 /* Close the session immediately so no changes can be made but
                    values are still available. */
