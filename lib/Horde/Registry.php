@@ -2330,7 +2330,7 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     public function currentProcessAuth()
     {
-        return ($this->_args['authentication'] !== 'none');
+        return (($this->_args['authentication'] ?? null) !== 'none');
     }
 
     /**
