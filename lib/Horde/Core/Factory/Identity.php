@@ -57,9 +57,27 @@ class Horde_Core_Factory_Identity extends Horde_Core_Factory_Base
 
             default:
                 if (!is_null($driver)) {
-                    $class = Horde_String::ucfirst($driver) . '_Prefs_Identity';
-                    if (!class_exists($class)) {
-                        throw new Horde_Exception($driver . ' identity driver does not exist.');
+                    if (str_contains($driver, '\\') || str_contains($driver, '_')) {
+                        $candidates = [$driver];
+                    } else {
+                        $candidates = [
+                            'Horde\\' . ucfirst($driver) . '\\IdentityDriverPrefs',
+                            Horde_String::ucfirst($driver) . '_Prefs_Identity',
+                            strtoupper($driver) . '_Prefs_Identity',
+                        ];
+                    }
+                    $class = null;
+                    foreach ($candidates as $candidate) {
+                        if (class_exists($candidate)) {
+                            $class = $candidate;
+                            break;
+                        }
+                    }
+                    if ($class === null) {
+                        throw new Horde_Exception(
+                            $driver . ' identity driver does not exist or cannot be autoloaded. Tried: '
+                            . implode(', ', $candidates)
+                        );
                     }
                 }
                 break;
