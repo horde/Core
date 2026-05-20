@@ -1,6 +1,7 @@
 <?php
 
 use Horde\Util\Util;
+use Horde\Date\Formatter\IcuFormatter;
 
 /**
  * The Horde_Core_Mime_Viewer_Vcard class renders out vCards in HTML format.
@@ -166,7 +167,7 @@ class Horde_Core_Mime_Viewer_Vcard extends Horde_Mime_Viewer_Base
                 $birthday = new Horde_Date($birthdays[0]);
                 $html .= $this->_row(
                     Horde_Core_Translation::t('Birthday'),
-                    $birthday->format($prefs->getValue('date_format'), new \Horde\Date\Formatter\IcuFormatter(), $GLOBALS['language'] ?? 'en_US')
+                    $birthday->format($prefs->getValue('date_format'), new IcuFormatter(), $GLOBALS['language'] ?? 'en_US')
                 );
             } catch (Horde_Icalendar_Exception $e) {
             }
