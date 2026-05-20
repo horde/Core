@@ -1,6 +1,6 @@
 <?php
-use Horde\Injector\Injector;
 
+use Horde\Injector\Injector;
 use NetDNS2\Resolver;
 use NetDNS2\Exception as DnsException;
 

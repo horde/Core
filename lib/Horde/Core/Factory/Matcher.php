@@ -1,6 +1,6 @@
 <?php
-use Horde\Injector\Injector;
 
+use Horde\Injector\Injector;
 use Horde\Routes\Mapper;
 use Horde\Routes\Matcher;
 

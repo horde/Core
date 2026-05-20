@@ -30,6 +30,8 @@ use Horde_Core_ActiveSync_Driver;
 use Horde_Injector;
 use Horde_Registry;
 use PHPUnit\Framework\Attributes\CoversMethod;
+use Horde_Exception;
+use InvalidArgumentException;
 
 /**
  * Unit tests for Horde_Core_ActiveSync_Driver::versionCallback().
@@ -359,7 +361,7 @@ class DriverVersionCallbackTest extends TestCase
 
         $index = array_search($maxVersion, $supported, true);
         if ($index === false) {
-            throw new \InvalidArgumentException('Unknown EAS version: ' . $maxVersion);
+            throw new InvalidArgumentException('Unknown EAS version: ' . $maxVersion);
         }
 
         return implode(',', array_slice($supported, 0, $index + 1));
@@ -437,7 +439,7 @@ class DriverVersionCallbackTest extends TestCase
                     return $perms;
                 }
 
-                throw new \Horde_Exception('Not configured: ' . $class);
+                throw new Horde_Exception('Not configured: ' . $class);
             });
         $GLOBALS['injector'] = $injector;
     }

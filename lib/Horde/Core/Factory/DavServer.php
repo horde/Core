@@ -1,6 +1,6 @@
 <?php
-use Horde\Injector\Injector;
 
+use Horde\Injector\Injector;
 /**
  * Copyright 2013-2026 Horde LLC (http://www.horde.org/)
  *

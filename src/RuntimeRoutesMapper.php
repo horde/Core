@@ -108,7 +108,7 @@ class RuntimeRoutesMapper extends Mapper
 
         // Inject app's base URI
         $routePath = $this->currentAppPrefix . $routePath;
-        $kargs['app'] = $kargs['app'] ?? $this->currentApp;
+        $kargs['app'] ??= $this->currentApp;
 
         if ($this->currentAppHost !== null && !isset($kargs['_host'])) {
             $kargs['_host'] = $this->currentAppHost;

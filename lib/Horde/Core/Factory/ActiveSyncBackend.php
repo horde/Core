@@ -1,6 +1,6 @@
 <?php
-use Horde\Injector\Injector;
 
+use Horde\Injector\Injector;
 use Horde\Http\ServerRequest;
 use Horde\Injector\NotFoundException as InjectorNotFoundException;
 

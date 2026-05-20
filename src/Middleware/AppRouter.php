@@ -37,8 +37,7 @@ class AppRouter extends RampageRequestHandler implements MiddlewareInterface, Re
     public function __construct(
         private readonly RuntimeRoutesMapper $runtimeMapper,
         private readonly Injector $injector,
-    ) {
-    }
+    ) {}
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

@@ -21,6 +21,7 @@ use Horde_Injector;
 use Horde\Injector\Injector;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Throwable;
 
 /**
  * Factory for DateFormatPrefs
@@ -37,7 +38,7 @@ class DateFormatPrefsFactory
         $logger = null;
         try {
             $logger = $injector->getInstance(LoggerInterface::class);
-        } catch (\Throwable) {
+        } catch (Throwable) {
             // Logger unavailable — proceed without
         }
 

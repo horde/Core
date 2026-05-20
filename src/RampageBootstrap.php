@@ -31,6 +31,7 @@ use Horde\Injector\TopLevel;
 use Horde\Routes\MatchResult;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
+use Horde_Injector;
 
 /**
  * Bootstrap the Rampage HTTP endpoint
@@ -45,7 +46,7 @@ class RampageBootstrap
         // 1. Create Injector
         $injector = new Injector(new TopLevel());
         $injector->setInstance(Injector::class, $injector);
-        $injector->setInstance(\Horde_Injector::class, $injector);
+        $injector->setInstance(Horde_Injector::class, $injector);
 
         if (class_exists('Horde\Bundle\PrecompiledBindings')) {
             (new \Horde\Bundle\PrecompiledBindings())->register($injector);
