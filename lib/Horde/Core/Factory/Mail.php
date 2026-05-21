@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2026 Horde LLC (http://www.horde.org/)
  *
@@ -100,8 +101,8 @@ class Horde_Core_Factory_Mail extends Horde_Core_Factory_Base
          * running from CLI with 'user_admin' registry flag, which sets
          * the authentication name but not the credentials. */
         if (strcasecmp($transport, 'smtp') === 0) {
-            if ($registry->isAuthenticated() &&
-                strlen((string) ($auth = $registry->getAuth()))) {
+            if ($registry->isAuthenticated()
+                && strlen((string) ($auth = $registry->getAuth()))) {
                 /* Try to get SMTP credentials via hook (e.g. for XOAUTH2 support). */
                 try {
                     $hooks = $this->_injector->getInstance('Horde_Core_Hooks');
