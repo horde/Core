@@ -1447,7 +1447,7 @@ class Horde_Core_ActiveSync_Connector
                 $info = [
                     'name' => $name,
                     'color' => $share->get('color'),
-                    'desc' => $share->get('desc'),
+                    'description' => $share->get('desc'),
                 ];
                 $this->_registry->tasks->updateTasklist($id, $info);
                 break;
