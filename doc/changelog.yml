@@ -732,6 +732,25 @@
     [rla] Adapt schema migrations to work in new H6 installation layout.
     [rla] Added injectable wrapper around Config to reduce globals access.
     [rla] With Marco Abbrancati: Upgraded test cases for phpunit 9.x utility.
+3.0.0-RC3:
+  api: 3.0.0-RC3
+  state:
+    release: RC
+    api: RC
+  date: 2026-05-21
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    style: ws
+    feat(mail): add XOAUTH2 support to SMTP factory
+    Refactor route prefixing logic in RuntimeRoutesMapper
+    Use null coalescing operator in currentProcessAuth
+    Update logout_url to use service link
+    Refactor logout URL generation in Helper.php
+    style: use "use" for IcuFormatter
+    style: mostly whitespace
+    feat: Support PSR-4 and FQCN identity drivers in factory
 3.0.0-RC2:
   api: 3.0.0-RC2
   state:
