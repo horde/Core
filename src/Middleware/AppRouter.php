@@ -63,11 +63,9 @@ class AppRouter extends RampageRequestHandler implements MiddlewareInterface, Re
         $this->injector->setInstance(MatchResult::class, $matchResult);
 
         // Resolve middleware stack
-        $defaultStack = DefaultStack::get();
-        if (!isset($matchDict['stack']) && ($matchDict['HordeAuthType'] ?? null) === 'NONE') {
-            $matchDict['stack'] = [];
-        }
-        $stack = $matchDict['stack'] ?? $defaultStack;
+        // GroupMapper ensures stack is always present in matchDict.
+        // Legacy fallback retained for routes loaded via old Mapper path.
+        $stack = $matchDict['stack'] ?? DefaultStack::get();
 
         // DEBUG - Only log if HORDE_DEBUG_ROUTER is set
         if (getenv('HORDE_DEBUG_ROUTER')) {
