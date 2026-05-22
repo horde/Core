@@ -44,7 +44,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
         if ($var->getProperty('fraction')) {
             $value = sprintf('%01.' . $var->getProperty('fraction') . 'f', $value);
         }
-        $linfo = Horde_Nls::getLocaleInfo();
+        $linfo = (new Horde\Nls\Nls())->getLocaleInfo();
         /* Only if there is a mon_decimal_point do the
          * substitution. */
         if (!empty($linfo['mon_decimal_point'])) {

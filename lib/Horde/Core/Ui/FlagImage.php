@@ -68,15 +68,21 @@ class Horde_Core_Ui_FlagImage
     {
         global $conf, $injector;
 
-        if (!Horde_Nls::$dnsResolver) {
-            Horde_Nls::$dnsResolver = $injector->getInstance('Net_DNS2_Resolver');
+        $datafile = empty($conf['geoip']['datafile']) ? null : $conf['geoip']['datafile'];
+        $geoip = $datafile
+            ? new Horde\Nls\Geoip\LegacyDatDriver($datafile)
+            : new Horde\Nls\Geoip\NullDriver();
+        $resolver = new Horde\Nls\Dns\NativeResolver();
+
+        try {
+            $netDnsResolver = $injector->getInstance('Net_DNS2_Resolver');
+            $resolver = new Horde\Nls\Dns\NetDns2Resolver($netDnsResolver);
+        } catch (Exception $e) {
         }
 
-        $data = Horde_Nls::getCountryByHost(
-            $host,
-            empty($conf['geoip']['datafile']) ? null : $conf['geoip']['datafile']
-        );
-        if ($data === false) {
+        $nls = new Horde\Nls\Nls(geoip: $geoip, resolver: $resolver);
+        $data = $nls->getCountryByHost($host);
+        if ($data === false || $data === null) {
             return false;
         }
 

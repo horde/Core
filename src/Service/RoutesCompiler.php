@@ -116,7 +116,7 @@ class RoutesCompiler
         $compiled = $mapper->dump();
 
         if (!is_dir($this->cacheDir)) {
-            if (!mkdir($this->cacheDir, 0755, true)) {
+            if (!mkdir($this->cacheDir, 0o755, true)) {
                 throw new RuntimeException(
                     'Cannot create cache directory: ' . $this->cacheDir
                 );

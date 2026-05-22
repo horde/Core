@@ -98,12 +98,12 @@ class Horde_Core_Factory_MimeViewer extends Horde_Core_Factory_Base
 
             case 'Ooo':
                 $params['temp_dir'] = Horde::getTempDir();
-                $params['zip'] = Horde_Compress::factory('Zip');
+                $params['zip'] = (new Horde\Compress\CompressFactory())->create('zip');
                 break;
 
             case 'Rar':
                 $params['monospace'] = 'fixed';
-                $params['rar'] = Horde_Compress::factory('Rar');
+                $params['rar'] = (new Horde\Compress\CompressFactory())->create('rar');
                 break;
 
             case 'Report':
@@ -119,13 +119,13 @@ class Horde_Core_Factory_MimeViewer extends Horde_Core_Factory_Base
                 break;
 
             case 'Tgz':
-                $params['gzip'] = Horde_Compress::factory('Gzip');
+                $params['gzip'] = (new Horde\Compress\CompressFactory())->create('gzip');
                 $params['monospace'] = 'fixed';
-                $params['tar'] = Horde_Compress::factory('Tar');
+                $params['tar'] = (new Horde\Compress\CompressFactory())->create('tar');
                 break;
 
             case 'Tnef':
-                $params['tnef'] = Horde_Compress::factory('Tnef');
+                $params['tnef'] = (new Horde\Compress\CompressFactory())->create('tnef');
                 break;
 
             case 'Vcard':
@@ -140,7 +140,7 @@ class Horde_Core_Factory_MimeViewer extends Horde_Core_Factory_Base
 
             case 'Zip':
                 $params['monospace'] = 'fixed';
-                $params['zip'] = Horde_Compress::factory('Zip');
+                $params['zip'] = (new Horde\Compress\CompressFactory())->create('zip');
                 break;
         }
 

@@ -42,7 +42,7 @@ class Horde_Core_Script_Package_Datejs extends Horde_Script_Package
         $to = [' d', 'd', 'dd', 'ddd', 'dddd', 'M', 'MM', 'MMM', 'MMM', 'MMMM', 'yy', 'yyyy'];
         if (defined('D_FMT')) {
             $from[] = '%x';
-            $to[] = str_replace($from, $to, Horde_Nls::getLangInfo(D_FMT));
+            $to[] = str_replace($from, $to, (new Horde\Nls\Nls())->getLangInfo(D_FMT));
         }
         return str_replace($from, $to, $format);
     }
