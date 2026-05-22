@@ -732,6 +732,20 @@
     [rla] Adapt schema migrations to work in new H6 installation layout.
     [rla] Added injectable wrapper around Config to reduce globals access.
     [rla] With Marco Abbrancati: Upgraded test cases for phpunit 9.x utility.
+3.0.0-RC4:
+  api: 3.0.0-RC4
+  state:
+    release: RC
+    api: RC
+  date: 2026-05-22
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    refactor: Rebase RuntimeRoutesMapper on horde/routes#7 GroupMapper
+    Merge pull request #113 from horde/fix/wrong_property-breaks_EAS
+    Rename 'desc' key to 'description' in task info
+    Update default log handler to include line break
 3.0.0-RC3:
   api: 3.0.0-RC3
   state:

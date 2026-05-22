@@ -37,7 +37,7 @@
         "config",
         "errorhandler"
     ],
-    "time": "2026-05-21",
+    "time": "2026-05-22",
     "repositories": [],
     "require": {
         "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || ^3 || ^2",
@@ -125,6 +125,9 @@
             "Horde\\Core\\Test\\": "test/"
         }
     },
+    "bin": [
+        "bin/horde-routes-compile"
+    ],
     "config": {
         "allow-plugins": {
             "horde/horde-installer-plugin": true
