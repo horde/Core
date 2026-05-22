@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Util\HordeString;
+
 /**
  * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
@@ -62,24 +64,30 @@ class Horde_Core_Ui_VarRenderer
             $app = '';
         }
 
-        $driver = Horde_String::ucfirst(basename($driver));
-        $class = (empty($app) ? 'Horde_Core' : $app) . '_Ui_VarRenderer_' . $driver;
+        $driverName = HordeString::ucfirst(basename((string) $driver));
+        $candidates = [];
 
-        $ok = class_exists($class);
-
-        // TODO: Eliminate after renaming Horde_Ui_VarRenderer_* classes in other apps to {app}_Ui_VarRenderer_*
-        if (!$ok && !empty($app)) {
-            // fallback to legacy method (manual load)
-            $class = __CLASS__ . '_' . $driver;
-            include_once $GLOBALS['registry']->get('fileroot', $app) . '/lib/Ui/VarRenderer/' . $driver . '.php';
-            $ok = class_exists($class);
+        if ($app === '' || $app === null) {
+            $candidates[] = 'Horde_Core_Ui_VarRenderer_' . $driverName;
+        } else {
+            $appPrefix = (string) $app;
+            $candidates[] = HordeString::ucfirst($appPrefix) . '_Ui_VarRenderer_' . $driverName;
+            if ($appPrefix !== HordeString::ucfirst($appPrefix)) {
+                $candidates[] = $appPrefix . '_Ui_VarRenderer_' . $driverName;
+            }
+            $candidates[] = 'Horde_Core_Ui_VarRenderer_' . $driverName;
         }
 
-        if (!$ok) {
-            throw new LogicException('Class definition of ' . $class . ' not found.');
+        foreach ($candidates as $class) {
+            if (class_exists($class)) {
+                return new $class($params);
+            }
         }
 
-        return new $class($params);
+        throw new LogicException(
+            'Class definition not found for VarRenderer driver. Tried: '
+            . implode(', ', $candidates)
+        );
     }
 
     /**
