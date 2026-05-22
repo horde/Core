@@ -12,6 +12,8 @@
  * @package  Core
  */
 
+use Horde\Util\HordeString;
+
 /**
  * The Horde_Core_Ui_VarRenderer:: class provides base functionality for other
  * Horde UI elements.
@@ -46,12 +48,12 @@ class Horde_Core_Ui_VarRenderer
      *
      * @param mixed $driver  This is the renderer subclass we will instantiate.
      *                       If an array is passed, the first element is the
-     *                       library path and the second element is the driver
-     *                       name.
+     *                       application name and the second element is the
+     *                       driver name.
      * @param array $params  Parameters specific to the subclass.
      *
      * @return Horde_Core_Ui_VarRenderer  A subclass instance.
-     * @throws Horde_Exception
+     * @throws LogicException
      */
     public static function factory($driver, $params = [])
     {
@@ -62,24 +64,29 @@ class Horde_Core_Ui_VarRenderer
             $app = '';
         }
 
-        $driver = Horde_String::ucfirst(basename($driver));
-        $class = (empty($app) ? 'Horde_Core' : $app) . '_Ui_VarRenderer_' . $driver;
+        $driver = HordeString::ucfirst(basename($driver));
 
-        $ok = class_exists($class);
+        if (!empty($app)) {
+            // Try ucfirst app name first (e.g. Nag_Ui_VarRenderer_Html)
+            $class = HordeString::ucfirst($app) . '_Ui_VarRenderer_' . $driver;
+            if (class_exists($class)) {
+                return new $class($params);
+            }
 
-        // TODO: Eliminate after renaming Horde_Ui_VarRenderer_* classes in other apps to {app}_Ui_VarRenderer_*
-        if (!$ok && !empty($app)) {
-            // fallback to legacy method (manual load)
-            $class = __CLASS__ . '_' . $driver;
-            include_once $GLOBALS['registry']->get('fileroot', $app) . '/lib/Ui/VarRenderer/' . $driver . '.php';
-            $ok = class_exists($class);
+            // Try lowercase app name (e.g. nag_Ui_VarRenderer_Html)
+            $class = strtolower($app) . '_Ui_VarRenderer_' . $driver;
+            if (class_exists($class)) {
+                return new $class($params);
+            }
         }
 
-        if (!$ok) {
-            throw new LogicException('Class definition of ' . $class . ' not found.');
+        // Fall back to core renderer (Horde_Core_Ui_VarRenderer_{Driver})
+        $class = __CLASS__ . '_' . $driver;
+        if (class_exists($class)) {
+            return new $class($params);
         }
 
-        return new $class($params);
+        throw new LogicException('Class definition of ' . $class . ' not found.');
     }
 
     /**
