@@ -1,0 +1,87 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Compile all application routes into an opcacheable PHP file.
+ *
+ * Usage:
+ *   php vendor/bin/horde-routes-compile /path/to/deployment
+ *
+ * The deployment root must contain var/config/ (registry) and var/cache/
+ * (output). Reads routes from all active apps and optional local overrides,
+ * then writes the compiled route table to var/cache/routes.compiled.php.
+ *
+ * This script does NOT create or modify var/config/use_compiled_router.
+ * That file must be placed manually by the admin to opt into compiled mode.
+ *
+ * @category  Horde
+ * @copyright 2026 The Horde Project
+ * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
+ * @package   Core
+ */
+
+// Require deployment root as first argument
+$root = $argv[1] ?? null;
+if ($root === null || $root === '--help' || $root === '-h') {
+    fwrite($root === null ? STDERR : STDOUT, "Usage: horde-routes-compile <deployment-root>\n");
+    fwrite($root === null ? STDERR : STDOUT, "\n");
+    fwrite($root === null ? STDERR : STDOUT, "  <deployment-root>  Path to the Horde deployment directory\n");
+    fwrite($root === null ? STDERR : STDOUT, "                     (must contain var/config/ and vendor/horde/horde/)\n");
+    exit($root === null ? 1 : 0);
+}
+
+$root = realpath(rtrim($root, '/'));
+if ($root === false) {
+    fwrite(STDERR, "Error: Deployment root not found: {$argv[1]}\n");
+    exit(1);
+}
+
+// Load autoloader from the deployment root
+if (isset($GLOBALS['_composer_autoload_path'])) {
+    require $GLOBALS['_composer_autoload_path'];
+} else {
+    $autoloader = $root . '/vendor/autoload.php';
+    if (!file_exists($autoloader)) {
+        fwrite(STDERR, "Error: Autoloader not found at: $autoloader\n");
+        exit(1);
+    }
+    require $autoloader;
+}
+
+use Horde\Core\Config\RegistryConfigLoader;
+use Horde\Core\Service\RoutesCompiler;
+
+$varDir = $root . '/var';
+$configBase = $varDir . '/config';
+$vendorBase = $root . '/vendor/horde/horde';
+
+if (!is_dir($configBase)) {
+    fwrite(STDERR, "Error: Config directory not found at: $configBase\n");
+    exit(1);
+}
+
+// Load registry via RegistryConfigLoader
+$loader = new RegistryConfigLoader($configBase, $vendorBase);
+$registryState = $loader->load();
+
+if (empty($registryState->listApplications())) {
+    fwrite(STDERR, "Error: No applications found in registry.\n");
+    fwrite(STDERR, "Check registry config at: $configBase/horde/registry.d/\n");
+    exit(1);
+}
+
+// Compile
+$cacheDir = $varDir . '/cache';
+
+try {
+    $compiler = new RoutesCompiler($registryState, $configBase, $cacheDir);
+    $result = $compiler->compile();
+} catch (\RuntimeException $e) {
+    fwrite(STDERR, "Error: " . $e->getMessage() . "\n");
+    exit(1);
+}
+
+echo "Compiled {$result->routeCount} routes from {$result->appCount} apps → {$result->outputFile}\n";
+exit(0);
