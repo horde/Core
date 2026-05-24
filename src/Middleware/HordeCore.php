@@ -18,6 +18,8 @@ use Horde\Http\UriFactory;
 use Horde\Http\StreamFactory;
 use Horde\Http\ResponseFactory;
 use Horde\Http\Server\RampageRequestHandler;
+use Horde\Core\RuntimeRoutesProvider;
+use Horde\Core\Uri\RoutesProvider;
 use Horde\Exception\HordeException;
 use Horde_Controller;
 use Horde_Registry;
@@ -63,11 +65,11 @@ class HordeCore implements MiddlewareInterface
         $registry = $injector->getInstance('Horde_Registry');
         $request = $request->withAttribute('registry', $registry);
 
-        // Bridge RuntimeRoutesProvider into legacy injector so controllers can use urlFor()
+        // Bridge RuntimeRoutesProvider into legacy injector so controllers can use RoutesProvider
         $mapper = $request->getAttribute('mapper');
-        if ($mapper !== null) {
-            $injector->setInstance(\Horde\Routes\Mapper::class, $mapper);
-            $injector->setInstance(\Horde\Core\RuntimeRoutesProvider::class, $mapper);
+        if ($mapper instanceof RuntimeRoutesProvider) {
+            $injector->setInstance(RuntimeRoutesProvider::class, $mapper);
+            $injector->setInstance(RoutesProvider::class, $mapper);
         }
 
         // Push the identified app onto the legacy registry stack

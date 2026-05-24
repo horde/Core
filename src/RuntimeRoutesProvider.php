@@ -118,6 +118,7 @@ class RuntimeRoutesProvider extends GroupMapper implements RoutesProvider
             }
         }
 
+        $this->registerSystemRoutes();
         $this->compile();
     }
 
@@ -128,5 +129,52 @@ class RuntimeRoutesProvider extends GroupMapper implements RoutesProvider
             return null;
         }
         return $route->generate($params);
+    }
+
+    /**
+     * Register system named routes for app webroots, jsuri, and staticuri.
+     *
+     * These routes exist purely for URL generation (no controller, no middleware).
+     * They are registered after route files so that app-defined routes take precedence.
+     */
+    private function registerSystemRoutes(): void
+    {
+        $existingNames = $this->getRouteNames();
+
+        foreach ($this->registryState->toArray() as $app => $config) {
+            $status = $config['status'] ?? 'active';
+            if (!in_array($status, ['active', 'notoolbar', 'hidden', 'admin'])) {
+                continue;
+            }
+
+            $webroot = $config['webroot'] ?? null;
+            if (!$webroot) {
+                continue;
+            }
+
+            $appPascal = ucfirst($app);
+            $webrootPath = rtrim((new Uri($webroot))->getPath(), '/');
+
+            // App webroot: e.g. "ImpHome" → /imp
+            $webrootName = $appPascal . 'Home';
+            if (!isset($existingNames[$webrootName])) {
+                $this->buildRoute(uri: $webrootPath, name: $webrootName)->add();
+            }
+
+            // App jsuri: e.g. "ImpJs" → /imp/js
+            $jsName = $appPascal . 'Js';
+            if (!isset($existingNames[$jsName])) {
+                $jsPath = $config['jsuri'] ?? $webrootPath . '/js';
+                $this->buildRoute(uri: $jsPath, name: $jsName)->add();
+            }
+        }
+
+        // Horde static URI
+        $hordeConfig = $this->registryState->getApplication('horde');
+        if ($hordeConfig && !isset($existingNames['HordeStatic'])) {
+            $hordeWebroot = rtrim((new Uri($hordeConfig['webroot'] ?? '/horde'))->getPath(), '/');
+            $staticPath = $hordeConfig['staticuri'] ?? $hordeWebroot . '/static';
+            $this->buildRoute(uri: $staticPath, name: 'HordeStatic')->add();
+        }
     }
 }

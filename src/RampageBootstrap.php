@@ -26,6 +26,7 @@ use Horde\Http\Server\RequestBuilder;
 use Horde\Http\Server\ResponseWriterWeb;
 use Horde\Http\Server\Runner;
 use Horde\Http\StreamFactory;
+use Horde\Core\Uri\RoutesProvider;
 use Horde\Injector\Injector;
 use Horde\Injector\TopLevel;
 use Horde\Routes\MatchResult;
@@ -78,7 +79,7 @@ class RampageBootstrap
         $runtimeMapper = new RuntimeRoutesProvider($registryState, $request);
         $runtimeMapper->loadAllApps();
         $injector->setInstance(RuntimeRoutesProvider::class, $runtimeMapper);
-        $injector->setInstance(\Horde\Routes\Mapper::class, $runtimeMapper);
+        $injector->setInstance(RoutesProvider::class, $runtimeMapper);
 
         // 6. Match route
         $path = $request->getUri()->getPath();
