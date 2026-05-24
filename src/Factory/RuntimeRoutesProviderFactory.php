@@ -17,7 +17,6 @@ declare(strict_types=1);
 namespace Horde\Core\Factory;
 
 use Horde\Core\Config\RegistryConfigLoader;
-use Horde\Core\Config\RegistryState;
 use Horde\Core\RuntimeRoutesProvider;
 use Horde\Http\RequestFactory;
 use Horde\Injector\Injector;
@@ -26,21 +25,14 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * Factory for RuntimeRoutesProvider.
  *
- * Works in both the Rampage path (RegistryState and ServerRequestInterface
- * already set) and the legacy path (derives them from RegistryConfigLoader
- * and server globals).
+ * Derives RegistryState from RegistryConfigLoader (cached internally).
+ * Builds ServerRequestInterface from globals when not already set.
  */
 class RuntimeRoutesProviderFactory
 {
     public function create(Injector $injector): RuntimeRoutesProvider
     {
-        if ($injector->has(RegistryState::class)) {
-            $registryState = $injector->getInstance(RegistryState::class);
-        } else {
-            $loader = $injector->getInstance(RegistryConfigLoader::class);
-            $registryState = $loader->load();
-            $injector->setInstance(RegistryState::class, $registryState);
-        }
+        $registryState = $injector->getInstance(RegistryConfigLoader::class)->load();
 
         if ($injector->has(ServerRequestInterface::class)) {
             $request = $injector->getInstance(ServerRequestInterface::class);
