@@ -90,21 +90,15 @@ class RuntimeRoutesProvider extends GroupMapper implements RoutesProvider
                 'scheme' => $uri->getScheme() !== '' ? $uri->getScheme() : null,
                 'port' => $uri->getPort(),
                 'defaults' => ['app' => $app],
-            ], function (GroupMapper $m) use ($routeFile, $fileroot, $configBase, $app) {
+            ], function (GroupMapper $m) use ($routeFile, $configBase, $app) {
                 $mapper = $m;
                 include $routeFile;
 
-                // Local overrides (admin-provided)
                 if ($configBase !== '') {
                     $localRouteFile = $configBase . '/' . $app . '/routes.local.php';
                     if (file_exists($localRouteFile)) {
                         include $localRouteFile;
                     }
-                }
-
-                $inAppLocal = $fileroot . '/config/routes.local.php';
-                if (file_exists($inAppLocal)) {
-                    include $inAppLocal;
                 }
             });
         }
@@ -155,26 +149,60 @@ class RuntimeRoutesProvider extends GroupMapper implements RoutesProvider
             $appPascal = ucfirst($app);
             $webrootPath = rtrim((new Uri($webroot))->getPath(), '/');
 
-            // App webroot: e.g. "ImpHome" → /imp
             $webrootName = $appPascal . 'Home';
             if (!isset($existingNames[$webrootName])) {
                 $this->buildRoute(uri: $webrootPath, name: $webrootName)->add();
             }
 
-            // App jsuri: e.g. "ImpJs" → /imp/js
-            $jsName = $appPascal . 'Js';
-            if (!isset($existingNames[$jsName])) {
-                $jsPath = $config['jsuri'] ?? $webrootPath . '/js';
-                $this->buildRoute(uri: $jsPath, name: $jsName)->add();
+            if (isset($config['jsuri'])) {
+                $jsName = $appPascal . 'Js';
+                if (!isset($existingNames[$jsName])) {
+                    $this->buildRoute(uri: $config['jsuri'], name: $jsName)->add();
+                }
+            }
+
+            if (isset($config['themesuri'])) {
+                $themesName = $appPascal . 'Themes';
+                if (!isset($existingNames[$themesName])) {
+                    $this->buildRoute(uri: $config['themesuri'], name: $themesName)->add();
+                }
             }
         }
 
-        // Horde static URI
         $hordeConfig = $this->registryState->getApplication('horde');
-        if ($hordeConfig && !isset($existingNames['HordeStatic'])) {
-            $hordeWebroot = rtrim((new Uri($hordeConfig['webroot'] ?? '/horde'))->getPath(), '/');
-            $staticPath = $hordeConfig['staticuri'] ?? $hordeWebroot . '/static';
-            $this->buildRoute(uri: $staticPath, name: 'HordeStatic')->add();
+        if ($hordeConfig && isset($hordeConfig['staticuri']) && !isset($existingNames['HordeStatic'])) {
+            $this->buildRoute(uri: $hordeConfig['staticuri'], name: 'HordeStatic')->add();
+        }
+
+        if ($hordeConfig && isset($hordeConfig['webroot'])) {
+            $hordeWebroot = rtrim((new Uri($hordeConfig['webroot']))->getPath(), '/');
+            $this->registerServiceRoutes($hordeWebroot, $existingNames);
+        }
+    }
+
+    private function registerServiceRoutes(string $hordeWebroot, array $existingNames): void
+    {
+        $services = [
+            'HordeServicesAjax' => '/services/ajax.php',
+            'HordeServicesCache' => '/services/cache.php',
+            'HordeServicesDownload' => '/services/download',
+            'HordeServicesConfirm' => '/services/confirm.php',
+            'HordeServicesGo' => '/services/go.php',
+            'HordeServicesHelp' => '/services/help',
+            'HordeServicesImple' => '/services/imple.php',
+            'HordeServicesLogin' => '/login.php',
+            'HordeServicesLogintasks' => '/services/logintasks.php',
+            'HordeServicesPortal' => '/services/portal',
+            'HordeServicesPrefs' => '/services/prefs.php',
+            'HordeServicesProblem' => '/services/problem.php',
+            'HordeServicesSidebar' => '/services/sidebar.php',
+            'HordeServicesRpc' => '/rpc',
+        ];
+
+        foreach ($services as $name => $path) {
+            if (!isset($existingNames[$name])) {
+                $this->buildRoute(uri: $hordeWebroot . $path, name: $name)->add();
+            }
         }
     }
 }

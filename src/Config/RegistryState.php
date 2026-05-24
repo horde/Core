@@ -16,10 +16,13 @@ declare(strict_types=1);
 
 namespace Horde\Core\Config;
 
+use Horde\Exception\HordeRuntimeException;
+
 /**
  * Registry configuration state
  *
- * Immutable state object holding application registry loaded from registry.php
+ * Immutable state object holding application registry loaded from registry.php.
+ * Validates that all active apps have the required URI keys after loading.
  *
  * @category  Horde
  * @copyright 2026 The Horde Project
@@ -28,6 +31,10 @@ namespace Horde\Core\Config;
  */
 class RegistryState
 {
+    private const ACTIVE_STATUSES = ['active', 'notoolbar', 'hidden', 'admin'];
+
+    private const REQUIRED_KEYS = ['webroot', 'fileroot', 'jsuri', 'themesuri'];
+
     /**
      * Constructor
      *
@@ -35,7 +42,9 @@ class RegistryState
      */
     public function __construct(
         private array $applications
-    ) {}
+    ) {
+        $this->validate();
+    }
 
     /**
      * Get specific application definition
@@ -77,5 +86,45 @@ class RegistryState
     public function toArray(): array
     {
         return $this->applications;
+    }
+
+    /**
+     * Validate that active apps have all required URI keys.
+     *
+     * @throws HordeRuntimeException If required keys are missing
+     */
+    private function validate(): void
+    {
+        $errors = [];
+
+        foreach ($this->applications as $app => $config) {
+            $status = $config['status'] ?? 'inactive';
+            if (!in_array($status, self::ACTIVE_STATUSES)) {
+                continue;
+            }
+
+            $missing = [];
+            foreach (self::REQUIRED_KEYS as $key) {
+                if (!isset($config[$key]) || $config[$key] === '') {
+                    $missing[] = $key;
+                }
+            }
+
+            if ($missing !== []) {
+                $errors[] = $app . ': ' . implode(', ', $missing);
+            }
+
+            if ($app === 'horde' && (!isset($config['staticuri']) || $config['staticuri'] === '')) {
+                $errors[] = 'horde: staticuri';
+            }
+        }
+
+        if ($errors !== []) {
+            throw new HordeRuntimeException(
+                'Registry configuration incomplete. Missing required keys for active apps: '
+                . implode('; ', $errors)
+                . '. Run "composer horde:reconfigure" to generate missing values.'
+            );
+        }
     }
 }
