@@ -47,6 +47,7 @@ class PageComposer
         $html .= " <head>\n";
         $html .= '  ' . $this->assetCollector->renderMetaTags();
         $html .= '  ' . $this->assetCollector->renderStylesheetTags();
+        $html .= '  ' . $this->assetCollector->renderInlineStyleBlock();
 
         if ($meta->faviconUrl !== null) {
             $html .= '  <link type="image/x-icon" href="'

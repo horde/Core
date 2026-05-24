@@ -314,4 +314,36 @@ class AssetCollectorTest extends TestCase
 
         $this->assertStringContainsString('a();b();', $html);
     }
+
+    public function testAddInlineStyleStores(): void
+    {
+        $this->collector->addInlineStyle('.form-field { color: red; }');
+        $html = $this->collector->renderInlineStyleBlock();
+
+        $this->assertStringContainsString('<style>', $html);
+        $this->assertStringContainsString('.form-field { color: red; }', $html);
+        $this->assertStringContainsString('</style>', $html);
+    }
+
+    public function testAddInlineStyleIgnoresEmpty(): void
+    {
+        $this->collector->addInlineStyle('');
+        $this->collector->addInlineStyle('   ');
+        $this->assertSame('', $this->collector->renderInlineStyleBlock());
+    }
+
+    public function testRenderInlineStyleBlockEmptyWhenNoStyles(): void
+    {
+        $this->assertSame('', $this->collector->renderInlineStyleBlock());
+    }
+
+    public function testMultipleInlineStylesCombined(): void
+    {
+        $this->collector->addInlineStyle('.a { color: red; }');
+        $this->collector->addInlineStyle('.b { color: blue; }');
+        $html = $this->collector->renderInlineStyleBlock();
+
+        $this->assertStringContainsString('.a { color: red; }', $html);
+        $this->assertStringContainsString('.b { color: blue; }', $html);
+    }
 }
