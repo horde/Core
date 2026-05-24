@@ -55,6 +55,9 @@ class AssetCollector
     private array $metaTags = [];
 
     /** @var string[] */
+    private array $inlineStyles = [];
+
+    /** @var string[] */
     private array $linkTags = [];
 
     public function addScript(string $url): void
@@ -134,6 +137,15 @@ class AssetCollector
         $this->linkTags[] = $out . ' />';
     }
 
+    public function addInlineStyle(string $code): void
+    {
+        $code = trim($code);
+        if ($code === '') {
+            return;
+        }
+        $this->inlineStyles[] = $code;
+    }
+
     /** @return string[] */
     public function getScriptUrls(): array
     {
@@ -185,6 +197,14 @@ class AssetCollector
                 . "\" />\n";
         }
         return $html;
+    }
+
+    public function renderInlineStyleBlock(): string
+    {
+        if (empty($this->inlineStyles)) {
+            return '';
+        }
+        return "<style>\n" . implode("\n", $this->inlineStyles) . "\n</style>\n";
     }
 
     public function renderJsVarBlock(bool $topOnly = false): string

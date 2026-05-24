@@ -56,6 +56,7 @@
         "horde/date": "^3 || dev-FRAMEWORK_6_0",
         "horde/eventdispatcher": "^1 || dev-FRAMEWORK_6_0",
         "horde/exception": "^3 || dev-FRAMEWORK_6_0",
+        "horde/form": "^3 || dev-FRAMEWORK_6_0",
         "horde/group": "^3 || dev-FRAMEWORK_6_0",
         "horde/hashtable": "^2 || dev-FRAMEWORK_6_0",
         "horde/history": "^3 || dev-FRAMEWORK_6_0",
