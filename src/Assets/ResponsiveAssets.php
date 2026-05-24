@@ -60,7 +60,7 @@ class ResponsiveAssets
         $urls = [];
         $theme ??= $this->getThemePreference();
 
-        $cssFiles = ['responsive.css'];
+        $cssFiles = ['screen.css'];
 
         foreach ($cssFiles as $file) {
             if ($this->cssFileExists($file, 'default', 'horde')) {

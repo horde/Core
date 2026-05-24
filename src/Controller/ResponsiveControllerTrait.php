@@ -23,8 +23,10 @@ namespace Horde\Core\Controller;
 
 use Horde\Core\Assets\CssDiscoverer;
 use Horde\Core\Assets\CssDiscoveryRequest;
+use Horde\Core\Assets\GraphicDiscoverer;
 use Horde\Core\Assets\JsDiscoverer;
 use Horde\Core\Assets\ResponsiveAssets;
+use Horde\Core\Assets\ThemeResolver;
 use Horde\Core\Config\RegistryState;
 use Horde\Core\View\ResponsiveTemplateView;
 use Horde\Core\View\ResponsiveTopbar;
@@ -181,6 +183,54 @@ trait ResponsiveControllerTrait
     }
 
     /**
+     * Resolve GraphicDiscoverer from controller method or request attribute.
+     *
+     * Controllers can provide getGraphicDiscoverer() or the middleware
+     * can set a 'graphicDiscoverer' request attribute.
+     */
+    private function resolveGraphicDiscoverer(?ServerRequestInterface $request = null): ?GraphicDiscoverer
+    {
+        if (method_exists($this, 'getGraphicDiscoverer')) {
+            return $this->getGraphicDiscoverer();
+        }
+        if ($request !== null) {
+            $discoverer = $request->getAttribute('graphicDiscoverer');
+            if ($discoverer instanceof GraphicDiscoverer) {
+                return $discoverer;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Resolve the current theme name.
+     *
+     * Uses ThemeResolver from controller method or request attribute,
+     * falling back to 'default'.
+     */
+    private function resolveTheme(Horde_Registry $registry, ?ServerRequestInterface $request = null): string
+    {
+        $themeResolver = null;
+        if (method_exists($this, 'getThemeResolver')) {
+            $themeResolver = $this->getThemeResolver();
+        } elseif ($request !== null) {
+            $resolver = $request->getAttribute('themeResolver');
+            if ($resolver instanceof ThemeResolver) {
+                $themeResolver = $resolver;
+            }
+        }
+
+        if ($themeResolver !== null) {
+            $authUid = $registry->getAuth();
+            if ($authUid) {
+                return $themeResolver->resolve($authUid);
+            }
+        }
+
+        return 'default';
+    }
+
+    /**
      * Render template with topbar and assets
      *
      * Automatically includes:
@@ -210,7 +260,9 @@ trait ResponsiveControllerTrait
         $data['cssUrls'] = $this->resolveCssUrls($registry, $app);
         $data['jsUrls'] = $this->resolveJsUrls($registry, $extraJsFiles, $app);
 
-        $responsiveTopbar = new ResponsiveTopbar($registry, $this->getAppName());
+        $graphicDiscoverer = $this->resolveGraphicDiscoverer($request);
+        $theme = $this->resolveTheme($registry, $request);
+        $responsiveTopbar = new ResponsiveTopbar($registry, $this->getAppName(), $graphicDiscoverer, $theme);
         $data['topbarHtml'] = $responsiveTopbar->render();
 
         $templatePath = $this->getTemplateBasePath() . $template;
@@ -237,9 +289,8 @@ trait ResponsiveControllerTrait
         if (method_exists($this, 'getCssDiscoverer')) {
             $discoverer = $this->getCssDiscoverer();
             $request = new CssDiscoveryRequest(
-                files: ['responsive.css'],
+                files: ['screen.css'],
                 app: $app,
-                subView: 'responsive',
             );
             $urls = [];
             foreach ($discoverer->discover($request) as $entry) {
