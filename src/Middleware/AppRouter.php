@@ -19,12 +19,12 @@ use Horde_Controller;
 use Horde_String;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Horde\Exception\HordeException;
-use Horde\Core\RuntimeRoutesMapper;
+use Horde\Core\RuntimeRoutesProvider;
 
 /**
  * AppRouter middleware
  *
- * Matches the request against the pre-loaded RuntimeRoutesMapper,
+ * Matches the request against the pre-loaded RuntimeRoutesProvider,
  * resolves the per-route middleware stack, and dispatches the controller.
  *
  * Sets Attributes:
@@ -35,7 +35,7 @@ use Horde\Core\RuntimeRoutesMapper;
 class AppRouter extends RampageRequestHandler implements MiddlewareInterface, RequestHandlerInterface
 {
     public function __construct(
-        private readonly RuntimeRoutesMapper $runtimeMapper,
+        private readonly RuntimeRoutesProvider $runtimeMapper,
         private readonly Injector $injector,
     ) {}
 
