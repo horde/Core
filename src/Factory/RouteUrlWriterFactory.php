@@ -16,7 +16,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Factory;
 
-use Horde\Core\Config\RegistryState;
+use Horde\Core\Config\RegistryConfigLoader;
 use Horde\Core\RuntimeRoutesProvider;
 use Horde\Core\Uri\RouteUrlWriter;
 use Horde\Injector\Injector;
@@ -26,7 +26,7 @@ class RouteUrlWriterFactory
     public function create(Injector $injector): RouteUrlWriter
     {
         $provider = $injector->getInstance(RuntimeRoutesProvider::class);
-        $registryState = $injector->getInstance(RegistryState::class);
+        $registryState = $injector->getInstance(RegistryConfigLoader::class)->load();
         $hordeConfig = $registryState->getApplication('horde');
         $webroot = $hordeConfig['webroot'] ?? '/horde';
 
