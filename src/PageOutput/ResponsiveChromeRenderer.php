@@ -55,9 +55,8 @@ class ResponsiveChromeRenderer implements ChromeRenderer
     private function buildCssUrls(string $app): array
     {
         $request = new CssDiscoveryRequest(
-            files: ['responsive.css'],
+            files: ['screen.css'],
             app: $app,
-            subView: 'responsive',
         );
         $result = $this->cssDiscoverer->discover($request);
 
@@ -128,7 +127,7 @@ class ResponsiveChromeRenderer implements ChromeRenderer
         }
 
         $html .= '</head>' . "\n";
-        $html .= '<body>' . "\n";
+        $html .= '<body class="horde-responsive">' . "\n";
         $html .= $topbarHtml . "\n";
         $html .= $bodyHtml . "\n";
 

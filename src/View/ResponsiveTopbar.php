@@ -21,6 +21,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\View;
 
+use Horde\Core\Assets\GraphicDiscoverer;
 use Horde\Core\Horde;
 use Horde_Perms;
 use Horde_Registry;
@@ -46,17 +47,27 @@ class ResponsiveTopbar
 {
     private Horde_Registry $registry;
     private string $appName;
+    private ?GraphicDiscoverer $graphicDiscoverer;
+    private string $theme;
 
     /**
      * Constructor
      *
      * @param Horde_Registry $registry Registry instance
      * @param string $appName Localized application name to display
+     * @param GraphicDiscoverer|null $graphicDiscoverer Resolves app icon graphics through theme cascade
+     * @param string $theme Current theme name for icon resolution
      */
-    public function __construct(Horde_Registry $registry, string $appName)
-    {
+    public function __construct(
+        Horde_Registry $registry,
+        string $appName,
+        ?GraphicDiscoverer $graphicDiscoverer = null,
+        string $theme = 'default',
+    ) {
         $this->registry = $registry;
         $this->appName = $appName;
+        $this->graphicDiscoverer = $graphicDiscoverer;
+        $this->theme = $theme;
     }
 
     /**
@@ -71,7 +82,16 @@ class ResponsiveTopbar
         $topbarTemplate = HORDE_TEMPLATES . '/responsive/topbar.html.php';
         $topbarView = new ResponsiveTemplateView($topbarTemplate, $topbarData);
 
-        return $topbarView->render();
+        $html = '';
+
+        $iconCss = $this->buildIconCss($topbarData['allApps']);
+        if ($iconCss !== '') {
+            $html .= '<style>' . $iconCss . '</style>' . "\n";
+        }
+
+        $html .= $topbarView->render();
+
+        return $html;
     }
 
     /**
@@ -143,5 +163,49 @@ class ResponsiveTopbar
             'topLevelApps' => $topLevelApps,
             'allApps' => $allAppsList,
         ];
+    }
+
+    /**
+     * Build inline CSS for app icons in the topbar menu.
+     *
+     * Uses GraphicDiscoverer to resolve each app's icon through the
+     * theme cascade (app+theme → app+default → horde+theme → horde+default).
+     * This ensures all app icons are available regardless of which app is active.
+     *
+     * @param array $apps App data from buildTopbarData
+     * @return string CSS rules for app icons, empty string if no discoverer
+     */
+    private function buildIconCss(array $apps): string
+    {
+        if ($this->graphicDiscoverer === null) {
+            return '';
+        }
+
+        $rules = [];
+        foreach ($apps as $app) {
+            $appName = $app['app'];
+            $iconFile = $appName . '.png';
+
+            $iconUri = $this->graphicDiscoverer->resolve($iconFile, $this->theme, $appName);
+            if ($iconUri === null) {
+                continue;
+            }
+
+            $escapedUri = htmlspecialchars($iconUri, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $rules[] = '.topbar-menu-app-' . $appName . '::before{'
+                . "content:'';"
+                . 'display:inline-block;'
+                . 'width:20px;'
+                . 'height:20px;'
+                . "background-image:url('" . $escapedUri . "');"
+                . 'background-size:contain;'
+                . 'background-repeat:no-repeat;'
+                . 'background-position:center;'
+                . 'vertical-align:middle;'
+                . 'margin-right:8px;'
+                . '}';
+        }
+
+        return implode("\n", $rules);
     }
 }
