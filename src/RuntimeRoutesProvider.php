@@ -18,20 +18,24 @@ namespace Horde\Core;
 
 use Horde\Core\Config\RegistryState;
 use Horde\Core\Middleware\DefaultStack;
+use Horde\Core\Uri\RoutesProvider;
 use Horde\Http\Uri;
 use Horde\Routes\GroupMapper;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Runtime route mapper that loads routes from all registered apps via GroupMapper.
+ * Runtime routes provider — loads and serves routes from all registered apps.
  *
  * Used in developer/debug mode (when var/config/use_compiled_router is absent).
  * In production, the compiled route cache is used instead via CompiledMatcher.
  *
+ * Implements RoutesProvider so that RouteUrlWriter can generate URLs from
+ * named routes without coupling to the runtime-vs-compiled distinction.
+ *
  * Group context (prefix, host, scheme, port, defaults) is applied to each app's
  * routes at definition time. The resulting Route objects are fully self-contained.
  */
-class RuntimeRoutesMapper extends GroupMapper
+class RuntimeRoutesProvider extends GroupMapper implements RoutesProvider
 {
     public function __construct(
         private readonly RegistryState $registryState,
@@ -117,4 +121,12 @@ class RuntimeRoutesMapper extends GroupMapper
         $this->compile();
     }
 
+    public function generateNamedPath(string $routeName, array $params = []): ?string
+    {
+        $route = $this->getRouteNames()[$routeName] ?? null;
+        if ($route === null) {
+            return null;
+        }
+        return $route->generate($params);
+    }
 }

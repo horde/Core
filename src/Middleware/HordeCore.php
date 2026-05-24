@@ -63,11 +63,11 @@ class HordeCore implements MiddlewareInterface
         $registry = $injector->getInstance('Horde_Registry');
         $request = $request->withAttribute('registry', $registry);
 
-        // Bridge RuntimeRoutesMapper into legacy injector so controllers can use urlFor()
+        // Bridge RuntimeRoutesProvider into legacy injector so controllers can use urlFor()
         $mapper = $request->getAttribute('mapper');
         if ($mapper !== null) {
             $injector->setInstance(\Horde\Routes\Mapper::class, $mapper);
-            $injector->setInstance(\Horde\Core\RuntimeRoutesMapper::class, $mapper);
+            $injector->setInstance(\Horde\Core\RuntimeRoutesProvider::class, $mapper);
         }
 
         // Push the identified app onto the legacy registry stack

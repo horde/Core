@@ -74,10 +74,10 @@ class RampageBootstrap
         }
         $injector->setInstance(RegistryState::class, $registryState);
 
-        // 5. RuntimeRoutesMapper — pre-load ALL app routes
-        $runtimeMapper = new RuntimeRoutesMapper($registryState, $request);
+        // 5. RuntimeRoutesProvider — pre-load ALL app routes
+        $runtimeMapper = new RuntimeRoutesProvider($registryState, $request);
         $runtimeMapper->loadAllApps();
-        $injector->setInstance(RuntimeRoutesMapper::class, $runtimeMapper);
+        $injector->setInstance(RuntimeRoutesProvider::class, $runtimeMapper);
         $injector->setInstance(\Horde\Routes\Mapper::class, $runtimeMapper);
 
         // 6. Match route
