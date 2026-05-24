@@ -75,6 +75,8 @@ use Horde\Core\Factory\PermissionServiceFactory;
 use Horde\Core\Factory\PrefsServiceFactory;
 use Horde\Core\Factory\RegistryConfigLoaderFactory;
 use Horde\Core\Factory\RouteUrlWriterFactory;
+use Horde\Core\Factory\RuntimeRoutesProviderFactory;
+use Horde\Core\RuntimeRoutesProvider;
 use Horde\Core\Factory\SecretManagerFactory;
 use Horde\Core\Factory\SessionHandlerFactory;
 use Horde\Core\Factory\SimpleCacheFactory;
@@ -97,6 +99,7 @@ use Horde\Core\Service\PrefsService;
 use Horde\Core\Service\VersionCheck\VersionService;
 use Horde\Core\Uri\RegistryRouteMapperProvider;
 use Horde\Core\Uri\RouteMapperProvider;
+use Horde\Core\Uri\RoutesProvider;
 use Horde\Core\Uri\RouteUrlWriter;
 use Horde\Db\Adapter as DbAdapter;
 use Horde\Editor\Tinymce;
@@ -281,6 +284,8 @@ class DefaultInjectorBindings implements InjectorBindings
             SimpleCacheInterface::class => SimpleCacheFactory::class,
             PsrHttpClientInterface::class => HttpClientFactory::class,
             RouteUrlWriter::class => RouteUrlWriterFactory::class,
+            RuntimeRoutesProvider::class => RuntimeRoutesProviderFactory::class,
+            RoutesProvider::class => RuntimeRoutesProviderFactory::class,
         ];
 
         $implementations = [
