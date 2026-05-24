@@ -20,6 +20,7 @@ use Horde\Core\Assets\CssDiscoverer;
 use Horde\Core\Assets\GraphicDiscoverer;
 use Horde\Core\Assets\JsDiscoverer;
 use Horde\Core\Assets\ThemeResolver;
+use Horde\Core\Config\RegistryConfigLoader;
 use Horde\Core\View\ResponsiveTopbar;
 use Horde\Injector\Injector;
 use Horde_Registry;
@@ -29,14 +30,17 @@ class ResponsiveChromeRendererFactory
     public function create(Injector $injector): ResponsiveChromeRenderer
     {
         $registry = $injector->get(Horde_Registry::class);
+        $registryState = $injector->get(RegistryConfigLoader::class)->load();
         $graphicDiscoverer = $injector->get(GraphicDiscoverer::class);
         $themeResolver = $injector->get(ThemeResolver::class);
 
         $authUid = $registry->getAuth();
         $theme = $authUid ? $themeResolver->resolve($authUid) : 'default';
 
-        $topbarFactory = static function (string $app) use ($registry, $graphicDiscoverer, $theme): string {
-            $topbar = new ResponsiveTopbar($registry, $app, $graphicDiscoverer, $theme);
+        $topbarFactory = static function (string $app) use ($registry, $registryState, $graphicDiscoverer, $theme): string {
+            $appConfig = $registryState->getApplication($app);
+            $appName = $appConfig['name'] ?? $app;
+            $topbar = new ResponsiveTopbar($registry, $appName, $graphicDiscoverer, $theme);
             return $topbar->render();
         };
 
