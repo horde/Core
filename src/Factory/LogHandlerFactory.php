@@ -76,9 +76,8 @@ class LogHandlerFactory extends Horde_Core_Factory_Injector
 
                     case 'default':
                     default:
-                        // Match legacy Horde_Log_Handler_Stream + SimpleFormatter:
-                        // append a line break after the (pre-formatted) message.
-                        $formatters[] = new SimpleFormatter('%message%' . PHP_EOL);
+                        // Match legacy Horde_Log_Handler_Stream + SimpleFormatter.
+                        $formatters[] = new SimpleFormatter();
                         break;
 
                     case 'xml':

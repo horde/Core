@@ -768,9 +768,10 @@ class Horde_Core_Prefs_Ui
 
         try {
             $pconf = $registry->loadConfigFile('prefs.php', ['prefGroups', '_prefs'], $app);
+            $config = $pconf->config ?? [];
             $res = [
-                'prefGroups' => $pconf->config['prefGroups'],
-                '_prefs' => $pconf->config['_prefs'],
+                'prefGroups' => $config['prefGroups'] ?? [],
+                '_prefs' => $config['_prefs'] ?? [],
             ];
         } catch (Horde_Exception $e) {
             $res = [
