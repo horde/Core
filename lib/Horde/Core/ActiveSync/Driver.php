@@ -1422,11 +1422,15 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             $flags = $folder->flags();
             $categories = $folder->categories();
             foreach ($changes['modify'] as $uid) {
+                if (!isset($flags[$uid])) {
+                    continue;
+                }
+
                 $results[] = [
                     'id' => $uid,
                     'type' => Horde_ActiveSync::CHANGE_TYPE_FLAGS,
                     'flags' => $flags[$uid],
-                    'categories' => $categories[$uid],
+                    'categories' => $categories[$uid] ?? [],
                 ];
             }
         } else {
