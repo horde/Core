@@ -1959,22 +1959,28 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 break;
 
             case Horde_ActiveSync::CLASS_NOTES:
-                try {
-                    $this->_connector->notes_delete($ids);
-                } catch (Horde_Exception $e) {
-                    $this->_logger->err($e->getMessage());
-                    // Since we don't get back successfully deleted ids and we can
-                    // can pass an array of ids to delete, we need to see what ids
-                    // were deleted if there was an error.
-                    // @todo For Horde 6, the API should return successfully
-                    // deleted ids.
-                    $success = [];
-                    foreach ($ids as $uid) {
-                        if ($mod_time = $this->_connector->tasks_getActionTimestamp($uid, 'delete', $folder_id)) {
-                            $success[] = $uid;
+                $results = [];
+                foreach ($ids as $uid) {
+                    try {
+                        $this->_connector->notes_delete($uid, $folder_id);
+                        $results[] = $uid;
+                    } catch (Horde_Exception_NotFound $e) {
+                        $this->_logger->err($e->getMessage());
+                        // Deleting a missing item is idempotent from the client
+                        // perspective, and should not block other deletes in
+                        // the same SYNC request.
+                        $results[] = $uid;
+                    } catch (Horde_Exception $e) {
+                        $this->_logger->err($e->getMessage());
+                        // Since we don't get back successfully deleted ids and we can
+                        // can pass an array of ids to delete, we need to see what ids
+                        // were deleted if there was an error.
+                        // @todo For Horde 6, the API should return successfully
+                        // deleted ids.
+                        if ($mod_time = $this->_connector->notes_getActionTimestamp($uid, 'delete', $folder_id)) {
+                            $results[] = $uid;
                         }
                     }
-                    $results = $success;
                 }
                 break;
             default:
