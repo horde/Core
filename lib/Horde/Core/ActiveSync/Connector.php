@@ -797,12 +797,14 @@ class Horde_Core_ActiveSync_Connector
     /**
      * Delete a note from the backend.
      *
-     * @param string $id  The task's uid
+     * @param string $id       The note's uid.
+     * @param string $notepad  The notepad id, if not using multiplex.
+     *
      * @since 5.1
      */
-    public function notes_delete($id)
+    public function notes_delete($id, $notepad = null)
     {
-        $this->_registry->notes->delete($id);
+        $this->_registry->notes->delete($id, $notepad);
     }
 
     /**
