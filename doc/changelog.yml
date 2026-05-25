@@ -732,6 +732,29 @@
     [rla] Adapt schema migrations to work in new H6 installation layout.
     [rla] Added injectable wrapper around Config to reduce globals access.
     [rla] With Marco Abbrancati: Upgraded test cases for phpunit 9.x utility.
+3.0.0-RC5:
+  api: 3.0.0-RC5
+  state:
+    release: RC
+    api: RC
+  date: 2026-05-25
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    fix(responsive): resolve translated app name via RegistryConfigLoader
+    refactor(responsive): switch CSS discovery from responsive.css to screen.css
+    fix(routes): resolve RegistryState via RegistryConfigLoader in factories
+    docs: add ROUTING.md covering the complete route chain
+    fix(routes): validate registry keys, add service routes, support legacy path
+    refactor(routes): migrate Mapper type-hints to RoutesProvider interface
+    feat(pageoutput): add PageOutputAssetManager bridging Form AssetManager to AssetCollector
+    refactor(routes): rely on RuntimeRoutesProvider for URL generation
+    Merge pull request #120 from horde/feat/adopt-nls-psr4
+    refactor: Use PSR-4 version of horde/nls
+    fix: Autoload more correctly
+    chore: Update workflow dependency
+    feat: Simple CLI script for the Cached Routes Compiler
 3.0.0-RC4:
   api: 3.0.0-RC4
   state:

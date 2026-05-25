@@ -37,7 +37,7 @@
         "config",
         "errorhandler"
     ],
-    "time": "2026-05-22",
+    "time": "2026-05-25",
     "repositories": [],
     "require": {
         "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || ^3 || ^2",
@@ -56,7 +56,6 @@
         "horde/date": "^3 || dev-FRAMEWORK_6_0",
         "horde/eventdispatcher": "^1 || dev-FRAMEWORK_6_0",
         "horde/exception": "^3 || dev-FRAMEWORK_6_0",
-        "horde/form": "^3 || dev-FRAMEWORK_6_0",
         "horde/group": "^3 || dev-FRAMEWORK_6_0",
         "horde/hashtable": "^2 || dev-FRAMEWORK_6_0",
         "horde/history": "^3 || dev-FRAMEWORK_6_0",
