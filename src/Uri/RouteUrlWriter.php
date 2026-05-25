@@ -62,6 +62,10 @@ class RouteUrlWriter
             ? 'https'
             : 'http';
 
+        // Strip default port to avoid redirect_uri mismatches with strict OIDC providers.
+        $defaultPort = $scheme === 'https' ? '443' : '80';
+        $host = preg_replace('/^(.+):' . $defaultPort . '$/', '$1', $host);
+
         return $scheme . '://' . $host . $path;
     }
 
