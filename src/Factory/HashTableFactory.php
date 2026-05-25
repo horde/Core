@@ -23,13 +23,13 @@ use Horde\HashTable\Driver\Memory;
 use Horde\HashTable\Driver\Redis;
 use Horde\HashTable\HashTable;
 use Horde\HashTable\LockableHashTable;
+use Horde\HashTable\Redis\Config\RedisClientFactory;
+use Horde\HashTable\Redis\Config\RedisConfigMapper;
 use Horde\HashTable\RedisHashTable;
 use Horde\Injector\Injector;
 use Horde\Memcache\MemcacheApi;
-use Predis\Client as PredisClient;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Redis as PhpRedis;
 use RuntimeException;
 use Throwable;
 
@@ -148,22 +148,18 @@ class HashTableFactory
     }
 
     /**
-     * Build a Redis driver, preferring ext-redis over Predis.
+     * Build a Redis driver using typed config objects.
      */
     private function createRedisDriver(State $state, LoggerInterface $logger, string $prefix): Redis
     {
-        $params = $this->getRedisParams($state);
-
-        if (extension_loaded('redis')) {
-            $client = $this->createPhpRedisClient($params);
-        } elseif (class_exists(PredisClient::class)) {
-            $client = $this->createPredisClient($params);
-        } else {
-            throw new ConnectionException(
-                'Neither ext-redis nor predis/predis is available. '
-                . 'Install one to use the Redis hashtable driver.'
-            );
+        $params = $state->get('hashtable.params', []);
+        if (!is_array($params)) {
+            $params = [];
         }
+
+        $config = RedisConfigMapper::fromArray($params, $prefix);
+        $factory = new RedisClientFactory();
+        $client = $factory->create($config);
 
         $lockTimeout = (int) $state->get('hashtable.lock_timeout', 30);
 
@@ -173,92 +169,6 @@ class HashTableFactory
             logger: $logger,
             lockTimeout: $lockTimeout,
         );
-    }
-
-    /**
-     * Extract Redis connection parameters from config state.
-     *
-     * @return array{host: string, port: int, password: ?string, database: int, protocol: string, socket: ?string, persistent: bool}
-     */
-    private function getRedisParams(State $state): array
-    {
-        $params = $state->get('hashtable.params', []);
-        if (!is_array($params)) {
-            $params = [];
-        }
-
-        return [
-            'host' => (string) ($params['hostspec'][0] ?? $params['host'] ?? '127.0.0.1'),
-            'port' => (int) ($params['port'][0] ?? $params['port'] ?? 6379),
-            'password' => $params['password'] ?? null,
-            'database' => (int) ($params['database'] ?? 0),
-            'protocol' => (string) ($params['protocol'] ?? 'tcp'),
-            'socket' => $params['socket'] ?? null,
-            'persistent' => !empty($params['persistent']),
-        ];
-    }
-
-    private function createPhpRedisClient(array $params): PhpRedis
-    {
-        $redis = new PhpRedis();
-
-        if ($params['protocol'] === 'unix' && $params['socket'] !== null) {
-            $connected = $params['persistent']
-                ? $redis->pconnect($params['socket'])
-                : $redis->connect($params['socket']);
-        } else {
-            $connected = $params['persistent']
-                ? $redis->pconnect($params['host'], $params['port'])
-                : $redis->connect($params['host'], $params['port']);
-        }
-
-        if (!$connected) {
-            throw new ConnectionException(
-                'Failed to connect to Redis at ' . $params['host'] . ':' . $params['port']
-            );
-        }
-
-        if ($params['password'] !== null && $params['password'] !== '') {
-            if (!$redis->auth($params['password'])) {
-                throw new ConnectionException('Redis authentication failed.');
-            }
-        }
-
-        if ($params['database'] !== 0) {
-            $redis->select($params['database']);
-        }
-
-        return $redis;
-    }
-
-    private function createPredisClient(array $params): PredisClient
-    {
-        if ($params['protocol'] === 'unix' && $params['socket'] !== null) {
-            $connectionParams = [
-                'scheme' => 'unix',
-                'path' => $params['socket'],
-            ];
-        } else {
-            $connectionParams = [
-                'scheme' => 'tcp',
-                'host' => $params['host'],
-                'port' => $params['port'],
-            ];
-        }
-
-        if ($params['password'] !== null && $params['password'] !== '') {
-            $connectionParams['password'] = $params['password'];
-        }
-
-        if ($params['database'] !== 0) {
-            $connectionParams['database'] = $params['database'];
-        }
-
-        if ($params['persistent']) {
-            $connectionParams['persistent'] = true;
-        }
-
-        return new PredisClient($connectionParams);
     }
 
     /**
