@@ -83,6 +83,8 @@ class Horde_Core_Factory_Auth extends Horde_Core_Factory_Base
             $driver = 'Horde_Core_Auth_Msad';
         } elseif (strcasecmp($driver, 'shibboleth') === 0) {
             $driver = 'Horde_Core_Auth_Shibboleth';
+        } elseif (strcasecmp($driver, 'oidc') === 0) {
+            $driver = 'Horde_Core_Auth_Oidc';
         } elseif (strcasecmp($driver, 'imsp') === 0) {
             $driver = 'Horde_Core_Auth_Imsp';
         } elseif (strcasecmp($driver, 'x509') === 0) {

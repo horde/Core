@@ -17,9 +17,12 @@ declare(strict_types=1);
 namespace Horde\Core\Factory;
 
 use Horde\Core\Config\ConfigLoader;
+use Horde\Core\Service\HordeDbService;
 use Horde\Core\Service\NullOAuthTokenRepository;
 use Horde\Core\Service\OAuthTokenRepository;
+use Horde\Horde\Service\SqlOAuthTokenRepository;
 use Horde\Injector\Injector;
+use Horde\Secret\SecretManager;
 
 /**
  * Factory for OAuthTokenRepository.
@@ -39,10 +42,13 @@ class OAuthTokenRepositoryFactory
         $loader = $injector->getInstance(ConfigLoader::class);
         $state = $loader->load('horde');
 
-        $driver = $state->get('oauth.token_driver', 'null');
+        $driver = strtolower((string) $state->get('oauth.token_driver', 'null'));
 
         return match (strtolower($driver)) {
-            'null', '' => new NullOAuthTokenRepository(),
+            'sql'      => new SqlOAuthTokenRepository(
+                db:     $injector->getInstance(HordeDbService::class)->getAdapter(),
+                secret: $injector->getInstance(SecretManager::class),
+            ),
             default => new NullOAuthTokenRepository(),
         };
     }

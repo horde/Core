@@ -96,8 +96,10 @@ use Horde\Core\Service\IdentityService;
 use Horde\Core\Service\OAuthHttpClientService;
 use Horde\Core\Service\OAuthProviderConfigRepository;
 use Horde\Core\Service\OAuthTokenService;
+use Horde\Core\Service\OidcPreLogoutHandler;
 use Horde\Core\Service\PermissionService;
 use Horde\Core\Service\PrefsService;
+use Horde\Core\Service\PreLogoutHandlerInterface;
 use Horde\Core\Service\VersionCheck\VersionService;
 use Horde\Core\Uri\RegistryRouteMapperProvider;
 use Horde\Core\Uri\RouteMapperProvider;
@@ -111,6 +113,7 @@ use Horde\HashTable\RedisHashTable;
 use Horde\Horde\Factory\AuthenticationServiceFactory;
 use Horde\Horde\Factory\OAuthHttpClientServiceFactory as BaseOAuthHttpClientServiceFactory;
 use Horde\Horde\Factory\OAuthTokenServiceFactory as BaseOAuthTokenServiceFactory;
+use Horde\Horde\Factory\OAuthTokenRepositoryFactory as BaseOAuthTokenRepositoryFactory;
 use Horde\Horde\Service\AuthenticationService;
 use Horde\Horde\Service\AuthLinkRepository;
 use Horde\Identity\IdentityHistoryRepository;
@@ -213,6 +216,7 @@ class DefaultInjectorBindings implements InjectorBindings
             OAuthProviderConfigRepository::class => OAuthProviderConfigRepositoryFactory::class,
             OAuthFlowStore::class => OAuthFlowStoreFactory::class,
             OAuthTokenService::class => BaseOAuthTokenServiceFactory::class,
+            OAuthTokenRepository::class => BaseOAuthTokenRepositoryFactory::class,
             OAuthHttpClientService::class => BaseOAuthHttpClientServiceFactory::class,
             IdentityRepository::class => IdentityRepositoryFactory::class,
             IdentityHistoryRepository::class => IdentityHistoryRepositoryFactory::class,
