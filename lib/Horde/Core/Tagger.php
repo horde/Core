@@ -65,7 +65,7 @@ abstract class Horde_Core_Tagger
         $ids = $cache->get($key, 360);
 
         if ($ids) {
-            $this->_type_ids = unserialize($ids);
+            $this->_type_ids = unserialize($ids, ['allowed_classes' => false]);
         } else {
             $types = $injector->getInstance('Content_Types_Manager')
                 ->ensureTypes($this->_types);

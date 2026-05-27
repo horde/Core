@@ -49,13 +49,13 @@ class Horde_Core_Prefs_Storage_Upgrade
                 /* Need to convert only if unserialize fails. If it succeeds,
                  * the data has already been converted or there is no need
                  * to convert. */
-                if (@unserialize($data) === false) {
+                if (@unserialize($data, ['allowed_classes' => false]) === false) {
                     /* Re-convert to original charset. */
                     $data = Horde_String::convertCharset($data, 'UTF-8', $charset);
 
                     /* Unserialize. If we fail here, remove the value
                      * outright since it is invalid and can not be fixed. */
-                    if (($data = @unserialize($data)) !== false) {
+                    if (($data = @unserialize($data, ['allowed_classes' => false])) !== false) {
                         $data = Horde_String::convertCharset($data, $charset, 'UTF-8');
 
                         /* Re-save in the prefs backend in the new format. */

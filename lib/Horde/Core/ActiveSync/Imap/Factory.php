@@ -150,7 +150,7 @@ class Horde_Core_ActiveSync_Imap_Factory implements Horde_ActiveSync_Interface_I
         global $registry;
 
         $msgFlags = [];
-        $flags = unserialize($registry->horde->getPreference($registry->hasInterface('mail'), 'msgflags'));
+        $flags = unserialize($registry->horde->getPreference($registry->hasInterface('mail'), 'msgflags'), ['allowed_classes' => false]);
 
         // Remove any system flags, as these should never be user (un)set.
         $system_flags = [

@@ -134,7 +134,7 @@ abstract class Horde_Core_LoginTasks_SystemTask_Upgrade extends Horde_LoginTasks
             $key .= '_auth';
         }
 
-        $upgrade = @unserialize($prefs->getValue('upgrade_tasks'));
+        $upgrade = @unserialize($prefs->getValue('upgrade_tasks'), ['allowed_classes' => false]);
 
         switch ($action) {
             case 'get':

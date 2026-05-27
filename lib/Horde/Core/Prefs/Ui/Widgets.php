@@ -295,7 +295,7 @@ class Horde_Core_Prefs_Ui_Widgets
         ]);
 
         $alarm_pref = $data['value']
-            ?? unserialize($GLOBALS['prefs']->getValue($pref));
+            ?? unserialize($GLOBALS['prefs']->getValue($pref), ['allowed_classes' => false]);
         $selected = array_keys($alarm_pref);
 
         $t = $GLOBALS['injector']->createInstance('Horde_Template');

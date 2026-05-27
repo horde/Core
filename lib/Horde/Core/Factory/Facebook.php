@@ -30,7 +30,7 @@ class Horde_Core_Factory_Facebook extends Horde_Core_Factory_Injector
         );
 
         /* Check for facebook session */
-        $fbp = unserialize($GLOBALS['prefs']->getValue('facebook'));
+        $fbp = unserialize($GLOBALS['prefs']->getValue('facebook'), ['allowed_classes' => false]);
         if (!empty($fbp['sid'])) {
             try {
                 $fb->auth->setSession($fbp['sid']);
