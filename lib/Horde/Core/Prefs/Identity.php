@@ -218,7 +218,7 @@ class Horde_Core_Prefs_Identity extends Horde_Prefs_Identity
     protected function _confirmEmail($confirm = null)
     {
         if (is_null($confirm)) {
-            return ($pref = @unserialize($this->_prefs->getValue('confirm_email')))
+            return ($pref = @unserialize($this->_prefs->getValue('confirm_email'), ['allowed_classes' => false]))
                 ? $pref
                 : [];
         }

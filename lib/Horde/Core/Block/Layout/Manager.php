@@ -174,7 +174,7 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
      */
     public function unserialize($data)
     {
-        $this->_layout = @unserialize($data);
+        $this->_layout = @unserialize($data, ['allowed_classes' => false]);
     }
 
     /**

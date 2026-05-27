@@ -58,7 +58,7 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
      */
     public function getLayout()
     {
-        $layout = @unserialize($GLOBALS['prefs']->getValue($this->_layout));
+        $layout = @unserialize($GLOBALS['prefs']->getValue($this->_layout), ['allowed_classes' => false]);
 
         if (empty($layout)) {
             $layout = [];

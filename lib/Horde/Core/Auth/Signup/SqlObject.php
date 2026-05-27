@@ -58,7 +58,7 @@ class Horde_Core_Auth_Signup_SqlObject
      */
     public function setData($data)
     {
-        $part = unserialize($data['signup_data']);
+        $part = unserialize($data['signup_data'], ['allowed_classes' => false]);
         if (!empty($part) && is_array($part)) {
             if (!empty($part['extra'])) {
                 $extra = $part['extra'];

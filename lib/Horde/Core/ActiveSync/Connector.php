@@ -1174,7 +1174,8 @@ class Horde_Core_ActiveSync_Connector
                 $this->_registry->horde->getPreference(
                     $this->_registry->hasInterface('calendar'),
                     'sync_calendars'
-                )
+                ),
+                ['allowed_classes' => false]
             );
             if (empty($calendars)) {
                 $calendars = $this->_registry->calendar->listCalendars(true, Horde_Perms::EDIT);

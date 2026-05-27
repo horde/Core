@@ -566,7 +566,7 @@ class Horde_Core_Prefs_Ui
                     case 'multienum':
                         $enum = $this->prefs[$pref]['enum'];
                         $esc = !empty($this->prefs[$pref]['escaped']);
-                        if (!$selected = @unserialize($prefs->getValue($pref))) {
+                        if (!$selected = @unserialize($prefs->getValue($pref), ['allowed_classes' => false])) {
                             $selected = [];
                         }
 

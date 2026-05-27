@@ -320,6 +320,6 @@ class Horde_Themes_Cache implements Serializable
      */
     public function unserialize($data)
     {
-        $this->__unserialize(@unserialize($data));
+        $this->__unserialize(@unserialize($data, ['allowed_classes' => false]));
     }
 }

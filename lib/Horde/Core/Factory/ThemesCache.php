@@ -54,7 +54,7 @@ class Horde_Core_Factory_ThemesCache extends Horde_Core_Factory_Base implements 
                 $instance = new Horde_Themes_Cache($app, $theme);
             } else {
                 try {
-                    $instance = @unserialize($cache->get($sig, $GLOBALS['conf']['cachethemesparams']['lifetime']));
+                    $instance = @unserialize($cache->get($sig, $GLOBALS['conf']['cachethemesparams']['lifetime']), ['allowed_classes' => [Horde_Themes_Cache::class]]);
                 } catch (Exception $e) {
                     $instance = null;
                 }

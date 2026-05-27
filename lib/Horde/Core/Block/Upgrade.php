@@ -31,7 +31,7 @@ class Horde_Core_Block_Upgrade
     {
         global $prefs;
 
-        $layout = @unserialize($prefs->getValue($name));
+        $layout = @unserialize($prefs->getValue($name), ['allowed_classes' => false]);
         if (is_array($layout)) {
             $upgrade = false;
         } else {
