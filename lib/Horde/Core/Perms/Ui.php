@@ -245,6 +245,9 @@ class Horde_Core_Perms_Ui
             return false;
         }
 
+        if (!is_array($info)) {
+            $info = [];
+        }
         $info = $this->_form->getInfo($this->_vars, $info);
         return $info;
     }
@@ -446,6 +449,9 @@ class Horde_Core_Perms_Ui
         if (!$this->_form->validate($this->_vars)) {
             return false;
         }
+        if (!is_array($info)) {
+            $info = [];
+        }
         $info = $this->_form->getInfo($this->_vars, $info);
         if ($this->_type == 'matrix') {
             /* Collapse the array for default/guest/creator. */
@@ -514,6 +520,9 @@ class Horde_Core_Perms_Ui
 
         if ($form_submit == Horde_Core_Translation::t('Delete')) {
             if ($this->_form->validate($this->_vars)) {
+                if (!is_array($info)) {
+                    $info = [];
+                }
                 return $this->_form->getInfo($this->_vars, $info);
             }
         } elseif (!empty($form_submit)) {
