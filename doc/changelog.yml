@@ -732,6 +732,27 @@
     [rla] Adapt schema migrations to work in new H6 installation layout.
     [rla] Added injectable wrapper around Config to reduce globals access.
     [rla] With Marco Abbrancati: Upgraded test cases for phpunit 9.x utility.
+3.0.0-RC6:
+  api: 3.0.0-RC6
+  state:
+    release: RC
+    api: RC
+  date: 2026-05-28
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    fix(security): restrict unserialize allowed_classes (ZDI-20-1051)
+    feat: Amend jcdelepine's previous patch for the very odd chance somebody does HTTPS on 80 or HTTP on 443
+    feat(hashtable): delegate Redis client creation to HashTable package
+    fix: Strip default port from Url
+    Merge pull request #126 from horde/fix/notes_deletion
+    Modify notes_delete to include notepad parameter
+    Refactor notes deletion to handle exceptions individually
+    Merge pull request #124 from horde/fix/misc
+    Refactor SimpleFormatter initialization in LogHandlerFactory
+    Handle missing config values in prefs loading
+    Check for flags before modifying results array
 3.0.0-RC5:
   api: 3.0.0-RC5
   state:
