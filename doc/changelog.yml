@@ -732,6 +732,19 @@
     [rla] Adapt schema migrations to work in new H6 installation layout.
     [rla] Added injectable wrapper around Config to reduce globals access.
     [rla] With Marco Abbrancati: Upgraded test cases for phpunit 9.x utility.
+3.0.0-RC7:
+  api: 3.0.0-RC7
+  state:
+    release: RC
+    api: RC
+  date: 2026-05-29
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    style: Empty method oneline format
+    Merge pull request #130 from horde/fix/perms_array
+    Ensure info is an array before processing
 3.0.0-RC6:
   api: 3.0.0-RC6
   state:
