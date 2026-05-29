@@ -71,7 +71,5 @@ class PageOutputAssetManager implements AssetManager
         return '';
     }
 
-    public function clear(): void
-    {
-    }
+    public function clear(): void {}
 }
