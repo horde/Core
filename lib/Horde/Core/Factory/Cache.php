@@ -1,5 +1,6 @@
 <?php
 
+use Horde\HashTable\HashTable;
 use Horde\Injector\Injector;
 
 /**
@@ -62,7 +63,11 @@ class Horde_Core_Factory_Cache extends Horde_Core_Factory_Injector
             case 'hashtable':
                 // DEPRECATED
             case 'memcache':
-                $sparams['hashtable'] = $injector->getInstance('Horde_Core_HashTable_Wrapper');
+                /* Prefer the modern Horde\HashTable\HashTable when available;
+                 * fall back to the legacy Horde_Core_HashTable_Wrapper. The
+                 * Horde_Cache_Storage_Hashtable accepts both and routes to
+                 * Horde\Cache\HashtableStorage when given the modern one. */
+                $sparams['hashtable'] = $this->_resolveHashTable($injector);
                 $driver = 'Horde_Cache_Storage_Hashtable';
                 unset($sparams['driverconfig'], $sparams['umask']);
                 break;
@@ -96,7 +101,7 @@ class Horde_Core_Factory_Cache extends Horde_Core_Factory_Injector
                             $this->_getStorage(
                                 $conf['cache']['use_memorycache'],
                                 [
-                                    'hashtable' => $injector->getInstance('Horde_Core_HashTable_Wrapper'),
+                                    'hashtable' => $this->_resolveHashTable($injector),
                                 ]
                             ),
                             $storage,
@@ -156,6 +161,31 @@ class Horde_Core_Factory_Cache extends Horde_Core_Factory_Injector
         }
 
         return new $class($params);
+    }
+
+    /**
+     * Resolve a HashTable instance for the cache storage.
+     *
+     * Prefers the modern Horde\HashTable\HashTable interface (which supports
+     * phpredis as well as Predis); falls back to the legacy
+     * Horde_Core_HashTable_Wrapper when the modern binding is unavailable.
+     *
+     * @param Horde_Injector|Injector $injector
+     *
+     * @return HashTable|Horde_HashTable
+     */
+    protected function _resolveHashTable($injector)
+    {
+        try {
+            $modern = $injector->getInstance(HashTable::class);
+            if ($modern instanceof HashTable) {
+                return $modern;
+            }
+        } catch (Throwable) {
+            // Fall through to legacy.
+        }
+
+        return $injector->getInstance('Horde_Core_HashTable_Wrapper');
     }
 
 }
