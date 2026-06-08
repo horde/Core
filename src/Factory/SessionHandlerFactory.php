@@ -19,11 +19,14 @@ use Horde\Core\Config\ConfigLoader;
 use Horde\Core\Config\State;
 use Horde\Core\Service\HordeDbService;
 use Horde\Core\Session\HordeSessionFactory;
+use Horde\HashTable\LockableHashTable;
 use Horde\SessionHandler\NativePhpSessionSerializer;
 use Horde\SessionHandler\SessionHandler;
 use Horde\SessionHandler\Storage\BuiltinBackend;
 use Horde\SessionHandler\Storage\FileBackend;
 use Horde\SessionHandler\Storage\HashtableBackend;
+use Horde\SessionHandler\Storage\ModernHashtableBackend;
+use Horde\SessionHandler\Storage\SessionStorageBackend;
 use Horde\SessionHandler\Storage\SqlBackend;
 use Horde\SessionHandler\Storage\StackBackend;
 use Horde_HashTable_Base;
@@ -117,10 +120,33 @@ class SessionHandlerFactory
     }
 
     /**
+     * Build the HashTable-backed session storage.
+     *
+     * Prefers the modern PSR-4 backend when a Horde\HashTable\LockableHashTable
+     * is bound. Falls back to the legacy backend (Horde_HashTable_Base &
+     * Horde_HashTable_Lock) for deployments still using the legacy DI binding.
+     *
      * @param array<string, mixed> $params
      */
-    private function createHashtableBackend(Injector $injector, array $params): HashtableBackend
+    private function createHashtableBackend(Injector $injector, array $params): SessionStorageBackend
     {
+        $track = (bool) ($params['track'] ?? false);
+        $trackKey = $params['track_id'] ?? 'horde_sessions_track_ht';
+
+        // Prefer modern LockableHashTable if available.
+        try {
+            $modern = $injector->getInstance(LockableHashTable::class);
+            if ($modern instanceof LockableHashTable) {
+                return new ModernHashtableBackend(
+                    hashTable: $modern,
+                    track: $track,
+                    trackKey: $trackKey,
+                );
+            }
+        } catch (Throwable) {
+            // Modern interface not bound; fall through to legacy lookup.
+        }
+
         $ht = $injector->getInstance('Horde_HashTable');
 
         if (!$ht instanceof Horde_HashTable_Base || !$ht instanceof Horde_HashTable_Lock) {
@@ -131,8 +157,8 @@ class SessionHandlerFactory
 
         return new HashtableBackend(
             hashTable: $ht,
-            track: (bool) ($params['track'] ?? false),
-            trackKey: $params['track_id'] ?? 'horde_sessions_track_ht',
+            track: $track,
+            trackKey: $trackKey,
         );
     }
 
