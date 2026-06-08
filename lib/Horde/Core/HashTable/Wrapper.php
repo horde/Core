@@ -22,6 +22,12 @@
  * @internal
  * @license   http://www.horde.org/licenses/lgpl21 LGPL-2.1
  * @package   Core
+ *
+ * @deprecated Used to bridge serializable wrappers to the legacy
+ *             'Horde_HashTable' DI binding. New code should depend on the
+ *             PSR-4 {@see Horde\HashTable\HashTable} interface and inject
+ *             the instance directly. Once the legacy binding is removed this
+ *             wrapper can be deleted.
  */
 class Horde_Core_HashTable_Wrapper
 {

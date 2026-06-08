@@ -22,6 +22,10 @@ use Horde\Injector\Injector;
  * @copyright 2013-2017 Horde LLC
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
+ *
+ * @deprecated Use {@see Horde\Core\Factory\HashTableFactory}, which produces
+ *             instances of the PSR-4 Horde\HashTable\HashTable interface and
+ *             supports phpredis as well as Predis.
  */
 class Horde_Core_Factory_HashTable extends Horde_Core_Factory_Injector
 {
