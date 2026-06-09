@@ -16,24 +16,27 @@ declare(strict_types=1);
 namespace Horde\Core\Test\Unit\Middleware;
 
 use Horde\Core\Middleware\ConditionalCsrfMiddleware;
+use Horde\Core\Session\HordeSession;
 use Horde\Http\ResponseFactory;
 use Horde\Http\ServerRequest;
-use Horde_Exception;
-use Horde_Session;
+use Horde\Token\Token;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 #[CoversClass(ConditionalCsrfMiddleware::class)]
 class ConditionalCsrfMiddlewareTest extends TestCase
 {
     private ResponseFactory $responseFactory;
+    private Token $tokenService;
 
     protected function setUp(): void
     {
         $this->responseFactory = new ResponseFactory();
+        // Token is final; use a real instance with NullStorage so the test
+        // exercises the actual generate/isValid round-trip.
+        $this->tokenService = Token::null('test-secret-key');
     }
 
     /**
@@ -41,8 +44,6 @@ class ConditionalCsrfMiddlewareTest extends TestCase
      *
      * @param array<string, string> $body    POST parameters
      * @param array<string, string> $headers HTTP headers
-     *
-     * @return ServerRequest
      */
     private function createPostRequest(array $body = [], array $headers = []): ServerRequest
     {
@@ -63,8 +64,6 @@ class ConditionalCsrfMiddlewareTest extends TestCase
 
     /**
      * Create a mock handler that returns a 200 response.
-     *
-     * @return RequestHandlerInterface
      */
     private function createPassthroughHandler(): RequestHandlerInterface
     {
@@ -77,25 +76,11 @@ class ConditionalCsrfMiddlewareTest extends TestCase
     }
 
     /**
-     * Create a Horde_Session mock.
-     *
-     * @param string|null $validToken  Token that checkToken() accepts;
-     *                                 null means all tokens are rejected
-     *
-     * @return Horde_Session
+     * Generate a fresh CSRF token bound to the session seed.
      */
-    private function createSessionMock(?string $validToken = null): Horde_Session
+    private function freshToken(): string
     {
-        $session = $this->createMock(Horde_Session::class);
-        $session->method('checkToken')->willReturnCallback(
-            function (string $token) use ($validToken): void {
-                if ($validToken === null || $token !== $validToken) {
-                    throw new Horde_Exception('Invalid token!');
-                }
-            }
-        );
-
-        return $session;
+        return $this->tokenService->generate(HordeSession::CSRF_SEED)->token;
     }
 
     // -----------------------------------------------------------------
@@ -105,8 +90,7 @@ class ConditionalCsrfMiddlewareTest extends TestCase
     #[Test]
     public function jwtAuthenticatedRequestSkipsCsrfValidation(): void
     {
-        $session = $this->createSessionMock();
-        $middleware = new ConditionalCsrfMiddleware($session);
+        $middleware = new ConditionalCsrfMiddleware($this->tokenService);
 
         $request = $this->createPostRequest();
         $request = $request->withAttribute('auth_type', 'jwt');
@@ -118,17 +102,17 @@ class ConditionalCsrfMiddlewareTest extends TestCase
     }
 
     #[Test]
-    public function jwtAuthenticatedRequestDoesNotCheckToken(): void
+    public function jwtAuthenticatedRequestEvenWithoutTokenIsAccepted(): void
     {
-        $session = $this->createMock(Horde_Session::class);
-        $session->expects(self::never())->method('checkToken');
-
-        $middleware = new ConditionalCsrfMiddleware($session);
+        $middleware = new ConditionalCsrfMiddleware($this->tokenService);
 
         $request = $this->createPostRequest();
         $request = $request->withAttribute('auth_type', 'jwt');
 
-        $middleware->process($request, $this->createPassthroughHandler());
+        $handler = $this->createPassthroughHandler();
+        $response = $middleware->process($request, $handler);
+
+        self::assertSame(200, $response->getStatusCode());
     }
 
     // -----------------------------------------------------------------
@@ -138,11 +122,9 @@ class ConditionalCsrfMiddlewareTest extends TestCase
     #[Test]
     public function validTokenInPostBodyPassesThrough(): void
     {
-        $token = 'valid-session-token-abc123';
-        $session = $this->createSessionMock($token);
-        $middleware = new ConditionalCsrfMiddleware($session);
+        $middleware = new ConditionalCsrfMiddleware($this->tokenService);
 
-        $request = $this->createPostRequest(['token' => $token]);
+        $request = $this->createPostRequest(['token' => $this->freshToken()]);
 
         $handler = $this->createPassthroughHandler();
         $response = $middleware->process($request, $handler);
@@ -153,11 +135,12 @@ class ConditionalCsrfMiddlewareTest extends TestCase
     #[Test]
     public function validTokenInHeaderPassesThrough(): void
     {
-        $token = 'valid-session-token-abc123';
-        $session = $this->createSessionMock($token);
-        $middleware = new ConditionalCsrfMiddleware($session);
+        $middleware = new ConditionalCsrfMiddleware($this->tokenService);
 
-        $request = $this->createPostRequest([], ['Horde-Session-Token' => $token]);
+        $request = $this->createPostRequest(
+            [],
+            ['Horde-Session-Token' => $this->freshToken()],
+        );
 
         $handler = $this->createPassthroughHandler();
         $response = $middleware->process($request, $handler);
@@ -168,14 +151,13 @@ class ConditionalCsrfMiddlewareTest extends TestCase
     #[Test]
     public function postBodyTokenTakesPrecedenceOverHeader(): void
     {
-        $correctToken = 'correct-token';
-        $wrongToken = 'wrong-token';
-        $session = $this->createSessionMock($correctToken);
-        $middleware = new ConditionalCsrfMiddleware($session);
+        $middleware = new ConditionalCsrfMiddleware($this->tokenService);
 
+        // Body holds a valid token, header holds garbage. The middleware
+        // should validate only the body's token and pass through.
         $request = $this->createPostRequest(
-            ['token' => $correctToken],
-            ['Horde-Session-Token' => $wrongToken],
+            ['token' => $this->freshToken()],
+            ['Horde-Session-Token' => 'wrong-token'],
         );
 
         $handler = $this->createPassthroughHandler();
@@ -191,8 +173,7 @@ class ConditionalCsrfMiddlewareTest extends TestCase
     #[Test]
     public function invalidTokenReturns403(): void
     {
-        $session = $this->createSessionMock('the-real-token');
-        $middleware = new ConditionalCsrfMiddleware($session);
+        $middleware = new ConditionalCsrfMiddleware($this->tokenService);
 
         $request = $this->createPostRequest(['token' => 'wrong-token']);
 
@@ -207,8 +188,7 @@ class ConditionalCsrfMiddlewareTest extends TestCase
     #[Test]
     public function invalidTokenResponseContainsAjaxTimeoutMessage(): void
     {
-        $session = $this->createSessionMock('the-real-token');
-        $middleware = new ConditionalCsrfMiddleware($session);
+        $middleware = new ConditionalCsrfMiddleware($this->tokenService);
 
         $request = $this->createPostRequest(['token' => 'wrong-token']);
         $handler = $this->createPassthroughHandler();
@@ -227,8 +207,7 @@ class ConditionalCsrfMiddlewareTest extends TestCase
     #[Test]
     public function missingTokenReturns403(): void
     {
-        $session = $this->createSessionMock('any-token');
-        $middleware = new ConditionalCsrfMiddleware($session);
+        $middleware = new ConditionalCsrfMiddleware($this->tokenService);
 
         $request = $this->createPostRequest();
 
@@ -243,8 +222,7 @@ class ConditionalCsrfMiddlewareTest extends TestCase
     #[Test]
     public function missingTokenResponseContainsAjaxTimeoutMessage(): void
     {
-        $session = $this->createSessionMock('any-token');
-        $middleware = new ConditionalCsrfMiddleware($session);
+        $middleware = new ConditionalCsrfMiddleware($this->tokenService);
 
         $request = $this->createPostRequest();
         $handler = $this->createPassthroughHandler();
@@ -263,10 +241,9 @@ class ConditionalCsrfMiddlewareTest extends TestCase
     #[Test]
     public function noAuthTypeAttributeEnforcesCsrf(): void
     {
-        $session = $this->createSessionMock('valid-token');
-        $middleware = new ConditionalCsrfMiddleware($session);
+        $middleware = new ConditionalCsrfMiddleware($this->tokenService);
 
-        $request = $this->createPostRequest(['token' => 'valid-token']);
+        $request = $this->createPostRequest(['token' => $this->freshToken()]);
 
         $handler = $this->createPassthroughHandler();
         $response = $middleware->process($request, $handler);
@@ -277,8 +254,7 @@ class ConditionalCsrfMiddlewareTest extends TestCase
     #[Test]
     public function noAuthTypeAttributeWithoutTokenRejects(): void
     {
-        $session = $this->createSessionMock('valid-token');
-        $middleware = new ConditionalCsrfMiddleware($session);
+        $middleware = new ConditionalCsrfMiddleware($this->tokenService);
 
         $request = $this->createPostRequest();
 
@@ -290,3 +266,4 @@ class ConditionalCsrfMiddlewareTest extends TestCase
         self::assertSame(403, $response->getStatusCode());
     }
 }
+

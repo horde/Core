@@ -31,8 +31,9 @@ declare(strict_types=1);
 namespace Horde\Core\Middleware;
 
 use Horde\Core\Controller\Traits\JsonResponseTrait;
-use Horde_Exception;
-use Horde_Session;
+use Horde\Core\Session\HordeSession;
+use Horde\Token\Exception\TokenException;
+use Horde\Token\Token;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -51,10 +52,13 @@ class ConditionalCsrfMiddleware implements MiddlewareInterface
     use JsonResponseTrait;
 
     /**
-     * @param Horde_Session $session  Session for token validation
+     * @param Token $tokenService  CSRF token validator. Tokens must be
+     *                             signed with {@see HordeSession::CSRF_SEED}
+     *                             so the middleware accepts the same tokens
+     *                             the legacy Horde_Session shim emits.
      */
     public function __construct(
-        private readonly Horde_Session $session,
+        private readonly Token $tokenService,
     ) {}
 
     /**
@@ -83,8 +87,12 @@ class ConditionalCsrfMiddleware implements MiddlewareInterface
         }
 
         try {
-            $this->session->checkToken($token);
-        } catch (Horde_Exception) {
+            $valid = $this->tokenService->isValid($token, HordeSession::CSRF_SEED);
+        } catch (TokenException) {
+            $valid = false;
+        }
+
+        if (!$valid) {
             return $this->csrfFailureResponse();
         }
 
