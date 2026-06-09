@@ -1,29 +1,47 @@
 <?php
 
 /**
- * A class that stores notifications in the session, using Horde_Session.
- *
- * @author   Michael Slusarz <slusarz@horde.org>
- * @category Horde
- * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
- * @package  Core
- */
-
-/**
- * A class that stores notifications in the session, using Horde_Session.
- *
  * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
  *
- * @author   Michael Slusarz <slusarz@horde.org>
- * @category Horde
- * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
- * @package  Core
+ * @category  Horde
+ * @copyright 2010-2026 Horde LLC
+ * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
+ * @package   Core
+ */
+
+use Horde\Core\Session\HordeSession;
+
+/**
+ * A class that stores notifications in the session.
+ *
+ * Reads and writes go through the modern PSR-4 {@see HordeSession}. The wire
+ * format diverges from values written through legacy `Horde_Session::set()`
+ * with TYPE_ARRAY/TYPE_OBJECT masks, but notifications are display-only
+ * transient state: stale entries from the prior shim format are simply
+ * treated as missing on the first read after deploy.
+ *
+ * The "session active" guard is preserved as a like-for-like translation of
+ * the legacy `Horde_Session::isActive()` flag, mapped onto PHP's native
+ * `session_status()`. Notifications pushed before PHP has an active session
+ * are queued in `$_cached` and replayed once the session opens.
+ *
+ * @author    Michael Slusarz <slusarz@horde.org>
+ * @author    Ralf Lang <ralf.lang@ralf-lang.de>
+ * @category  Horde
+ * @copyright 2010-2026 Horde LLC
+ * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
+ * @package   Core
  */
 class Horde_Core_Notification_Storage_Session implements Horde_Notification_Storage_Interface
 {
+    /**
+     * The modern session.
+     */
+    protected HordeSession $_session;
+
     /**
      * Cached notifications if session is not active.
      *
@@ -32,21 +50,32 @@ class Horde_Core_Notification_Storage_Session implements Horde_Notification_Stor
     protected $_cached = [];
 
     /**
+     * @param HordeSession|null $session  Modern session to read/write through.
+     *                                    If omitted, resolved from the global
+     *                                    injector for BC.
+     */
+    public function __construct(?HordeSession $session = null)
+    {
+        $this->_session = $session
+            ?? $GLOBALS['injector']->getInstance(HordeSession::class);
+    }
+
+    /**
      */
     public function get($key)
     {
         $this->_processCached();
-        return $GLOBALS['session']->get('horde', 'notify/' . $key);
+        return $this->_session->getScoped('horde', 'notify/' . $key);
     }
 
     /**
      */
     public function set($key, $value)
     {
-        if ($GLOBALS['session']->isActive()) {
+        if ($this->_isSessionActive()) {
             $this->_processCached();
             if (!empty($value) || $this->exists($key)) {
-                $GLOBALS['session']->set('horde', 'notify/' . $key, $value);
+                $this->_session->setScoped('horde', 'notify/' . $key, $value);
             }
         } else {
             $this->_cached[] = [$key, $value];
@@ -58,7 +87,7 @@ class Horde_Core_Notification_Storage_Session implements Horde_Notification_Stor
     public function exists($key)
     {
         $this->_processCached();
-        return $GLOBALS['session']->exists('horde', 'notify/' . $key);
+        return $this->_session->hasScoped('horde', 'notify/' . $key);
     }
 
     /**
@@ -66,19 +95,20 @@ class Horde_Core_Notification_Storage_Session implements Horde_Notification_Stor
     public function clear($key)
     {
         $this->_cached = [];
-        $GLOBALS['session']->remove('horde', 'notify/' . $key);
+        $this->_session->removeScoped('horde', 'notify/' . $key);
     }
 
     /**
      */
     public function push($listener, Horde_Notification_Event $event)
     {
-        global $session;
-
-        if ($session->isActive()) {
-            $events = $session->get('horde', 'notify/' . $listener, Horde_Session::TYPE_ARRAY);
+        if ($this->_isSessionActive()) {
+            $events = $this->_session->getScoped('horde', 'notify/' . $listener);
+            if (!is_array($events)) {
+                $events = [];
+            }
             $events[] = $event;
-            $session->set('horde', 'notify/' . $listener, $events, Horde_Session::TYPE_OBJECT);
+            $this->_session->setScoped('horde', 'notify/' . $listener, $events);
         } else {
             $this->_cached[] = [$listener, $event];
         }
@@ -88,7 +118,7 @@ class Horde_Core_Notification_Storage_Session implements Horde_Notification_Stor
      */
     protected function _processCached()
     {
-        if (!empty($this->_cached) && $GLOBALS['session']->isActive()) {
+        if (!empty($this->_cached) && $this->_isSessionActive()) {
             $cached = $this->_cached;
             $this->_cached = [];
 
@@ -102,4 +132,12 @@ class Horde_Core_Notification_Storage_Session implements Horde_Notification_Stor
         }
     }
 
+    /**
+     * Whether PHP's session is currently active. Replaces the legacy
+     * `Horde_Session::isActive()` shim flag.
+     */
+    protected function _isSessionActive(): bool
+    {
+        return session_status() === PHP_SESSION_ACTIVE;
+    }
 }
