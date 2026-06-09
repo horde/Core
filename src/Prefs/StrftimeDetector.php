@@ -107,7 +107,7 @@ class StrftimeDetector
                         field: 'value',
                         location: "{$prefName}['value']",
                         strftime: $value,
-                        icu: DateFormat::strftimeToIcu($value),
+                        icu: $this->buildIcu($value),
                         confidence: $this->calculateConfidence($value),
                     );
                 }
@@ -125,7 +125,7 @@ class StrftimeDetector
                             field: 'enum.key',
                             location: "{$prefName}['enum']['{$key}']",
                             strftime: $key,
-                            icu: DateFormat::strftimeToIcu($key),
+                            icu: $this->buildIcu($key),
                             confidence: $this->calculateConfidence($key),
                         );
                     }
@@ -139,7 +139,7 @@ class StrftimeDetector
                             field: 'enum.value',
                             location: "{$prefName}['enum']['{$key}'] (value)",
                             strftime: $value,
-                            icu: DateFormat::strftimeToIcu($value),
+                            icu: $this->buildIcu($value),
                             confidence: $this->calculateConfidence($value),
                         );
                     }
@@ -160,6 +160,38 @@ class StrftimeDetector
     {
         // Use Format class detection
         return DateFormat::isStrftimeFormat($value);
+    }
+
+    /**
+     * Locales for which we resolve %x / %X / %c when reporting findings.
+     *
+     * Two locales with materially different conventions is enough to
+     * make it visible to the reader that the pattern is locale-bound;
+     * the goal is detection guidance, not exhaustive ICU output.
+     */
+    private const LOCALE_SPECIFIC_LOCALES = ['en_US', 'de_DE'];
+
+    /**
+     * Compute the ICU equivalent for a strftime pattern.
+     *
+     * Returns a single ICU string for ordinary patterns, or a
+     * locale => ICU map when the pattern contains locale-specific
+     * tokens (%x, %X, %c) whose meaning differs per locale.
+     *
+     * @param string $strftime Detected strftime pattern.
+     * @return string|array<string,string>
+     */
+    protected function buildIcu(string $strftime): string|array
+    {
+        if (!preg_match('/%[xXc]/', $strftime)) {
+            return DateFormat::strftimeToIcu($strftime);
+        }
+
+        $byLocale = [];
+        foreach (self::LOCALE_SPECIFIC_LOCALES as $locale) {
+            $byLocale[$locale] = DateFormat::strftimeToIcu($strftime, $locale);
+        }
+        return $byLocale;
     }
 
     /**

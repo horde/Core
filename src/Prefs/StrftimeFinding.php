@@ -43,7 +43,9 @@ class StrftimeFinding implements JsonSerializable
      * @param string $field Field path (e.g., 'value', 'enum.key')
      * @param string $location Human-readable location
      * @param string $strftime Detected strftime pattern
-     * @param string|array $icu ICU pattern or array for locale-specific
+     * @param string|array<string,string> $icu ICU pattern, or a map of
+     *        locale => ICU pattern for locale-specific strftime tokens
+     *        (e.g. %x, %X, %c) which resolve differently per locale.
      * @param string $confidence Confidence level (high, medium, low)
      * @throws InvalidArgumentException if confidence level is invalid
      */
@@ -52,7 +54,7 @@ class StrftimeFinding implements JsonSerializable
         public readonly string $field,
         public readonly string $location,
         public readonly string $strftime,
-        public readonly string $icu,
+        public readonly string|array $icu,
         public readonly string $confidence,
     ) {
         if (!in_array($confidence, [self::CONFIDENCE_HIGH, self::CONFIDENCE_MEDIUM, self::CONFIDENCE_LOW], true)) {
@@ -61,13 +63,40 @@ class StrftimeFinding implements JsonSerializable
     }
 
     /**
+     * Whether the ICU equivalent depends on the active locale.
+     *
+     * Locale-specific strftime tokens like %x, %X and %c resolve to
+     * different ICU patterns per locale. For those, the constructor
+     * was passed an array of locale => pattern instead of a single
+     * string, and this method returns true.
+     *
+     * @return bool True if $icu is a locale => pattern map.
+     */
+    public function isLocaleSpecific(): bool
+    {
+        return is_array($this->icu);
+    }
+
+    /**
      * Get ICU pattern as string
      *
-     * @return string ICU pattern
+     * For locale-specific findings, returns a human-readable summary of
+     * the per-locale patterns rather than a single ICU string.
+     *
+     * @return string ICU pattern, or a description for locale-specific findings.
      */
     public function getIcuString(): string
     {
-        return $this->icu;
+        if (is_string($this->icu)) {
+            return $this->icu;
+        }
+
+        $parts = [];
+        foreach ($this->icu as $locale => $pattern) {
+            $parts[] = $locale . '=' . $pattern;
+        }
+
+        return '[locale-specific: ' . implode(', ', $parts) . ']';
     }
 
     /**
@@ -87,7 +116,10 @@ class StrftimeFinding implements JsonSerializable
     }
 
     /**
-     * Convert to associative array
+     * Convert to associative array.
+     *
+     * The 'icu' key is a string for normal findings or an array for
+     * locale-specific findings, mirroring the constructor argument.
      *
      * @return array Array representation
      */
