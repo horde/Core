@@ -577,7 +577,15 @@ class Horde_Registry implements Horde_Shutdown_Task
         }
         $this->_regmtime = max(array_map('filemtime', $regfiles));
 
-        /* Start a session. */
+        /* Start a session.
+         *
+         * Horde_Session is a shim that delegates to the PSR-4 stack:
+         * Horde\Core\Session\HordeSession for data, Horde\Token\Token for
+         * CSRF tokens, and Horde\SessionHandler\SessionHandler as PHP's
+         * save handler (installed by setup()). The legacy
+         * Horde_Core_Factory_SessionHandler still builds an unbound
+         * Horde_SessionHandler for the two CLI admin tools; it no longer
+         * registers itself with PHP's session machinery. */
         if ($session_flags & self::SESSION_NONE) {
             /* Never start a session if the session flags include
                SESSION_NONE. */
