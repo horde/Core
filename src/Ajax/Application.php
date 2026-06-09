@@ -23,7 +23,10 @@ namespace Horde\Core\Ajax;
 
 use Horde\Core\Api\ApiInterfaceListProvider;
 use Horde\Core\Api\ApiRegistry;
+use Horde\Core\Session\HordeSession;
 use Horde\Rpc\Dispatch\ApiCallContext;
+use Horde\Token\Exception\TokenException;
+use Horde\Token\Token;
 use Horde\Util\Variables;
 use Horde_Core_Ajax_Application_Handler;
 use Horde_Core_Ajax_Response;
@@ -98,7 +101,7 @@ abstract class Application
         $action = null,
         $token = null,
     ) {
-        global $registry, $session;
+        global $injector, $registry, $session;
 
         $this->_app = $app;
         $this->_vars = $vars;
@@ -119,7 +122,15 @@ abstract class Application
             if (!$auth) {
                 throw new Horde_Exception('Accessing AJAX action without being authenticated.');
             }
-            $session->checkToken($token);
+            $tokenService = $injector->getInstance(Token::class);
+            try {
+                $valid = $tokenService->isValid((string) $token, HordeSession::CSRF_SEED);
+            } catch (TokenException) {
+                $valid = false;
+            }
+            if (!$valid) {
+                throw new Horde_Exception('Invalid token!');
+            }
         }
 
         /* Check for session regeneration request. */
