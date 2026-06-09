@@ -16,10 +16,10 @@ declare(strict_types=1);
 namespace Horde\Core\Test\Unit\Middleware;
 
 use Horde\Core\Middleware\DemandSessionToken;
-use PHPUnit\Framework\TestCase;
+use Horde\Core\Session\HordeSession;
+use Horde\Token\Token;
 use PHPUnit\Framework\Attributes\CoversClass;
-use Horde_Session;
-use Horde_Exception;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(DemandSessionToken::class)]
 class DemandSessionTokenTest extends TestCase
@@ -28,59 +28,66 @@ class DemandSessionTokenTest extends TestCase
         setUp as protected traitSetUp;
     }
 
+    protected Token $tokenService;
+
     protected function setUp(): void
     {
-        // Call trait setUp first
         $this->traitSetUp();
-        // Then replace stub with mock for expectations
-        $this->session = $this->createMock(Horde_Session::class);
+        // Token is a final class — use a real instance with NullStorage so the
+        // test exercises the actual generate/isValid round-trip without
+        // requiring a database or filesystem backend.
+        $this->tokenService = Token::null('test-secret-key');
     }
 
-    protected function getMiddleware()
+    protected function getMiddleware(): DemandSessionToken
     {
         return new DemandSessionToken(
             $this->responseFactory,
             $this->streamFactory,
-            $this->session
+            $this->tokenService
         );
     }
 
-    public function testSessionTokenMissing()
+    public function testSessionTokenMissing(): void
     {
         $middleware = $this->getMiddleware();
 
-        // Mock expects checkToken() to be called once and throw exception
-        $this->session->expects($this->once())
-            ->method('checkToken')
-            ->willThrowException(new Horde_Exception('Invalid token'));
-
         $request = $this->requestFactory->createServerRequest('GET', '/test');
+        // No Horde-Session-Token header set — must be rejected.
         $response = $middleware->process($request, $this->handler);
 
-        // Should return 403 Forbidden
         $this->assertEquals(403, $response->getStatusCode());
-
-        // Check reason phrase contains meaningful message
         $this->assertStringContainsString('Horde-Session-Token', $response->getReasonPhrase());
     }
 
-    public function testSessionTokenCorrect()
+    public function testSessionTokenIncorrect(): void
     {
         $middleware = $this->getMiddleware();
 
-        // Mock expects checkToken() to be called once and succeed (no exception)
-        $this->session->expects($this->once())
-            ->method('checkToken')
-            ->willReturn(true);
-
-        $request = $this->requestFactory->createServerRequest('GET', '/test');
+        $request = $this->requestFactory
+            ->createServerRequest('GET', '/test')
+            ->withHeader('Horde-Session-Token', 'not-a-valid-token');
         $response = $middleware->process($request, $this->handler);
 
-        // Should pass through to handler
+        $this->assertEquals(403, $response->getStatusCode());
+    }
+
+    public function testSessionTokenCorrect(): void
+    {
+        $middleware = $this->getMiddleware();
+
+        $generated = $this->tokenService->generate(HordeSession::CSRF_SEED);
+
+        $request = $this->requestFactory
+            ->createServerRequest('GET', '/test')
+            ->withHeader('Horde-Session-Token', $generated->token);
+        $response = $middleware->process($request, $this->handler);
+
+        // Should pass through to handler.
         $this->assertEquals($this->defaultPayloadResponse, $response);
         $this->assertEquals(200, $response->getStatusCode());
-
-        // Verify request reached the handler
         $this->assertNotNull($this->recentlyHandledRequest);
     }
 }
+
+
