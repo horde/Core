@@ -31,8 +31,12 @@ class Horde_Session_Null extends Horde_Session implements Horde_Shutdown_Task
      */
     public function __construct()
     {
+        parent::__construct();
         // Store session data internally.
         $this->_data = [];
+        // Override the parent's stub session handler with the legacy
+        // Horde_Support_Stub for shutdown-task compatibility.
+        $this->sessionHandler = new Horde_Support_Stub();
     }
 
     /**
