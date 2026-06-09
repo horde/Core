@@ -1776,6 +1776,21 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     }
 
     /**
+     * Resolve mailbox:uid for ItemOperations when the client sends a virtual
+     * folder id from unified Find search (e.g. iOS M&lt;uid&gt;).
+     *
+     * @author Torben Dannhauer <torben@dannhauer.de>
+     *
+     * @param integer $uid  IMAP message UID.
+     *
+     * @return string|null
+     */
+    public function resolveLongIdForUid(int $uid): ?string
+    {
+        return $this->_imap->resolveLongIdForUid($uid);
+    }
+
+    /**
      * Return the specified attachement data for an ITEMOPERATIONS request.
      *
      * @param string $filereference  The attachment identifier.
@@ -2318,7 +2333,6 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      *
      * @return Horde_ActiveSync_Search_Results  The search results.
      *
-     * @todo $params->deepTraversal is NOT YET SUPPORTED.
      */
     public function getSearchResults(Horde_ActiveSync_Search_Params $params): Horde_ActiveSync_Search_Results
     {
@@ -2380,6 +2394,55 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             total: $total,
             rows: $rows,
             status: 0 /* not yet used */
+        );
+    }
+
+    /**
+     * Returns Find command results.
+     *
+     * @author Torben Dannhauer <torben@dannhauer.de>
+     *
+     * @param Horde_ActiveSync_Find_Params $params      Find parameters.
+     * @param array                        $bodyprefs     Body preferences.
+     * @param integer                      $mimesupport MIME support flag.
+     *
+     * @return Horde_ActiveSync_Find_Results
+     */
+    public function getFindResults(
+        Horde_ActiveSync_Find_Params $params,
+        array $bodyprefs = [],
+        $mimesupport = 0
+    ): Horde_ActiveSync_Find_Results {
+        unset($bodyprefs, $mimesupport);
+
+        try {
+            $searchParams = Horde_ActiveSync_Find_QueryMapper::toSearchParams($params);
+            $results = $this->getSearchResults($searchParams);
+
+            if ($results->rows === null) {
+                return new Horde_ActiveSync_Find_Results(
+                    Horde_ActiveSync_Request_Find::STATUS_SUCCESS,
+                    Horde_ActiveSync_Request_Find::STORE_STATUS_SERVERERR,
+                    0,
+                    null
+                );
+            }
+
+            return new Horde_ActiveSync_Find_Results(
+                Horde_ActiveSync_Request_Find::STATUS_SUCCESS,
+                Horde_ActiveSync_Request_Find::STORE_STATUS_SUCCESS,
+                $results->total,
+                $results->rows
+            );
+        } catch (Horde_ActiveSync_Exception $e) {
+            $this->_logger->err($e->getMessage());
+        }
+
+        return new Horde_ActiveSync_Find_Results(
+            Horde_ActiveSync_Request_Find::STATUS_SUCCESS,
+            Horde_ActiveSync_Request_Find::STORE_STATUS_SERVERERR,
+            0,
+            null
         );
     }
 
@@ -3852,7 +3915,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      *
      * @param array $query          A query array. @see self::getSearchResults()
      * @param array $options        The search options (currently ignored).
-     * @param bool  $deepTraversal  If true, traverse sub folders (currently ignored)
+     * @param bool  $deepTraversal  If true, traverse sub-folders of the target mailbox.
      *
      * @return array|null           An array of search results or null on error
      *
