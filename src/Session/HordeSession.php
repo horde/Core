@@ -36,6 +36,16 @@ use Horde\SessionHandler\SessionId;
 #[Factory(factory: HordeSessionFactory::class, method: 'create')]
 class HordeSession extends DefaultSession implements SessionMetaInterface, EncryptedValuesInterface
 {
+    /**
+     * Seed used by the session-wide CSRF token derivation
+     * ({@see Horde\Token\Token::generate()} via the shim's getToken() and any
+     * direct consumer that wants to verify a session-bound CSRF token).
+     * Public so consumers can reference it from one place. Per-form tokens
+     * (e.g. Horde_Form V3) use their own seed and live in a separate token
+     * stream.
+     */
+    public const CSRF_SEED = 'horde-session-csrf';
+
     /** Internal key for session begin timestamp. */
     private const BEGIN_KEY = '_b';
 

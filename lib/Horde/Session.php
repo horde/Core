@@ -84,12 +84,6 @@ class Horde_Session
     public const DATA = '_d';
 
     /**
-     * The seed used for the session-wide CSRF token. Per-form tokens (e.g.
-     * Horde_Form V3) use their own seed and live in a separate token stream.
-     */
-    private const CSRF_SEED = 'horde-session-csrf';
-
-    /**
      * Maximum size of the pruneable data store.
      *
      * @var integer
@@ -705,7 +699,7 @@ class Horde_Session
      */
     public function getToken()
     {
-        return (string) $this->_tokenService()->generate(self::CSRF_SEED);
+        return (string) $this->_tokenService()->generate(HordeSession::CSRF_SEED);
     }
 
     /**
@@ -720,7 +714,7 @@ class Horde_Session
         try {
             $valid = $this->_tokenService()->isValid(
                 (string) $token,
-                self::CSRF_SEED
+                HordeSession::CSRF_SEED
             );
         } catch (TokenException $e) {
             throw new Horde_Exception('Invalid token!');
