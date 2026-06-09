@@ -1,5 +1,6 @@
 <?php
 
+use Horde\Core\Session\HordeSession;
 use Horde\Injector\Injector;
 
 /**
@@ -26,7 +27,9 @@ class Horde_Core_Factory_Notification extends Horde_Core_Factory_Injector
         }
 
         $this->_notify = new Horde_Core_Notification_Handler(
-            new Horde_Core_Notification_Storage_Session()
+            new Horde_Core_Notification_Storage_Session(
+                $injector->getInstance(HordeSession::class)
+            )
         );
 
         $this->_notify->addType('default', '*', 'Horde_Core_Notification_Event_Status');
