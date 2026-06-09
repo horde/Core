@@ -115,12 +115,10 @@ dependencies:
   dev:
     composer:
       horde/activesync: ^3
-      horde/kolab_server: ^3
-      horde/kolab_session: ^3
+      horde/form: ^3
       horde/ldap: ^3
       horde/mongo: ^2
       horde/routes: ^3
-      horde/test: ^3
       horde/tree: ^3
       horde/vfs: ^3
 autoload:
