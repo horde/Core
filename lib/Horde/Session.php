@@ -7,30 +7,60 @@
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
  *
  * @author   Michael Slusarz <slusarz@horde.org>
+ * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @category Horde
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
 
+use Horde\Core\Factory\TokenServiceFactory;
 use Horde\Core\Horde;
+use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\HordeSessionFactory;
+use Horde\SessionHandler\SessionHandler as ModernSessionHandler;
+use Horde\SessionHandler\SessionId;
+use Horde\Token\Exception\TokenException;
+use Horde\Token\Token as ModernToken;
 
 /**
- * The Horde_Session class provides a set of methods for handling the
- * administration and contents of the Horde session variable.
+ * Backwards-compatible session facade.
+ *
+ * Once the canonical session implementation, now a thin shim over the modern
+ * PSR-4 {@see HordeSession} for legacy callers. New code should inject
+ * HordeSession directly.
+ *
+ * Roles of the shim:
+ * - Keep the legacy public API ($session->get/set/exists/remove/getToken/...)
+ *   and the $GLOBALS['session'] global stable while individual call sites
+ *   migrate to the modern stack.
+ * - Translate legacy calls to {@see HordeSession::getScoped()} et al.
+ * - Hold the legacy ENCRYPT/TYPE_ARRAY/TYPE_OBJECT serialization invariants
+ *   ({@see Horde_Pack}-packed values) so existing on-disk session payloads
+ *   continue to decode.
+ * - Cut tokens over to the HMAC-based {@see ModernToken} service in one
+ *   place so the legacy stable-randomid contract is replaced atomically.
+ *
+ * Treatment of $_SESSION:
+ *   $_SESSION is a dumb mirror, not the source of truth. The modern
+ *   HordeSession owns the data. The shim mirrors HordeSession's payload back
+ *   into $_SESSION before any code path that might read $_SESSION (PHP shutdown,
+ *   session_destroy()). Direct $_SESSION[...] = ... writes by callers are not
+ *   supported and will be silently overwritten on the next sync.
  *
  * @author   Michael Slusarz <slusarz@horde.org>
+ * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @category Horde
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  *
- * @property-read integer $begin  The timestamp when this session began (0 if
- *                                session is not active).
- * @property-read boolean $regenerate_due  True if session ID is due for
- *                                         regeneration (since 2.5.0).
+ * @property-read integer $begin             The timestamp when this session
+ *                                           began (0 if session is not active).
+ * @property-read boolean $regenerate_due    True if session ID is due for
+ *                                           regeneration (since 2.5.0).
  * @property-read integer $regenerate_interval  The regeneration interval
- *                                              (since 2.5.0).
- * @property-write array $session_data  Manually set session data (since
- *                                      2.5.0).
+ *                                           (since 2.5.0).
+ * @property-write array $session_data       Manually set session data (since
+ *                                           2.5.0).
  */
 class Horde_Session
 {
@@ -50,6 +80,15 @@ class Horde_Session
     public const NONCE_ID = 'session_nonce'; /* @since 2.11.0 */
     public const TOKEN_ID = 'session_token';
 
+    /** @deprecated Use Horde_Core_Cache_SessionObjects instead. */
+    public const DATA = '_d';
+
+    /**
+     * The seed used for the session-wide CSRF token. Per-form tokens (e.g.
+     * Horde_Form V3) use their own seed and live in a separate token stream.
+     */
+    private const CSRF_SEED = 'horde-session-csrf';
+
     /**
      * Maximum size of the pruneable data store.
      *
@@ -58,28 +97,56 @@ class Horde_Session
     public $maxStore = 20;
 
     /**
-     * The session handler object.
+     * BC stub for the legacy session handler. Some out-of-tree code sets
+     * `$session->sessionHandler->changed = true` to flag a write; this object
+     * accepts that without effect (the modern SessionHandler always persists
+     * dirty sessions on shutdown).
      *
-     * @var Horde_SessionHandler
+     * @var object
      */
-    public $sessionHandler = null;
+    public object $sessionHandler;
+
+    /**
+     * The modern session object holding the actual data.
+     */
+    private HordeSession $modern;
+
+    /**
+     * The token service used for getToken()/checkToken(). Resolved lazily to
+     * avoid a circular dependency at construction time: the legacy
+     * TokenServiceFactory::create() path reads $GLOBALS['session'], which is
+     * this very object, not yet assigned to the global at constructor entry.
+     */
+    private ?ModernToken $tokenService = null;
+
+    /**
+     * Optional explicit token service injected at construction time. When set,
+     * {@see _tokenService()} returns this instead of building one from the
+     * modern session.
+     */
+    private ?ModernToken $explicitTokenService = null;
+
+    /**
+     * The pack service used to preserve legacy ENCRYPT/TYPE_ARRAY/TYPE_OBJECT
+     * wire format inside session values.
+     */
+    private Horde_Pack $pack;
 
     /**
      * Indicates that the session is active (read/write).
-     *
-     * @var boolean
      */
-    protected $_active = false;
+    protected bool $_active = false;
 
     /**
      * Indicate that a new session ID has been generated for this page load.
-     *
-     * @var boolean
      */
-    protected $_cleansession = false;
+    protected bool $_cleansession = false;
 
     /**
-     * Pointer to the session data.
+     * Pointer to the session data. Kept for BC: some legacy code reads
+     * `$session->session_data` (settable via __set) or peeks at this property
+     * directly. Now points at $_SESSION, which the shim keeps mirrored from
+     * the modern session.
      *
      * @var array
      */
@@ -87,26 +154,76 @@ class Horde_Session
 
     /**
      * Indicates that session data is read-only.
-     *
-     * @var boolean
      */
-    protected $_readonly = false;
+    protected bool $_readonly = false;
 
     /**
      * On re-login, indicate whether we were previously authenticated.
-     *
-     * @var integer
      */
-    protected $_relogin = null;
+    protected ?bool $_relogin = null;
 
     /**
      * Constructor.
+     *
+     * All dependencies are optional: when omitted they are resolved from the
+     * global injector. This keeps `new Horde_Session()` callers (legacy tests,
+     * Horde_Test_Factory_Session, the SESSION_NONE Registry branch) working
+     * unchanged while modern callers and DI can pass explicit instances.
      */
-    public function __construct()
-    {
-        /* Make sure global session variable is always initialized. */
-        $_SESSION = [];
+    public function __construct(
+        ?HordeSession $modern = null,
+        ?ModernToken $tokenService = null,
+        ?Horde_Pack $pack = null
+    ) {
+        $this->modern = $modern ?? $this->_resolveModern();
+        $this->explicitTokenService = $tokenService;
+        $this->pack = $pack ?? $this->_resolvePack();
+
+        /* Make sure the global session variable is initialised and points to
+         * the array the shim mirrors into. */
+        if (!isset($_SESSION)) {
+            $_SESSION = [];
+        }
         $this->_data = &$_SESSION;
+
+        /* The legacy handler property is exposed publicly; provide a stub so
+         * out-of-tree code that sets `->changed = true` keeps working. */
+        $this->sessionHandler = new class {
+            public bool $changed = false;
+        };
+    }
+
+    /**
+     * Resolve the modern session at construction time. Prefers the global
+     * injector (so encryptor/decryptor closures wired by HordeSessionFactory
+     * are present); falls back to a minimal direct construction for legacy
+     * test contexts that build a Horde_Session without setting up an
+     * injector.
+     */
+    private function _resolveModern(): HordeSession
+    {
+        if (isset($GLOBALS['injector'])) {
+            return $GLOBALS['injector']->getInstance(HordeSession::class);
+        }
+
+        $sid = (string) (session_id() ?: 'none');
+        return new HordeSession(
+            new SessionId($sid !== '' ? $sid : 'none'),
+            $_SESSION ?? []
+        );
+    }
+
+    /**
+     * Resolve the pack service at construction time, with the same legacy-
+     * test fallback as {@see _resolveModern()}.
+     */
+    private function _resolvePack(): Horde_Pack
+    {
+        if (isset($GLOBALS['injector'])) {
+            return $GLOBALS['injector']->getInstance('Horde_Pack');
+        }
+
+        return new Horde_Pack();
     }
 
     /**
@@ -115,18 +232,26 @@ class Horde_Session
     {
         switch ($name) {
             case 'begin':
-                return ($this->_active || $this->_relogin)
-                    ? $this->_data[self::BEGIN]
-                    : 0;
+                if (!$this->_active && !$this->_relogin) {
+                    return 0;
+                }
+                $value = $this->modern->getScoped(self::BEGIN, '');
+                if ($value === null) {
+                    $value = $this->_data[self::BEGIN] ?? 0;
+                }
+
+                return is_int($value) ? $value : 0;
 
             case 'regenerate_due':
-                return (isset($this->_data[self::REGENERATE])
-                        && (time() >= $this->_data[self::REGENERATE]));
+                $regen = $this->_data[self::REGENERATE] ?? null;
+                return is_int($regen) && time() >= $regen;
 
             case 'regenerate_interval':
                 // DEFAULT: 6 hours
                 return 21600;
         }
+
+        return null;
     }
 
     /**
@@ -135,7 +260,12 @@ class Horde_Session
     {
         switch ($name) {
             case 'session_data':
+                /* Used by the legacy SessionHandler factory's session-decode
+                 * path (`readSessionData`) to swap in foreign session data
+                 * temporarily. Replace both views. */
                 $this->_data = &$value;
+                $_SESSION = $value;
+                $this->_rebuildModern();
                 break;
         }
     }
@@ -143,10 +273,16 @@ class Horde_Session
     /**
      * Sets a custom session handler up, if there is one.
      *
+     * Tunes PHP session ini settings, registers the modern PSR-4
+     * {@see ModernSessionHandler} as PHP's save handler, and optionally starts
+     * the session. Legacy callers in horde/base (login.php, LoginService) call
+     * this after destroying a session on logout to start a fresh anonymous
+     * session.
+     *
      * @param boolean $start         Initiate the session?
-     * @param string $cache_limiter  Override for the session cache limiter
+     * @param string  $cache_limiter Override for the session cache limiter
      *                               value.
-     * @param string $session_id     The session ID to use.
+     * @param string  $session_id    The session ID to use.
      *
      * @throws Horde_Exception
      */
@@ -158,14 +294,24 @@ class Horde_Session
         global $conf, $injector;
 
         ini_set('url_rewriter.tags', 0);
-        if (empty($conf['session']['use_only_cookies'])) {
-            ini_set('session.use_only_cookies', 0);
-        } else {
-            ini_set('session.use_only_cookies', 1);
-            if (!empty($conf['cookie']['domain'])
-                && (strpos($conf['server']['name'], '.') === false)) {
-                throw new Horde_Exception('Session cookies will not work without a FQDN and with a non-empty cookie domain. Either use a fully qualified domain name like "http://www.example.com" instead of "http://example" only, or set the cookie domain in the Horde configuration to an empty value, or enable non-cookie (url-based) sessions in the Horde configuration.');
-            }
+
+        if (!empty($conf['cookie']['domain'])
+            && (strpos($conf['server']['name'], '.') === false)) {
+            throw new Horde_Exception(sprintf(
+                'Session cookies will not work because the server name "%s" '
+                . 'is a single-label hostname (no dot) but a cookie domain '
+                . '("%s") is configured. Browsers reject Domain= cookie '
+                . 'attributes on hostnames without a dot. This typically '
+                . 'affects http://localhost and other single-label hostnames. '
+                . 'Either: (1) use a fully qualified hostname like '
+                . 'http://horde.localhost or http://example.test, '
+                . '(2) clear $conf[\'cookie\'][\'domain\'] to let the browser '
+                . 'scope the cookie to the exact hostname, or '
+                . '(3) enable URL-based sessions by clearing '
+                . '$conf[\'session\'][\'use_only_cookies\'] (not recommended).',
+                (string) ($conf['server']['name'] ?? ''),
+                (string) $conf['cookie']['domain']
+            ));
         }
 
         if (!empty($conf['session']['timeout'])) {
@@ -173,21 +319,27 @@ class Horde_Session
         }
 
         session_set_cookie_params(
-            $conf['session']['timeout'],
-            $conf['cookie']['path'],
-            $conf['cookie']['domain'],
-            $conf['use_ssl'] == 1 ? 1 : 0,
+            (int) ($conf['session']['timeout'] ?? 0),
+            (string) ($conf['cookie']['path'] ?? ''),
+            (string) ($conf['cookie']['domain'] ?? ''),
+            !empty($conf['use_ssl']) && $conf['use_ssl'] == 1,
             true
         );
-        session_cache_limiter(is_null($cache_limiter) ? $conf['session']['cache_limiter'] : $cache_limiter);
-        session_name(urlencode($conf['session']['name']));
+        session_cache_limiter(
+            is_null($cache_limiter)
+                ? (string) ($conf['session']['cache_limiter'] ?? '')
+                : $cache_limiter
+        );
+        session_name(urlencode((string) ($conf['session']['name'] ?? '')));
         if ($session_id) {
             session_id($session_id);
         }
 
-        /* We want to create an instance here, not get, since we may be
-         * destroying the previous instances in the page. */
-        $this->sessionHandler = $injector->createInstance('Horde_SessionHandler');
+        /* Install the modern handler. The legacy
+         * Horde_Core_Factory_SessionHandler is no longer wire-bound; the modern
+         * SessionHandlerFactory already covers every backend except mongo. */
+        $modernHandler = $injector->getInstance(ModernSessionHandler::class);
+        session_set_save_handler($modernHandler, true);
 
         if ($start) {
             $this->start();
@@ -197,6 +349,9 @@ class Horde_Session
 
     /**
      * Starts the session.
+     *
+     * Calls session_start() and rebuilds the modern HordeSession from the now
+     * populated $_SESSION so subsequent reads see the persisted data.
      */
     public function start()
     {
@@ -209,13 +364,18 @@ class Horde_Session
         session_start();
         $this->_active = true;
         $this->_data = &$_SESSION;
+        $this->_rebuildModern();
 
         /* We have reopened a session. Check to make sure that authentication
          * status has not changed in the meantime. */
         if (!$this->_readonly
             && !is_null($this->_relogin)
             && (($GLOBALS['registry']->getAuth() !== false) !== $this->_relogin)) {
-            Horde::log('Previous session attempted to be reopened after authentication status change. All session modifications will be ignored.', Horde_Log::DEBUG);
+            Horde::log(
+                'Previous session attempted to be reopened after authentication'
+                . ' status change. All session modifications will be ignored.',
+                Horde_Log::DEBUG
+            );
             $this->_readonly = true;
         }
     }
@@ -228,9 +388,17 @@ class Horde_Session
         $curr_time = time();
 
         /* Create internal data arrays. */
-        if (!isset($this->_data[self::BEGIN])) {
+        if ($this->modern->getScoped(self::BEGIN, '') === null
+            && !isset($this->_data[self::BEGIN])) {
             $this->_data[self::BEGIN] = $curr_time;
-            $this->_data[self::REGENERATE] = $curr_time + $this->regenerate_interval;
+            $this->_data[self::REGENERATE] = $curr_time
+                + $this->regenerate_interval;
+            $this->modern->setScoped(self::BEGIN, '', $curr_time);
+            $this->modern->setScoped(
+                self::REGENERATE,
+                '',
+                $curr_time + $this->regenerate_interval
+            );
         }
     }
 
@@ -241,27 +409,15 @@ class Horde_Session
      */
     public function regenerate()
     {
-        /* Load old encrypted data. */
-        $encrypted = [];
-        if (!empty($this->_data[self::ENCRYPTED])) {
-            foreach ($this->_data[self::ENCRYPTED] as $app => $val) {
-                foreach (array_keys($val) as $val2) {
-                    $encrypted[$app][$val2] = $this->get($app, $val2);
-                }
-            }
-        }
-
+        $this->_mirrorToSession();
         session_regenerate_id(true);
-        $this->_data[self::REGENERATE] = time() + $this->regenerate_interval;
+        $regenAt = time() + $this->regenerate_interval;
+        $this->_data[self::REGENERATE] = $regenAt;
+        $this->modern->setScoped(self::REGENERATE, '', $regenAt);
 
-        /* Store encrypted data, since secret key may have changed. */
-        foreach ($encrypted as $app => $val) {
-            foreach ($val as $key2 => $val2) {
-                $this->set($app, $key2, $val2, self::ENCRYPT);
-            }
-        }
-
-        $this->sessionHandler->changed = true;
+        /* Modern HordeSession handles re-encryption of values in its
+         * encryption map under the new $_SESSION id-derived key, if the
+         * factory wired encryptor/decryptor closures. */
     }
 
     /**
@@ -281,10 +437,14 @@ class Horde_Session
         // session data.
         session_regenerate_id(true);
         session_unset();
-        $this->_data = [];
+        $_SESSION = [];
+        $this->_data = &$_SESSION;
+        $this->_rebuildModern();
         $this->_start();
 
-        $GLOBALS['injector']->getInstance('Horde_Secret_Cbc')->setKey();
+        if (isset($GLOBALS['injector'])) {
+            $GLOBALS['injector']->getInstance('Horde_Secret_Cbc')->setKey();
+        }
 
         $this->_cleansession = true;
 
@@ -293,11 +453,16 @@ class Horde_Session
 
     /**
      * Close the current session.
+     *
+     * Mirrors the modern session payload back into $_SESSION so PHP's save
+     * handler writes the up-to-date data, then calls session_write_close().
      */
     public function close()
     {
         $this->_active = false;
-        $this->_relogin = ($GLOBALS['registry']->getAuth() !== false);
+        $this->_relogin = isset($GLOBALS['registry'])
+            && ($GLOBALS['registry']->getAuth() !== false);
+        $this->_mirrorToSession();
         session_write_close();
     }
 
@@ -309,9 +474,13 @@ class Horde_Session
         if (isset($_SESSION)) {
             session_destroy();
         }
-        // @suspicious shouldn't we empty $this->_data here too?
+        $_SESSION = [];
+        $this->_data = &$_SESSION;
+        $this->_rebuildModern();
         $this->_cleansession = true;
-        $GLOBALS['injector']->getInstance('Horde_Secret_Cbc')->clearKey();
+        if (isset($GLOBALS['injector'])) {
+            $GLOBALS['injector']->getInstance('Horde_Secret_Cbc')->clearKey();
+        }
     }
 
     /**
@@ -336,11 +505,16 @@ class Horde_Session
      */
     public function exists($app, $name)
     {
-        return isset($this->_data[$app][$name]);
+        return $this->modern->hasScoped($app, $name);
     }
 
     /**
      * Get the value of a session variable.
+     *
+     * Reverses the legacy ENCRYPT/TYPE_ARRAY/TYPE_OBJECT serialization. Values
+     * stored under the legacy contract are wrapped Horde_Pack payloads (or
+     * NOT_SERIALIZED-prefixed strings for raw scalars); this method unwraps
+     * them.
      *
      * @param string $app    Application name.
      * @param string $name   Session variable name.
@@ -352,17 +526,24 @@ class Horde_Session
      */
     public function get($app, $name, $mask = 0)
     {
-        global $injector;
-
-        if ($this->exists($app, $name)) {
-            $value = $this->_data[$app][$name];
+        if ($this->modern->hasScoped($app, $name)) {
+            $value = $this->modern->getScoped($app, $name);
             if (!is_string($value) || strlen($value) === 0) {
                 return $value;
             }
 
-            if (isset($this->_data[self::ENCRYPTED][$app][$name])) {
-                $secret = $injector->getInstance('Horde_Secret_Cbc');
-                $value = strval($secret->read($secret->getKey(), $value));
+            if ($this->modern->isEncrypted($app, $name)) {
+                /* getEncrypted returns the raw decrypted bytes (a Horde_Pack
+                 * payload under our contract). */
+                $decrypted = $this->modern->getEncrypted($app, $name);
+                if (!is_string($decrypted)) {
+                    return $decrypted;
+                }
+                try {
+                    return $this->pack->unpack($decrypted);
+                } catch (Horde_Pack_Exception $e) {
+                    return null;
+                }
             }
 
             if (($value[0] ?? '') === self::NOT_SERIALIZED) {
@@ -370,7 +551,7 @@ class Horde_Session
             }
 
             try {
-                return $injector->getInstance('Horde_Pack')->unpack($value);
+                return $this->pack->unpack($value);
             } catch (Horde_Pack_Exception $e) {
                 return null;
             }
@@ -385,7 +566,7 @@ class Horde_Session
         }
 
         /* @todo Deprecated. */
-        if (strpos($name, self::DATA) === 0) {
+        if (is_string($name) && strpos($name, self::DATA) === 0) {
             return $this->retrieve($name);
         }
 
@@ -403,6 +584,12 @@ class Horde_Session
     /**
      * Sets the value of a session variable.
      *
+     * Preserves the legacy wire format: arrays/objects/encrypted values are
+     * Horde_Pack-packed; raw strings are NOT_SERIALIZED-prefixed. Encrypted
+     * values are then handed to {@see HordeSession::setEncrypted()} which
+     * applies the configured encryptor closure and tracks them in the
+     * encryption map for re-encryption on session ID regeneration.
+     *
      * @param string $app    Application name.
      * @param string $name   Session variable name.
      * @param mixed $value   Session variable value.
@@ -413,20 +600,10 @@ class Horde_Session
      */
     public function set($app, $name, $value, $mask = 0)
     {
-        global $injector;
-
         if ($this->_readonly) {
             return;
         }
 
-        unset($this->_data[self::ENCRYPTED][$app][$name]);
-
-        /* Each particular piece of session data is generally not used on any
-         * given page load.  Thus, for arrays and objects, it is beneficial to
-         * always convert to string representations so that the object/array
-         * does not need to be rebuilt every time the session is reloaded.
-         * For convenience, encrypted data is ALWAYS serialized, regardless
-         * of whether it is already a string. */
         if (($mask & self::ENCRYPT)
             || is_object($value) || ($mask & self::TYPE_OBJECT)
             || is_array($value) || ($mask & self::TYPE_ARRAY)) {
@@ -434,20 +611,26 @@ class Horde_Session
             if (is_object($value) || ($mask & self::TYPE_OBJECT)) {
                 $opts['phpob'] = true;
             }
-            $value = $injector->getInstance('Horde_Pack')->pack($value, $opts);
+            $packed = $this->pack->pack($value, $opts);
 
             if ($mask & self::ENCRYPT) {
-                $secret = $injector->getInstance('Horde_Secret_Cbc');
-                $value = $secret->write($secret->getKey(), $value);
-                $this->_data[self::ENCRYPTED][$app][$name] = true;
+                $this->modern->setEncrypted($app, $name, $packed);
+                $this->sessionHandler->changed = true;
+                return;
             }
-        } elseif (is_string($value)) {
+
+            $this->modern->setScoped($app, $name, $packed);
+            $this->sessionHandler->changed = true;
+            return;
+        }
+
+        if (is_string($value)) {
             $value = self::NOT_SERIALIZED . $value;
         }
 
-        if (!$this->exists($app, $name)
-            || ($this->_data[$app][$name] !== $value)) {
-            $this->_data[$app][$name] = $value;
+        if (!$this->modern->hasScoped($app, $name)
+            || ($this->modern->getScoped($app, $name) !== $value)) {
+            $this->modern->setScoped($app, $name, $value);
             $this->sessionHandler->changed = true;
         }
     }
@@ -460,37 +643,23 @@ class Horde_Session
      */
     public function remove($app, $name = null)
     {
-        if ($this->_readonly || !isset($this->_data[$app])) {
+        if ($this->_readonly) {
             return;
         }
 
         if (is_null($name)) {
-            unset($this->_data[$app]);
+            foreach ($this->modern->keysForApp($app) as $key) {
+                $this->modern->removeScoped($app, $key);
+            }
             $this->sessionHandler->changed = true;
-        } elseif ($this->exists($app, $name)) {
-            unset(
-                $this->_data[$app][$name],
-                $this->_data[self::PRUNE][$this->_getKey($app, $name)]
-            );
+        } elseif ($this->modern->hasScoped($app, $name)) {
+            $this->modern->removeScoped($app, $name);
             $this->sessionHandler->changed = true;
         } else {
             foreach ($this->_subkeys($app, $name) as $val) {
                 $this->remove($app, $val);
             }
         }
-    }
-
-    /**
-     * Generates the unique storage key.
-     *
-     * @param string $app   Application name.
-     * @param string $name  Session variable name.
-     *
-     * @return string  The unique storage key.
-     */
-    private function _getKey($app, $name)
-    {
-        return $app . ':' . $name;
     }
 
     /**
@@ -505,13 +674,16 @@ class Horde_Session
     {
         $ret = [];
 
-        if ($name
-            && isset($this->_data[$app])
-            && ($name[strlen($name) - 1] == '/')) {
-            foreach (array_keys($this->_data[$app]) as $k) {
-                if (strpos($k, $name) === 0) {
-                    $ret[substr($k, strlen($name))] = $k;
-                }
+        if (!is_string($name) || $name === '') {
+            return $ret;
+        }
+        if ($name[strlen($name) - 1] !== '/') {
+            return $ret;
+        }
+
+        foreach ($this->modern->keysForApp($app) as $k) {
+            if (strpos($k, $name) === 0) {
+                $ret[substr($k, strlen($name))] = $k;
             }
         }
 
@@ -521,20 +693,19 @@ class Horde_Session
     /* Session tokens. */
 
     /**
-     * Returns the session token.
+     * Returns a session-bound CSRF token.
+     *
+     * Backed by {@see ModernToken}: an HMAC over the per-session secret and a
+     * fixed seed. NOT stable across calls within a session — the legacy
+     * "stable random id stored in $_SESSION['horde']['session_token']" contract
+     * is replaced with a stateless HMAC token. All known framework + app call
+     * sites round-trip this value (emit, POST, verify), so the change is safe.
      *
      * @return string  Session token.
      */
     public function getToken()
     {
-        if ($token = $this->get('horde', self::TOKEN_ID)) {
-            return $token;
-        }
-
-        $token = strval(new Horde_Support_Randomid());
-        $this->set('horde', self::TOKEN_ID, $token);
-
-        return $token;
+        return (string) $this->_tokenService()->generate(self::CSRF_SEED);
     }
 
     /**
@@ -546,9 +717,46 @@ class Horde_Session
      */
     public function checkToken($token)
     {
-        if ($this->getToken() != $token) {
+        try {
+            $valid = $this->_tokenService()->isValid(
+                (string) $token,
+                self::CSRF_SEED
+            );
+        } catch (TokenException $e) {
             throw new Horde_Exception('Invalid token!');
         }
+        if (!$valid) {
+            throw new Horde_Exception('Invalid token!');
+        }
+    }
+
+    /**
+     * Resolve the token service lazily, avoiding the circular dependency
+     * between Horde_Session::__construct() and the legacy
+     * TokenServiceFactory::create() path which reads $GLOBALS['session'].
+     */
+    private function _tokenService(): ModernToken
+    {
+        if ($this->explicitTokenService !== null) {
+            return $this->explicitTokenService;
+        }
+        if ($this->tokenService !== null) {
+            return $this->tokenService;
+        }
+
+        if (isset($GLOBALS['injector'])) {
+            $factory = $GLOBALS['injector']->getInstance(
+                TokenServiceFactory::class
+            );
+            $this->tokenService = $factory->createForSession($this->modern);
+            return $this->tokenService;
+        }
+
+        /* No injector available — use the deployment secret as a last
+         * resort. This path is only hit in misbuilt test contexts. */
+        $factory = new TokenServiceFactory($GLOBALS['injector'] ?? null);
+        $this->tokenService = $factory->createFromDeploymentSecret();
+        return $this->tokenService;
     }
 
     /* Session nonces. */
@@ -564,9 +772,10 @@ class Horde_Session
     {
         $id = strval(new Horde_Support_Randomid());
 
-        $nonces = $this->get('horde', self::NONCE_ID, self::TYPE_ARRAY);
+        $nonces = $this->_nonces();
         $nonces[] = $id;
-        $this->set('horde', self::NONCE_ID, array_values($nonces));
+        $this->modern->setScoped('horde', self::NONCE_ID, array_values($nonces));
+        $this->sessionHandler->changed = true;
 
         return $id;
     }
@@ -582,18 +791,26 @@ class Horde_Session
      */
     public function checkNonce($nonce)
     {
-        $nonces = $this->get('horde', self::NONCE_ID, self::TYPE_ARRAY);
-        if (($pos = array_search($nonce, $nonces)) === false) {
+        $nonces = $this->_nonces();
+        if (($pos = array_search($nonce, $nonces, true)) === false) {
             throw new Horde_Exception('Invalid token!');
         }
         unset($nonces[$pos]);
-        $this->set('horde', self::NONCE_ID, array_values($nonces));
+        $this->modern->setScoped('horde', self::NONCE_ID, array_values($nonces));
+        $this->sessionHandler->changed = true;
     }
 
-    /* Session object storage. */
+    /**
+     * @return array<int, string>
+     */
+    private function _nonces(): array
+    {
+        $nonces = $this->modern->getScoped('horde', self::NONCE_ID);
 
-    /** @deprecated */
-    public const DATA = '_d';
+        return is_array($nonces) ? array_values($nonces) : [];
+    }
+
+    /* Session object storage (deprecated facades). */
 
     /**
      * @deprecated  Use Horde_Core_Cache_SessionObjects instead.
@@ -637,4 +854,38 @@ class Horde_Session
         return $ob->expire($id);
     }
 
+    /* Internal helpers — modern <-> $_SESSION mirror plumbing. */
+
+    /**
+     * Mirror the modern session payload back into $_SESSION so PHP's save
+     * handler writes the up-to-date data on shutdown.
+     */
+    private function _mirrorToSession(): void
+    {
+        $_SESSION = $this->modern->toPayload();
+        $this->_data = &$_SESSION;
+    }
+
+    /**
+     * Rebuild the modern session from the current $_SESSION via the injector
+     * so encryptor/decryptor closures wired by HordeSessionFactory are
+     * preserved. Used by start() (after session_start populates $_SESSION),
+     * clean() and destroy() (after $_SESSION is cleared), and by
+     * __set('session_data') (after a foreign payload is swapped in).
+     */
+    private function _rebuildModern(): void
+    {
+        if (isset($GLOBALS['injector'])) {
+            $this->modern = $GLOBALS['injector']->createInstance(
+                HordeSession::class
+            );
+            return;
+        }
+
+        /* Fallback for bootstrapping/test contexts without an injector. No
+         * encryption closures available; encrypted reads will return raw bytes
+         * and encrypted writes will fail loudly via setEncrypted(). */
+        $sid = (string) (session_id() ?: 'none');
+        $this->modern = new HordeSession($sid !== '' ? new SessionId($sid) : new SessionId('none'), $_SESSION ?? []);
+    }
 }
