@@ -43,11 +43,9 @@ class Horde_Core_Factory_SessionHandler extends Horde_Core_Factory_Injector
         $params = Horde::getDriverConfig('sessionhandler', $driver);
 
         $driver = basename(Horde_String::lower($driver));
-        $noset = false;
 
         switch ($driver) {
             case 'builtin':
-                $noset = true;
                 break;
 
             case 'hashtable':
@@ -89,12 +87,20 @@ class Horde_Core_Factory_SessionHandler extends Horde_Core_Factory_Injector
             ]);
         }
 
+        /* Always pass noset=true: the modern Horde\SessionHandler\SessionHandler
+         * is the wire-bound save handler (installed by Horde_Session::setup()).
+         * Letting the legacy handler call session_set_save_handler() would
+         * overwrite that registration. This factory now exists only to build
+         * a working storage-backed Horde_SessionHandler for the CLI tools
+         * (bin/horde-sessions-gc, bin/horde-active-sessions); they will be
+         * migrated to Horde\SessionHandler\SessionAdministrator in a follow-up
+         * PR after which this factory can be removed entirely. */
         return new Horde_SessionHandler(
             $storage,
             [
                 'logger' => $injector->getInstance('Horde_Log_Logger'),
                 'no_md5' => true,
-                'noset' => $noset,
+                'noset' => true,
                 'parse' => [$this, 'readSessionData'],
             ]
         );
