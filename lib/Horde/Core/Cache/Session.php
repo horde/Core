@@ -157,15 +157,20 @@ class Horde_Core_Cache_Session extends Horde_Cache_Storage_Base
      */
     protected function _getCid($key, $in_session)
     {
-        global $session;
-
         if ($in_session) {
             return $this->_params['storage_key'] . '/' . $key;
         }
 
+        /* Stable per-session prefix. Derived from session_id() rather than
+         * $session->getToken() because the legacy getToken() value will not
+         * remain stable across calls once Horde_Session delegates to the
+         * HMAC token service. The cache-key role wants a stable session
+         * fingerprint, not a security token. SHA-1 is good enough for
+         * uniqueness and avoids leaking the raw session id into cache keys
+         * that may end up in backend logs. */
         return implode('|', [
             $this->_params['app'],
-            $session->getToken(),
+            sha1((string) session_id()),
             $key,
         ]);
     }

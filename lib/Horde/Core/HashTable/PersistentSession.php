@@ -46,10 +46,14 @@ class Horde_Core_HashTable_PersistentSession extends Horde_Core_HashTable_Vfs im
      */
     public function __construct(array $params = [])
     {
-        global $session;
-
+        /* Stable per-session VFS prefix. Derived from session_id() rather
+         * than $session->getToken() because the legacy getToken() value
+         * will not remain stable across calls once Horde_Session delegates
+         * to the HMAC token service. The path-prefix role wants a stable
+         * session fingerprint, not a security token. SHA-1 is good enough
+         * for uniqueness and keeps the raw session id out of VFS paths. */
         parent::__construct([
-            'prefix' => $session->getToken(),
+            'prefix' => sha1((string) session_id()),
             'vfspath' => self::VFS_PATH,
         ]);
 
