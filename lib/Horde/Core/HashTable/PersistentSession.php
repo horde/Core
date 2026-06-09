@@ -7,10 +7,12 @@
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
  *
  * @category  Horde
- * @copyright 2014-2017 Horde LLC
+ * @copyright 2014-2026 Horde LLC
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
+
+use Horde\Core\Session\HordeSession;
 
 /**
  * Hashtable implementation that ensures persistency of data within a given
@@ -28,8 +30,9 @@
  * TempFileStore service that wraps VFS directly.
  *
  * @author    Michael Slusarz <slusarz@horde.org>
+ * @author    Ralf Lang <ralf.lang@ralf-lang.de>
  * @category  Horde
- * @copyright 2014-2017 Horde LLC
+ * @copyright 2014-2026 Horde LLC
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  * @since     2.13.0
@@ -43,15 +46,25 @@ class Horde_Core_HashTable_PersistentSession extends Horde_Core_HashTable_Vfs im
     public const VFS_PATH = '.horde/core/psession_data';
 
     /**
+     * The modern session.
+     */
+    protected HordeSession $_session;
+
+    /**
+     * @param array $params  Configuration parameters:
+     *   - session: (HordeSession) Modern session for the key list. If
+     *              omitted, resolved from the global injector for BC.
      */
     public function __construct(array $params = [])
     {
+        $this->_session = $params['session']
+            ?? $GLOBALS['injector']->getInstance(HordeSession::class);
+
         /* Stable per-session VFS prefix. Derived from session_id() rather
-         * than $session->getToken() because the legacy getToken() value
-         * will not remain stable across calls once Horde_Session delegates
-         * to the HMAC token service. The path-prefix role wants a stable
-         * session fingerprint, not a security token. SHA-1 is good enough
-         * for uniqueness and keeps the raw session id out of VFS paths. */
+         * than a CSRF token because such tokens are not stable across calls.
+         * The path-prefix role wants a stable session fingerprint, not a
+         * security token. SHA-1 is good enough for uniqueness and keeps the
+         * raw session id out of VFS paths. */
         parent::__construct([
             'prefix' => sha1((string) session_id()),
             'vfspath' => self::VFS_PATH,
@@ -64,8 +77,6 @@ class Horde_Core_HashTable_PersistentSession extends Horde_Core_HashTable_Vfs im
      */
     public function set($key, $val, array $opts = [])
     {
-        global $session;
-
         if (!parent::set($key, $val, $opts)) {
             return false;
         }
@@ -79,7 +90,7 @@ class Horde_Core_HashTable_PersistentSession extends Horde_Core_HashTable_Vfs im
 
         $data_keys[] = $key;
 
-        $session->set('horde', self::SESS_KEY, $data_keys);
+        $this->_session->setScoped('horde', self::SESS_KEY, $data_keys);
 
         return true;
     }
@@ -104,9 +115,9 @@ class Horde_Core_HashTable_PersistentSession extends Horde_Core_HashTable_Vfs im
      */
     protected function _getKeys()
     {
-        global $session;
+        $keys = $this->_session->getScoped('horde', self::SESS_KEY);
 
-        return $session->get('horde', self::SESS_KEY, $session::TYPE_ARRAY);
+        return is_array($keys) ? $keys : [];
     }
 
 }
