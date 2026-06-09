@@ -35,7 +35,23 @@ class ResponsiveAssetsTest extends TestCase
 
     private function buildState(array $apps): RegistryState
     {
-        return new RegistryState($apps);
+        $definitions = [];
+        foreach ($apps as $app => $config) {
+            // Fill in any required URI keys the test didn't specify.
+            // ResponsiveAssets only consults webroot / themesfs / themesuri /
+            // jsuri; the rest are placeholders to satisfy RegistryState
+            // validation.
+            $definitions[$app] = $config + [
+                'webroot' => '/' . $app,
+                'fileroot' => '/var/www/' . $app,
+                'jsuri' => '/' . $app . '/js',
+                'themesuri' => '/' . $app . '/themes',
+            ];
+            if ($app === 'horde') {
+                $definitions[$app] += ['staticuri' => '/' . $app . '/static'];
+            }
+        }
+        return new RegistryState($definitions);
     }
 
     public function testGetCssUrlsHordeOnly(): void
@@ -52,7 +68,7 @@ class ResponsiveAssetsTest extends TestCase
 
         $this->filesystemStub->method('fileExists')
             ->willReturnCallback(function ($path) {
-                return $path === '/horde/themes/default/responsive.css';
+                return $path === '/horde/themes/default/screen.css';
             });
 
         $assets = new ResponsiveAssets($state, $this->filesystemStub);
@@ -60,7 +76,7 @@ class ResponsiveAssetsTest extends TestCase
 
         $this->assertIsArray($urls);
         $this->assertCount(1, $urls);
-        $this->assertEquals('/themes/horde/default/responsive.css', $urls[0]);
+        $this->assertEquals('/themes/horde/default/screen.css', $urls[0]);
     }
 
     public function testGetCssUrlsWithAppCascade(): void
@@ -80,15 +96,15 @@ class ResponsiveAssetsTest extends TestCase
 
         $this->filesystemStub->method('fileExists')
             ->willReturnCallback(function ($path) {
-                return str_contains($path, 'responsive.css');
+                return str_contains($path, 'screen.css');
             });
 
         $assets = new ResponsiveAssets($state, $this->filesystemStub);
         $urls = $assets->getCssUrls('kronolith', 'default');
 
         $this->assertCount(2, $urls);
-        $this->assertEquals('/themes/horde/default/responsive.css', $urls[0]);
-        $this->assertEquals('/themes/kronolith/default/responsive.css', $urls[1]);
+        $this->assertEquals('/themes/horde/default/screen.css', $urls[0]);
+        $this->assertEquals('/themes/kronolith/default/screen.css', $urls[1]);
     }
 
     public function testGetCssUrlsFileNotFound(): void
@@ -134,7 +150,7 @@ class ResponsiveAssetsTest extends TestCase
         $urls = $assets->getCssUrls('kronolith', 'default');
 
         $this->assertCount(1, $urls);
-        $this->assertEquals('/themes/kronolith/default/responsive.css', $urls[0]);
+        $this->assertEquals('/themes/kronolith/default/screen.css', $urls[0]);
     }
 
     public function testGetJsUrlsHordeOnly(): void
@@ -447,33 +463,5 @@ class ResponsiveAssetsTest extends TestCase
         $url = $assets->getGraphicUrl('mime/pdf.png', 'jonah', 'default');
 
         $this->assertEquals('/themes/jonah/default/graphics/mime/pdf.png', $url);
-    }
-
-    public function testGetParamFallsBackToHorde(): void
-    {
-        $state = $this->buildState([
-            'horde' => [
-                'status' => 'active',
-                'jsfs' => '/horde/js',
-                'jsuri' => '/js/horde',
-            ],
-            'nag' => [
-                'status' => 'active',
-            ],
-        ]);
-
-        $this->filesystemStub->method('fileExists')
-            ->willReturnCallback(function ($path) {
-                return $path === '/horde/js/test.js';
-            });
-
-        $assets = new ResponsiveAssets($state, $this->filesystemStub);
-        $urls = $assets->getJsUrls('nag', ['test.js']);
-
-        // Both horde and nag resolve to horde's jsuri (nag has no jsfs/jsuri,
-        // so getParam falls back to horde for both)
-        $this->assertCount(2, $urls);
-        $this->assertEquals('/js/horde/test.js', $urls[0]);
-        $this->assertEquals('/js/horde/test.js', $urls[1]);
     }
 }

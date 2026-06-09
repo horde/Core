@@ -1,13 +1,15 @@
 <?php
 
+use PHPUnit\Framework\Attributes\CoversNothing;
+
 /**
  * Tests the Nls API contract used by Core (FlagImage, VarRenderer, Datejs).
  *
  * - Horde_Nls::getLangInfo(D_FMT) for Datejs translateFormat
  * - Horde_Nls::getLocaleInfo() for VarRenderer number formatting
  * - Horde_Nls::getCountryByHost() for FlagImage (returns array or false)
- * @coversNothing
  */
+#[CoversNothing]
 class Horde_Core_Unit_NlsTest extends PHPUnit\Framework\TestCase
 {
     /**
@@ -68,7 +70,10 @@ class Horde_Core_Unit_NlsTest extends PHPUnit\Framework\TestCase
     {
         Horde_Nls::$dnsResolver = null;
 
-        $result = Horde_Nls::getCountryByHost('www.example.com', '/nonexistent/path');
+        // The path is intentionally invalid — Geoip emits an fopen()
+        // warning for missing databases, which we silence here so the
+        // test asserts only the documented return value.
+        $result = @Horde_Nls::getCountryByHost('www.example.com', '/nonexistent/path');
 
         $this->assertFalse($result);
     }

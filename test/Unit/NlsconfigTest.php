@@ -15,13 +15,13 @@ declare(strict_types=1);
 
 namespace Horde\Core\Test\Unit;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
+use Horde\Core\Test\Stub\Loadconfig;
+use Horde\Core\Test\Stub\Registry as StubRegistry;
+use Horde_Registry_Nlsconfig;
 use Horde_Session;
 use Horde_Support_Stub;
-use Horde_Test_Stub_Registry;
-use Horde_Test_Stub_Registry_Loadconfig;
-use Horde_Registry_Nlsconfig;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for Horde_Registry_Nlsconfig.
@@ -38,12 +38,8 @@ class NlsconfigTest extends TestCase
     {
         $GLOBALS['session'] = new Horde_Session();
         $GLOBALS['session']->sessionHandler = new Horde_Support_Stub();
-        $GLOBALS['registry'] = new Horde_Test_Stub_Registry('john', 'horde');
-        $config = new Horde_Test_Stub_Registry_Loadconfig(
-            'horde',
-            'nls.php',
-            'horde_nls_config'
-        );
+        $GLOBALS['registry'] = new StubRegistry('john', 'horde');
+        $config = new Loadconfig('horde', 'nls.php', 'horde_nls_config');
         foreach ($this->providerForTestGet() as $values) {
             $config->config['horde_nls_config'][$values[0]] = $values[1];
         }

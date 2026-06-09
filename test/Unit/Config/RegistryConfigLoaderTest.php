@@ -93,6 +93,11 @@ class RegistryConfigLoaderTest extends TestCase
                     'name' => 'Horde',
                     'status' => 'active',
                     'provides' => 'horde',
+                    'webroot' => '/horde',
+                    'fileroot' => '/var/www/horde',
+                    'jsuri' => '/horde/js',
+                    'themesuri' => '/horde/themes',
+                    'staticuri' => '/horde/static',
                 ];
                 $this->applications['imp'] = [
                     'name' => 'IMP',
@@ -122,6 +127,10 @@ class RegistryConfigLoaderTest extends TestCase
                 $this->applications['imp'] = [
                     'name' => 'IMP',
                     'status' => 'inactive',
+                    'webroot' => '/imp',
+                    'fileroot' => '/var/www/imp',
+                    'jsuri' => '/imp/js',
+                    'themesuri' => '/imp/themes',
                 ];
                 PHP
         );
@@ -211,6 +220,9 @@ class RegistryConfigLoaderTest extends TestCase
                     'name' => 'IMP',
                     'status' => 'inactive',
                     'webroot' => '/imp',
+                    'fileroot' => '/var/www/imp',
+                    'jsuri' => '/imp/js',
+                    'themesuri' => '/imp/themes',
                 ];
                 PHP
         );

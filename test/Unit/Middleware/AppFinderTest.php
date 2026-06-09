@@ -35,12 +35,26 @@ class AppFinderTest extends TestCase
                 $app = $extra;
                 $extra = [];
             }
-            $definitions[$app] = array_merge([
-                'status' => 'active',
-                'webroot' => $baseUrl . $app,
-            ], $extra);
+            $definitions[$app] = array_merge($this->defaultAppConfig($app, $baseUrl), $extra);
         }
         return new RegistryState($definitions);
+    }
+
+    /**
+     * Default app definition satisfying RegistryState's required keys.
+     *
+     * AppFinder only consults webroot/webroot_aliases; the URI keys are
+     * filled with placeholder values so RegistryState validation passes.
+     */
+    private function defaultAppConfig(string $app, string $baseUrl): array
+    {
+        return [
+            'status' => 'active',
+            'webroot' => $baseUrl . $app,
+            'fileroot' => '/var/www/horde/' . $app,
+            'jsuri' => $baseUrl . $app . '/js',
+            'themesuri' => $baseUrl . $app . '/themes',
+        ];
     }
 
     protected function getMiddleware(RegistryState $state): AppFinder
@@ -197,14 +211,10 @@ class AppFinderTest extends TestCase
     public function testFindWebrootAlias()
     {
         $baseUrl = 'https://example.ex/';
-        $state = new RegistryState([
-            'foobar' => ['status' => 'active', 'webroot' => $baseUrl . 'foobar'],
-            'bar' => [
-                'status' => 'active',
-                'webroot' => $baseUrl . 'bar',
-                'webroot_aliases' => [$baseUrl . '/barV2'],
-            ],
-        ]);
+        $state = $this->buildState([
+            'foobar',
+            'bar' => ['webroot_aliases' => [$baseUrl . '/barV2']],
+        ], $baseUrl);
         $request = $this->requestFactory->createServerRequest('GET', $baseUrl . 'barV2');
 
         $middleware = $this->getMiddleware($state);
@@ -216,10 +226,7 @@ class AppFinderTest extends TestCase
     public function testDoNotFindWithoutAlias()
     {
         $baseUrl = 'https://example.ex/';
-        $state = new RegistryState([
-            'foobar' => ['status' => 'active', 'webroot' => $baseUrl . 'foobar'],
-            'bar' => ['status' => 'active', 'webroot' => $baseUrl . 'bar'],
-        ]);
+        $state = $this->buildState(['foobar', 'bar'], $baseUrl);
         $request = $this->requestFactory->createServerRequest('GET', $baseUrl . 'barV2');
 
         $middleware = $this->getMiddleware($state);
@@ -230,10 +237,10 @@ class AppFinderTest extends TestCase
     public function testInactiveAppsAreSkipped()
     {
         $baseUrl = 'https://example.ex/';
-        $state = new RegistryState([
-            'foo' => ['status' => 'active', 'webroot' => $baseUrl . 'foo'],
-            'bar' => ['status' => 'inactive', 'webroot' => $baseUrl . 'bar'],
-        ]);
+        $state = $this->buildState([
+            'foo',
+            'bar' => ['status' => 'inactive'],
+        ], $baseUrl);
         $request = $this->requestFactory->createServerRequest('GET', $baseUrl . 'bar');
 
         $middleware = $this->getMiddleware($state);

@@ -13,16 +13,17 @@ declare(strict_types=1);
 
 namespace Horde\Core\Test\Unit;
 
+use Horde\Core\Test\Mock\MockConnector;
+use Horde\Core\Test\Mock\MockIMPMailbox;
+use Horde\Core\Test\Support\MockSkipConstructorTrait;
 use Horde\Http\ServerRequest;
 use Horde\Http\Uri;
-use Horde\Test\TestCase;
+use Horde_ActiveSync_Device;
 use Horde_Core_ActiveSync_Driver;
 use Horde_Date;
 use Horde_Registry;
 use PHPUnit\Framework\Attributes\CoversNothing;
-use Horde\Core\Test\Mock\MockConnector;
-use Horde\Core\Test\Mock\MockIMPMailbox;
-use Horde_ActiveSync_Device;
+use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use stdClass;
 
@@ -37,6 +38,8 @@ use stdClass;
 #[CoversNothing]
 class ActiveSyncTest extends TestCase
 {
+    use MockSkipConstructorTrait;
+
     protected $_auth;
     protected $_state;
     protected $_mailboxes;

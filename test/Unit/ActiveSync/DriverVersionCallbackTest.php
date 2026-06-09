@@ -17,7 +17,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Test\Unit\ActiveSync;
 
-use Horde\Test\TestCase;
+use Horde\Core\Test\Support\MockSkipConstructorTrait;
 use Horde\Http\ServerRequest;
 use Horde_ActiveSync;
 use Horde_ActiveSync_Credentials;
@@ -27,11 +27,12 @@ use Horde_Controller_Request_Mock;
 use Horde_Core_ActiveSync_Auth;
 use Horde_Core_ActiveSync_Connector;
 use Horde_Core_ActiveSync_Driver;
+use Horde_Exception;
 use Horde_Injector;
 use Horde_Registry;
-use PHPUnit\Framework\Attributes\CoversMethod;
-use Horde_Exception;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests for Horde_Core_ActiveSync_Driver::versionCallback().
@@ -49,6 +50,8 @@ use InvalidArgumentException;
 #[CoversMethod(Horde_Core_ActiveSync_Driver::class, 'versionCallback')]
 class DriverVersionCallbackTest extends TestCase
 {
+    use MockSkipConstructorTrait;
+
     private array $savedGlobals = [];
 
     protected function tearDown(): void

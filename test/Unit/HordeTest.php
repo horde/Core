@@ -17,10 +17,11 @@ declare(strict_types=1);
 namespace Horde\Core\Test\Unit;
 
 use Horde\Core\Horde;
+use Horde\Core\Test\Support\MockSkipConstructorTrait;
 use Horde\Log\Handler\BufferHandler;
 use Horde\Log\Logger;
-use Horde\Test\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 use Horde_Core_Factory_Logger;
 use Horde_Injector;
 use Horde_Registry;
@@ -41,6 +42,8 @@ use Stringable;
 #[CoversClass(Horde::class)]
 class HordeTest extends TestCase
 {
+    use MockSkipConstructorTrait;
+
     /**
      * BufferHandler wired into the PSR-3 logger to capture output.
      */
@@ -55,6 +58,14 @@ class HordeTest extends TestCase
     {
         $this->buffer = new BufferHandler();
         $this->logger = new Logger([$this->buffer]);
+
+        // Clear any messages other tests left in the static
+        // pre-init buffer. Without this, `Horde::log()` drains
+        // those leaked messages into our test buffer and breaks
+        // count-based assertions.
+        $ref = new ReflectionClass(Horde::class);
+        $prop = $ref->getProperty('_logBuffer');
+        $prop->setValue(null, null);
     }
 
     protected function tearDown(): void

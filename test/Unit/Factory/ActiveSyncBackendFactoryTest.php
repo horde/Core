@@ -17,18 +17,19 @@ declare(strict_types=1);
 
 namespace Horde\Core\Test\Unit\Factory;
 
-use Horde\Test\TestCase;
+use Horde\Core\Test\Support\MockSkipConstructorTrait;
 use Horde\Http\ServerRequest;
-use PHPUnit\Framework\Attributes\CoversClass;
+use Horde_ActiveSync_State_Sql;
 use Horde_Auth_Base;
+use Horde_Cache;
+use Horde_Core_ActiveSync_Driver;
 use Horde_Core_Factory_ActiveSyncBackend;
 use Horde_Core_Factory_Auth;
+use Horde_Exception_NotFound;
 use Horde_Injector;
 use Horde_Registry;
-use Horde_ActiveSync_State_Sql;
-use Horde_Cache;
-use Horde_Exception_NotFound;
-use Horde_Core_ActiveSync_Driver;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests for Horde_Core_Factory_ActiveSyncBackend
@@ -42,6 +43,8 @@ use Horde_Core_ActiveSync_Driver;
 #[CoversClass(Horde_Core_Factory_ActiveSyncBackend::class)]
 class ActiveSyncBackendFactoryTest extends TestCase
 {
+    use MockSkipConstructorTrait;
+
     /**
      * Test that factory passes ServerRequest to driver
      */

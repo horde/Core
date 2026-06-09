@@ -17,14 +17,15 @@ declare(strict_types=1);
 
 namespace Horde\Core\Test\Unit\ActiveSync;
 
-use Horde\Test\TestCase;
+use Horde\Core\Test\Support\MockSkipConstructorTrait;
 use Horde\Http\ServerRequest;
-use PHPUnit\Framework\Attributes\CoversClass;
-use Horde_Core_ActiveSync_Driver;
 use Horde_Core_ActiveSync_Auth;
 use Horde_Core_ActiveSync_Connector;
+use Horde_Core_ActiveSync_Driver;
 use Horde_Registry;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 
 /**
@@ -42,6 +43,8 @@ use ReflectionProperty;
 #[CoversClass(Horde_Core_ActiveSync_Driver::class)]
 class DriverGetUserTest extends TestCase
 {
+    use MockSkipConstructorTrait;
+
     /**
      * Test Priority 1: Authenticated user takes precedence
      */
