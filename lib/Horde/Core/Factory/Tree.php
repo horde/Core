@@ -3,17 +3,6 @@
 /**
  * A Horde_Injector:: based Horde_Tree:: factory.
  *
- * PHP version 5
- *
- * @category Horde
- * @package  Core
- * @author   Michael Slusarz <slusarz@horde.org>
- * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
- */
-
-/**
- * A Horde_Injector:: based Horde_Tree:: factory.
- *
  * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
@@ -22,8 +11,12 @@
  * @category Horde
  * @package  Core
  * @author   Michael Slusarz <slusarz@horde.org>
+ * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
+
+use Horde\Core\Session\HordeSession;
+
 class Horde_Core_Factory_Tree extends Horde_Core_Factory_Base
 {
     /**
@@ -84,21 +77,35 @@ class Horde_Core_Factory_Tree extends Horde_Core_Factory_Base
     }
 
     /**
+     * Reads a tree expanded-state slot from the modern session.
+     *
+     * The legacy implementation accepted a Horde_Session mask; raw scoped
+     * reads ignore it. The renderer now passes booleans only, no packing
+     * required.
      */
-    public static function getSession($instance, $id, $mask = 0)
+    public static function getSession($instance, $id)
     {
-        return $GLOBALS['session']->get('horde', 'tree-' . $instance . '/' . $id, $mask);
+        return self::session()->getScoped('horde', 'tree-' . $instance . '/' . $id);
     }
 
     /**
      */
     public static function setSession($instance, $id, $val)
     {
+        $session = self::session();
+        $key = 'tree-' . $instance . '/' . $id;
         if ($val) {
-            $GLOBALS['session']->set('horde', 'tree-' . $instance . '/' . $id, $val);
+            $session->setScoped('horde', $key, $val);
         } else {
-            $GLOBALS['session']->remove('horde', 'tree-' . $instance . '/' . $id);
+            $session->removeScoped('horde', $key);
         }
     }
 
+    /**
+     * Resolve the modern session lazily from the global injector.
+     */
+    private static function session(): HordeSession
+    {
+        return $GLOBALS['injector']->getInstance(HordeSession::class);
+    }
 }
