@@ -131,8 +131,14 @@ class HordeSessionTest extends TestCase
 
         $payload = $session->toPayload();
 
-        self::assertSame('alice', $payload['horde']['auth/userId']);
-        self::assertSame('INBOX', $payload['imp']['mailbox']);
+        // String values go on the wire prefixed with NOT_SERIALIZED so the
+        // legacy Horde_Session can still distinguish them from packed shapes.
+        self::assertSame("\0alice", $payload['horde']['auth/userId']);
+        self::assertSame("\0INBOX", $payload['imp']['mailbox']);
+
+        // Round-trip via the public API recovers the original strings.
+        self::assertSame('alice', $session->getScoped('horde', 'auth/userId'));
+        self::assertSame('INBOX', $session->getScoped('imp', 'mailbox'));
     }
 
     #[Test]
@@ -439,7 +445,11 @@ class HordeSessionTest extends TestCase
     {
         $decryptor = fn(string $c): string => substr($c, 4);
 
-        // Simulate a legacy session payload with encryption map
+        // Simulate a legacy session payload with encryption map. The legacy
+        // Horde_Session writes encrypt(Horde_Pack::pack($value)) for ENCRYPT
+        // slots; reproduce that exact wire shape here.
+        $pack = new \Horde_Pack();
+        $packed = $pack->pack('imp-password', ['compress' => 0]);
         $legacyPayload = [
             '_b' => 1700000000,
             '_e' => [
@@ -450,7 +460,7 @@ class HordeSessionTest extends TestCase
             'horde' => [
                 'auth/userId' => 'alice',
                 'auth/timestamp' => 1700000000,
-                'auth_app/imp' => 'ENC:' . serialize('imp-password'),
+                'auth_app/imp' => 'ENC:' . $packed,
             ],
         ];
 

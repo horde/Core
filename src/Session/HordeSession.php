@@ -19,6 +19,8 @@ use Horde\Injector\Attribute\Factory;
 use Horde\SessionHandler\DefaultSession;
 use Horde\SessionHandler\Exception\SessionException;
 use Horde\SessionHandler\SessionId;
+use Horde_Pack;
+use Horde_Pack_Exception;
 
 /**
  * Horde-specific session implementation with scoped keys and encryption.
@@ -46,6 +48,14 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
      */
     public const CSRF_SEED = 'horde-session-csrf';
 
+    /**
+     * Marker prefix for raw string values stored via {@see setScoped()}.
+     * A string with this single-byte prefix is unambiguously a stored
+     * string; any other byte sequence is either a non-string scalar (raw)
+     * or a {@see Horde_Pack} payload.
+     */
+    public const NOT_SERIALIZED = "\0";
+
     /** Internal key for session begin timestamp. */
     private const BEGIN_KEY = '_b';
 
@@ -57,6 +67,13 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
 
     private ?Closure $encryptor;
     private ?Closure $decryptor;
+
+    /**
+     * Pack/unpack service used to serialise arrays, objects, and the
+     * plaintext side of encrypted values, matching the wire format
+     * produced by the legacy Horde_Session for cross-compatibility.
+     */
+    private Horde_Pack $pack;
 
     /**
      * @param SessionId    $id        Session identifier
@@ -73,6 +90,7 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
         parent::__construct($id, $data);
         $this->encryptor = $encryptor;
         $this->decryptor = $decryptor;
+        $this->pack = new Horde_Pack();
     }
 
     // ---------------------------------------------------------------
@@ -81,22 +99,78 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
 
     /**
      * Get a scoped value.
+     *
+     * Reverses the wire format applied by {@see setScoped()}:
+     * - A string starting with {@see NOT_SERIALIZED} is a stored raw string
+     *   minus the marker byte.
+     * - A non-string scalar is returned as-is (integers, floats, booleans
+     *   and null go on the wire raw).
+     * - Any other string is a {@see Horde_Pack} payload and gets unpacked.
+     * - If unpacking fails (the value is some other byte sequence), the raw
+     *   value is returned to remain robust against unknown shapes.
      */
     public function getScoped(string $app, string $name): mixed
     {
-        return $this->data[$app][$name] ?? null;
+        $raw = $this->data[$app][$name] ?? null;
+
+        if ($raw === null) {
+            return null;
+        }
+        if (!is_string($raw)) {
+            return $raw;
+        }
+        if ($raw === '') {
+            return $raw;
+        }
+        if ($raw[0] === self::NOT_SERIALIZED) {
+            return substr($raw, 1);
+        }
+
+        try {
+            return $this->pack->unpack($raw);
+        } catch (Horde_Pack_Exception) {
+            return $raw;
+        }
     }
 
     /**
      * Set a scoped value.
+     *
+     * Applies the wire format last week's Horde_Session produced:
+     * - Strings get a single-byte {@see NOT_SERIALIZED} prefix.
+     * - Arrays and objects get serialised via {@see Horde_Pack} (with
+     *   `phpob` opt set for objects).
+     * - Other scalars (int, float, bool, null) go on the wire raw.
      */
     public function setScoped(string $app, string $name, mixed $value): void
     {
+        $stored = $this->encodeForStorage($value);
+
         if (!isset($this->data[$app])) {
             $this->data[$app] = [];
         }
-        $this->data[$app][$name] = $value;
+        $this->data[$app][$name] = $stored;
         $this->dirty = true;
+    }
+
+    /**
+     * Encode a value for storage in the scoped or encrypted-plaintext
+     * positions, matching the legacy Horde_Session wire format.
+     */
+    private function encodeForStorage(mixed $value): mixed
+    {
+        if (is_string($value)) {
+            return self::NOT_SERIALIZED . $value;
+        }
+        if (is_array($value) || is_object($value)) {
+            $opts = ['compress' => 0];
+            if (is_object($value)) {
+                $opts['phpob'] = true;
+            }
+            return $this->pack->pack($value, $opts);
+        }
+
+        return $value;
     }
 
     /**
@@ -242,7 +316,11 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
 
         $decrypted = ($this->decryptor)($raw);
 
-        return unserialize($decrypted);
+        try {
+            return $this->pack->unpack($decrypted);
+        } catch (Horde_Pack_Exception) {
+            return $decrypted;
+        }
     }
 
     public function setEncrypted(string $app, string $name, mixed $value): void
@@ -251,8 +329,12 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
             throw new SessionException('No encryptor configured — cannot store encrypted value');
         }
 
-        $serialized = serialize($value);
-        $encrypted = ($this->encryptor)($serialized);
+        $opts = ['compress' => 0];
+        if (is_object($value)) {
+            $opts['phpob'] = true;
+        }
+        $packed = $this->pack->pack($value, $opts);
+        $encrypted = ($this->encryptor)($packed);
 
         // Store the encrypted value
         if (!isset($this->data[$app])) {

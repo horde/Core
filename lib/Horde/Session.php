@@ -34,11 +34,16 @@ use Horde\Token\Token as ModernToken;
  *   and the $GLOBALS['session'] global stable while individual call sites
  *   migrate to the modern stack.
  * - Translate legacy calls to {@see HordeSession::getScoped()} et al.
- * - Hold the legacy ENCRYPT/TYPE_ARRAY/TYPE_OBJECT serialization invariants
- *   ({@see Horde_Pack}-packed values) so existing on-disk session payloads
- *   continue to decode.
  * - Cut tokens over to the HMAC-based {@see ModernToken} service in one
  *   place so the legacy stable-randomid contract is replaced atomically.
+ *
+ * Wire format ownership:
+ *   The modern {@see HordeSession} owns the legacy ENCRYPT/TYPE_ARRAY/TYPE_OBJECT
+ *   serialization invariants. Strings get a {@see HordeSession::NOT_SERIALIZED}
+ *   prefix; arrays and objects are {@see Horde_Pack}-packed; encrypted values
+ *   are encrypt-of-pack. The shim no longer pre-packs or pre-prefixes; it just
+ *   hands raw values to {@see HordeSession::setScoped()} /
+ *   {@see HordeSession::setEncrypted()} which encode for storage.
  *
  * Treatment of $_SESSION:
  *   $_SESSION is a dumb mirror, not the source of truth. The modern
@@ -75,7 +80,12 @@ class Horde_Session
     public const TYPE_OBJECT = 2;
     public const ENCRYPT = 4; /* @since 2.7.0 */
 
-    public const NOT_SERIALIZED = "\0";
+    /**
+     * Marker prefix for raw string values. Re-exported from
+     * {@see HordeSession::NOT_SERIALIZED} so legacy callers that reference
+     * `Horde_Session::NOT_SERIALIZED` keep working unchanged.
+     */
+    public const NOT_SERIALIZED = HordeSession::NOT_SERIALIZED;
 
     public const NONCE_ID = 'session_nonce'; /* @since 2.11.0 */
     public const TOKEN_ID = 'session_token';
@@ -121,12 +131,6 @@ class Horde_Session
     private ?ModernToken $explicitTokenService = null;
 
     /**
-     * The pack service used to preserve legacy ENCRYPT/TYPE_ARRAY/TYPE_OBJECT
-     * wire format inside session values.
-     */
-    private Horde_Pack $pack;
-
-    /**
      * Indicates that the session is active (read/write).
      */
     protected bool $_active = false;
@@ -166,12 +170,10 @@ class Horde_Session
      */
     public function __construct(
         ?HordeSession $modern = null,
-        ?ModernToken $tokenService = null,
-        ?Horde_Pack $pack = null
+        ?ModernToken $tokenService = null
     ) {
         $this->modern = $modern ?? $this->_resolveModern();
         $this->explicitTokenService = $tokenService;
-        $this->pack = $pack ?? $this->_resolvePack();
 
         /* Make sure the global session variable is initialised and points to
          * the array the shim mirrors into. */
@@ -205,19 +207,6 @@ class Horde_Session
             new SessionId($sid !== '' ? $sid : 'none'),
             $_SESSION ?? []
         );
-    }
-
-    /**
-     * Resolve the pack service at construction time, with the same legacy-
-     * test fallback as {@see _resolveModern()}.
-     */
-    private function _resolvePack(): Horde_Pack
-    {
-        if (isset($GLOBALS['injector'])) {
-            return $GLOBALS['injector']->getInstance('Horde_Pack');
-        }
-
-        return new Horde_Pack();
     }
 
     /**
@@ -505,10 +494,11 @@ class Horde_Session
     /**
      * Get the value of a session variable.
      *
-     * Reverses the legacy ENCRYPT/TYPE_ARRAY/TYPE_OBJECT serialization. Values
-     * stored under the legacy contract are wrapped Horde_Pack payloads (or
-     * NOT_SERIALIZED-prefixed strings for raw scalars); this method unwraps
-     * them.
+     * Encoding/decoding (Horde_Pack-packed values, NOT_SERIALIZED-prefixed
+     * strings) is owned by the modern {@see HordeSession}. The shim just
+     * delegates and applies the legacy mask-based default-value semantics
+     * (an absent value reads as [] under TYPE_ARRAY or stdClass under
+     * TYPE_OBJECT) on top.
      *
      * @param string $app    Application name.
      * @param string $name   Session variable name.
@@ -521,34 +511,10 @@ class Horde_Session
     public function get($app, $name, $mask = 0)
     {
         if ($this->modern->hasScoped($app, $name)) {
-            $value = $this->modern->getScoped($app, $name);
-            if (!is_string($value) || strlen($value) === 0) {
-                return $value;
-            }
-
             if ($this->modern->isEncrypted($app, $name)) {
-                /* getEncrypted returns the raw decrypted bytes (a Horde_Pack
-                 * payload under our contract). */
-                $decrypted = $this->modern->getEncrypted($app, $name);
-                if (!is_string($decrypted)) {
-                    return $decrypted;
-                }
-                try {
-                    return $this->pack->unpack($decrypted);
-                } catch (Horde_Pack_Exception $e) {
-                    return null;
-                }
+                return $this->modern->getEncrypted($app, $name);
             }
-
-            if (($value[0] ?? '') === self::NOT_SERIALIZED) {
-                return substr($value, 1);
-            }
-
-            try {
-                return $this->pack->unpack($value);
-            } catch (Horde_Pack_Exception $e) {
-                return null;
-            }
+            return $this->modern->getScoped($app, $name);
         }
 
         if ($subkeys = $this->_subkeys($app, $name)) {
@@ -578,18 +544,22 @@ class Horde_Session
     /**
      * Sets the value of a session variable.
      *
-     * Preserves the legacy wire format: arrays/objects/encrypted values are
-     * Horde_Pack-packed; raw strings are NOT_SERIALIZED-prefixed. Encrypted
-     * values are then handed to {@see HordeSession::setEncrypted()} which
-     * applies the configured encryptor closure and tracks them in the
-     * encryption map for re-encryption on session ID regeneration.
+     * Encoding (Horde_Pack-packing for arrays/objects, NOT_SERIALIZED prefix
+     * for strings, raw for other scalars) is owned by the modern
+     * {@see HordeSession}. The shim just routes the value to the right
+     * accessor: encrypted slots through {@see HordeSession::setEncrypted()},
+     * everything else through {@see HordeSession::setScoped()}.
+     *
+     * The TYPE_ARRAY/TYPE_OBJECT masks are no-ops at runtime — modern
+     * HordeSession infers the wire shape from the value type itself. The
+     * constants are kept for source-compat with callers that pass them.
      *
      * @param string $app    Application name.
      * @param string $name   Session variable name.
      * @param mixed $value   Session variable value.
      * @param integer $mask  One of:
-     *   - Horde_Session::TYPE_ARRAY: Force save as an array value.
-     *   - Horde_Session::TYPE_OBJECT: Force save as an object value.
+     *   - Horde_Session::TYPE_ARRAY: Force save as an array value (no-op).
+     *   - Horde_Session::TYPE_OBJECT: Force save as an object value (no-op).
      *   - Horde_Session::ENCRYPT: Encrypt the value. (since 2.7.0)
      */
     public function set($app, $name, $value, $mask = 0)
@@ -598,35 +568,14 @@ class Horde_Session
             return;
         }
 
-        if (($mask & self::ENCRYPT)
-            || is_object($value) || ($mask & self::TYPE_OBJECT)
-            || is_array($value) || ($mask & self::TYPE_ARRAY)) {
-            $opts = ['compress' => 0];
-            if (is_object($value) || ($mask & self::TYPE_OBJECT)) {
-                $opts['phpob'] = true;
-            }
-            $packed = $this->pack->pack($value, $opts);
-
-            if ($mask & self::ENCRYPT) {
-                $this->modern->setEncrypted($app, $name, $packed);
-                $this->sessionHandler->changed = true;
-                return;
-            }
-
-            $this->modern->setScoped($app, $name, $packed);
+        if ($mask & self::ENCRYPT) {
+            $this->modern->setEncrypted($app, $name, $value);
             $this->sessionHandler->changed = true;
             return;
         }
 
-        if (is_string($value)) {
-            $value = self::NOT_SERIALIZED . $value;
-        }
-
-        if (!$this->modern->hasScoped($app, $name)
-            || ($this->modern->getScoped($app, $name) !== $value)) {
-            $this->modern->setScoped($app, $name, $value);
-            $this->sessionHandler->changed = true;
-        }
+        $this->modern->setScoped($app, $name, $value);
+        $this->sessionHandler->changed = true;
     }
 
     /**
