@@ -18,12 +18,13 @@ declare(strict_types=1);
 
 namespace Horde\Core\Test\Unit\Factory;
 
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\TestCase;
+use Horde_Core_Factory_Group;
 use Horde_Injector;
 use Horde_Injector_TopLevel;
 
-#[CoversNothing]
+#[CoversMethod(Horde_Core_Factory_Group::class, 'create')]
 class GroupTest extends TestCase
 {
     public function testMock()
