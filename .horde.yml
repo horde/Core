@@ -40,7 +40,7 @@ authors:
     active: false
     role: developer
 version:
-  release: 3.0.0-RC7
+  release: 3.0.0-RC8
   api: 3.0.0alpha1
 state:
   release: RC

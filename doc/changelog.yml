@@ -732,6 +732,75 @@
     [rla] Adapt schema migrations to work in new H6 installation layout.
     [rla] Added injectable wrapper around Config to reduce globals access.
     [rla] With Marco Abbrancati: Upgraded test cases for phpunit 9.x utility.
+3.0.0-RC8:
+  api: 3.0.0-RC8
+  state:
+    release: RC
+    api: RC
+  date: 2026-06-10
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    refactor(registry): Port Registry data and token sites off shim
+    refactor(block): Port Block_Layout_Manager CSRF check to Horde\Token\Token
+    refactor(auth): Port Auth_Application view-init check to HordeSession
+    refactor(registry): Port Registry_Application::updateSessVars to HordeSession
+    refactor(prefs): Port Factory_Prefs no_prefs flag to HordeSession
+    refactor(config): Port Horde_Config session fallback to HordeSession
+    refactor(logintasks): Port LoginTasks to HordeSession
+    refactor(logintasks): Port LoginTasks_Backend_Horde to HordeSession
+    refactor(token): Resolve session via HordeSession in legacy create()
+    refactor: Explicitly flush the HordeSession to the backend on request shutdown.
+    refactor: Get the AuthCredentialStore encryptor via injector
+    refactor(auth): Introduce AuthCredentialStore; Registry delegates
+    refactor(session): Adopt Horde_Pack natively in HordeSession
+    feat(core): wire EAS 16.0 Find command to IMP search backend
+    test(assets): Tighten PrefsThemeResolver and CascadeGraphic mocks
+    test(factory): Remove Kolab Session and Server placeholder tests
+    test(mocks): Tighten expectations across four notice-heavy files
+    test(page-output): Tighten ResponsiveChromeRendererTest mock expectations
+    test(active-sync): Tighten driver-mock expectations across two files
+    test(coverage): Upgrade CoversNothing to CoversClass/CoversMethod
+    test(topbar): Tighten TopbarBuilder mock expectations
+    test(page-output): Tighten DesktopChromeRendererTest mock expectations
+    refactor(horde): Port src/Horde.php gc_tempfiles to HordeSession
+    refactor(registry): Port Horde_Registry_Nlsconfig to HordeSession
+    refactor(registry): Port Horde_Registry_Logout to HordeSession
+    refactor(ui): Port Horde_Core_Ui_Language to HordeSession
+    refactor(tree): Port Horde_Core_Tree_Renderer_Javascript to HordeSession
+    refactor(prefs): Port Horde_Core_Prefs_Ui to HordeSession
+    refactor(prefs): Port Horde_Core_Prefs_Cache_Session to HordeSession
+    refactor(share): Port Horde_Core_Factory_ShareBase to HordeSession
+    refactor(alarm): Port Horde_Core_Factory_Alarm to HordeSession
+    refactor(tagbrowser): Port Horde_Core_TagBrowser to HordeSession
+    refactor(notification): Port Horde_Core_Notification_Handler to HordeSession
+    test(sidebar): Tighten SidebarBuilderTest mock expectations
+    test(page-output): Tighten ViewModeConfiguratorTest mock expectations
+    test(active-sync): Tighten DriverVersionCallbackTest mock expectations
+    test(page-output): Tighten RenderingModeResolverTest mock expectations
+    test(factory): Tighten SessionHandlerFactoryTest mock expectations
+    test(config): Surface deprecation, notice, error, warning details
+    test(integration): Update RampageIntegrationTest to current router shape
+    refactor(notification): Port Horde_Core_Notification_Storage_Session to HordeSession
+    refactor(hashtable): Port Horde_Core_HashTable_PersistentSession to HordeSession
+    refactor(cache): Port Horde_Core_Cache_Session to HordeSession
+    refactor(ajax): Use Horde\Token\Token for the AJAX request token check
+    refactor(pageoutput): Use Horde\Token\Token for the JS-exposed CSRF token
+    refactor(middleware): Port ConditionalCsrfMiddleware to Horde\Token\Token
+    refactor(middleware): Port DemandSessionToken to Horde\Token\Token
+    refactor(session/csrf): Move the constant for the CSRF seed string from Horde_Session to HordeSession
+    refactor(sessions): Simplify registry bootstrap of sessions
+    chore(metadata): Drop kolab dev-dependencies and add horde/form.
+    test: Fix various tests outdated by refactorings
+    feat: Make StrftimeDetector signature support what the phpdoc comments hint at
+    refactor(session): reshape Horde_Session as shim over modern PSR-4 stack
+    refactor(Core): use sha1(session_id()) instead of getToken() as session cache prefix
+    fix(Core): correct SessionStorageBackend namespace in SessionHandlerFactory
+    feat(Core): TokenServiceFactory exposes named secret-source methods
+    refactor(Core): deprecate legacy HashTable factory and Wrapper
+    refactor(Core): Cache factory prefers modern Horde\HashTable when available
+    feat(Core): prefer ModernHashtableBackend in SessionHandlerFactory
 3.0.0-RC7:
   api: 3.0.0-RC7
   state:
