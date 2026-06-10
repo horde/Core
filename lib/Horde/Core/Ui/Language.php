@@ -10,10 +10,14 @@
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
  *
  * @author   Jason M. Felice <jason.m.felice@gmail.com>
+ * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @category Horde
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+
+use Horde\Core\Session\HordeSession;
+
 class Horde_Core_Ui_Language
 {
     /**
@@ -23,12 +27,13 @@ class Horde_Core_Ui_Language
      */
     public static function render()
     {
-        global $prefs, $registry, $session;
+        global $prefs, $registry;
 
         $html = '';
 
         if (!$prefs->isLocked('language')) {
-            $session->set('horde', 'language', $registry->preferredLang());
+            $session = $GLOBALS['injector']->getInstance(HordeSession::class);
+            $session->setScoped('horde', 'language', $registry->preferredLang());
             $html = sprintf(
                 '<form name="language" action="%s">',
                 Horde::url($registry->get('webroot', 'horde') . '/services/language.php', false, -1)
@@ -36,7 +41,7 @@ class Horde_Core_Ui_Language
             $html .= '<input type="hidden" name="url" value="' . @htmlspecialchars(Horde::signUrl(Horde::selfUrl(false, false, true))) . '" />';
             $html .= '<select name="new_lang" onchange="document.language.submit()">';
             foreach ($registry->nlsconfig->languages as $key => $val) {
-                $sel = ($key == $session->get('horde', 'language')) ? ' selected="selected"' : '';
+                $sel = ($key == $session->getScoped('horde', 'language')) ? ' selected="selected"' : '';
                 $html .= "<option value=\"$key\"$sel>$val</option>";
             }
             $html .= '</select></form>';
