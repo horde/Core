@@ -54,37 +54,62 @@ class SessionHandlerFactoryTest extends TestCase
         return $prop->getValue($handler);
     }
 
-    private function createInjector(array $conf, bool $withDb = false, bool $withHashTable = false): Horde_Injector
-    {
+    /**
+     * Build an injector mock with explicit expectations on `getInstance`.
+     *
+     * The factory always asks for ConfigLoader exactly once. Driver-specific
+     * lookups (HordeDbService, Horde_HashTable) are added via $extraInstances.
+     * Two further lookups (Horde_Secret, EventDispatcherInterface) are wrapped
+     * in try/catch by the factory; the mock throws RuntimeException for any
+     * key not provided here, which the factory swallows.
+     *
+     * @param array<string, mixed> $conf            Config seed for the State.
+     * @param array<string, object> $extraInstances Driver-specific bindings keyed
+     *                                              by class/string identifier.
+     */
+    private function createInjector(
+        array $conf,
+        array $extraInstances = [],
+    ): Horde_Injector {
         $state = new State($conf);
 
         $loader = $this->createMock(ConfigLoader::class);
-        $loader->method('load')
+        $loader->expects($this->once())
+            ->method('load')
             ->with('horde')
             ->willReturn($state);
 
+        $instances = [ConfigLoader::class => $loader] + $extraInstances;
+
         $injector = $this->createMock(Horde_Injector::class);
+        $injector->expects($this->atLeastOnce())
+            ->method('getInstance')
+            ->willReturnCallback(function (string $key) use ($instances): object {
+                if (!array_key_exists($key, $instances)) {
+                    // Mirrors Horde_Injector's behaviour for unbound keys; the
+                    // factory's try/catch swallows this for optional lookups.
+                    throw new RuntimeException("No binding for $key");
+                }
 
-        $map = [
-            [ConfigLoader::class, $loader],
-        ];
-
-        if ($withDb) {
-            $adapter = $this->createMock(Adapter::class);
-            $dbService = $this->createMock(HordeDbService::class);
-            $dbService->method('getAdapter')->willReturn($adapter);
-            $map[] = [HordeDbService::class, $dbService];
-        }
-
-        if ($withHashTable) {
-            $ht = $this->createMock(Horde_HashTable_Memory::class);
-            $map[] = ['Horde_HashTable', $ht];
-        }
-
-        $injector->method('getInstance')
-            ->willReturnMap($map);
+                return $instances[$key];
+            });
 
         return $injector;
+    }
+
+    private function createDbServiceMock(): HordeDbService
+    {
+        // The Adapter is held by the SqlBackend the factory builds, but the
+        // factory never calls a method on it during create(). A stub is the
+        // right shape for this pure type-hint placeholder.
+        $adapter = $this->createStub(Adapter::class);
+
+        $dbService = $this->createMock(HordeDbService::class);
+        $dbService->expects($this->once())
+            ->method('getAdapter')
+            ->willReturn($adapter);
+
+        return $dbService;
     }
 
     #[Test]
@@ -115,7 +140,7 @@ class SessionHandlerFactoryTest extends TestCase
     {
         $injector = $this->createInjector(
             ['sessionhandler' => ['type' => 'sql']],
-            withDb: true,
+            [HordeDbService::class => $this->createDbServiceMock()],
         );
 
         $handler = $this->factory->create($injector);
@@ -128,7 +153,7 @@ class SessionHandlerFactoryTest extends TestCase
     {
         $injector = $this->createInjector(
             ['sessionhandler' => ['type' => 'sql', 'params' => ['table' => 'custom_sessions']]],
-            withDb: true,
+            [HordeDbService::class => $this->createDbServiceMock()],
         );
 
         $handler = $this->factory->create($injector);
@@ -146,7 +171,7 @@ class SessionHandlerFactoryTest extends TestCase
     {
         $injector = $this->createInjector(
             ['sessionhandler' => ['type' => 'hashtable']],
-            withHashTable: true,
+            ['Horde_HashTable' => $this->createStub(Horde_HashTable_Memory::class)],
         );
 
         $handler = $this->factory->create($injector);
@@ -159,7 +184,7 @@ class SessionHandlerFactoryTest extends TestCase
     {
         $injector = $this->createInjector(
             ['sessionhandler' => ['type' => 'memcache']],
-            withHashTable: true,
+            ['Horde_HashTable' => $this->createStub(Horde_HashTable_Memory::class)],
         );
 
         $handler = $this->factory->create($injector);
@@ -203,8 +228,10 @@ class SessionHandlerFactoryTest extends TestCase
                     'hashtable' => true,
                 ],
             ],
-            withDb: true,
-            withHashTable: true,
+            [
+                HordeDbService::class => $this->createDbServiceMock(),
+                'Horde_HashTable' => $this->createStub(Horde_HashTable_Memory::class),
+            ],
         );
 
         $handler = $this->factory->create($injector);
@@ -222,8 +249,10 @@ class SessionHandlerFactoryTest extends TestCase
                     'memcache' => true,
                 ],
             ],
-            withDb: true,
-            withHashTable: true,
+            [
+                HordeDbService::class => $this->createDbServiceMock(),
+                'Horde_HashTable' => $this->createStub(Horde_HashTable_Memory::class),
+            ],
         );
 
         $handler = $this->factory->create($injector);
@@ -241,7 +270,7 @@ class SessionHandlerFactoryTest extends TestCase
                     'hashtable' => true,
                 ],
             ],
-            withHashTable: true,
+            ['Horde_HashTable' => $this->createStub(Horde_HashTable_Memory::class)],
         );
 
         $handler = $this->factory->create($injector);
