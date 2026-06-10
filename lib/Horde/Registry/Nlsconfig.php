@@ -7,10 +7,13 @@
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
  *
  * @author   Michael Slusarz <slusarz@horde.org>
+ * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @category Horde
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+
+use Horde\Core\Session\HordeSession;
 
 /**
  * Interface to NLS configuration.
@@ -33,7 +36,9 @@ class Horde_Registry_Nlsconfig
      */
     public function __get($name)
     {
-        global $language, $registry, $session;
+        global $language, $registry;
+
+        $session = $this->_session();
 
         /* These entries can be cached in the session. */
         $cached = [
@@ -45,8 +50,8 @@ class Horde_Registry_Nlsconfig
         ];
 
         if (in_array($name, $cached)
-            && $session->exists('horde', 'nls/' . $name)) {
-            return $session->get('horde', 'nls/' . $name);
+            && $session->hasScoped('horde', 'nls/' . $name)) {
+            return $session->getScoped('horde', 'nls/' . $name);
         }
 
         if (!isset($this->_config)) {
@@ -110,7 +115,7 @@ class Horde_Registry_Nlsconfig
         }
 
         if (in_array($name, $cached)) {
-            $session->set('horde', 'nls/' . $name, $ret);
+            $session->setScoped('horde', 'nls/' . $name, $ret);
         }
 
         return $ret;
@@ -125,7 +130,9 @@ class Horde_Registry_Nlsconfig
      */
     public function validLang($lang)
     {
-        if (!$GLOBALS['session']->exists('horde', 'nls/valid_' . $lang)) {
+        $session = $this->_session();
+
+        if (!$session->hasScoped('horde', 'nls/valid_' . $lang)) {
             $valid = false;
             if (isset($this->languages[$lang])) {
                 $locale = setlocale(LC_ALL, '0');
@@ -144,10 +151,17 @@ class Horde_Registry_Nlsconfig
                     }
                 }
             }
-            $GLOBALS['session']->set('horde', 'nls/valid_' . $lang, $valid);
+            $session->setScoped('horde', 'nls/valid_' . $lang, $valid);
         }
 
-        return $GLOBALS['session']->get('horde', 'nls/valid_' . $lang);
+        return $session->getScoped('horde', 'nls/valid_' . $lang);
     }
 
+    /**
+     * Resolve the modern session lazily from the global injector.
+     */
+    private function _session(): HordeSession
+    {
+        return $GLOBALS['injector']->getInstance(HordeSession::class);
+    }
 }
