@@ -7,17 +7,25 @@
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
  *
  * @category  Horde
- * @copyright 2014-2017 Horde LLC
+ * @copyright 2014-2026 Horde LLC
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
 
+use Horde\Core\Session\HordeSession;
+
 /**
  * Manage the logout tasks registered with Horde_Registry.
  *
+ * The queue is stored as a plain array via HordeSession scoped accessors.
+ * Wire format diverges from legacy `Horde_Pack`-wrapped values; stale
+ * entries from the prior shim format are treated as an empty queue on
+ * the first read after deploy, which is harmless.
+ *
  * @author    Michael Slusarz <slusarz@horde.org>
+ * @author    Ralf Lang <ralf.lang@ralf-lang.de>
  * @category  Horde
- * @copyright 2014-2017 Horde LLC
+ * @copyright 2014-2026 Horde LLC
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  * @since     2.13.0
@@ -75,13 +83,9 @@ class Horde_Registry_Logout
      */
     private function _getTasks()
     {
-        global $session;
+        $stored = $this->_session()->getScoped('horde', self::SESSION_KEY);
 
-        return $session->get(
-            'horde',
-            self::SESSION_KEY,
-            $session::TYPE_ARRAY
-        );
+        return is_array($stored) ? $stored : [];
     }
 
     /**
@@ -91,11 +95,14 @@ class Horde_Registry_Logout
      */
     private function _setTasks($queue)
     {
-        $GLOBALS['session']->set(
-            'horde',
-            self::SESSION_KEY,
-            $queue
-        );
+        $this->_session()->setScoped('horde', self::SESSION_KEY, $queue);
     }
 
+    /**
+     * Resolve the modern session lazily from the global injector.
+     */
+    private function _session(): HordeSession
+    {
+        return $GLOBALS['injector']->getInstance(HordeSession::class);
+    }
 }
