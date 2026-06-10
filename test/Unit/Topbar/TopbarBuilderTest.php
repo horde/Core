@@ -25,30 +25,40 @@ use Horde\Url\Url;
 use Horde_Exception;
 use Horde_Registry;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * TopbarBuilder always reads from registry+session+prefs+permissions during
+ * build(). Tests pin those reads as `atLeastOnce` and check the resulting
+ * TopbarData. Tests that pin a particular call shape (logoutUrl, sidebar
+ * width, etc.) inject a more focused mock.
+ */
 #[CoversClass(TopbarBuilder::class)]
 class TopbarBuilderTest extends TestCase
 {
-    private function createBuilder(
-        ?Horde_Registry $registry = null,
-        ?PrefsService $prefs = null,
-        ?PermissionService $permissions = null,
-        ?HordeSession $session = null,
-    ): TopbarBuilder {
-        $registry ??= $this->createMock(Horde_Registry::class);
-        $prefs ??= $this->createMock(PrefsService::class);
-        $permissions ??= $this->createMock(PermissionService::class);
-        $session ??= $this->createMock(HordeSession::class);
-
-        return new TopbarBuilder($registry, $prefs, $permissions, $session);
-    }
-
-    private function registryWithNoServiceLinks(): Horde_Registry
+    /**
+     * Registry mock that throws on every getServiceLink lookup. Most tests
+     * don't care about service links and want them suppressed.
+     */
+    private function registryWithNoServiceLinks(): MockObject
     {
         $registry = $this->createMock(Horde_Registry::class);
-        $registry->method('getServiceLink')->willThrowException(new Horde_Exception('No service'));
+        $registry->method('getServiceLink')
+            ->willThrowException(new Horde_Exception('No service'));
+
         return $registry;
+    }
+
+    /**
+     * Pin the registry calls every build() makes regardless of the path
+     * under test: get('webroot'/'version'), listApps, isAdmin.
+     */
+    private function pinCommonRegistryReads(MockObject $registry): void
+    {
+        $registry->expects($this->atLeastOnce())->method('get');
+        $registry->expects($this->atLeastOnce())->method('listApps');
+        $registry->expects($this->atLeastOnce())->method('isAdmin');
     }
 
     public function testBuildReturnsTopbarData(): void
@@ -57,11 +67,18 @@ class TopbarBuilderTest extends TestCase
         $registry->method('get')->willReturn('/horde');
         $registry->method('listApps')->willReturn([]);
         $registry->method('isAdmin')->willReturn(false);
+        $this->pinCommonRegistryReads($registry);
 
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn(null);
+        $session->expects($this->atLeastOnce())
+            ->method('getAuthId')->willReturn(null);
 
-        $builder = $this->createBuilder(registry: $registry, session: $session);
+        $builder = new TopbarBuilder(
+            $registry,
+            $this->createStub(PrefsService::class),
+            $this->createStub(PermissionService::class),
+            $session,
+        );
         $data = $builder->build();
 
         $this->assertInstanceOf(TopbarData::class, $data);
@@ -81,22 +98,21 @@ class TopbarBuilderTest extends TestCase
         ]);
         $registry->method('isAdmin')->willReturn(false);
         $registry->method('getInitialPage')->willReturn('/imp/');
+        $this->pinCommonRegistryReads($registry);
 
         $permissions = $this->createMock(PermissionService::class);
-        $permissions->method('exists')->willReturn(false);
+        $permissions->expects($this->atLeastOnce())
+            ->method('exists')->willReturn(false);
 
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn('testuser');
+        $session->expects($this->atLeastOnce())
+            ->method('getAuthId')->willReturn('testuser');
 
         $prefs = $this->createMock(PrefsService::class);
-        $prefs->method('getValue')->willReturn(null);
+        $prefs->expects($this->atLeastOnce())
+            ->method('getValue')->willReturn(null);
 
-        $builder = $this->createBuilder(
-            registry: $registry,
-            prefs: $prefs,
-            permissions: $permissions,
-            session: $session,
-        );
+        $builder = new TopbarBuilder($registry, $prefs, $permissions, $session);
         $data = $builder->build('horde');
 
         $this->assertNotEmpty($data->menuTree);
@@ -110,12 +126,15 @@ class TopbarBuilderTest extends TestCase
         $registry->method('get')->willReturn('/horde');
         $registry->method('listApps')->willReturn([]);
         $registry->method('isAdmin')->willReturn(false);
+        $this->pinCommonRegistryReads($registry);
 
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn('testuser');
+        $session->expects($this->atLeastOnce())
+            ->method('getAuthId')->willReturn('testuser');
 
         $prefs = $this->createMock(PrefsService::class);
-        $prefs->method('getValue')
+        $prefs->expects($this->atLeastOnce())
+            ->method('getValue')
             ->willReturnCallback(function ($uid, $app, $key) {
                 if ($key === 'sidebar_width') {
                     return '250';
@@ -123,7 +142,12 @@ class TopbarBuilderTest extends TestCase
                 return null;
             });
 
-        $builder = $this->createBuilder(registry: $registry, prefs: $prefs, session: $session);
+        $builder = new TopbarBuilder(
+            $registry,
+            $prefs,
+            $this->createStub(PermissionService::class),
+            $session,
+        );
         $data = $builder->build();
 
         $this->assertSame(250, $data->sidebarWidth);
@@ -135,11 +159,18 @@ class TopbarBuilderTest extends TestCase
         $registry->method('get')->willReturn('/horde');
         $registry->method('listApps')->willReturn([]);
         $registry->method('isAdmin')->willReturn(false);
+        $this->pinCommonRegistryReads($registry);
 
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn(null);
+        $session->expects($this->atLeastOnce())
+            ->method('getAuthId')->willReturn(null);
 
-        $builder = $this->createBuilder(registry: $registry, session: $session);
+        $builder = new TopbarBuilder(
+            $registry,
+            $this->createStub(PrefsService::class),
+            $this->createStub(PermissionService::class),
+            $session,
+        );
         $data = $builder->build();
 
         $this->assertSame(150, $data->sidebarWidth);
@@ -151,7 +182,9 @@ class TopbarBuilderTest extends TestCase
         $registry->method('get')->willReturn('/horde');
         $registry->method('listApps')->willReturn([]);
         $registry->method('isAdmin')->willReturn(false);
-        $registry->method('getServiceLink')
+        $this->pinCommonRegistryReads($registry);
+        $registry->expects($this->atLeastOnce())
+            ->method('getServiceLink')
             ->willReturnCallback(function (string $service) {
                 if ($service === 'logout') {
                     return new Url('/horde/login/logout');
@@ -160,12 +193,15 @@ class TopbarBuilderTest extends TestCase
             });
 
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn('admin');
+        $session->expects($this->atLeastOnce())
+            ->method('getAuthId')->willReturn('admin');
 
-        $prefs = $this->createMock(PrefsService::class);
-        $prefs->method('getValue')->willReturn(null);
-
-        $builder = $this->createBuilder(registry: $registry, prefs: $prefs, session: $session);
+        $builder = new TopbarBuilder(
+            $registry,
+            $this->createStub(PrefsService::class),
+            $this->createStub(PermissionService::class),
+            $session,
+        );
         $data = $builder->build();
 
         $this->assertSame('/horde/login/logout', $data->logoutUrl);
@@ -178,7 +214,9 @@ class TopbarBuilderTest extends TestCase
         $registry->method('get')->willReturn('/horde');
         $registry->method('listApps')->willReturn([]);
         $registry->method('isAdmin')->willReturn(false);
-        $registry->method('getServiceLink')
+        $this->pinCommonRegistryReads($registry);
+        $registry->expects($this->atLeastOnce())
+            ->method('getServiceLink')
             ->willReturnCallback(function (string $service) {
                 if ($service === 'login') {
                     return new Url('/horde/login');
@@ -187,9 +225,15 @@ class TopbarBuilderTest extends TestCase
             });
 
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn(null);
+        $session->expects($this->atLeastOnce())
+            ->method('getAuthId')->willReturn(null);
 
-        $builder = $this->createBuilder(registry: $registry, session: $session);
+        $builder = new TopbarBuilder(
+            $registry,
+            $this->createStub(PrefsService::class),
+            $this->createStub(PermissionService::class),
+            $session,
+        );
         $data = $builder->build();
 
         $this->assertNull($data->logoutUrl);
@@ -207,11 +251,18 @@ class TopbarBuilderTest extends TestCase
             ],
         ]);
         $registry->method('isAdmin')->willReturn(false);
+        $this->pinCommonRegistryReads($registry);
 
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn(null);
+        $session->expects($this->atLeastOnce())
+            ->method('getAuthId')->willReturn(null);
 
-        $builder = $this->createBuilder(registry: $registry, session: $session);
+        $builder = new TopbarBuilder(
+            $registry,
+            $this->createStub(PrefsService::class),
+            $this->createStub(PermissionService::class),
+            $session,
+        );
         $data = $builder->build();
 
         // The heading with no children should be filtered out.
