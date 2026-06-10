@@ -14,6 +14,7 @@
  */
 
 use Horde\Backup;
+use Horde\Core\Session\HordeSession;
 use Horde\Util\Variables;
 
 /**
@@ -533,8 +534,9 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      */
     final public function updateSessVars()
     {
+        $session = $GLOBALS['injector']->getInstance(HordeSession::class);
         foreach ($this->_sessVars as $key => $val) {
-            $GLOBALS['session']->set($this->_app, $key, $val);
+            $session->setScoped($this->_app, $key, $val);
         }
         $this->_sessVars = [];
     }
