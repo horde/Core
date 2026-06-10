@@ -38,10 +38,11 @@ use RuntimeException;
  * Two access patterns supported:
  *
  * 1. **Legacy DI binding** — `Horde\Token\Token::class` resolves through
- *    {@see create()}. The HMAC secret is sourced from the global
- *    `$session` for backward compatibility with Horde_Form V3 and other
- *    consumers wired before this factory grew explicit secret-source
- *    methods.
+ *    {@see create()}. The HMAC secret is sourced from the modern
+ *    HordeSession resolved via the injector. Form V3 and other
+ *    auto-wired consumers reach the same per-session secret slot
+ *    (`['horde']['token_secret_key']`) as
+ *    {@see createForSession()}, so tokens are mutually verifiable.
  *
  * 2. **Explicit secret source** — Inject `TokenServiceFactory` itself
  *    (the Injector autowires concrete classes) and call
@@ -74,7 +75,7 @@ class TokenServiceFactory
 
     /**
      * Legacy entry: produce a Token whose signing secret is sourced from
-     * the global $session.
+     * the modern HordeSession resolved through the injector.
      *
      * Form V3 / whups consume this via the
      * `Horde\Token\Token::class => TokenServiceFactory::class` DI binding.
@@ -86,9 +87,9 @@ class TokenServiceFactory
      */
     public function create(Injector $injector): Token
     {
-        $secret = $this->resolveSessionSecretFromGlobal();
-
-        return $this->createFromSecret($secret);
+        return $this->createForSession(
+            $this->injector->getInstance(HordeSession::class)
+        );
     }
 
     /**
@@ -261,26 +262,6 @@ class TokenServiceFactory
             : sys_get_temp_dir();
 
         return new FileStorage($dir, $this->getTimeout());
-    }
-
-    /**
-     * Source the per-session secret from the global $session, generating
-     * and storing it on first use. Matches legacy
-     * Horde_Core_Factory_Token behaviour for wire compatibility.
-     */
-    private function resolveSessionSecretFromGlobal(): string
-    {
-        global $session;
-
-        if (!$session->exists('horde', 'token_secret_key')) {
-            $session->set(
-                'horde',
-                'token_secret_key',
-                strval(new Horde_Support_Randomid())
-            );
-        }
-
-        return (string) $session->get('horde', 'token_secret_key');
     }
 
     /**
