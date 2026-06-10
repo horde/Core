@@ -28,7 +28,7 @@ use Horde_Pack_Exception;
  * Stores data in the same two-level structure as the legacy Horde_Session:
  * $data[$app][$name] for application-scoped values, and $data['_b'],
  * $data['_e'], $data['_r'] for internal metadata. This makes it
- * wire-compatible with sessions created by the legacy handler — both
+ * wire-compatible with sessions created by the legacy handler. Both
  * produce the same $_SESSION layout when exposed through PHP's native
  * session machinery.
  *
@@ -94,7 +94,7 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
     }
 
     // ---------------------------------------------------------------
-    // Scoped access — two-level $data[$app][$name]
+    // Scoped access: two-level $data[$app][$name]
     // ---------------------------------------------------------------
 
     /**
@@ -326,7 +326,7 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
     public function setEncrypted(string $app, string $name, mixed $value): void
     {
         if ($this->encryptor === null) {
-            throw new SessionException('No encryptor configured — cannot store encrypted value');
+            throw new SessionException('No encryptor configured. Cannot store encrypted value.');
         }
 
         $opts = ['compress' => 0];

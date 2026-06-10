@@ -14,8 +14,11 @@ namespace Horde\Core\Test\Unit\Session;
 use Horde\Core\Session\HordeSession;
 use Horde\Core\Session\HordeSessionFactory;
 use Horde\Core\Session\SessionMetaInterface;
+use Horde\Injector\Injector;
+use Horde\Injector\TopLevel;
 use Horde\SessionHandler\DefaultSessionFactory;
 use Horde\SessionHandler\SessionId;
+use Horde_Core_Secret_Cbc;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -133,5 +136,87 @@ class HordeSessionFactoryTest extends TestCase
 
         self::assertInstanceOf(HordeSession::class, $session);
         self::assertNull($session->getAuthenticatedUser());
+    }
+
+    /**
+     * Regression: the DI auto-wire path used to construct a HordeSession
+     * with null encryptor/decryptor, which made setEncrypted() throw on
+     * every login (Horde_Registry::setAuthCredential delegates here through
+     * AuthCredentialStore). The factory must resolve Horde_Core_Secret_Cbc
+     * from the injector and wrap it in lazy closures so the per-session
+     * key is read at call time, not at factory time.
+     */
+    #[Test]
+    public function testCreateWiresEncryptionClosuresFromInjector(): void
+    {
+        $secret = $this->createMock(Horde_Core_Secret_Cbc::class);
+        $secret->expects(self::exactly(2))
+            ->method('getKey')
+            ->willReturn('the-session-key');
+        $secret->expects(self::once())
+            ->method('write')
+            ->willReturnCallback(static function (string $k, string $p): string {
+                self::assertSame('the-session-key', $k);
+                return 'CT:' . $p;
+            });
+        $secret->expects(self::once())
+            ->method('read')
+            ->willReturnCallback(static function (string $k, string $c): string {
+                self::assertSame('the-session-key', $k);
+                return substr($c, 3);
+            });
+
+        $injector = new Injector(new TopLevel());
+        $injector->setInstance(Horde_Core_Secret_Cbc::class, $secret);
+
+        $factory = new HordeSessionFactory();
+        $session = $factory->create($injector);
+
+        $session->setEncrypted('horde', 'auth_app/imp', ['user' => 'alice']);
+        self::assertSame(['user' => 'alice'], $session->getEncrypted('horde', 'auth_app/imp'));
+    }
+
+    /**
+     * The closures must defer key resolution until call time. Horde_Session::clean()
+     * calls Horde_Core_Secret_Cbc::setKey() during login, after the factory has
+     * already built the session. Capturing the key at factory time would lock
+     * in the pre-login key.
+     */
+    #[Test]
+    public function testCreateClosuresResolveKeyLazily(): void
+    {
+        $keys = ['first-key', 'second-key'];
+        $callIndex = 0;
+
+        $secret = $this->createMock(Horde_Core_Secret_Cbc::class);
+        $secret->expects(self::exactly(2))
+            ->method('getKey')
+            ->willReturnCallback(
+                static function () use (&$callIndex, $keys): string {
+                    return $keys[$callIndex++] ?? 'overflow';
+                }
+            );
+        $observedKeys = [];
+        $secret->expects(self::exactly(2))
+            ->method('write')
+            ->willReturnCallback(
+                static function (string $key, string $plaintext) use (&$observedKeys): string {
+                    $observedKeys[] = $key;
+                    return 'CT:' . $plaintext;
+                }
+            );
+
+        $injector = new Injector(new TopLevel());
+        $injector->setInstance(Horde_Core_Secret_Cbc::class, $secret);
+
+        $factory = new HordeSessionFactory();
+        $session = $factory->create($injector);
+
+        // Two writes against the same session: the key changes between calls,
+        // proving the closure asks the secret for getKey() each time.
+        $session->setEncrypted('horde', 'auth_app/imp', 'one');
+        $session->setEncrypted('horde', 'auth_app/turba', 'two');
+
+        self::assertSame(['first-key', 'second-key'], $observedKeys);
     }
 }

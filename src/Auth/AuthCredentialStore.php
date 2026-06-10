@@ -34,10 +34,10 @@ use Horde\Injector\Injector;
  * here. Both flows produce byte-identical writes at the same slot.
  *
  * The class deliberately does NOT touch:
- * - `('horde', 'auth/credentials')` — Registry's base-app pointer. Registry
+ * - `('horde', 'auth/credentials')`: Registry's base-app pointer. Registry
  *   continues to write that slot in `setAuth()`. The store only reads it.
  * - Registry's per-app authentication caches (`_cache['existing']`,
- *   `_cache['isauth']`) — those are Registry-internal state. The Registry
+ *   `_cache['isauth']`): those are Registry-internal state. The Registry
  *   facade clears them after delegating the persistence here.
  */
 #[Factory(factory: AuthCredentialStoreFactory::class, method: 'create')]
@@ -92,7 +92,7 @@ class AuthCredentialStore
         }
 
         if ($app === null) {
-            // No base app and no explicit app — nothing to anchor against.
+            // No base app and no explicit app: nothing to anchor against.
             return;
         }
 
@@ -141,7 +141,7 @@ class AuthCredentialStore
      * Returns false when no base app has been established (no authenticated
      * user per Registry's contract). Returns the credentials array when the
      * slot is present. Falls back to the base app's slot when the requested
-     * app's slot is absent — matching the legacy `_getAuthCredentials`
+     * app's slot is absent, matching the legacy `_getAuthCredentials`
      * resolver.
      *
      * @return array<string,mixed>|true|false

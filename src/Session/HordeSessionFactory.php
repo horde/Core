@@ -18,6 +18,7 @@ use Horde\Injector\Injector;
 use Horde\SessionHandler\DefaultSessionFactory;
 use Horde\SessionHandler\Session;
 use Horde\SessionHandler\SessionId;
+use Horde_Core_Secret_Cbc;
 
 /**
  * Factory that creates HordeSession instances with encryption closures.
@@ -54,14 +55,25 @@ class HordeSessionFactory extends DefaultSessionFactory
      * DI factory method: wrap the current PHP session in a HordeSession.
      *
      * Called by the injector when HordeSession is requested via
-     * its #[Factory] attribute. Encryption closures are not available
-     * through DI auto-wiring, so the returned session reads raw values.
+     * its #[Factory] attribute. Resolves Horde_Core_Secret_Cbc from the
+     * injector and wraps it in lazy closures so the per-session key is
+     * looked up at write/read time. setKey() is called during
+     * Horde_Session::clean() at login, after this factory has already
+     * built the session, so capturing the key eagerly would be wrong.
      */
     public function create(Injector $injector): HordeSession
     {
+        $secret = $injector->getInstance(Horde_Core_Secret_Cbc::class);
+        $encryptor = static fn (string $plaintext): string
+            => (string) $secret->write($secret->getKey(), $plaintext);
+        $decryptor = static fn (string $ciphertext): string
+            => (string) $secret->read($secret->getKey(), $ciphertext);
+
         return new HordeSession(
             new SessionId(session_id() ?: 'none'),
             $_SESSION ?? [],
+            $encryptor,
+            $decryptor,
         );
     }
 }
