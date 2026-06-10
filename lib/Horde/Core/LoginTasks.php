@@ -10,10 +10,14 @@
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
  *
  * @author   Michael Slusarz <slusarz@horde.org>
+ * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @category Horde
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
+
+use Horde\Core\Session\HordeSession;
+
 class Horde_Core_LoginTasks extends Horde_LoginTasks
 {
     /**
@@ -42,7 +46,8 @@ class Horde_Core_LoginTasks extends Horde_LoginTasks
         }
 
         if (($this->_app != 'horde')
-            && ($GLOBALS['session']->get('horde', 'logintasks') !== true)) {
+            && ($GLOBALS['injector']->getInstance(HordeSession::class)
+                ->getScoped('horde', 'logintasks') !== true)) {
             $GLOBALS['injector']->getInstance('Horde_Core_Factory_LoginTasks')->create('horde')->runTasks($opts);
         }
 
