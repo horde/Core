@@ -32,6 +32,7 @@ use Horde_Injector;
 use Horde_Registry;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -259,7 +260,11 @@ class DriverVersionCallbackTest extends TestCase
             [],
             Horde_ActiveSync::VERSION_FOURTEENONE
         );
-        $driver = $this->createDriver();
+        // versionCallback() falls back to the driver's registry when neither
+        // PHP_AUTH_USER nor the User GET parameter is set. Pin that call.
+        $registry = $this->getMockSkipConstructor(Horde_Registry::class);
+        $registry->expects($this->once())->method('getAuth')->willReturn(null);
+        $driver = $this->createDriver(registry: $registry);
         $this->setupGlobals(
             permsVersion: Horde_ActiveSync::VERSION_SIXTEEN,
             globalVersion: Horde_ActiveSync::VERSION_FOURTEENONE
@@ -320,12 +325,17 @@ class DriverVersionCallbackTest extends TestCase
         array $getVars = [],
         ?string $globalVersion = null
     ): Horde_ActiveSync {
+        // The Horde_ActiveSync constructor calls $driver->setProtocolVersion()
+        // exactly once and stores driver+state for later. versionCallback()
+        // never reads either of these via the server (it only uses
+        // request/setSupportedVersion/getSupportedVersions).
         $mockDriver = $this->getMockSkipConstructor('Horde_ActiveSync_Driver_Base');
+        $mockDriver->expects($this->once())->method('setProtocolVersion');
         $input = fopen('php://memory', 'wb+');
         $decoder = new Horde_ActiveSync_Wbxml_Decoder($input);
         $output = fopen('php://memory', 'wb+');
         $encoder = new Horde_ActiveSync_Wbxml_Encoder($output);
-        $state = $this->getMockSkipConstructor('Horde_ActiveSync_State_Base');
+        $state = $this->expectUntouched('Horde_ActiveSync_State_Base');
 
         $request = new Horde_Controller_Request_Mock([
             'server' => $serverVars,
@@ -370,15 +380,44 @@ class DriverVersionCallbackTest extends TestCase
         return implode(',', array_slice($supported, 0, $index + 1));
     }
 
-    private function createDriver(): Horde_Core_ActiveSync_Driver
+    private function createDriver(?Horde_Registry $registry = null): Horde_Core_ActiveSync_Driver
     {
         return new Horde_Core_ActiveSync_Driver([
-            'connector' => $this->getMockSkipConstructor(Horde_Core_ActiveSync_Connector::class),
-            'auth' => $this->getMockSkipConstructor(Horde_Core_ActiveSync_Auth::class),
+            'connector' => $this->expectUntouched(Horde_Core_ActiveSync_Connector::class),
+            'auth' => $this->expectUntouched(Horde_Core_ActiveSync_Auth::class),
             'serverrequest' => new ServerRequest('POST', '/'),
-            'registry' => $this->getMockSkipConstructor(Horde_Registry::class),
-            'state' => $this->getMockSkipConstructor('Horde_ActiveSync_State_Sql'),
+            'registry' => $registry ?? $this->expectUntouched(Horde_Registry::class),
+            'state' => $this->createDriverStateMock(),
         ]);
+    }
+
+    /**
+     * State mock pinned to the calls Horde_ActiveSync_Driver_Base::__construct
+     * makes during driver setup. versionCallback() itself never touches state.
+     */
+    private function createDriverStateMock(): MockObject
+    {
+        $state = $this->getMockSkipConstructor('Horde_ActiveSync_State_Sql');
+        $state->expects($this->once())->method('setLogger');
+        $state->expects($this->once())->method('setBackend');
+
+        return $state;
+    }
+
+    /**
+     * Build a mock for $className that expects to be untouched by both
+     * driver construction and the method under test (versionCallback).
+     * Pins isolation: future drift that adds calls to these collaborators
+     * inside versionCallback() fails the test.
+     *
+     * @param class-string $className
+     */
+    private function expectUntouched(string $className): MockObject
+    {
+        $mock = $this->getMockSkipConstructor($className);
+        $mock->expects($this->never())->method($this->anything());
+
+        return $mock;
     }
 
     /**
@@ -422,9 +461,19 @@ class DriverVersionCallbackTest extends TestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['exists', 'getPermissions'])
             ->getMock();
-        $perms->method('exists')
-            ->with('horde:activesync:version')
-            ->willReturn($permsExists);
+
+        if ($expectedUsername !== null || $permsExists === false) {
+            // versionCallback resolved a username (or the test wants to assert
+            // the missing-permission path); driver consults exists() once.
+            $perms->expects($this->once())
+                ->method('exists')
+                ->with('horde:activesync:version')
+                ->willReturn($permsExists);
+        } else {
+            // No username resolvable — driver short-circuits before asking
+            // perms.
+            $perms->expects($this->never())->method('exists');
+        }
 
         if ($permsExists && $expectedUsername !== null) {
             $perms->expects($this->once())
