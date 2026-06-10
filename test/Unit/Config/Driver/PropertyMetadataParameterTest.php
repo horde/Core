@@ -16,7 +16,8 @@ declare(strict_types=1);
 
 namespace Horde\Core\Test\Unit\Config\Driver;
 
-use PHPUnit\Framework\Attributes\CoversNothing;
+use Horde\Core\Config\Metadata\PropertyMetadata;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -36,7 +37,7 @@ use ReflectionClass;
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
-#[CoversNothing]
+#[CoversClass(PropertyMetadata::class)]
 class PropertyMetadataParameterTest extends TestCase
 {
     /**

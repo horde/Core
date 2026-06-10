@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Horde\Core\Test\Unit;
 
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Horde;
+use Horde\Core\Horde as CoreHorde;
 
 /**
  * @author     Jan Schneider <jan@horde.org>
@@ -15,7 +16,8 @@ use Horde;
  * @package    Core
  * @subpackage UnitTests
  */
-#[CoversNothing]
+#[CoversClass(Horde::class)]
+#[CoversClass(CoreHorde::class)]
 class UrlTest extends TestCase
 {
     public function testUrl()

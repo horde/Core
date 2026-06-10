@@ -8,7 +8,7 @@ use Horde\Compress\CompressFactory;
 use Horde\Compress\CompressorInterface;
 use Horde_Compress_Tar;
 use Horde_Compress_Zip;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
  * and passes them to viewers as config params. This test verifies the
  * created instances can decompress data in the expected format.
  */
-#[CoversNothing]
+#[CoversMethod(CompressFactory::class, 'create')]
 class MimeViewerCompressTest extends TestCase
 {
     /**

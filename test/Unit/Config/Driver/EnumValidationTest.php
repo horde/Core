@@ -18,7 +18,7 @@ namespace Horde\Core\Test\Unit\Config\Driver;
 
 use Horde\Core\Config\Metadata\FieldType;
 use Horde\Core\Config\Metadata\PropertyMetadata;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RecursiveDirectoryIterator;
@@ -41,7 +41,7 @@ use Throwable;
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
-#[CoversNothing]
+#[CoversMethod(PropertyMetadata::class, 'validate')]
 class EnumValidationTest extends TestCase
 {
     /**

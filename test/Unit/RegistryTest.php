@@ -16,10 +16,11 @@ declare(strict_types=1);
 namespace Horde\Core\Test\Unit;
 
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Horde\Core\Test\Stub\Registryconfig as RegistryconfigStub;
-use Horde_Registry_Hordeconfig_Merged;
 use Horde_Registry_Hordeconfig;
+use Horde_Registry_Hordeconfig_Merged;
+use Horde_Registry_Registryconfig;
 
 /**
  * Tests for Horde_Registry.
@@ -29,7 +30,9 @@ use Horde_Registry_Hordeconfig;
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
  */
-#[CoversNothing]
+#[CoversClass(Horde_Registry_Registryconfig::class)]
+#[CoversClass(Horde_Registry_Hordeconfig::class)]
+#[CoversClass(Horde_Registry_Hordeconfig_Merged::class)]
 class RegistryTest extends TestCase
 {
     protected string $_tmpdir = '';

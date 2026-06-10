@@ -19,7 +19,7 @@ namespace Horde\Core\Test\Unit\Config\Legacy;
 use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Driver\DriverRepository;
 use Horde\Core\Config\Metadata\FieldType;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RecursiveDirectoryIterator;
@@ -41,7 +41,7 @@ use Throwable;
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
-#[CoversNothing]
+#[CoversMethod(ConfigMetadataProvider::class, 'toLegacyFormat')]
 class CompleteLegacyFormatTest extends TestCase
 {
     private DriverRepository $repository;

@@ -23,7 +23,7 @@ use Horde_Injector;
 use Horde_Injector_TopLevel;
 use Horde_Registry_Hordeconfig;
 use Horde_Registry_Hordeconfig_Merged;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -38,7 +38,7 @@ use RuntimeException;
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
-#[CoversNothing]
+#[CoversClass(LegacyMergedConfig::class)]
 class LegacyMergedConfigInjectorTest extends TestCase
 {
     private Horde_Injector $injector;

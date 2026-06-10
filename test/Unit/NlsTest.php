@@ -1,6 +1,6 @@
 <?php
 
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * Tests the Nls API contract used by Core (FlagImage, VarRenderer, Datejs).
@@ -9,7 +9,8 @@ use PHPUnit\Framework\Attributes\CoversNothing;
  * - Horde_Nls::getLocaleInfo() for VarRenderer number formatting
  * - Horde_Nls::getCountryByHost() for FlagImage (returns array or false)
  */
-#[CoversNothing]
+#[CoversClass(Horde_Nls::class)]
+#[CoversClass(Horde_Core_Script_Package_Datejs::class)]
 class Horde_Core_Unit_NlsTest extends PHPUnit\Framework\TestCase
 {
     /**
