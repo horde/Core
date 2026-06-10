@@ -3246,7 +3246,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 throw new Horde_ActiveSync_Exception($e);
             }
 
-            $ident = $injector->getInstance('Horde_Core_Factory_Identity')->create($vEvent->creator);
+            // $ident was created above for the authenticated ActiveSync user.
             if (!$ident->getValue('from_addr')) {
                 throw new Horde_ActiveSync_Exception(_('You do not have an email address configured in your Personal Information Preferences.'));
             }
