@@ -30,10 +30,15 @@ class SidebarBuilderTest extends TestCase
     public function testBuildReturnsSidebarData(): void
     {
         $registry = $this->createMock(Horde_Registry::class);
-        $registry->method('callAppMethod')->willReturn(null);
-        $registry->method('getAuth')->willReturn(null);
+        // build() calls menu() and sidebar() once each via callAppMethod.
+        $registry->expects($this->exactly(2))
+            ->method('callAppMethod')
+            ->willReturn(null);
+        $registry->expects($this->once())->method('getAuth')->willReturn(null);
 
+        // Anonymous user: prefs lookup never fires.
         $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->never())->method('getValue');
 
         $builder = new SidebarBuilder($registry, $prefs);
         $data = $builder->build();
@@ -44,10 +49,13 @@ class SidebarBuilderTest extends TestCase
     public function testBuildDefaultWidth(): void
     {
         $registry = $this->createMock(Horde_Registry::class);
-        $registry->method('callAppMethod')->willReturn(null);
-        $registry->method('getAuth')->willReturn(null);
+        $registry->expects($this->exactly(2))
+            ->method('callAppMethod')
+            ->willReturn(null);
+        $registry->expects($this->once())->method('getAuth')->willReturn(null);
 
         $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->never())->method('getValue');
 
         $builder = new SidebarBuilder($registry, $prefs);
         $data = $builder->build();
@@ -58,11 +66,14 @@ class SidebarBuilderTest extends TestCase
     public function testBuildCustomWidthFromPrefs(): void
     {
         $registry = $this->createMock(Horde_Registry::class);
-        $registry->method('callAppMethod')->willReturn(null);
-        $registry->method('getAuth')->willReturn('testuser');
+        $registry->expects($this->exactly(2))
+            ->method('callAppMethod')
+            ->willReturn(null);
+        $registry->expects($this->once())->method('getAuth')->willReturn('testuser');
 
         $prefs = $this->createMock(PrefsService::class);
-        $prefs->method('getValue')
+        $prefs->expects($this->once())
+            ->method('getValue')
             ->with('testuser', 'horde', 'sidebar_width')
             ->willReturn('300');
 
@@ -82,9 +93,10 @@ class SidebarBuilderTest extends TestCase
                 $this->assertContains($method, ['menu', 'sidebar']);
                 return null;
             });
-        $registry->method('getAuth')->willReturn(null);
+        $registry->expects($this->once())->method('getAuth')->willReturn(null);
 
         $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->never())->method('getValue');
 
         $builder = new SidebarBuilder($registry, $prefs);
         $builder->build('imp');
@@ -93,10 +105,13 @@ class SidebarBuilderTest extends TestCase
     public function testBuildPassesCookieData(): void
     {
         $registry = $this->createMock(Horde_Registry::class);
-        $registry->method('callAppMethod')->willReturn(null);
-        $registry->method('getAuth')->willReturn(null);
+        $registry->expects($this->exactly(2))
+            ->method('callAppMethod')
+            ->willReturn(null);
+        $registry->expects($this->once())->method('getAuth')->willReturn(null);
 
         $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->never())->method('getValue');
 
         $builder = new SidebarBuilder($registry, $prefs);
         $data = $builder->build('horde', ['horde_sidebar_c_test' => '1']);
@@ -107,11 +122,15 @@ class SidebarBuilderTest extends TestCase
     public function testBuildHandlesExceptionGracefully(): void
     {
         $registry = $this->createMock(Horde_Registry::class);
-        $registry->method('callAppMethod')
+        // Both callAppMethod invocations throw; build() must catch and
+        // continue with an empty container set.
+        $registry->expects($this->exactly(2))
+            ->method('callAppMethod')
             ->willThrowException(new Exception('App not found'));
-        $registry->method('getAuth')->willReturn(null);
+        $registry->expects($this->once())->method('getAuth')->willReturn(null);
 
         $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->never())->method('getValue');
 
         $builder = new SidebarBuilder($registry, $prefs);
         $data = $builder->build();
