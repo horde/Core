@@ -425,6 +425,10 @@ class Horde_Session implements Horde_Shutdown_Task
             return false;
         }
 
+        if (!$this->_active) {
+            $this->start();
+        }
+
         // Make sure to force a completely new session ID and clear all
         // session data.
         session_regenerate_id(true);

@@ -171,11 +171,17 @@ class AuthCredentialStore
             $value = $this->session->getScoped(self::SCOPE, $slotKey);
         }
 
-        if ($value === true && $app !== $baseApp) {
-            return $this->get($baseApp);
+        if ($value === true) {
+            return ($app !== $baseApp) ? $this->get($baseApp) : false;
         }
 
-        return is_array($value) ? $value : $value;
+        if (is_array($value)) {
+            return $value;
+        }
+
+        // Wrong encryption key, legacy wire format, or corrupted slot: treat as
+        // missing credentials instead of violating the array|bool return type.
+        return false;
     }
 
     /**
