@@ -8,11 +8,15 @@
  * See the enclosed file LICENSE for license information (GPL). If you
  * did not receive this file, see http://www.horde.org/licenses/gpl.
  *
- * @author  Michael J Rubinsky <mrubinsk@horde.org>
+ * @author   Michael J Rubinsky <mrubinsk@horde.org>
+ * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @category Horde
  * @license  http://www.horde.org/licenses/gpl GPL
  * @package  Core
  */
+
+use Horde\Core\Session\HordeSession;
+
 abstract class Horde_Core_TagBrowser
 {
     /**
@@ -66,6 +70,14 @@ abstract class Horde_Core_TagBrowser
     protected $_tagger;
 
     /**
+     * The modern session. Reads and writes for the per-user `browsetags`
+     * cache go through scoped accessors. The wire format diverges from
+     * legacy `Horde_Pack` blobs, but this slot is a transient browse cache
+     * that gets rebuilt on the next page request.
+     */
+    protected HordeSession $_session;
+
+    /**
      * Const'r
      *
      * @param Horde_Core_Tagger $tagger  The tagger object.
@@ -78,14 +90,13 @@ abstract class Horde_Core_TagBrowser
         $owner = null
     ) {
         $this->_tagger = $tagger;
+        $this->_session = $GLOBALS['injector']->getInstance(HordeSession::class);
+
         if (!empty($tags)) {
             $this->_tags = $this->_tagger->getTagIds($tags);
         } else {
-            $this->_tags = $GLOBALS['session']->get(
-                $this->_app,
-                'browsetags',
-                Horde_Session::TYPE_ARRAY
-            );
+            $stored = $this->_session->getScoped($this->_app, 'browsetags');
+            $this->_tags = is_array($stored) ? $stored : [];
         }
 
         $this->_owner = empty($owner) ? $GLOBALS['registry']->getAuth() : $owner;
@@ -96,7 +107,7 @@ abstract class Horde_Core_TagBrowser
      */
     public function save()
     {
-        $GLOBALS['session']->set($this->_app, 'browsetags', $this->_tags);
+        $this->_session->setScoped($this->_app, 'browsetags', $this->_tags);
         $this->_dirty = false;
     }
 
@@ -275,7 +286,7 @@ abstract class Horde_Core_TagBrowser
      */
     public function clearSearch()
     {
-        $GLOBALS['session']->remove($this->_app, 'browsetags');
+        $this->_session->removeScoped($this->_app, 'browsetags');
         $this->_tags = [];
     }
 
