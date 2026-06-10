@@ -7,17 +7,26 @@
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
  *
  * @category  Horde
- * @copyright 2014-2017 Horde LLC
+ * @copyright 2014-2026 Horde LLC
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
 
+use Horde\Core\Session\HordeSession;
+
 /**
  * Core Horde notification handler.
  *
+ * Persists the per-session list of application notification handlers via
+ * the modern PSR-4 {@see HordeSession} (scoped writes). The wire format
+ * diverges from values previously written through the legacy
+ * `Horde_Session::set()` path. Stale entries from the prior format are
+ * treated as missing on the first read after deploy.
+ *
  * @author    Michael Slusarz <slusarz@horde.org>
+ * @author    Ralf Lang <ralf.lang@ralf-lang.de>
  * @category  Horde
- * @copyright 2014-2017 Horde LLC
+ * @copyright 2014-2026 Horde LLC
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  * @since     2.18.0
@@ -27,11 +36,34 @@ class Horde_Core_Notification_Handler extends Horde_Notification_Handler
     public const SESS_KEY = 'core_notification_handler';
 
     /**
+     * The modern session.
+     */
+    protected HordeSession $_session;
+
+    /**
      * List of applications that contain notification handlers. Array with
      * keys as app names and values as boolean values indicating if the
      * handler has been loaded yet. False indicates attaching is not active.
      */
     protected $_apps = false;
+
+    /**
+     * @param Horde_Notification_Storage_Interface $storage  Notification storage.
+     * @param HordeSession|null                    $session  Modern session for
+     *                                                       the per-session
+     *                                                       app-handler cache.
+     *                                                       If omitted, resolved
+     *                                                       from the global
+     *                                                       injector for BC.
+     */
+    public function __construct(
+        Horde_Notification_Storage_Interface $storage,
+        ?HordeSession $session = null
+    ) {
+        parent::__construct($storage);
+        $this->_session = $session
+            ?? $GLOBALS['injector']->getInstance(HordeSession::class);
+    }
 
     /**
      */
@@ -55,10 +87,10 @@ class Horde_Core_Notification_Handler extends Horde_Notification_Handler
      */
     public function attachAllAppHandlers()
     {
-        global $registry, $session;
+        global $registry;
 
         /* Cache notification handler application method existence. */
-        $this->_apps = $session->get('horde', self::SESS_KEY);
+        $this->_apps = $this->_session->getScoped('horde', self::SESS_KEY);
         if (!is_null($this->_apps)) {
             return;
         }
@@ -77,7 +109,7 @@ class Horde_Core_Notification_Handler extends Horde_Notification_Handler
             }
         }
 
-        $session->set('horde', self::SESS_KEY, $this->_apps);
+        $this->_session->setScoped('horde', self::SESS_KEY, $this->_apps);
     }
 
     /**
