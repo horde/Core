@@ -20,55 +20,85 @@ use Horde\Core\Topbar\TopbarRenderer;
 use Horde\Http\ServerRequest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(DesktopChromeRenderer::class)]
 class DesktopChromeRendererTest extends TestCase
 {
-    private AssetCollector $collector;
-    private PageComposer $pageComposer;
-    private ViewModeConfigurator $configurator;
-    private TopbarBuilder $topbarBuilder;
-    private TopbarRenderer $topbarRenderer;
-    private SidebarRenderer $sidebarRenderer;
-    private JsDiscoverer $jsDiscoverer;
-
-    protected function setUp(): void
-    {
-        $this->collector = new AssetCollector();
-
-        $this->pageComposer = $this->createMock(PageComposer::class);
-        $this->pageComposer->method('renderHead')->willReturn('<head-html>');
-        $this->pageComposer->method('renderFoot')->willReturn('<foot-html>');
-
-        $this->configurator = $this->createMock(ViewModeConfigurator::class);
-
-        $this->topbarBuilder = $this->createMock(TopbarBuilder::class);
-        $this->topbarBuilder->method('build')->willReturn(
-            new TopbarData(portalUrl: '/horde/', version: 'H6')
+    /**
+     * Per-test renderer assembly. Each parameter is optional; when omitted
+     * the test gets a mock with sensible expectations for the renderPage()
+     * call shape. Tests that care about a specific collaborator pass an
+     * already-configured mock and assert on it.
+     */
+    private function createRenderer(
+        ?AssetCollector $collector = null,
+        ?MockObject $pageComposer = null,
+        ?MockObject $configurator = null,
+        ?MockObject $topbarBuilder = null,
+        ?MockObject $topbarRenderer = null,
+        ?MockObject $sidebarRenderer = null,
+        ?MockObject $jsDiscoverer = null,
+    ): DesktopChromeRenderer {
+        return new DesktopChromeRenderer(
+            $collector ?? new AssetCollector(),
+            $pageComposer ?? $this->defaultPageComposer(),
+            $configurator ?? $this->defaultConfigurator(),
+            $topbarBuilder ?? $this->defaultTopbarBuilder(),
+            $topbarRenderer ?? $this->defaultTopbarRenderer(),
+            $sidebarRenderer ?? $this->defaultSidebarRenderer(),
+            $jsDiscoverer ?? $this->defaultJsDiscoverer(),
         );
-
-        $this->topbarRenderer = $this->createMock(TopbarRenderer::class);
-        $this->topbarRenderer->method('render')->willReturn('<topbar-html>');
-
-        $this->sidebarRenderer = $this->createMock(SidebarRenderer::class);
-        $this->sidebarRenderer->method('render')->willReturn('<sidebar-html>');
-
-        $this->jsDiscoverer = $this->createMock(JsDiscoverer::class);
-        $this->jsDiscoverer->method('resolve')->willReturn(null);
     }
 
-    private function createRenderer(): DesktopChromeRenderer
+    /** PageComposer is called once for renderHead and once for renderFoot. */
+    private function defaultPageComposer(): MockObject
     {
-        return new DesktopChromeRenderer(
-            $this->collector,
-            $this->pageComposer,
-            $this->configurator,
-            $this->topbarBuilder,
-            $this->topbarRenderer,
-            $this->sidebarRenderer,
-            $this->jsDiscoverer,
-        );
+        $mock = $this->createMock(PageComposer::class);
+        $mock->expects($this->once())->method('renderHead')->willReturn('<head-html>');
+        $mock->expects($this->once())->method('renderFoot')->willReturn('<foot-html>');
+        return $mock;
+    }
+
+    /** ViewModeConfigurator is called exactly once per renderPage. */
+    private function defaultConfigurator(): MockObject
+    {
+        $mock = $this->createMock(ViewModeConfigurator::class);
+        $mock->expects($this->once())->method('configure');
+        return $mock;
+    }
+
+    private function defaultTopbarBuilder(): MockObject
+    {
+        $mock = $this->createMock(TopbarBuilder::class);
+        $mock->expects($this->once())
+            ->method('build')
+            ->willReturn(new TopbarData(portalUrl: '/horde/', version: 'H6'));
+        return $mock;
+    }
+
+    private function defaultTopbarRenderer(): MockObject
+    {
+        $mock = $this->createMock(TopbarRenderer::class);
+        $mock->expects($this->once())->method('render')->willReturn('<topbar-html>');
+        return $mock;
+    }
+
+    /** SidebarRenderer fires only when PageContent carries sidebar data. */
+    private function defaultSidebarRenderer(): MockObject
+    {
+        $mock = $this->createMock(SidebarRenderer::class);
+        $mock->expects($this->never())->method('render');
+        return $mock;
+    }
+
+    /** JsDiscoverer fires once per extra js file; default content has none. */
+    private function defaultJsDiscoverer(): MockObject
+    {
+        $mock = $this->createMock(JsDiscoverer::class);
+        $mock->expects($this->never())->method('resolve');
+        return $mock;
     }
 
     private function createRequest(RenderingMode $mode = RenderingMode::DYNAMIC): ServerRequest
@@ -112,12 +142,17 @@ class DesktopChromeRendererTest extends TestCase
     #[Test]
     public function renderPageIncludesSidebarWhenProvided(): void
     {
-        $renderer = $this->createRenderer();
-        $sidebarData = new SidebarData();
+        // SidebarData present => sidebarRenderer must fire exactly once.
+        $sidebarRenderer = $this->createMock(SidebarRenderer::class);
+        $sidebarRenderer->expects($this->once())
+            ->method('render')
+            ->willReturn('<sidebar-html>');
+
+        $renderer = $this->createRenderer(sidebarRenderer: $sidebarRenderer);
         $content = new PageContent(
             title: 'Test',
             bodyHtml: '<div>Body</div>',
-            sidebarData: $sidebarData,
+            sidebarData: new SidebarData(),
         );
 
         $html = $renderer->renderPage($content, $this->createRequest());
@@ -128,8 +163,7 @@ class DesktopChromeRendererTest extends TestCase
     #[Test]
     public function renderPageSkipsSidebarWhenNull(): void
     {
-        $this->sidebarRenderer->expects(self::never())->method('render');
-
+        // Default sidebar mock already pins expects(never)->method('render').
         $renderer = $this->createRenderer();
         $content = new PageContent(title: 'Test', bodyHtml: '<div>Body</div>');
 
@@ -139,11 +173,12 @@ class DesktopChromeRendererTest extends TestCase
     #[Test]
     public function renderPageConfiguresViewModeFromRequest(): void
     {
-        $this->configurator->expects(self::once())
+        $configurator = $this->createMock(ViewModeConfigurator::class);
+        $configurator->expects($this->once())
             ->method('configure')
-            ->with($this->collector, ViewMode::BASIC);
+            ->with(self::isInstanceOf(AssetCollector::class), ViewMode::BASIC);
 
-        $renderer = $this->createRenderer();
+        $renderer = $this->createRenderer(configurator: $configurator);
         $content = new PageContent(title: 'Test', bodyHtml: '');
 
         $renderer->renderPage($content, $this->createRequest(RenderingMode::BASIC));
@@ -152,11 +187,12 @@ class DesktopChromeRendererTest extends TestCase
     #[Test]
     public function renderPageDynamicModeUsesViewModeDynamic(): void
     {
-        $this->configurator->expects(self::once())
+        $configurator = $this->createMock(ViewModeConfigurator::class);
+        $configurator->expects($this->once())
             ->method('configure')
-            ->with($this->collector, ViewMode::DYNAMIC);
+            ->with(self::isInstanceOf(AssetCollector::class), ViewMode::DYNAMIC);
 
-        $renderer = $this->createRenderer();
+        $renderer = $this->createRenderer(configurator: $configurator);
         $content = new PageContent(title: 'Test', bodyHtml: '');
 
         $renderer->renderPage($content, $this->createRequest(RenderingMode::DYNAMIC));
@@ -165,13 +201,18 @@ class DesktopChromeRendererTest extends TestCase
     #[Test]
     public function renderPageResolvesExtraJsFiles(): void
     {
-        $jsDiscoverer = $this->createMock(JsDiscoverer::class);
-        $jsDiscoverer->method('resolve')->willReturnCallback(function (string $file, string $app) {
-            return '/js/' . $app . '/' . $file;
-        });
-        $this->jsDiscoverer = $jsDiscoverer;
+        $collector = new AssetCollector();
 
-        $renderer = $this->createRenderer();
+        $jsDiscoverer = $this->createMock(JsDiscoverer::class);
+        $jsDiscoverer->expects($this->once())
+            ->method('resolve')
+            ->with('tasks.js', 'nag')
+            ->willReturn('/js/nag/tasks.js');
+
+        $renderer = $this->createRenderer(
+            collector: $collector,
+            jsDiscoverer: $jsDiscoverer,
+        );
         $content = new PageContent(
             title: 'Test',
             bodyHtml: '',
@@ -181,14 +222,16 @@ class DesktopChromeRendererTest extends TestCase
 
         $renderer->renderPage($content, $this->createRequest());
 
-        $urls = $this->collector->getScriptUrls();
+        $urls = $collector->getScriptUrls();
         self::assertContains('/js/nag/tasks.js', $urls);
     }
 
     #[Test]
     public function renderPageAddsExtraCssFiles(): void
     {
-        $renderer = $this->createRenderer();
+        $collector = new AssetCollector();
+
+        $renderer = $this->createRenderer(collector: $collector);
         $content = new PageContent(
             title: 'Test',
             bodyHtml: '',
@@ -197,19 +240,20 @@ class DesktopChromeRendererTest extends TestCase
 
         $renderer->renderPage($content, $this->createRequest());
 
-        $urls = $this->collector->getStylesheetUrls();
+        $urls = $collector->getStylesheetUrls();
         self::assertContains('/themes/default/custom.css', $urls);
     }
 
     #[Test]
     public function renderPageBuildsTopbarWithCorrectApp(): void
     {
-        $this->topbarBuilder->expects(self::once())
+        $topbarBuilder = $this->createMock(TopbarBuilder::class);
+        $topbarBuilder->expects($this->once())
             ->method('build')
             ->with('imp')
             ->willReturn(new TopbarData(portalUrl: '/horde/', version: 'H6'));
 
-        $renderer = $this->createRenderer();
+        $renderer = $this->createRenderer(topbarBuilder: $topbarBuilder);
         $content = new PageContent(title: 'Mail', bodyHtml: '', app: 'imp');
 
         $renderer->renderPage($content, $this->createRequest());
@@ -218,11 +262,12 @@ class DesktopChromeRendererTest extends TestCase
     #[Test]
     public function renderPageDefaultsModeWhenAttributeMissing(): void
     {
-        $this->configurator->expects(self::once())
+        $configurator = $this->createMock(ViewModeConfigurator::class);
+        $configurator->expects($this->once())
             ->method('configure')
-            ->with($this->collector, ViewMode::DYNAMIC);
+            ->with(self::isInstanceOf(AssetCollector::class), ViewMode::DYNAMIC);
 
-        $renderer = $this->createRenderer();
+        $renderer = $this->createRenderer(configurator: $configurator);
         $content = new PageContent(title: 'Test', bodyHtml: '');
 
         $request = new ServerRequest('GET', 'http://localhost/', [], null, '1.1', []);
