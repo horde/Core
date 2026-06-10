@@ -25,45 +25,54 @@ use Horde\Core\Session\HordeSession;
 use Horde\Url\Url;
 use Horde_Registry;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ViewModeConfigurator::class)]
 class ViewModeConfiguratorTest extends TestCase
 {
-    private function createConfigurator(
-        ?Horde_Registry $registry = null,
-        ?PrefsService $prefs = null,
-        ?HordeSession $session = null,
-        ?JsDiscoverer $jsDiscoverer = null,
-    ): ViewModeConfigurator {
-        $registry ??= $this->createMock(Horde_Registry::class);
-        $prefs ??= $this->createMock(PrefsService::class);
-        $session ??= $this->createMock(HordeSession::class);
-        if ($jsDiscoverer === null) {
-            $jsDiscoverer = $this->createMock(JsDiscoverer::class);
-            $jsDiscoverer->method('resolve')->willReturnCallback(
-                fn(string $file) => '/js/' . $file
-            );
-            $jsDiscoverer->method('resolveMany')->willReturnCallback(
+    /**
+     * JsDiscoverer mock that mirrors filename-to-URL mapping. resolveMany is
+     * the canonical "look up scripts" call configure() always uses; tests
+     * that exercise the access-keys path also drive resolve().
+     */
+    private function createJsDiscovererMock(): MockObject
+    {
+        $jsDiscoverer = $this->createMock(JsDiscoverer::class);
+        $jsDiscoverer->expects($this->atLeastOnce())
+            ->method('resolveMany')
+            ->willReturnCallback(
                 fn(array $files) => array_combine(
                     $files,
                     array_map(fn($f) => '/js/' . $f, $files)
                 )
             );
-        }
+        $jsDiscoverer->method('resolve')->willReturnCallback(
+            fn(string $file) => '/js/' . $file
+        );
 
-        return new ViewModeConfigurator($registry, $prefs, $session, $jsDiscoverer);
+        return $jsDiscoverer;
     }
 
     public function testBasicModeAddsPrototypeAndHorde(): void
     {
         $registry = $this->createMock(Horde_Registry::class);
-        $registry->method('get')->willReturn('/js');
+        $registry->expects($this->never())->method('getApp');
 
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn(null);
+        $session->expects($this->once())->method('getAuthId')->willReturn(null);
+        // Anonymous user: prefs lookup never fires.
+        $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->never())->method('getValue');
 
-        $configurator = $this->createConfigurator(registry: $registry, session: $session);
+        $jsDiscoverer = $this->createJsDiscovererMock();
+
+        $configurator = new ViewModeConfigurator(
+            $registry,
+            $prefs,
+            $session,
+            $jsDiscoverer,
+        );
         $collector = new AssetCollector();
 
         $configurator->configure($collector, ViewMode::BASIC);
@@ -76,17 +85,23 @@ class ViewModeConfiguratorTest extends TestCase
     public function testBasicModeAddsAccessKeysWhenPrefEnabled(): void
     {
         $registry = $this->createMock(Horde_Registry::class);
-        $registry->method('get')->willReturn('/js');
+        $registry->expects($this->never())->method('getApp');
 
         $prefs = $this->createMock(PrefsService::class);
-        $prefs->method('getValue')
+        $prefs->expects($this->once())
+            ->method('getValue')
             ->with('testuser', 'horde', 'widget_accesskey')
             ->willReturn(true);
 
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn('testuser');
+        $session->expects($this->once())->method('getAuthId')->willReturn('testuser');
 
-        $configurator = $this->createConfigurator(registry: $registry, prefs: $prefs, session: $session);
+        $configurator = new ViewModeConfigurator(
+            $registry,
+            $prefs,
+            $session,
+            $this->createJsDiscovererMock(),
+        );
         $collector = new AssetCollector();
 
         $configurator->configure($collector, ViewMode::BASIC);
@@ -97,17 +112,23 @@ class ViewModeConfiguratorTest extends TestCase
     public function testBasicModeSkipsAccessKeysWhenPrefDisabled(): void
     {
         $registry = $this->createMock(Horde_Registry::class);
-        $registry->method('get')->willReturn('/js');
+        $registry->expects($this->never())->method('getApp');
 
         $prefs = $this->createMock(PrefsService::class);
-        $prefs->method('getValue')
+        $prefs->expects($this->once())
+            ->method('getValue')
             ->with('testuser', 'horde', 'widget_accesskey')
             ->willReturn(false);
 
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn('testuser');
+        $session->expects($this->once())->method('getAuthId')->willReturn('testuser');
 
-        $configurator = $this->createConfigurator(registry: $registry, prefs: $prefs, session: $session);
+        $configurator = new ViewModeConfigurator(
+            $registry,
+            $prefs,
+            $session,
+            $this->createJsDiscovererMock(),
+        );
         $collector = new AssetCollector();
 
         $configurator->configure($collector, ViewMode::BASIC);
@@ -118,18 +139,31 @@ class ViewModeConfiguratorTest extends TestCase
     public function testDynamicModeAddsAdditionalScripts(): void
     {
         $registry = $this->createMock(Horde_Registry::class);
-        $registry->method('get')->willReturn('/js');
-        $registry->method('getApp')->willReturn('horde');
-        $registry->method('getServiceLink')->willReturn(new Url('/horde/services/ajax.php'));
+        $registry->expects($this->once())->method('getApp')->willReturn('horde');
+        $registry->expects($this->atLeastOnce())
+            ->method('getServiceLink')
+            ->willReturn(new Url('/horde/services/ajax.php'));
 
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn('testuser');
-        $session->method('getScoped')->willReturn('token123');
+        // getAuthId fires for BASIC's accesskey check AND for DYNAMIC's uid lookup.
+        $session->expects($this->exactly(2))->method('getAuthId')->willReturn('testuser');
+        $session->expects($this->once())
+            ->method('getScoped')
+            ->with('horde', 'token')
+            ->willReturn('token123');
 
         $prefs = $this->createMock(PrefsService::class);
-        $prefs->method('getValue')->willReturn(false);
+        $prefs->expects($this->once())
+            ->method('getValue')
+            ->with('testuser', 'horde', 'widget_accesskey')
+            ->willReturn(false);
 
-        $configurator = $this->createConfigurator(registry: $registry, prefs: $prefs, session: $session);
+        $configurator = new ViewModeConfigurator(
+            $registry,
+            $prefs,
+            $session,
+            $this->createJsDiscovererMock(),
+        );
         $collector = new AssetCollector();
 
         $configurator->configure($collector, ViewMode::DYNAMIC);
@@ -144,18 +178,30 @@ class ViewModeConfiguratorTest extends TestCase
     public function testDynamicModeRegistersHordeCoreJsVars(): void
     {
         $registry = $this->createMock(Horde_Registry::class);
-        $registry->method('get')->willReturn('/js');
-        $registry->method('getApp')->willReturn('horde');
-        $registry->method('getServiceLink')->willReturn(new Url('/horde/services/ajax.php'));
+        $registry->expects($this->once())->method('getApp')->willReturn('horde');
+        $registry->expects($this->atLeastOnce())
+            ->method('getServiceLink')
+            ->willReturn(new Url('/horde/services/ajax.php'));
 
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn('testuser');
-        $session->method('getScoped')->willReturn('mytoken');
+        $session->expects($this->exactly(2))->method('getAuthId')->willReturn('testuser');
+        $session->expects($this->once())
+            ->method('getScoped')
+            ->with('horde', 'token')
+            ->willReturn('mytoken');
 
         $prefs = $this->createMock(PrefsService::class);
-        $prefs->method('getValue')->willReturn(false);
+        $prefs->expects($this->once())
+            ->method('getValue')
+            ->with('testuser', 'horde', 'widget_accesskey')
+            ->willReturn(false);
 
-        $configurator = $this->createConfigurator(registry: $registry, prefs: $prefs, session: $session);
+        $configurator = new ViewModeConfigurator(
+            $registry,
+            $prefs,
+            $session,
+            $this->createJsDiscovererMock(),
+        );
         $collector = new AssetCollector();
 
         $configurator->configure($collector, ViewMode::DYNAMIC);
