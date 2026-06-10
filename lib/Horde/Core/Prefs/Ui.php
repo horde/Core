@@ -1,6 +1,7 @@
 <?php
 
 use Horde\Core\Horde;
+use Horde\Core\Session\HordeSession;
 use Horde\Util\Util;
 use Horde\Util\Variables;
 
@@ -147,7 +148,9 @@ class Horde_Core_Prefs_Ui
      */
     public function getChangeablePrefs($group = null)
     {
-        global $prefs, $session;
+        global $prefs;
+
+        $session = $GLOBALS['injector']->getInstance(HordeSession::class);
 
         if (is_null($group)) {
             if (!$this->group) {
@@ -178,7 +181,7 @@ class Horde_Core_Prefs_Ui
             if (!$prefs->isLocked($pref)
                 && !in_array($pref, $this->suppress)
                 && (empty($p['advanced'])
-                 || $session->get('horde', 'prefs_advanced'))
+                 || $session->getScoped('horde', 'prefs_advanced'))
                 && ((!empty($p['type']) && ($p['type'] != 'implicit')))) {
                 if (!empty($p['suppress'])
                     && (!is_callable($p['suppress']) || $p['suppress']())) {
@@ -252,7 +255,8 @@ class Horde_Core_Prefs_Ui
         /* Toggle Advanced/Basic mode. */
         if (!empty($this->vars->show_advanced)
             || !empty($this->vars->show_basic)) {
-            $GLOBALS['session']->set('horde', 'prefs_advanced', !empty($this->vars->show_advanced));
+            $GLOBALS['injector']->getInstance(HordeSession::class)
+                ->setScoped('horde', 'prefs_advanced', !empty($this->vars->show_advanced));
         } elseif (!$this->vars->actionID
                   || !$this->group
                   || !$this->groupIsEditable($this->group)) {
@@ -696,7 +700,8 @@ class Horde_Core_Prefs_Ui
         $t->set('header', $header);
 
         $t->set('has_advanced', $this->hasAdvancedPrefs());
-        if ($GLOBALS['session']->get('horde', 'prefs_advanced')) {
+        if ($GLOBALS['injector']->getInstance(HordeSession::class)
+            ->getScoped('horde', 'prefs_advanced')) {
             $t->set('basic', $this->selfUrl()->add('show_basic', 1));
         } else {
             $t->set('advanced', $this->selfUrl()->add('show_advanced', 1));
