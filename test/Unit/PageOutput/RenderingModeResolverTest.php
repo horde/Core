@@ -15,25 +15,32 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(RenderingModeResolver::class)]
 class RenderingModeResolverTest extends TestCase
 {
-    private function createResolver(
-        ?HordeSession $session = null,
-        ?Browser $browser = null,
-    ): RenderingModeResolver {
-        $session ??= $this->createMock(HordeSession::class);
-        $browser ??= $this->createMock(Browser::class);
+    /**
+     * For tests that exercise only one of (session, browser), build a stub
+     * for the unused dependency. The resolver never reads it on the path
+     * under test, so a pure type-hint stub is the right shape.
+     */
+    private function unusedSessionStub(): HordeSession
+    {
+        return $this->createStub(HordeSession::class);
+    }
 
-        return new RenderingModeResolver($session, $browser);
+    private function unusedBrowserStub(): Browser
+    {
+        return $this->createStub(Browser::class);
     }
 
     #[Test]
     public function authenticatedUserWithStoredModeUsesSessionValue(): void
     {
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn('testuser');
-        $session->method('hasScoped')->with('horde', 'rendering_mode')->willReturn(true);
-        $session->method('getScoped')->with('horde', 'rendering_mode')->willReturn('responsive');
+        $session->expects(self::once())->method('getAuthId')->willReturn('testuser');
+        $session->expects(self::once())->method('hasScoped')
+            ->with('horde', 'rendering_mode')->willReturn(true);
+        $session->expects(self::once())->method('getScoped')
+            ->with('horde', 'rendering_mode')->willReturn('responsive');
 
-        $resolver = $this->createResolver(session: $session);
+        $resolver = new RenderingModeResolver($session, $this->unusedBrowserStub());
         self::assertSame(RenderingMode::RESPONSIVE, $resolver->resolve());
     }
 
@@ -41,11 +48,13 @@ class RenderingModeResolverTest extends TestCase
     public function authenticatedUserWithDynamicModeStored(): void
     {
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn('testuser');
-        $session->method('hasScoped')->with('horde', 'rendering_mode')->willReturn(true);
-        $session->method('getScoped')->with('horde', 'rendering_mode')->willReturn('dynamic');
+        $session->expects(self::once())->method('getAuthId')->willReturn('testuser');
+        $session->expects(self::once())->method('hasScoped')
+            ->with('horde', 'rendering_mode')->willReturn(true);
+        $session->expects(self::once())->method('getScoped')
+            ->with('horde', 'rendering_mode')->willReturn('dynamic');
 
-        $resolver = $this->createResolver(session: $session);
+        $resolver = new RenderingModeResolver($session, $this->unusedBrowserStub());
         self::assertSame(RenderingMode::DYNAMIC, $resolver->resolve());
     }
 
@@ -53,16 +62,19 @@ class RenderingModeResolverTest extends TestCase
     public function authenticatedUserWithInvalidStoredModeFallsToBrowserDetection(): void
     {
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn('testuser');
-        $session->method('hasScoped')->with('horde', 'rendering_mode')->willReturn(true);
-        $session->method('getScoped')->with('horde', 'rendering_mode')->willReturn('invalid_mode');
+        $session->expects(self::once())->method('getAuthId')->willReturn('testuser');
+        $session->expects(self::once())->method('hasScoped')
+            ->with('horde', 'rendering_mode')->willReturn(true);
+        $session->expects(self::once())->method('getScoped')
+            ->with('horde', 'rendering_mode')->willReturn('invalid_mode');
 
         $browser = $this->createMock(Browser::class);
-        $browser->method('mobile')->willReturn(false);
-        $browser->method('tablet')->willReturn(false);
-        $browser->method('hasFeature')->with('ajax')->willReturn(true);
+        $browser->expects(self::once())->method('mobile')->willReturn(false);
+        $browser->expects(self::once())->method('tablet')->willReturn(false);
+        $browser->expects(self::once())->method('hasFeature')
+            ->with('ajax')->willReturn(true);
 
-        $resolver = $this->createResolver(session: $session, browser: $browser);
+        $resolver = new RenderingModeResolver($session, $browser);
         self::assertSame(RenderingMode::DYNAMIC, $resolver->resolve());
     }
 
@@ -70,14 +82,18 @@ class RenderingModeResolverTest extends TestCase
     public function authenticatedUserWithNoStoredModeFallsToBrowserDetection(): void
     {
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn('testuser');
-        $session->method('hasScoped')->with('horde', 'rendering_mode')->willReturn(false);
+        $session->expects(self::once())->method('getAuthId')->willReturn('testuser');
+        $session->expects(self::once())->method('hasScoped')
+            ->with('horde', 'rendering_mode')->willReturn(false);
+        $session->expects(self::never())->method('getScoped');
 
         $browser = $this->createMock(Browser::class);
-        $browser->method('mobile')->willReturn(true);
-        $browser->method('tablet')->willReturn(false);
+        $browser->expects(self::once())->method('mobile')->willReturn(true);
+        // tablet() and hasFeature() are short-circuited by mobile() returning true.
+        $browser->expects(self::never())->method('tablet');
+        $browser->expects(self::never())->method('hasFeature');
 
-        $resolver = $this->createResolver(session: $session, browser: $browser);
+        $resolver = new RenderingModeResolver($session, $browser);
         self::assertSame(RenderingMode::RESPONSIVE, $resolver->resolve());
     }
 
@@ -85,13 +101,14 @@ class RenderingModeResolverTest extends TestCase
     public function anonymousUserOnMobileBrowserGetsResponsive(): void
     {
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn(null);
+        $session->expects(self::once())->method('getAuthId')->willReturn(null);
+        $session->expects(self::never())->method('hasScoped');
 
         $browser = $this->createMock(Browser::class);
-        $browser->method('mobile')->willReturn(true);
-        $browser->method('tablet')->willReturn(false);
+        $browser->expects(self::once())->method('mobile')->willReturn(true);
+        $browser->expects(self::never())->method('tablet');
 
-        $resolver = $this->createResolver(session: $session, browser: $browser);
+        $resolver = new RenderingModeResolver($session, $browser);
         self::assertSame(RenderingMode::RESPONSIVE, $resolver->resolve());
     }
 
@@ -99,13 +116,14 @@ class RenderingModeResolverTest extends TestCase
     public function anonymousUserOnTabletGetsResponsive(): void
     {
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn(null);
+        $session->expects(self::once())->method('getAuthId')->willReturn(null);
 
         $browser = $this->createMock(Browser::class);
-        $browser->method('mobile')->willReturn(false);
-        $browser->method('tablet')->willReturn(true);
+        $browser->expects(self::once())->method('mobile')->willReturn(false);
+        $browser->expects(self::once())->method('tablet')->willReturn(true);
+        $browser->expects(self::never())->method('hasFeature');
 
-        $resolver = $this->createResolver(session: $session, browser: $browser);
+        $resolver = new RenderingModeResolver($session, $browser);
         self::assertSame(RenderingMode::RESPONSIVE, $resolver->resolve());
     }
 
@@ -113,14 +131,15 @@ class RenderingModeResolverTest extends TestCase
     public function anonymousUserOnDesktopWithAjaxGetsDynamic(): void
     {
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn(null);
+        $session->expects(self::once())->method('getAuthId')->willReturn(null);
 
         $browser = $this->createMock(Browser::class);
-        $browser->method('mobile')->willReturn(false);
-        $browser->method('tablet')->willReturn(false);
-        $browser->method('hasFeature')->with('ajax')->willReturn(true);
+        $browser->expects(self::once())->method('mobile')->willReturn(false);
+        $browser->expects(self::once())->method('tablet')->willReturn(false);
+        $browser->expects(self::once())->method('hasFeature')
+            ->with('ajax')->willReturn(true);
 
-        $resolver = $this->createResolver(session: $session, browser: $browser);
+        $resolver = new RenderingModeResolver($session, $browser);
         self::assertSame(RenderingMode::DYNAMIC, $resolver->resolve());
     }
 
@@ -128,14 +147,15 @@ class RenderingModeResolverTest extends TestCase
     public function anonymousUserOnDesktopWithoutAjaxGetsBasic(): void
     {
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn(null);
+        $session->expects(self::once())->method('getAuthId')->willReturn(null);
 
         $browser = $this->createMock(Browser::class);
-        $browser->method('mobile')->willReturn(false);
-        $browser->method('tablet')->willReturn(false);
-        $browser->method('hasFeature')->with('ajax')->willReturn(false);
+        $browser->expects(self::once())->method('mobile')->willReturn(false);
+        $browser->expects(self::once())->method('tablet')->willReturn(false);
+        $browser->expects(self::once())->method('hasFeature')
+            ->with('ajax')->willReturn(false);
 
-        $resolver = $this->createResolver(session: $session, browser: $browser);
+        $resolver = new RenderingModeResolver($session, $browser);
         self::assertSame(RenderingMode::BASIC, $resolver->resolve());
     }
 
@@ -146,8 +166,9 @@ class RenderingModeResolverTest extends TestCase
         $session->expects(self::once())
             ->method('setScoped')
             ->with('horde', 'rendering_mode', 'responsive');
+        $session->expects(self::never())->method('removeScoped');
 
-        $resolver = $this->createResolver(session: $session);
+        $resolver = new RenderingModeResolver($session, $this->unusedBrowserStub());
         $resolver->storeMode(RenderingMode::RESPONSIVE);
     }
 
@@ -155,12 +176,14 @@ class RenderingModeResolverTest extends TestCase
     public function storeModeNullRemovesFromSession(): void
     {
         $session = $this->createMock(HordeSession::class);
-        $session->method('hasScoped')->with('horde', 'rendering_mode')->willReturn(true);
+        $session->expects(self::once())->method('hasScoped')
+            ->with('horde', 'rendering_mode')->willReturn(true);
         $session->expects(self::once())
             ->method('removeScoped')
             ->with('horde', 'rendering_mode');
+        $session->expects(self::never())->method('setScoped');
 
-        $resolver = $this->createResolver(session: $session);
+        $resolver = new RenderingModeResolver($session, $this->unusedBrowserStub());
         $resolver->storeMode(null);
     }
 
@@ -168,10 +191,12 @@ class RenderingModeResolverTest extends TestCase
     public function storeModeNullWithNoExistingValueDoesNothing(): void
     {
         $session = $this->createMock(HordeSession::class);
-        $session->method('hasScoped')->with('horde', 'rendering_mode')->willReturn(false);
+        $session->expects(self::once())->method('hasScoped')
+            ->with('horde', 'rendering_mode')->willReturn(false);
         $session->expects(self::never())->method('removeScoped');
+        $session->expects(self::never())->method('setScoped');
 
-        $resolver = $this->createResolver(session: $session);
+        $resolver = new RenderingModeResolver($session, $this->unusedBrowserStub());
         $resolver->storeMode(null);
     }
 
