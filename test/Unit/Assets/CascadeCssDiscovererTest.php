@@ -22,29 +22,22 @@ use SplFileInfo;
 #[CoversClass(CascadeCssDiscoverer::class)]
 class CascadeCssDiscovererTest extends TestCase
 {
-    /** @var list<string> */
-    private array $existingPaths = [];
-
     private PathBuilderInterface $pathBuilder;
     private UriBuilderInterface $uriBuilder;
-    private AssetFilesystem $filesystem;
 
     protected function setUp(): void
     {
-        $this->existingPaths = [];
-
         $this->pathBuilder = $this->createPathBuilderMock('/srv/www/horde');
         $this->uriBuilder = $this->createUriBuilderMock('/horde');
-        $this->filesystem = $this->createMock(AssetFilesystem::class);
-        $this->filesystem->method('fileExists')->willReturnCallback(
-            fn(string $path): bool => in_array($path, $this->existingPaths, true)
-        );
     }
 
     #[Test]
     public function implementsCssDiscoverer(): void
     {
-        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $filesystem = $this->createMock(AssetFilesystem::class);
+        $filesystem->expects($this->never())->method($this->anything());
+
+        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $filesystem);
 
         self::assertInstanceOf(CssDiscoverer::class, $discoverer);
     }
@@ -52,9 +45,11 @@ class CascadeCssDiscovererTest extends TestCase
     #[Test]
     public function hordeDefaultOnly(): void
     {
-        $this->existingPaths = ['/srv/www/horde/themes/horde/default/screen.css'];
+        $filesystem = $this->createFilesystemMock([
+            '/srv/www/horde/themes/horde/default/screen.css',
+        ]);
 
-        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $filesystem);
         $result = $discoverer->discover(new CssDiscoveryRequest());
 
         self::assertCount(1, $result);
@@ -67,14 +62,14 @@ class CascadeCssDiscovererTest extends TestCase
     #[Test]
     public function fullFourLevelCascade(): void
     {
-        $this->existingPaths = [
+        $filesystem = $this->createFilesystemMock([
             '/srv/www/horde/themes/horde/default/screen.css',
             '/srv/www/horde/themes/horde/silver/screen.css',
             '/srv/www/horde/turba/themes/turba/default/screen.css',
             '/srv/www/horde/turba/themes/turba/silver/screen.css',
-        ];
+        ]);
 
-        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $filesystem);
         $result = $discoverer->discover(new CssDiscoveryRequest(
             app: 'turba',
             theme: 'silver',
@@ -96,12 +91,12 @@ class CascadeCssDiscovererTest extends TestCase
     #[Test]
     public function defaultThemeSkipsThemeOverride(): void
     {
-        $this->existingPaths = [
+        $filesystem = $this->createFilesystemMock([
             '/srv/www/horde/themes/horde/default/screen.css',
             '/srv/www/horde/turba/themes/turba/default/screen.css',
-        ];
+        ]);
 
-        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $filesystem);
         $result = $discoverer->discover(new CssDiscoveryRequest(
             app: 'turba',
             theme: 'default',
@@ -118,12 +113,12 @@ class CascadeCssDiscovererTest extends TestCase
     #[Test]
     public function hordeAppSkipsAppLevels(): void
     {
-        $this->existingPaths = [
+        $filesystem = $this->createFilesystemMock([
             '/srv/www/horde/themes/horde/default/screen.css',
             '/srv/www/horde/themes/horde/silver/screen.css',
-        ];
+        ]);
 
-        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $filesystem);
         $result = $discoverer->discover(new CssDiscoveryRequest(
             app: 'horde',
             theme: 'silver',
@@ -135,12 +130,12 @@ class CascadeCssDiscovererTest extends TestCase
     #[Test]
     public function subViewOverlay(): void
     {
-        $this->existingPaths = [
+        $filesystem = $this->createFilesystemMock([
             '/srv/www/horde/themes/horde/default/screen.css',
             '/srv/www/horde/themes/horde/default/dynamic/screen.css',
-        ];
+        ]);
 
-        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $filesystem);
         $result = $discoverer->discover(new CssDiscoveryRequest(
             subView: 'dynamic',
         ));
@@ -156,18 +151,18 @@ class CascadeCssDiscovererTest extends TestCase
     #[Test]
     public function rtlAppendedWhenProviderReturnsTrue(): void
     {
-        $this->existingPaths = [
+        $filesystem = $this->createFilesystemMock([
             '/srv/www/horde/themes/horde/default/screen.css',
             '/srv/www/horde/themes/horde/default/rtl.css',
-        ];
+        ]);
 
         $rtl = $this->createMock(TextDirectionProvider::class);
-        $rtl->method('isRtl')->willReturn(true);
+        $rtl->expects($this->once())->method('isRtl')->willReturn(true);
 
         $discoverer = new CascadeCssDiscoverer(
             $this->pathBuilder,
             $this->uriBuilder,
-            $this->filesystem,
+            $filesystem,
             $rtl,
         );
         $result = $discoverer->discover(new CssDiscoveryRequest());
@@ -183,18 +178,18 @@ class CascadeCssDiscovererTest extends TestCase
     #[Test]
     public function rtlSkippedWhenProviderReturnsFalse(): void
     {
-        $this->existingPaths = [
+        $filesystem = $this->createFilesystemMock([
             '/srv/www/horde/themes/horde/default/screen.css',
             '/srv/www/horde/themes/horde/default/rtl.css',
-        ];
+        ]);
 
         $rtl = $this->createMock(TextDirectionProvider::class);
-        $rtl->method('isRtl')->willReturn(false);
+        $rtl->expects($this->once())->method('isRtl')->willReturn(false);
 
         $discoverer = new CascadeCssDiscoverer(
             $this->pathBuilder,
             $this->uriBuilder,
-            $this->filesystem,
+            $filesystem,
             $rtl,
         );
         $result = $discoverer->discover(new CssDiscoveryRequest());
@@ -205,12 +200,12 @@ class CascadeCssDiscovererTest extends TestCase
     #[Test]
     public function rtlSkippedWhenProviderIsNull(): void
     {
-        $this->existingPaths = [
+        $filesystem = $this->createFilesystemMock([
             '/srv/www/horde/themes/horde/default/screen.css',
             '/srv/www/horde/themes/horde/default/rtl.css',
-        ];
+        ]);
 
-        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $filesystem);
         $result = $discoverer->discover(new CssDiscoveryRequest());
 
         self::assertCount(1, $result);
@@ -219,19 +214,22 @@ class CascadeCssDiscovererTest extends TestCase
     #[Test]
     public function hookFilesAppended(): void
     {
-        $this->existingPaths = [
+        $filesystem = $this->createFilesystemMock([
             '/srv/www/horde/themes/horde/default/screen.css',
-        ];
+        ]);
 
         $hooks = $this->createMock(CssHookProvider::class);
-        $hooks->method('getHookFiles')->willReturn([
-            '/custom/hook.css' => '/custom/hook.css',
-        ]);
+        $hooks->expects($this->once())
+            ->method('getHookFiles')
+            ->with('horde', 'default')
+            ->willReturn([
+                '/custom/hook.css' => '/custom/hook.css',
+            ]);
 
         $discoverer = new CascadeCssDiscoverer(
             $this->pathBuilder,
             $this->uriBuilder,
-            $this->filesystem,
+            $filesystem,
             null,
             $hooks,
         );
@@ -246,11 +244,11 @@ class CascadeCssDiscovererTest extends TestCase
     #[Test]
     public function hooksSkippedWhenNull(): void
     {
-        $this->existingPaths = [
+        $filesystem = $this->createFilesystemMock([
             '/srv/www/horde/themes/horde/default/screen.css',
-        ];
+        ]);
 
-        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $filesystem);
         $result = $discoverer->discover(new CssDiscoveryRequest());
 
         self::assertCount(1, $result);
@@ -259,9 +257,9 @@ class CascadeCssDiscovererTest extends TestCase
     #[Test]
     public function missingFilesOmitted(): void
     {
-        $this->existingPaths = [];
+        $filesystem = $this->createFilesystemMock([]);
 
-        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $filesystem);
         $result = $discoverer->discover(new CssDiscoveryRequest(
             app: 'turba',
             theme: 'silver',
@@ -273,12 +271,12 @@ class CascadeCssDiscovererTest extends TestCase
     #[Test]
     public function multipleFilesInRequest(): void
     {
-        $this->existingPaths = [
+        $filesystem = $this->createFilesystemMock([
             '/srv/www/horde/themes/horde/default/screen.css',
             '/srv/www/horde/themes/horde/default/print.css',
-        ];
+        ]);
 
-        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $filesystem);
         $result = $discoverer->discover(new CssDiscoveryRequest(
             files: ['screen.css', 'print.css'],
         ));
@@ -294,9 +292,9 @@ class CascadeCssDiscovererTest extends TestCase
     #[Test]
     public function resultMetadata(): void
     {
-        $this->existingPaths = [];
+        $filesystem = $this->createFilesystemMock([]);
 
-        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeCssDiscoverer($this->pathBuilder, $this->uriBuilder, $filesystem);
         $result = $discoverer->discover(new CssDiscoveryRequest(
             app: 'turba',
             theme: 'silver',
@@ -304,6 +302,27 @@ class CascadeCssDiscovererTest extends TestCase
 
         self::assertSame('silver', $result->getTheme());
         self::assertSame('turba', $result->getApp());
+    }
+
+    /**
+     * Build an AssetFilesystem mock whose fileExists() returns true only for
+     * the provided paths. The discoverer probes multiple candidate paths per
+     * cascade level, so atLeastOnce() is used to assert the path is exercised
+     * without over-pinning the call count.
+     *
+     * @param list<string> $existingPaths
+     */
+    private function createFilesystemMock(array $existingPaths): AssetFilesystem
+    {
+        $filesystem = $this->createMock(AssetFilesystem::class);
+        $filesystem->expects($this->atLeastOnce())
+            ->method('fileExists')
+            ->willReturnCallback(
+                static fn(string $path): bool => in_array($path, $existingPaths, true)
+            );
+        $filesystem->expects($this->never())->method('isReadable');
+
+        return $filesystem;
     }
 
     private function createPathBuilderMock(string $baseFs): PathBuilderInterface
