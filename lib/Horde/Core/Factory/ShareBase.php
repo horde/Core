@@ -3,14 +3,6 @@
 /**
  * A Horde_Injector based Horde_Share factory.
  *
- * @category Horde
- * @package  Core
- * @author   Michael J. Rubinsky <mrubinsk@horde.org>
- */
-
-/**
- * A Horde_Injector based Horde_Share factory.
- *
  * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
@@ -19,7 +11,11 @@
  * @category Horde
  * @package  Core
  * @author   Michael J. Rubinsky <mrubinsk@horde.org>
+ * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  */
+
+use Horde\Core\Session\HordeSession;
+
 class Horde_Core_Factory_ShareBase extends Horde_Core_Factory_Base
 {
     /** Session storage key. */
@@ -51,7 +47,7 @@ class Horde_Core_Factory_ShareBase extends Horde_Core_Factory_Base
      */
     public function create($app = null, $driver = null)
     {
-        global $conf, $session;
+        global $conf;
         $registry = $this->_injector->getInstance('Horde_Registry');
 
         if (empty($driver)) {
@@ -73,8 +69,9 @@ class Horde_Core_Factory_ShareBase extends Horde_Core_Factory_Base
         $ob->setLogger($this->_injector->getInstance('Horde_Log_Logger'));
 
         if (!empty($conf['share']['cache'])) {
+            $session = $this->_injector->getInstance(HordeSession::class);
             $cache_sig = self::STORAGE_KEY . $driver;
-            $listCache = $session->get($app, $cache_sig);
+            $listCache = $session->getScoped($app, $cache_sig);
             $ob->setListCache($listCache);
 
             if (empty($this->_toCache)) {
@@ -94,11 +91,11 @@ class Horde_Core_Factory_ShareBase extends Horde_Core_Factory_Base
      */
     public function shutdown()
     {
-        global $session;
+        $session = $this->_injector->getInstance(HordeSession::class);
 
         foreach ($this->_toCache as $sig => $val) {
             try {
-                $session->set($val[0], $val[1], $this->_instances[$sig]->getListCache());
+                $session->setScoped($val[0], $val[1], $this->_instances[$sig]->getListCache());
             } catch (Horde_Exception $e) {
             }
         }
