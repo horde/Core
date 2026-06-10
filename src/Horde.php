@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Horde\Core;
 
+use Horde\Core\Session\HordeSession;
 use Horde\Exception\HordeException;
 use Horde\Log\Handler\BufferHandler;
 use Horde\Log\Handler\StreamHandler;
@@ -33,7 +34,6 @@ use Horde_Core_Translation;
 use Horde_Exception_HookNotSet;
 use Horde_Menu;
 use Horde_Serialize;
-use Horde_Session;
 use Horde_View_Sidebar;
 use Stringable;
 use stdClass;
@@ -1074,9 +1074,11 @@ class Horde
         }
         $tmpfile = Util::getTempFile($prefix, $delete, $dir, $secure);
         if ($session_remove) {
-            $gcfiles = $GLOBALS['session']->get('horde', 'gc_tempfiles', Horde_Session::TYPE_ARRAY);
+            $session = $GLOBALS['injector']->getInstance(HordeSession::class);
+            $stored = $session->getScoped('horde', 'gc_tempfiles');
+            $gcfiles = is_array($stored) ? $stored : [];
             $gcfiles[] = $tmpfile;
-            $GLOBALS['session']->set('horde', 'gc_tempfiles', $gcfiles);
+            $session->setScoped('horde', 'gc_tempfiles', $gcfiles);
         }
 
         return $tmpfile;
