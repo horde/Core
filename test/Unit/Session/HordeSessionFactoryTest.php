@@ -109,10 +109,16 @@ class HordeSessionFactoryTest extends TestCase
     {
         $decryptor = fn(string $c): string => substr($c, 4);
 
+        // Encrypted plaintext is Horde_Pack-packed (matching the legacy
+        // Horde_Session::set(..., ENCRYPT) wire format). Reproduce that here
+        // rather than using bare serialize().
+        $pack = new \Horde_Pack();
+        $packed = $pack->pack('password', ['compress' => 0]);
+
         $factory = new HordeSessionFactory(null, $decryptor);
         $session = $factory->restore(new SessionId('dec-test'), [
             '_e' => ['horde' => ['auth_app/imp' => true]],
-            'horde' => ['auth_app/imp' => 'ENC:' . serialize('password')],
+            'horde' => ['auth_app/imp' => 'ENC:' . $packed],
         ]);
 
         self::assertTrue($session->isEncrypted('horde', 'auth_app/imp'));
