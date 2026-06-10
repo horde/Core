@@ -18,6 +18,7 @@
 use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Legacy\LegacyConfigAdapter;
 use Horde\Core\Horde;
+use Horde\Core\Session\HordeSession;
 use Horde\Injector\Injector;
 use Horde\Util\Util;
 use Horde\Util\Variables;
@@ -351,7 +352,8 @@ class Horde_Config
         }
 
         /* Cannot write. Save to session. */
-        $GLOBALS['session']->set('horde', 'config/' . $this->_app, $php);
+        $GLOBALS['injector']->getInstance(HordeSession::class)
+            ->setScoped('horde', 'config/' . $this->_app, $php);
 
         return false;
     }
