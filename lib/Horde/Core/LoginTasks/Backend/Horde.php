@@ -11,9 +11,13 @@
  *
  * @author   Michael Slusarz <slusarz@horde.org>
  * @author   Gunnar Wrobel <wrobel@pardus.de>
+ * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @category Horde
  * @package  Core
  */
+
+use Horde\Core\Session\HordeSession;
+
 class Horde_Core_LoginTasks_Backend_Horde extends Horde_LoginTasks_Backend
 {
     /**
@@ -42,7 +46,8 @@ class Horde_Core_LoginTasks_Backend_Horde extends Horde_LoginTasks_Backend
      */
     public function getTasklistFromCache()
     {
-        return $GLOBALS['session']->get($this->_app, 'logintasks');
+        return $GLOBALS['injector']->getInstance(HordeSession::class)
+            ->getScoped($this->_app, 'logintasks');
     }
 
     /**
@@ -53,7 +58,8 @@ class Horde_Core_LoginTasks_Backend_Horde extends Horde_LoginTasks_Backend
      */
     public function storeTasklistInCache($tasklist)
     {
-        $GLOBALS['session']->set($this->_app, 'logintasks', $tasklist);
+        $GLOBALS['injector']->getInstance(HordeSession::class)
+            ->setScoped($this->_app, 'logintasks', $tasklist);
     }
 
     /**
