@@ -25,6 +25,7 @@
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
 use Horde\Core\Horde;
+use Horde\Core\Session\HordeSession;
 
 class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
 {
@@ -197,8 +198,9 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
      */
     protected function _notifyError($e)
     {
-        if (!$GLOBALS['session']->get('horde', 'no_prefs')) {
-            $GLOBALS['session']->set('horde', 'no_prefs', true);
+        $session = $GLOBALS['injector']->getInstance(HordeSession::class);
+        if (!$session->getScoped('horde', 'no_prefs')) {
+            $session->setScoped('horde', 'no_prefs', true);
             if (isset($GLOBALS['notification'])) {
                 $GLOBALS['notification']->push(Horde_Core_Translation::t('The preferences backend is currently unavailable and your preferences have not been loaded. You may continue to use the system with default preferences.'));
                 Horde::log($e);
