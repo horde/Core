@@ -167,7 +167,7 @@ class HordeSessionFactoryTest extends TestCase
             });
 
         $injector = new Injector(new TopLevel());
-        $injector->setInstance(Horde_Core_Secret_Cbc::class, $secret);
+        $injector->setInstance('Horde_Secret_Cbc', $secret);
 
         $factory = new HordeSessionFactory();
         $session = $factory->create($injector);
@@ -207,7 +207,7 @@ class HordeSessionFactoryTest extends TestCase
             );
 
         $injector = new Injector(new TopLevel());
-        $injector->setInstance(Horde_Core_Secret_Cbc::class, $secret);
+        $injector->setInstance('Horde_Secret_Cbc', $secret);
 
         $factory = new HordeSessionFactory();
         $session = $factory->create($injector);
