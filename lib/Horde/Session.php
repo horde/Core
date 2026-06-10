@@ -67,7 +67,7 @@ use Horde\Token\Token as ModernToken;
  * @property-write array $session_data       Manually set session data (since
  *                                           2.5.0).
  */
-class Horde_Session
+class Horde_Session implements Horde_Shutdown_Task
 {
     /* Class constants. */
     public const BEGIN = '_b';
@@ -324,6 +324,15 @@ class Horde_Session
         $modernHandler = $injector->getInstance(ModernSessionHandler::class);
         session_set_save_handler($modernHandler, true);
 
+        /* Mirror the modern HordeSession payload back into $_SESSION before
+         * PHP runs its own session save. The shim treats $_SESSION as a
+         * write-only mirror at end-of-request: HordeSession owns the data,
+         * and PHP's native save handler serialises whatever sits in $_SESSION
+         * when it runs. Without a shutdown task here, only data written
+         * directly to $_SESSION (e.g. _b/_r) survives across requests, and
+         * scoped/encrypted writes that live in HordeSession are lost. */
+        Horde_Shutdown::add($this);
+
         if ($start) {
             $this->start();
             $this->_start();
@@ -447,6 +456,23 @@ class Horde_Session
             && ($GLOBALS['registry']->getAuth() !== false);
         $this->_mirrorToSession();
         session_write_close();
+    }
+
+    /**
+     * Shutdown task: mirror the modern session payload into $_SESSION so the
+     * native PHP save handler picks up scoped/encrypted writes when it runs
+     * automatically at request end.
+     *
+     * close() does the same thing but also explicitly calls
+     * session_write_close(). For requests that never call close() (the
+     * common write-mode path), this shutdown hook is what carries the
+     * modern data across to the persisted session.
+     */
+    public function shutdown()
+    {
+        if ($this->_active) {
+            $this->_mirrorToSession();
+        }
     }
 
     /**
@@ -815,12 +841,23 @@ class Horde_Session
      * preserved. Used by start() (after session_start populates $_SESSION),
      * clean() and destroy() (after $_SESSION is cleared), and by
      * __set('session_data') (after a foreign payload is swapped in).
+     *
+     * The freshly-built instance is also registered as the injector singleton
+     * so callers that resolve HordeSession via getInstance (e.g. modern
+     * AuthCredentialStore) see the same object the shim mirrors back to
+     * $_SESSION on close(). Without this, two HordeSession instances coexist:
+     * the shim's authoritative one and a stale singleton that silently swallows
+     * writes from modern callers.
      */
     private function _rebuildModern(): void
     {
         if (isset($GLOBALS['injector'])) {
             $this->modern = $GLOBALS['injector']->createInstance(
                 HordeSession::class
+            );
+            $GLOBALS['injector']->setInstance(
+                HordeSession::class,
+                $this->modern
             );
             return;
         }
