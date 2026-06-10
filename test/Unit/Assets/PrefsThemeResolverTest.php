@@ -18,13 +18,6 @@ use DateTimeImmutable;
 #[CoversClass(PrefsThemeResolver::class)]
 class PrefsThemeResolverTest extends TestCase
 {
-    private PrefsService $prefs;
-
-    protected function setUp(): void
-    {
-        $this->prefs = $this->createMock(PrefsService::class);
-    }
-
     private function makeIdentity(string $id = 'identity-001'): Identity
     {
         return new Identity(
@@ -43,7 +36,10 @@ class PrefsThemeResolverTest extends TestCase
     #[Test]
     public function implementsThemeResolver(): void
     {
-        $resolver = new PrefsThemeResolver($this->prefs);
+        $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->never())->method($this->anything());
+
+        $resolver = new PrefsThemeResolver($prefs);
 
         self::assertInstanceOf(ThemeResolver::class, $resolver);
     }
@@ -51,11 +47,13 @@ class PrefsThemeResolverTest extends TestCase
     #[Test]
     public function identityWithPrefsReturnsIdentityTheme(): void
     {
-        $this->prefs->method('getValue')->willReturnMap([
-            ['identity-001', 'horde', 'theme', 'silver'],
-        ]);
+        $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->once())
+            ->method('getValue')
+            ->with('identity-001', 'horde', 'theme')
+            ->willReturn('silver');
 
-        $resolver = new PrefsThemeResolver($this->prefs);
+        $resolver = new PrefsThemeResolver($prefs);
         $result = $resolver->resolve($this->makeIdentity());
 
         self::assertSame('silver', $result);
@@ -64,12 +62,15 @@ class PrefsThemeResolverTest extends TestCase
     #[Test]
     public function identityWithoutPrefsFallsToAuthUid(): void
     {
-        $this->prefs->method('getValue')->willReturnMap([
-            ['identity-001', 'horde', 'theme', null],
-            ['admin', 'horde', 'theme', 'dark'],
-        ]);
+        $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->exactly(2))
+            ->method('getValue')
+            ->willReturnMap([
+                ['identity-001', 'horde', 'theme', null],
+                ['admin', 'horde', 'theme', 'dark'],
+            ]);
 
-        $resolver = new PrefsThemeResolver($this->prefs);
+        $resolver = new PrefsThemeResolver($prefs);
         $result = $resolver->resolve($this->makeIdentity(), 'admin');
 
         self::assertSame('dark', $result);
@@ -78,9 +79,13 @@ class PrefsThemeResolverTest extends TestCase
     #[Test]
     public function identityWithoutPrefsNoAuthUidReturnsDefault(): void
     {
-        $this->prefs->method('getValue')->willReturn(null);
+        $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->once())
+            ->method('getValue')
+            ->with('identity-001', 'horde', 'theme')
+            ->willReturn(null);
 
-        $resolver = new PrefsThemeResolver($this->prefs);
+        $resolver = new PrefsThemeResolver($prefs);
         $result = $resolver->resolve($this->makeIdentity());
 
         self::assertSame('default', $result);
@@ -89,12 +94,13 @@ class PrefsThemeResolverTest extends TestCase
     #[Test]
     public function identityWithPrefsIgnoresAuthUid(): void
     {
-        $this->prefs->method('getValue')->willReturnMap([
-            ['identity-001', 'horde', 'theme', 'silver'],
-            ['admin', 'horde', 'theme', 'dark'],
-        ]);
+        $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->once())
+            ->method('getValue')
+            ->with('identity-001', 'horde', 'theme')
+            ->willReturn('silver');
 
-        $resolver = new PrefsThemeResolver($this->prefs);
+        $resolver = new PrefsThemeResolver($prefs);
         $result = $resolver->resolve($this->makeIdentity(), 'admin');
 
         self::assertSame('silver', $result);
@@ -103,11 +109,13 @@ class PrefsThemeResolverTest extends TestCase
     #[Test]
     public function stringUidWithPrefsReturnsTheme(): void
     {
-        $this->prefs->method('getValue')->willReturnMap([
-            ['john', 'horde', 'theme', 'blue'],
-        ]);
+        $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->once())
+            ->method('getValue')
+            ->with('john', 'horde', 'theme')
+            ->willReturn('blue');
 
-        $resolver = new PrefsThemeResolver($this->prefs);
+        $resolver = new PrefsThemeResolver($prefs);
         $result = $resolver->resolve('john');
 
         self::assertSame('blue', $result);
@@ -116,9 +124,13 @@ class PrefsThemeResolverTest extends TestCase
     #[Test]
     public function stringUidWithoutPrefsReturnsDefault(): void
     {
-        $this->prefs->method('getValue')->willReturn(null);
+        $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->once())
+            ->method('getValue')
+            ->with('john', 'horde', 'theme')
+            ->willReturn(null);
 
-        $resolver = new PrefsThemeResolver($this->prefs);
+        $resolver = new PrefsThemeResolver($prefs);
         $result = $resolver->resolve('john');
 
         self::assertSame('default', $result);
@@ -127,9 +139,13 @@ class PrefsThemeResolverTest extends TestCase
     #[Test]
     public function customDefaultTheme(): void
     {
-        $this->prefs->method('getValue')->willReturn(null);
+        $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->once())
+            ->method('getValue')
+            ->with('john', 'horde', 'theme')
+            ->willReturn(null);
 
-        $resolver = new PrefsThemeResolver($this->prefs, 'corporate');
+        $resolver = new PrefsThemeResolver($prefs, 'corporate');
         $result = $resolver->resolve('john');
 
         self::assertSame('corporate', $result);
@@ -138,9 +154,13 @@ class PrefsThemeResolverTest extends TestCase
     #[Test]
     public function customDefaultThemeWithIdentity(): void
     {
-        $this->prefs->method('getValue')->willReturn(null);
+        $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->once())
+            ->method('getValue')
+            ->with('identity-001', 'horde', 'theme')
+            ->willReturn(null);
 
-        $resolver = new PrefsThemeResolver($this->prefs, 'corporate');
+        $resolver = new PrefsThemeResolver($prefs, 'corporate');
         $result = $resolver->resolve($this->makeIdentity());
 
         self::assertSame('corporate', $result);
@@ -149,11 +169,13 @@ class PrefsThemeResolverTest extends TestCase
     #[Test]
     public function perAppScopeOverride(): void
     {
-        $this->prefs->method('getValue')->willReturnMap([
-            ['john', 'imp', 'theme', 'mail-dark'],
-        ]);
+        $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->once())
+            ->method('getValue')
+            ->with('john', 'imp', 'theme')
+            ->willReturn('mail-dark');
 
-        $resolver = new PrefsThemeResolver($this->prefs);
+        $resolver = new PrefsThemeResolver($prefs);
         $result = $resolver->resolve('john', null, 'imp');
 
         self::assertSame('mail-dark', $result);
@@ -162,11 +184,13 @@ class PrefsThemeResolverTest extends TestCase
     #[Test]
     public function identityPerAppScopeOverride(): void
     {
-        $this->prefs->method('getValue')->willReturnMap([
-            ['identity-001', 'turba', 'theme', 'contacts-light'],
-        ]);
+        $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->once())
+            ->method('getValue')
+            ->with('identity-001', 'turba', 'theme')
+            ->willReturn('contacts-light');
 
-        $resolver = new PrefsThemeResolver($this->prefs);
+        $resolver = new PrefsThemeResolver($prefs);
         $result = $resolver->resolve($this->makeIdentity(), null, 'turba');
 
         self::assertSame('contacts-light', $result);
@@ -175,12 +199,15 @@ class PrefsThemeResolverTest extends TestCase
     #[Test]
     public function identityAppScopeFallsToAuthUid(): void
     {
-        $this->prefs->method('getValue')->willReturnMap([
-            ['identity-001', 'imp', 'theme', null],
-            ['admin', 'imp', 'theme', 'mail-corp'],
-        ]);
+        $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->exactly(2))
+            ->method('getValue')
+            ->willReturnMap([
+                ['identity-001', 'imp', 'theme', null],
+                ['admin', 'imp', 'theme', 'mail-corp'],
+            ]);
 
-        $resolver = new PrefsThemeResolver($this->prefs);
+        $resolver = new PrefsThemeResolver($prefs);
         $result = $resolver->resolve($this->makeIdentity(), 'admin', 'imp');
 
         self::assertSame('mail-corp', $result);
@@ -190,14 +217,17 @@ class PrefsThemeResolverTest extends TestCase
     public function authUidNullDoesNotAttemptLookup(): void
     {
         $calls = [];
-        $this->prefs->method('getValue')->willReturnCallback(
-            function (string $uid, string $scope, string $key) use (&$calls) {
-                $calls[] = $uid;
-                return null;
-            }
-        );
+        $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects($this->once())
+            ->method('getValue')
+            ->willReturnCallback(
+                function (string $uid, string $scope, string $key) use (&$calls) {
+                    $calls[] = $uid;
+                    return null;
+                }
+            );
 
-        $resolver = new PrefsThemeResolver($this->prefs);
+        $resolver = new PrefsThemeResolver($prefs);
         $resolver->resolve($this->makeIdentity());
 
         self::assertSame(['identity-001'], $calls);

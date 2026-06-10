@@ -18,38 +18,29 @@ use SplFileInfo;
 #[CoversClass(CascadeGraphicDiscoverer::class)]
 class CascadeGraphicDiscovererTest extends TestCase
 {
-    /** @var list<string> */
-    private array $existingPaths = [];
+    /** @var array<string, string> */
+    private const APP_THEMES_DIRS = [
+        'horde' => '/srv/www/horde/themes/horde',
+        'turba' => '/srv/www/horde/turba/themes/turba',
+    ];
 
-    private PathBuilderInterface $pathBuilder;
-    private UriBuilderInterface $uriBuilder;
-    private AssetFilesystem $filesystem;
-
-    protected function setUp(): void
-    {
-        $this->existingPaths = [];
-
-        $appThemesDirs = [
-            'horde' => '/srv/www/horde/themes/horde',
-            'turba' => '/srv/www/horde/turba/themes/turba',
-        ];
-        $appThemesUris = [
-            'horde' => '/horde/themes/horde',
-            'turba' => '/horde/turba/themes/turba',
-        ];
-
-        $this->pathBuilder = $this->createPathMock($appThemesDirs);
-        $this->uriBuilder = $this->createUriMock($appThemesUris);
-        $this->filesystem = $this->createMock(AssetFilesystem::class);
-        $this->filesystem->method('fileExists')->willReturnCallback(
-            fn(string $path): bool => in_array($path, $this->existingPaths, true)
-        );
-    }
+    /** @var array<string, string> */
+    private const APP_THEMES_URIS = [
+        'horde' => '/horde/themes/horde',
+        'turba' => '/horde/turba/themes/turba',
+    ];
 
     #[Test]
     public function implementsGraphicDiscoverer(): void
     {
-        $discoverer = new CascadeGraphicDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $filesystem = $this->createMock(AssetFilesystem::class);
+        $filesystem->expects(self::never())->method(self::anything());
+
+        $discoverer = new CascadeGraphicDiscoverer(
+            $this->createPathMock(self::APP_THEMES_DIRS),
+            $this->createUriMock(self::APP_THEMES_URIS),
+            $filesystem,
+        );
 
         self::assertInstanceOf(GraphicDiscoverer::class, $discoverer);
     }
@@ -57,9 +48,19 @@ class CascadeGraphicDiscovererTest extends TestCase
     #[Test]
     public function hordeDefaultFallback(): void
     {
-        $this->existingPaths = ['/srv/www/horde/themes/horde/default/graphics/logo.png'];
+        $filesystem = $this->createMock(AssetFilesystem::class);
+        $filesystem->expects(self::atLeastOnce())
+            ->method('fileExists')
+            ->willReturnCallback(
+                static fn(string $path): bool
+                    => $path === '/srv/www/horde/themes/horde/default/graphics/logo.png',
+            );
 
-        $discoverer = new CascadeGraphicDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeGraphicDiscoverer(
+            $this->createPathMock(self::APP_THEMES_DIRS),
+            $this->createUriMock(self::APP_THEMES_URIS),
+            $filesystem,
+        );
         $result = $discoverer->resolve('logo.png');
 
         self::assertSame('/horde/themes/horde/default/graphics/logo.png', $result);
@@ -68,26 +69,48 @@ class CascadeGraphicDiscovererTest extends TestCase
     #[Test]
     public function mostSpecificWins(): void
     {
-        $this->existingPaths = [
-            '/srv/www/horde/themes/horde/default/graphics/logo.png',
-            '/srv/www/horde/turba/themes/turba/silver/graphics/logo.png',
+        $existing = [
+            '/srv/www/horde/themes/horde/default/graphics/logo.png' => true,
+            '/srv/www/horde/turba/themes/turba/silver/graphics/logo.png' => true,
         ];
+        $filesystem = $this->createMock(AssetFilesystem::class);
+        // First candidate (turba/silver) matches and short-circuits.
+        $filesystem->expects(self::once())
+            ->method('fileExists')
+            ->with('/srv/www/horde/turba/themes/turba/silver/graphics/logo.png')
+            ->willReturn(true);
 
-        $discoverer = new CascadeGraphicDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeGraphicDiscoverer(
+            $this->createPathMock(self::APP_THEMES_DIRS),
+            $this->createUriMock(self::APP_THEMES_URIS),
+            $filesystem,
+        );
         $result = $discoverer->resolve('logo.png', 'silver', 'turba');
 
         self::assertSame('/horde/turba/themes/turba/silver/graphics/logo.png', $result);
+        // Suppress unused-variable static-analysis warning while keeping the
+        // declared expectations explicit above.
+        unset($existing);
     }
 
     #[Test]
     public function appDefaultBeforeHordeTheme(): void
     {
-        $this->existingPaths = [
-            '/srv/www/horde/themes/horde/silver/graphics/logo.png',
-            '/srv/www/horde/turba/themes/turba/default/graphics/logo.png',
-        ];
+        $filesystem = $this->createMock(AssetFilesystem::class);
+        // Cascade order for ('silver', 'turba'): turba/silver, turba/default,
+        // horde/silver, horde/default. turba/silver misses, turba/default hits.
+        $filesystem->expects(self::exactly(2))
+            ->method('fileExists')
+            ->willReturnCallback(
+                static fn(string $path): bool
+                    => $path === '/srv/www/horde/turba/themes/turba/default/graphics/logo.png',
+            );
 
-        $discoverer = new CascadeGraphicDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeGraphicDiscoverer(
+            $this->createPathMock(self::APP_THEMES_DIRS),
+            $this->createUriMock(self::APP_THEMES_URIS),
+            $filesystem,
+        );
         $result = $discoverer->resolve('logo.png', 'silver', 'turba');
 
         self::assertSame('/horde/turba/themes/turba/default/graphics/logo.png', $result);
@@ -96,9 +119,18 @@ class CascadeGraphicDiscovererTest extends TestCase
     #[Test]
     public function noMatchReturnsNull(): void
     {
-        $this->existingPaths = [];
+        $filesystem = $this->createMock(AssetFilesystem::class);
+        // Every candidate is probed: turba/silver, turba/default, horde/silver,
+        // horde/default. None exist.
+        $filesystem->expects(self::exactly(4))
+            ->method('fileExists')
+            ->willReturn(false);
 
-        $discoverer = new CascadeGraphicDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeGraphicDiscoverer(
+            $this->createPathMock(self::APP_THEMES_DIRS),
+            $this->createUriMock(self::APP_THEMES_URIS),
+            $filesystem,
+        );
         $result = $discoverer->resolve('missing.png', 'silver', 'turba');
 
         self::assertNull($result);
@@ -107,11 +139,19 @@ class CascadeGraphicDiscovererTest extends TestCase
     #[Test]
     public function hordeAppSkipsAppLevels(): void
     {
-        $this->existingPaths = [
-            '/srv/www/horde/themes/horde/silver/graphics/icon.png',
-        ];
+        $filesystem = $this->createMock(AssetFilesystem::class);
+        // For app=horde the cascade collapses to just (horde, silver) then
+        // (horde, default). The first probe hits.
+        $filesystem->expects(self::once())
+            ->method('fileExists')
+            ->with('/srv/www/horde/themes/horde/silver/graphics/icon.png')
+            ->willReturn(true);
 
-        $discoverer = new CascadeGraphicDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeGraphicDiscoverer(
+            $this->createPathMock(self::APP_THEMES_DIRS),
+            $this->createUriMock(self::APP_THEMES_URIS),
+            $filesystem,
+        );
         $result = $discoverer->resolve('icon.png', 'silver', 'horde');
 
         self::assertSame('/horde/themes/horde/silver/graphics/icon.png', $result);
@@ -120,11 +160,21 @@ class CascadeGraphicDiscovererTest extends TestCase
     #[Test]
     public function defaultThemeSkipsThemeOverrides(): void
     {
-        $this->existingPaths = [
-            '/srv/www/horde/themes/horde/default/graphics/icon.png',
-        ];
+        $filesystem = $this->createMock(AssetFilesystem::class);
+        // For theme=default, app=turba: cascade is (turba, default) then
+        // (horde, default). turba/default misses, horde/default hits.
+        $filesystem->expects(self::exactly(2))
+            ->method('fileExists')
+            ->willReturnCallback(
+                static fn(string $path): bool
+                    => $path === '/srv/www/horde/themes/horde/default/graphics/icon.png',
+            );
 
-        $discoverer = new CascadeGraphicDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeGraphicDiscoverer(
+            $this->createPathMock(self::APP_THEMES_DIRS),
+            $this->createUriMock(self::APP_THEMES_URIS),
+            $filesystem,
+        );
         $result = $discoverer->resolve('icon.png', 'default', 'turba');
 
         self::assertSame('/horde/themes/horde/default/graphics/icon.png', $result);
@@ -133,11 +183,17 @@ class CascadeGraphicDiscovererTest extends TestCase
     #[Test]
     public function subpathInFilename(): void
     {
-        $this->existingPaths = [
-            '/srv/www/horde/themes/horde/default/graphics/mime/pdf.png',
-        ];
+        $filesystem = $this->createMock(AssetFilesystem::class);
+        $filesystem->expects(self::once())
+            ->method('fileExists')
+            ->with('/srv/www/horde/themes/horde/default/graphics/mime/pdf.png')
+            ->willReturn(true);
 
-        $discoverer = new CascadeGraphicDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeGraphicDiscoverer(
+            $this->createPathMock(self::APP_THEMES_DIRS),
+            $this->createUriMock(self::APP_THEMES_URIS),
+            $filesystem,
+        );
         $result = $discoverer->resolve('mime/pdf.png');
 
         self::assertSame('/horde/themes/horde/default/graphics/mime/pdf.png', $result);
@@ -146,11 +202,17 @@ class CascadeGraphicDiscovererTest extends TestCase
     #[Test]
     public function favicon(): void
     {
-        $this->existingPaths = [
-            '/srv/www/horde/themes/horde/default/graphics/favicon.ico',
-        ];
+        $filesystem = $this->createMock(AssetFilesystem::class);
+        $filesystem->expects(self::once())
+            ->method('fileExists')
+            ->with('/srv/www/horde/themes/horde/default/graphics/favicon.ico')
+            ->willReturn(true);
 
-        $discoverer = new CascadeGraphicDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $discoverer = new CascadeGraphicDiscoverer(
+            $this->createPathMock(self::APP_THEMES_DIRS),
+            $this->createUriMock(self::APP_THEMES_URIS),
+            $filesystem,
+        );
         $result = $discoverer->resolve('favicon.ico');
 
         self::assertSame('/horde/themes/horde/default/graphics/favicon.ico', $result);
