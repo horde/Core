@@ -13,6 +13,8 @@
  * @package  Core
  */
 
+use Horde\Core\Session\HordeSession;
+
 /**
  * The Horde_Core_Auth_Application class provides application-specific
  * authentication built on top of the horde/Auth API.
@@ -738,7 +740,8 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
         ]);
 
         /* Only set the view mode on initial authentication */
-        if (!$GLOBALS['session']->exists('horde', 'view')) {
+        if (!$GLOBALS['injector']->getInstance(HordeSession::class)
+            ->hasScoped('horde', 'view')) {
             $this->_setView();
         }
 
