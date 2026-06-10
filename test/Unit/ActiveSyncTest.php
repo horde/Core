@@ -22,20 +22,24 @@ use Horde_ActiveSync_Device;
 use Horde_Core_ActiveSync_Driver;
 use Horde_Date;
 use Horde_Registry;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use stdClass;
 
 /**
-* Unit tests for ActiveSync functionality in Core.
-*
-* @author  Michael J Rubinsky <mrubinsk@horde.org>
-* @category   Horde
-* @package    Core
-* @subpackage UnitTests
-*/
-#[CoversNothing]
+ * Unit tests for ActiveSync functionality in Core.
+ *
+ * Covers Horde_Core_ActiveSync_Driver: folder structure handling, free/busy
+ * string generation, and the getUser() priority chain.
+ *
+ * @author  Michael J Rubinsky <mrubinsk@horde.org>
+ * @category   Horde
+ * @package    Core
+ * @subpackage UnitTests
+ */
+#[CoversClass(Horde_Core_ActiveSync_Driver::class)]
 class ActiveSyncTest extends TestCase
 {
     use MockSkipConstructorTrait;
@@ -49,6 +53,10 @@ class ActiveSyncTest extends TestCase
 
     public function setUp(): void
     {
+        // Property-bag mocks for the getFolder* tests (which mostly skip on
+        // CI without horde/imap_client). Tests that care about specific call
+        // shapes ignore these and build mocks inline. The placeholders pass
+        // type checks but pin no expectations.
         $this->_auth = $this->getMockSkipConstructor('Horde_Auth_Auto');
         $this->_state = $this->getMockSkipConstructor('Horde_ActiveSync_State_Sql');
         $this->_serverRequest = new ServerRequest('POST', '/');
@@ -58,6 +66,34 @@ class ActiveSyncTest extends TestCase
     public function tearDown(): void
     {
         unset($GLOBALS['registry']);
+    }
+
+    /**
+     * Build a mock that asserts the path under test never invokes a method
+     * on it. Constructor placeholders for collaborators the test method
+     * does not exercise.
+     *
+     * @param class-string $className
+     */
+    private function expectUntouched(string $className): MockObject
+    {
+        $mock = $this->getMockSkipConstructor($className);
+        $mock->expects($this->never())->method($this->anything());
+
+        return $mock;
+    }
+
+    /**
+     * State mock pinned to the calls Horde_ActiveSync_Driver_Base::__construct
+     * makes during driver setup (setLogger + setBackend).
+     */
+    private function createDriverStateMock(): MockObject
+    {
+        $state = $this->getMockSkipConstructor('Horde_ActiveSync_State_Sql');
+        $state->expects($this->once())->method('setLogger');
+        $state->expects($this->once())->method('setBackend');
+
+        return $state;
     }
 
     public function _setupDeepStructure()
@@ -504,11 +540,11 @@ class ActiveSyncTest extends TestCase
 
         $connector = new MockConnector();
         $driver = new Horde_Core_ActiveSync_Driver([
-            'state' => $this->_state,
+            'state' => $this->createDriverStateMock(),
             'connector' => $connector,
-            'auth' => $this->_auth,
-            'serverrequest' => $this->_serverRequest,
-            'registry' => $this->_registry,
+            'auth' => $this->expectUntouched('Horde_Auth_Auto'),
+            'serverrequest' => new ServerRequest('POST', '/'),
+            'registry' => $this->expectUntouched(Horde_Registry::class),
             'imap' => null, ]);
 
         $fixture = new stdClass();
@@ -531,16 +567,12 @@ class ActiveSyncTest extends TestCase
 
     public function testGetUserReturnsAuthenticatedUser()
     {
-        $serverRequest = new ServerRequest('POST', '/');
-        $connector = new MockConnector();
-        $mockRegistry = $this->getMockSkipConstructor(Horde_Registry::class);
-
         $driver = new Horde_Core_ActiveSync_Driver([
-            'state' => $this->_state,
-            'connector' => $connector,
-            'auth' => $this->_auth,
-            'serverrequest' => $serverRequest,
-            'registry' => $mockRegistry,
+            'state' => $this->createDriverStateMock(),
+            'connector' => new MockConnector(),
+            'auth' => $this->expectUntouched('Horde_Auth_Auto'),
+            'serverrequest' => new ServerRequest('POST', '/'),
+            'registry' => $this->expectUntouched(Horde_Registry::class),
             'imap' => null,
         ]);
 
@@ -557,45 +589,37 @@ class ActiveSyncTest extends TestCase
     {
         $serverRequest = (new ServerRequest('POST', '/'))
             ->withQueryParams(['User' => 'get_param_user']);
-        $connector = new MockConnector();
-        $mockRegistry = $this->getMockSkipConstructor(Horde_Registry::class);
-
-        $mockRegistry->expects($this->never())
-            ->method('getAuth');
 
         $driver = new Horde_Core_ActiveSync_Driver([
-            'state' => $this->_state,
-            'connector' => $connector,
-            'auth' => $this->_auth,
+            'state' => $this->createDriverStateMock(),
+            'connector' => new MockConnector(),
+            'auth' => $this->expectUntouched('Horde_Auth_Auto'),
             'serverrequest' => $serverRequest,
-            'registry' => $mockRegistry,
+            'registry' => $this->expectUntouched(Horde_Registry::class),
             'imap' => null,
         ]);
 
-        // No authentication, should use GET parameter
+        // No authentication, should use GET parameter; registry must not be consulted.
         $this->assertEquals('get_param_user', $driver->getUser());
     }
 
     public function testGetUserFallsBackToRegistry()
     {
-        $serverRequest = new ServerRequest('POST', '/');
-        $connector = new MockConnector();
-        $mockRegistry = $this->getMockSkipConstructor(Horde_Registry::class);
-
-        $mockRegistry->expects($this->once())
+        // Path 3 actively calls the registry — pin the call shape.
+        $registry = $this->getMockSkipConstructor(Horde_Registry::class);
+        $registry->expects($this->once())
             ->method('getAuth')
             ->willReturn('registry_user');
 
         $driver = new Horde_Core_ActiveSync_Driver([
-            'state' => $this->_state,
-            'connector' => $connector,
-            'auth' => $this->_auth,
-            'serverrequest' => $serverRequest,
-            'registry' => $mockRegistry,
+            'state' => $this->createDriverStateMock(),
+            'connector' => new MockConnector(),
+            'auth' => $this->expectUntouched('Horde_Auth_Auto'),
+            'serverrequest' => new ServerRequest('POST', '/'),
+            'registry' => $registry,
             'imap' => null,
         ]);
 
-        // No authentication, no GET parameter, should use registry
         $this->assertEquals('registry_user', $driver->getUser());
     }
 
@@ -603,22 +627,17 @@ class ActiveSyncTest extends TestCase
     {
         $serverRequest = (new ServerRequest('POST', '/'))
             ->withQueryParams(['User' => 'get_param_user']);
-        $connector = new MockConnector();
-        $mockRegistry = $this->getMockSkipConstructor(Horde_Registry::class);
-
-        $mockRegistry->expects($this->never())
-            ->method('getAuth');
 
         $driver = new Horde_Core_ActiveSync_Driver([
-            'state' => $this->_state,
-            'connector' => $connector,
-            'auth' => $this->_auth,
+            'state' => $this->createDriverStateMock(),
+            'connector' => new MockConnector(),
+            'auth' => $this->expectUntouched('Horde_Auth_Auto'),
             'serverrequest' => $serverRequest,
-            'registry' => $mockRegistry,
+            // GET param wins; registry must NOT be consulted.
+            'registry' => $this->expectUntouched(Horde_Registry::class),
             'imap' => null,
         ]);
 
-        // No authentication, GET parameter present, should not call registry
         $this->assertEquals('get_param_user', $driver->getUser());
     }
 }
