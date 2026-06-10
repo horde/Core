@@ -12,6 +12,7 @@
  * @package   Core
  */
 
+use Horde\Core\Auth\AuthCredentialStore;
 use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Driver\DriverRepository;
 use Horde\Core\Editor\TinymcePageBinder;
@@ -2545,46 +2546,29 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     public function setAuthCredential($credential, $value = null, $app = null)
     {
-        global $session;
-
         if (!$this->getAuth()) {
             return;
         }
 
+        $store = $this->_credentialStore();
+
         if (is_array($credential)) {
-            $credentials = $credential;
-        } else {
-            if (($credentials = $this->_getAuthCredentials($app)) === false) {
-                return;
-            }
-
-            if (!is_array($credentials)) {
-                $credentials = [];
-            }
-
-            $credentials[$credential] = $value;
+            $store->set($app, $credential);
+        } elseif (!$store->setOne($app, $credential, $value)) {
+            return;
         }
 
-        $entry = $credentials;
-        if (($base_app = $session->get('horde', 'auth/credentials'))
-            && ($session->get('horde', 'auth_app/' . $base_app) == $entry)) {
-            $entry = true;
+        // Resolve the app the store wrote against so the cache invalidation
+        // matches the slot. setOne()/set() fall back to the base app when
+        // $app is null; mirror that here.
+        $resolvedApp = $app ?? $this->_credentialBaseApp();
+        if ($resolvedApp === null) {
+            return;
         }
-
-        if (is_null($app)) {
-            $app = $base_app;
-        }
-
-        /* The auth_app key contains application-specific authentication.
-         * Session subkeys are the app names, values are an array containing
-         * credentials. If the value is true, application does not require any
-         * specific credentials. */
-        $session->set('horde', 'auth_app/' . $app, $entry, $session::ENCRYPT);
-        $session->set('horde', 'auth_app_init/' . $app, true);
 
         unset(
-            $this->_cache['existing'][$app],
-            $this->_cache['isauth'][$app]
+            $this->_cache['existing'][$resolvedApp],
+            $this->_cache['isauth'][$resolvedApp]
         );
     }
 
@@ -2597,24 +2581,33 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     protected function _getAuthCredentials($app)
     {
+        return $this->_credentialStore()->get($app);
+    }
+
+    /**
+     * Resolve the modern AuthCredentialStore for credentials persistence.
+     *
+     * Lazy-resolved from the global injector to keep Registry's existing
+     * construction unchanged. The store owns the `auth_app/<app>` and
+     * `auth_app_init/<app>` slots; Registry retains the `auth/credentials`
+     * base-app pointer plus its own per-app caches.
+     */
+    private function _credentialStore(): AuthCredentialStore
+    {
+        return $GLOBALS['injector']->getInstance(AuthCredentialStore::class);
+    }
+
+    /**
+     * Read the base-app pointer that {@see setAuth()} writes during login.
+     * Used by {@see setAuthCredential()} to mirror the legacy fall-back when
+     * no explicit app is supplied.
+     */
+    private function _credentialBaseApp(): ?string
+    {
         global $session;
+        $value = $session->get('horde', 'auth/credentials');
 
-        $base_app = $session->get('horde', 'auth/credentials');
-        if (is_null($base_app)) {
-            return false;
-        }
-
-        if (is_null($app)) {
-            $app = $base_app;
-        }
-
-        if (!$session->exists('horde', 'auth_app/' . $app)) {
-            return ($base_app != $app)
-                ? $this->_getAuthCredentials($base_app)
-                : false;
-        }
-
-        return $session->get('horde', 'auth_app/' . $app);
+        return is_string($value) ? $value : null;
     }
 
     /**
