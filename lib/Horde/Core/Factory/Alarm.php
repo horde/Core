@@ -3,17 +3,6 @@
 /**
  * A Horde_Injector:: based Horde_Alarm:: factory.
  *
- * PHP version 5
- *
- * @category Horde
- * @package  Core
- * @author   Michael J. Rubinsky <mrubinsk@horde.org>
- * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
- */
-
-/**
- * A Horde_Injector:: based Horde_Core_Ajax_Application:: factory.
- *
  * Copyright 2010-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
@@ -22,8 +11,12 @@
  * @category Horde
  * @package  Core
  * @author   Michael J. Rubinsky <mrubinsk@horde.org>
+ * @author   Ralf Lang <ralf.lang@ralf-lang.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
+
+use Horde\Core\Session\HordeSession;
+
 class Horde_Core_Factory_Alarm extends Horde_Core_Factory_Base
 {
     /**
@@ -126,16 +119,18 @@ class Horde_Core_Factory_Alarm extends Horde_Core_Factory_Base
      */
     public function load($user = null, $preload = true)
     {
-        global $registry, $session;
+        global $registry;
+
+        $session = $this->_injector->getInstance(HordeSession::class);
 
         if ($this->_ttl
-            && $session->exists('horde', 'alarm_loaded')
-            && ((time() - $session->get('horde', 'alarm_loaded')) < $this->_ttl)) {
+            && $session->hasScoped('horde', 'alarm_loaded')
+            && ((time() - $session->getScoped('horde', 'alarm_loaded')) < $this->_ttl)) {
             return;
         }
 
         /* Cache alarm handler application method existence. */
-        $cache = $session->get('horde', 'factory_alarm');
+        $cache = $session->getScoped('horde', 'factory_alarm');
 
         if (is_null($cache)) {
             $save = [];
@@ -173,10 +168,10 @@ class Horde_Core_Factory_Alarm extends Horde_Core_Factory_Base
         }
 
         if ($changed) {
-            $session->set('horde', 'factory_alarm', $save);
+            $session->setScoped('horde', 'factory_alarm', $save);
         }
 
-        $session->set('horde', 'alarm_loaded', time());
+        $session->setScoped('horde', 'alarm_loaded', time());
     }
 
 }
