@@ -44,21 +44,6 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
         };
     }
 
-    private function createConfigurator(JsDiscoverer $discoverer): ViewModeConfigurator
-    {
-        $registry = $this->createMock(Horde_Registry::class);
-        $registry->method('getApp')->willReturn('horde');
-        $registry->method('getServiceLink')->willReturn(new Url('/horde/services/ajax.php'));
-
-        $prefs = $this->createMock(PrefsService::class);
-        $prefs->method('getValue')->willReturn(false);
-
-        $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn(null);
-
-        return new ViewModeConfigurator($registry, $prefs, $session, $discoverer);
-    }
-
     #[Test]
     public function basicModeResolvesPrototypeAndHorde(): void
     {
@@ -66,7 +51,20 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
             'prototype.js' => '/static/js/prototype.js',
             'horde.js' => '/static/js/horde.js',
         ]);
-        $configurator = $this->createConfigurator($discoverer);
+
+        // BASIC mode does not touch the registry at all.
+        $registry = $this->createMock(Horde_Registry::class);
+        $registry->expects(self::never())->method(self::anything());
+
+        // Without an authenticated user, prefs are never consulted.
+        $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects(self::never())->method(self::anything());
+
+        $session = $this->createMock(HordeSession::class);
+        $session->expects(self::once())->method('getAuthId')->willReturn(null);
+        $session->expects(self::never())->method('getScoped');
+
+        $configurator = new ViewModeConfigurator($registry, $prefs, $session, $discoverer);
         $collector = new AssetCollector();
 
         $configurator->configure($collector, ViewMode::BASIC);
@@ -81,7 +79,18 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
         $discoverer = $this->createDiscoverer([
             'prototype.js' => '/js/prototype.js',
         ]);
-        $configurator = $this->createConfigurator($discoverer);
+
+        $registry = $this->createMock(Horde_Registry::class);
+        $registry->expects(self::never())->method(self::anything());
+
+        $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects(self::never())->method(self::anything());
+
+        $session = $this->createMock(HordeSession::class);
+        $session->expects(self::once())->method('getAuthId')->willReturn(null);
+        $session->expects(self::never())->method('getScoped');
+
+        $configurator = new ViewModeConfigurator($registry, $prefs, $session, $discoverer);
         $collector = new AssetCollector();
 
         $configurator->configure($collector, ViewMode::BASIC);
@@ -101,7 +110,26 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
             'scriptaculous/effects.js' => '/js/scriptaculous/effects.js',
             'scriptaculous/sound.js' => '/js/scriptaculous/sound.js',
         ]);
-        $configurator = $this->createConfigurator($discoverer);
+
+        // DYNAMIC mode pulls the active app and three service links from the registry.
+        $registry = $this->createMock(Horde_Registry::class);
+        $registry->expects(self::once())->method('getApp')->willReturn('horde');
+        $registry->expects(self::exactly(3))
+            ->method('getServiceLink')
+            ->willReturn(new Url('/horde/services/ajax.php'));
+
+        // No authenticated user, so prefs are never read.
+        $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects(self::never())->method(self::anything());
+
+        $session = $this->createMock(HordeSession::class);
+        $session->expects(self::exactly(2))->method('getAuthId')->willReturn(null);
+        $session->expects(self::once())
+            ->method('getScoped')
+            ->with('horde', 'token')
+            ->willReturn(null);
+
+        $configurator = new ViewModeConfigurator($registry, $prefs, $session, $discoverer);
         $collector = new AssetCollector();
 
         $configurator->configure($collector, ViewMode::DYNAMIC);
@@ -122,17 +150,23 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
             'accesskeys.js' => '/js/accesskeys.js',
         ]);
 
+        // BASIC mode never touches the registry.
         $registry = $this->createMock(Horde_Registry::class);
+        $registry->expects(self::never())->method(self::anything());
+
         $prefs = $this->createMock(PrefsService::class);
-        $prefs->method('getValue')->willReturnCallback(function ($uid, $app, $key) {
-            if ($key === 'widget_accesskey') {
-                return true;
-            }
-            return null;
-        });
+        $prefs->expects(self::atLeastOnce())
+            ->method('getValue')
+            ->willReturnCallback(function ($uid, $app, $key) {
+                if ($key === 'widget_accesskey') {
+                    return true;
+                }
+                return null;
+            });
 
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn('testuser');
+        $session->expects(self::once())->method('getAuthId')->willReturn('testuser');
+        $session->expects(self::never())->method('getScoped');
 
         $configurator = new ViewModeConfigurator($registry, $prefs, $session, $discoverer);
         $collector = new AssetCollector();
@@ -162,10 +196,16 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
             }
         };
 
+        // BASIC mode without an authenticated user only consults the session.
         $registry = $this->createMock(Horde_Registry::class);
+        $registry->expects(self::never())->method(self::anything());
+
         $prefs = $this->createMock(PrefsService::class);
+        $prefs->expects(self::never())->method(self::anything());
+
         $session = $this->createMock(HordeSession::class);
-        $session->method('getAuthId')->willReturn(null);
+        $session->expects(self::once())->method('getAuthId')->willReturn(null);
+        $session->expects(self::never())->method('getScoped');
 
         $configurator = new ViewModeConfigurator($registry, $prefs, $session, $discoverer);
         $collector = new AssetCollector();
