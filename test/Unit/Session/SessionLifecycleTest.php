@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Horde\Core\Test\Unit\Session;
 
 use Horde\Core\Config\State;
+use Horde\Core\Secret\SessionSecret;
 use Horde\Core\Session\HordeSession;
 use Horde\Core\Session\SessionConfigFactory;
 use Horde\Core\Session\SessionLifecycle;
@@ -55,6 +56,7 @@ class SessionLifecycleTest extends TestCase
     private function build(
         array $conf = [],
         ?HordeSession $session = null,
+        ?SessionSecret $secret = null,
     ): SessionLifecycle {
         $injector = new Injector(new TopLevel());
         $session ??= new HordeSession(new SessionId('test-id'), []);
@@ -63,7 +65,7 @@ class SessionLifecycleTest extends TestCase
         $handler = new SessionHandler(new BuiltinBackend());
         $config = (new SessionConfigFactory())->fromState(new State($conf));
 
-        return new SessionLifecycle($injector, $handler, $config);
+        return new SessionLifecycle($injector, $handler, $config, $secret);
     }
 
     // ---------------------------------------------------------------
@@ -81,6 +83,39 @@ class SessionLifecycleTest extends TestCase
     public function testIsInactiveByDefault(): void
     {
         self::assertFalse($this->build()->isActive());
+    }
+
+    #[Test]
+    public function testAcceptsSessionSecretImplementation(): void
+    {
+        // Regression sentinel for the binding-name-vs-class confusion.
+        // SessionLifecycle's secret arg is typed against the
+        // SessionSecret interface, not the legacy Horde_Secret_Cbc
+        // binding name. Anything that implements the interface
+        // (including production's Horde_Core_Secret_Cbc) must satisfy
+        // the constructor type check.
+        $secret = $this->createStub(SessionSecret::class);
+        $lifecycle = $this->build(secret: $secret);
+        self::assertInstanceOf(SessionLifecycle::class, $lifecycle);
+    }
+
+    #[Test]
+    public function testAcceptsHordeCoreSecretCbcViaInterfaceContract(): void
+    {
+        // Belt-and-braces: the actual production class is
+        // Horde_Core_Secret_Cbc which now implements SessionSecret.
+        // The class is loadable in unit context (no DB / no session
+        // module needed for the constructor itself) so we can
+        // instantiate it without arguments and confirm it satisfies
+        // the lifecycle's type constraint.
+        if (!class_exists(\Horde_Core_Secret_Cbc::class)) {
+            self::markTestSkipped('Horde_Core_Secret_Cbc not loadable in this test environment');
+        }
+        $secret = new \Horde_Core_Secret_Cbc();
+        self::assertInstanceOf(SessionSecret::class, $secret);
+
+        $lifecycle = $this->build(secret: $secret);
+        self::assertInstanceOf(SessionLifecycle::class, $lifecycle);
     }
 
     // ---------------------------------------------------------------
