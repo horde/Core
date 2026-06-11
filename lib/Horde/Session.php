@@ -330,8 +330,14 @@ class Horde_Session implements Horde_Shutdown_Task
          * and PHP's native save handler serialises whatever sits in $_SESSION
          * when it runs. Without a shutdown task here, only data written
          * directly to $_SESSION (e.g. _b/_r) survives across requests, and
-         * scoped/encrypted writes that live in HordeSession are lost. */
-        Horde_Shutdown::add($this);
+         * scoped/encrypted writes that live in HordeSession are lost.
+         *
+         * Pinned to run after every regular Horde_Shutdown_Task so that any
+         * task writing through the shim (e.g. IMP's per-factory shutdown
+         * writers) lands in HordeSession before this mirror copies it back
+         * to $_SESSION. addFinal() is a single-slot last-writer-wins API
+         * reserved for this kind of framework-owned end-of-request work. */
+        $injector->getInstance('Horde_Shutdown')->addFinal($this);
 
         if ($start) {
             $this->start();
