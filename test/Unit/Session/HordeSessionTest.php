@@ -20,6 +20,7 @@ use Horde\SessionHandler\SessionId;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Horde_Pack;
 
 #[CoversClass(HordeSession::class)]
 class HordeSessionTest extends TestCase
@@ -448,7 +449,7 @@ class HordeSessionTest extends TestCase
         // Simulate a legacy session payload with encryption map. The legacy
         // Horde_Session writes encrypt(Horde_Pack::pack($value)) for ENCRYPT
         // slots; reproduce that exact wire shape here.
-        $pack = new \Horde_Pack();
+        $pack = new Horde_Pack();
         $packed = $pack->pack('imp-password', ['compress' => 0]);
         $legacyPayload = [
             '_b' => 1700000000,
@@ -514,5 +515,108 @@ class HordeSessionTest extends TestCase
         ]);
         $session->removeScoped('horde', 'key');
         self::assertTrue($session->isDirty());
+    }
+
+    // ---------------------------------------------------------------
+    // Lifecycle intent flags (scheduleRegeneration / markDestroyed)
+    // ---------------------------------------------------------------
+
+    #[Test]
+    public function testFlagsDefaultToFalse(): void
+    {
+        $session = $this->createSession();
+        self::assertFalse($session->shouldRegenerate());
+        self::assertFalse($session->isDestroyed());
+    }
+
+    #[Test]
+    public function testScheduleRegenerationSetsFlag(): void
+    {
+        $session = $this->createSession();
+        $session->scheduleRegeneration();
+        self::assertTrue($session->shouldRegenerate());
+    }
+
+    #[Test]
+    public function testScheduleRegenerationIsIdempotent(): void
+    {
+        $session = $this->createSession();
+        $session->scheduleRegeneration();
+        $session->scheduleRegeneration();
+        self::assertTrue($session->shouldRegenerate());
+    }
+
+    #[Test]
+    public function testMarkDestroyedSetsFlag(): void
+    {
+        $session = $this->createSession();
+        $session->markDestroyed();
+        self::assertTrue($session->isDestroyed());
+    }
+
+    #[Test]
+    public function testMarkDestroyedIsIdempotent(): void
+    {
+        $session = $this->createSession();
+        $session->markDestroyed();
+        $session->markDestroyed();
+        self::assertTrue($session->isDestroyed());
+    }
+
+    #[Test]
+    public function testFlagsAreIndependent(): void
+    {
+        $session = $this->createSession();
+        $session->scheduleRegeneration();
+        self::assertTrue($session->shouldRegenerate());
+        self::assertFalse($session->isDestroyed());
+
+        $other = $this->createSession();
+        $other->markDestroyed();
+        self::assertTrue($other->isDestroyed());
+        self::assertFalse($other->shouldRegenerate());
+    }
+
+    #[Test]
+    public function testBothFlagsCanBeSet(): void
+    {
+        $session = $this->createSession();
+        $session->scheduleRegeneration();
+        $session->markDestroyed();
+        self::assertTrue($session->shouldRegenerate());
+        self::assertTrue($session->isDestroyed());
+    }
+
+    #[Test]
+    public function testFlagsNotInPayload(): void
+    {
+        // Regression sentinel: the flags must not leak into the
+        // serialised payload that hits the backend. They are
+        // request-scoped runtime state.
+        $session = $this->createSession();
+        $session->scheduleRegeneration();
+        $session->markDestroyed();
+
+        $payload = $session->toPayload();
+        $flat = json_encode($payload);
+        self::assertNotFalse($flat);
+        self::assertStringNotContainsString('regenerationScheduled', $flat);
+        self::assertStringNotContainsString('destroyed', $flat);
+        self::assertStringNotContainsString('shouldRegenerate', $flat);
+    }
+
+    #[Test]
+    public function testRestoredSessionStartsWithFlagsFalse(): void
+    {
+        // A session restored from a payload that happens to contain
+        // misleading keys must not pick up the flags. They are private
+        // properties of the runtime instance, not session data.
+        $session = $this->createSession([
+            'regenerationScheduled' => true,
+            'destroyed' => true,
+            'horde' => ['regenerationScheduled' => true],
+        ]);
+        self::assertFalse($session->shouldRegenerate());
+        self::assertFalse($session->isDestroyed());
     }
 }
