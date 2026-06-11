@@ -2222,11 +2222,44 @@ class Horde_Registry implements Horde_Shutdown_Task
         $logout = new Horde_Registry_Logout();
         $logout->run();
 
-        // @suspicious shouldn't this be 'auth/'
-        $session->removeScoped('horde', 'auth');
+        /* Wipe every auth-related slot from the horde scope.
+         *
+         * Setup: Registry::setAuth() writes flat keys (auth/userId,
+         * auth/credentials, auth/timestamp, auth/browser, auth/remoteAddr,
+         * auth/authId). AuthCredentialStore::set() writes per-app slots
+         * under several prefixes (auth_app/, auth_app_init/,
+         * auth_app_state/, auth_app_state_at/, auth_app_state_reason/,
+         * auth_app_state_detail/).
+         *
+         * Pre-fix this method called removeScoped('horde', 'auth') which
+         * removes a key literally named 'auth' that does not exist;
+         * stored keys all have a slash. Result: every auth/ slot
+         * survived clearAuth and any session reader that trusted the
+         * row (modern PSR-15 routes via SessionHandler::load()) would
+         * report the user as still authenticated after logout. The
+         * legacy stack masked this because it re-runs appInit() with
+         * its own auth-state checks on every request.
+         *
+         * The sweep below removes every key whose name starts with one
+         * of the auth prefixes. The list of prefixes is the union of
+         * what Registry::setAuth() and AuthCredentialStore use; keep
+         * synchronised when new slot families are added.
+         */
+        $authPrefixes = [
+            'auth/',
+            'auth_app/',
+            'auth_app_init/',
+            'auth_app_state/',
+            'auth_app_state_at/',
+            'auth_app_state_reason/',
+            'auth_app_state_detail/',
+        ];
         foreach ($session->keysForApp('horde') as $key) {
-            if (str_starts_with($key, 'auth_app/')) {
-                $session->removeScoped('horde', $key);
+            foreach ($authPrefixes as $prefix) {
+                if (str_starts_with($key, $prefix)) {
+                    $session->removeScoped('horde', $key);
+                    continue 2;
+                }
             }
         }
 
