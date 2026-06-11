@@ -34,7 +34,15 @@ class Horde_Core_LoginTasks extends Horde_LoginTasks
     {
         $this->_app = $app;
 
-        parent::__construct($backend);
+        /* Pass false: Core owns the shutdown-time persist call via
+         * Horde\Core\ShutdownTask\LoginTasks, which is registered through
+         * Horde_Shutdown by the factory. The library's own
+         * register_shutdown_function callback would fire *after*
+         * Horde_Shutdown::runTasks() (which includes the pinned-final
+         * session shim mirror) and any session writes from it would be
+         * dropped. Requires horde/logintasks >= 3.x with the
+         * $registerShutdown constructor flag. */
+        parent::__construct($backend, false);
     }
 
     /**
