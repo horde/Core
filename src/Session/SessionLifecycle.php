@@ -41,6 +41,33 @@ use Horde_Shutdown_Task;
  * both flows leverage; it does not reach upward into Registry or sideways
  * into the shim.
  *
+ * Two flavours of lifecycle methods coexist:
+ *
+ * - **Synchronous executors** {@see clean()}, {@see destroy()},
+ *   {@see regenerate()}: act immediately, called when the caller knows
+ *   the right moment. Each clears HordeSession's intent markers after
+ *   acting so a downstream {@see processFlags()} call is a coherent
+ *   no-op.
+ *
+ * - **Engine** {@see processFlags()}: reads the lifecycle intent
+ *   markers carried by {@see HordeSession} and dispatches to the
+ *   matching synchronous executor. Canonical reader of those markers.
+ *   Other code paths SHOULD NOT read the markers directly. Always
+ *   called explicitly; never auto-fired from {@see shutdown()} or
+ *   any other implicit trigger. Lifecycle dispatch is visible at the
+ *   call site, not magic last-minute behaviour.
+ *
+ * Time-based vs intent-based regeneration:
+ *
+ * - {@see regenerationDue()} is a time-deadline check ("the regenerate-at
+ *   timestamp has passed"). Reads via {@see HordeSession}, not the
+ *   superglobal.
+ * - {@see HordeSession::shouldRegenerate()} is intent ("a controller
+ *   asked for it"). Read by {@see processFlags()}.
+ *
+ * The two are independent and compose: a caller can rotate when either
+ * fires.
+ *
  * Replaces the lifecycle role previously carried by the legacy
  * `Horde_Session` shim. Modern callers (Registry bootstrap, LoginService,
  * Auth_Application, Ajax/Application) consume this class directly. The shim
@@ -262,6 +289,11 @@ class SessionLifecycle implements Horde_Shutdown_Task
 
         $this->cleaned = true;
 
+        // Synchronous executor: any pending lifecycle intent has just been
+        // resolved synchronously; clear so downstream processFlags() is a
+        // coherent no-op.
+        $this->getSession()->clearLifecycleFlags();
+
         return true;
     }
 
@@ -281,6 +313,10 @@ class SessionLifecycle implements Horde_Shutdown_Task
         $this->active = false;
 
         $this->secret?->clearKey();
+
+        // Synchronous executor: clear pending intent so a downstream
+        // processFlags() call does not attempt to re-destroy.
+        $this->getSession()->clearLifecycleFlags();
     }
 
     /**
@@ -298,16 +334,62 @@ class SessionLifecycle implements Horde_Shutdown_Task
         // The shim's addFinal() shutdown task mirrors HordeSession to
         // $_SESSION for legacy code that reads the superglobal directly.
         $this->getSession()->setScoped(self::REGENERATE_KEY, '', $regenAt);
+
+        // Synchronous executor: clear pending intent so a downstream
+        // processFlags() call sees a coherent no-op.
+        $this->getSession()->clearLifecycleFlags();
+    }
+
+    /**
+     * Act on the lifecycle intent markers carried by {@see HordeSession}.
+     *
+     * Reads {@see HordeSession::shouldRegenerate()} and
+     * {@see HordeSession::isDestroyed()} and dispatches to the matching
+     * synchronous executor. The executor clears the markers via
+     * {@see HordeSession::clearLifecycleFlags()} as part of acting.
+     *
+     * Resolution policy: destruction wins over regeneration. A session
+     * being destroyed need not bother rotating its id.
+     *
+     * Idempotent: calling repeatedly with no markers set is a no-op.
+     *
+     * Canonical reader of the markers. Other code paths in this class
+     * and elsewhere SHOULD NOT read the markers directly. Setters can
+     * live anywhere; readers go through here so the dispatch policy is
+     * defined in one place.
+     *
+     * Always called explicitly by a caller that knows the right moment
+     * (e.g. a controller after authentication, a future PSR-15
+     * middleware, a logout handler). NEVER auto-fired from
+     * {@see shutdown()} or any other implicit trigger. Lifecycle
+     * dispatch is visible at the call site, not magic last-minute
+     * behaviour.
+     */
+    public function processFlags(HordeSession $session): void
+    {
+        if ($session->isDestroyed()) {
+            $this->destroy();
+            return;
+        }
+        if ($session->shouldRegenerate()) {
+            $this->regenerate();
+        }
     }
 
     /**
      * Whether the current session is past its regenerate-at deadline.
      *
      * Replaces the legacy `$session->regenerate_due` magic property.
+     *
+     * Reads via the modern {@see HordeSession}, not via `$_SESSION`:
+     * SessionLifecycle is the orchestrator over HordeSession + the PHP
+     * session module, not a parallel reader of the same data. Time-based
+     * (deadline) check, separate from {@see HordeSession::shouldRegenerate()}
+     * which is intent-based.
      */
     public function regenerationDue(): bool
     {
-        $regen = $_SESSION[self::REGENERATE_KEY] ?? null;
+        $regen = $this->getSession()->getScoped(self::REGENERATE_KEY, '');
         return is_int($regen) && time() >= $regen;
     }
 

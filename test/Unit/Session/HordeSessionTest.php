@@ -619,4 +619,27 @@ class HordeSessionTest extends TestCase
         self::assertFalse($session->shouldRegenerate());
         self::assertFalse($session->isDestroyed());
     }
+
+    #[Test]
+    public function testClearLifecycleFlagsClearsBoth(): void
+    {
+        $session = $this->createSession();
+        $session->scheduleRegeneration();
+        $session->markDestroyed();
+        $session->clearLifecycleFlags();
+        self::assertFalse($session->shouldRegenerate());
+        self::assertFalse($session->isDestroyed());
+    }
+
+    #[Test]
+    public function testClearLifecycleFlagsIsIdempotent(): void
+    {
+        // Clearing already-clear flags is a valid no-op for executors
+        // that always clear regardless of who set what.
+        $session = $this->createSession();
+        $session->clearLifecycleFlags();
+        $session->clearLifecycleFlags();
+        self::assertFalse($session->shouldRegenerate());
+        self::assertFalse($session->isDestroyed());
+    }
 }

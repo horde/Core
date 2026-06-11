@@ -34,6 +34,13 @@ use Horde_Pack_Exception;
  *
  * Encryption closures are optional. Without them, encrypted read returns
  * raw values and encrypted write throws.
+ *
+ * Carries a pair of runtime intent flags ({@see scheduleRegeneration()},
+ * {@see markDestroyed()}). The flags are not data; they are not persisted.
+ * The actual lifecycle work (rotating the id, destroying the row, etc.)
+ * is the responsibility of {@see SessionLifecycle}, which reads the
+ * flags via {@see SessionLifecycle::processFlags()} and clears them via
+ * {@see clearLifecycleFlags()} after acting.
  */
 #[Factory(factory: HordeSessionFactory::class, method: 'create')]
 class HordeSession extends DefaultSession implements SessionMetaInterface, EncryptedValuesInterface
@@ -491,5 +498,19 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
     public function isDestroyed(): bool
     {
         return $this->destroyed;
+    }
+
+    /**
+     * Clear both lifecycle intent flags.
+     *
+     * @internal Called by lifecycle engines (currently
+     *           {@see SessionLifecycle}) after they have acted on the
+     *           markers. Application code should not call this directly;
+     *           intent setters set, executors clear.
+     */
+    public function clearLifecycleFlags(): void
+    {
+        $this->regenerationScheduled = false;
+        $this->destroyed = false;
     }
 }
