@@ -16,7 +16,6 @@ declare(strict_types=1);
 
 namespace Horde\Core\Session;
 
-use Horde\Core\Config\State;
 use Horde\Injector\Attribute\Factory;
 use Horde\Injector\Injector;
 use Horde\SessionHandler\SessionHandler;
@@ -83,9 +82,6 @@ use Horde_Shutdown_Task;
 #[Factory(factory: SessionLifecycleFactory::class, method: 'create')]
 class SessionLifecycle implements Horde_Shutdown_Task
 {
-    /** Default deadline (in seconds) for periodic session ID rotation. */
-    private const DEFAULT_REGENERATE_INTERVAL = 21600; // 6 hours
-
     /** Marker for a string scoped value (matches HordeSession). */
     private const NOT_SERIALIZED = "\0";
 
@@ -121,16 +117,18 @@ class SessionLifecycle implements Horde_Shutdown_Task
      *                                        {@see destroy()} replace it.
      * @param SessionHandler        $handler  Modern save handler. Registered
      *                                        with PHP via setup().
-     * @param State                 $config   Loaded Horde config. setup()
-     *                                        reads cookie.*, server.name,
-     *                                        session.*, use_ssl from it.
+     * @param SessionConfig         $config   Typed view of session-related
+     *                                        Horde config keys. Built by
+     *                                        {@see SessionConfigFactory} from
+     *                                        the same `ConfigLoader` state
+     *                                        {@see SessionHandlerFactory} uses.
      * @param Horde_Secret_Cbc|null $secret   Optional. Re-keyed on clean(),
      *                                        cleared on destroy().
      */
     public function __construct(
         private readonly Injector $injector,
         private readonly SessionHandler $handler,
-        private readonly State $config,
+        private readonly SessionConfig $config,
         private readonly ?Horde_Secret_Cbc $secret = null,
     ) {}
 
@@ -159,8 +157,8 @@ class SessionLifecycle implements Horde_Shutdown_Task
     ): void {
         ini_set('url_rewriter.tags', 0);
 
-        $cookieDomain = (string) ($this->config->get('cookie.domain', '') ?? '');
-        $serverName = (string) ($this->config->get('server.name', '') ?? '');
+        $cookieDomain = $this->config->cookieDomain ?? '';
+        $serverName = $this->config->serverName;
         if ($cookieDomain !== '' && strpos($serverName, '.') === false) {
             throw new Horde_Exception(sprintf(
                 'Session cookies will not work because the server name "%s" '
@@ -179,23 +177,22 @@ class SessionLifecycle implements Horde_Shutdown_Task
             ));
         }
 
-        $timeout = (int) ($this->config->get('session.timeout', 0) ?? 0);
+        $timeout = $this->config->lifetime;
         if ($timeout > 0) {
             ini_set('session.gc_maxlifetime', (string) $timeout);
         }
 
         session_set_cookie_params(
             $timeout,
-            (string) ($this->config->get('cookie.path', '') ?? ''),
+            $this->config->cookiePath,
             $cookieDomain,
-            (int) ($this->config->get('use_ssl', 0) ?? 0) === 1,
+            $this->config->secure,
             true,
         );
         session_cache_limiter(
-            $cacheLimiter
-                ?? (string) ($this->config->get('session.cache_limiter', '') ?? ''),
+            $cacheLimiter ?? ($this->config->cacheLimiter ?? ''),
         );
-        session_name(urlencode((string) ($this->config->get('session.name', '') ?? '')));
+        session_name(urlencode($this->config->cookieName));
         if ($sessionId !== null && $sessionId !== '') {
             session_id($sessionId);
         }
@@ -425,15 +422,13 @@ class SessionLifecycle implements Horde_Shutdown_Task
     /**
      * The deadline interval (seconds) between forced session ID rotations.
      *
-     * Reads `session.regenerate_interval` from config if set, else falls
-     * back to the 6-hour default. Matches the legacy shim's default.
+     * Reads from {@see SessionConfig::$regenerateInterval}, which the
+     * factory builds from `session.regenerate_interval` with a 6-hour
+     * fallback (the legacy shim's default).
      */
     private function regenerateInterval(): int
     {
-        $configured = $this->config->get('session.regenerate_interval');
-        return is_int($configured) && $configured > 0
-            ? $configured
-            : self::DEFAULT_REGENERATE_INTERVAL;
+        return $this->config->regenerateInterval;
     }
 
     /**

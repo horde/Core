@@ -13,6 +13,7 @@ namespace Horde\Core\Test\Unit\Session;
 
 use Horde\Core\Config\State;
 use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionConfigFactory;
 use Horde\Core\Session\SessionLifecycle;
 use Horde\Injector\Injector;
 use Horde\Injector\TopLevel;
@@ -60,8 +61,9 @@ class SessionLifecycleTest extends TestCase
         $injector->setInstance(HordeSession::class, $session);
 
         $handler = new SessionHandler(new BuiltinBackend());
+        $config = (new SessionConfigFactory())->fromState(new State($conf));
 
-        return new SessionLifecycle($injector, $handler, new State($conf));
+        return new SessionLifecycle($injector, $handler, $config);
     }
 
     // ---------------------------------------------------------------
@@ -235,7 +237,8 @@ class SessionLifecycleTest extends TestCase
         $session ??= new HordeSession(new SessionId('process-flags-test'), []);
         $injector->setInstance(HordeSession::class, $session);
         $handler = new SessionHandler(new BuiltinBackend());
-        return new RecordingSessionLifecycle($injector, $handler, new State([]));
+        $config = (new SessionConfigFactory())->fromState(new State([]));
+        return new RecordingSessionLifecycle($injector, $handler, $config);
     }
 
     #[Test]
