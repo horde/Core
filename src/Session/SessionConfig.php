@@ -73,6 +73,14 @@ final class SessionConfig
      *                                        value. Null leaves the PHP
      *                                        default in place. From
      *                                        `$conf['session']['cache_limiter']`.
+     * @param string      $serverName         Hostname the application is
+     *                                        served under. Used by the
+     *                                        cookie-domain guard in
+     *                                        {@see SessionLifecycle::setup()}
+     *                                        to refuse the broken
+     *                                        single-label-host plus
+     *                                        Domain-attribute combination.
+     *                                        From `$conf['server']['name']`.
      */
     public function __construct(
         public readonly string $cookieName,
@@ -82,5 +90,6 @@ final class SessionConfig
         public readonly int $lifetime,
         public readonly int $regenerateInterval,
         public readonly ?string $cacheLimiter,
+        public readonly string $serverName = '',
     ) {}
 }
