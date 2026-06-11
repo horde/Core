@@ -113,62 +113,47 @@ class SessionLifecycleTest extends TestCase
     #[Test]
     public function testRegenerationDueIsFalseWhenDeadlineNotSet(): void
     {
-        $previous = $_SESSION ?? null;
-        $_SESSION = [];
-
-        try {
-            self::assertFalse($this->build()->regenerationDue());
-        } finally {
-            if ($previous === null) {
-                unset($_SESSION);
-            } else {
-                $_SESSION = $previous;
-            }
-        }
+        // Default HordeSession has no _r key set.
+        self::assertFalse($this->build()->regenerationDue());
     }
 
     #[Test]
     public function testRegenerationDueIsFalseWhenDeadlineInFuture(): void
     {
-        $previous = $_SESSION ?? null;
-        $_SESSION = ['_r' => time() + 3600];
-
-        try {
-            self::assertFalse($this->build()->regenerationDue());
-        } finally {
-            if ($previous === null) {
-                unset($_SESSION);
-            } else {
-                $_SESSION = $previous;
-            }
-        }
+        $session = new HordeSession(new SessionId('rd-test'), []);
+        $session->setScoped('_r', '', time() + 3600);
+        self::assertFalse($this->build(session: $session)->regenerationDue());
     }
 
     #[Test]
     public function testRegenerationDueIsTrueWhenDeadlineInPast(): void
     {
-        $previous = $_SESSION ?? null;
-        $_SESSION = ['_r' => time() - 1];
-
-        try {
-            self::assertTrue($this->build()->regenerationDue());
-        } finally {
-            if ($previous === null) {
-                unset($_SESSION);
-            } else {
-                $_SESSION = $previous;
-            }
-        }
+        $session = new HordeSession(new SessionId('rd-test'), []);
+        $session->setScoped('_r', '', time() - 1);
+        self::assertTrue($this->build(session: $session)->regenerationDue());
     }
 
     #[Test]
     public function testRegenerationDueIgnoresNonIntegerDeadlines(): void
     {
+        $session = new HordeSession(new SessionId('rd-test'), []);
+        $session->setScoped('_r', '', 'not-a-timestamp');
+        self::assertFalse($this->build(session: $session)->regenerationDue());
+    }
+
+    #[Test]
+    public function testRegenerationDueReadsViaHordeSessionNotSuperglobal(): void
+    {
+        // Layering: SessionLifecycle is the orchestrator; HordeSession owns
+        // session data reads. Putting the deadline only in $_SESSION must
+        // NOT make regenerationDue() see it.
         $previous = $_SESSION ?? null;
-        $_SESSION = ['_r' => 'not-a-timestamp'];
+        $_SESSION = ['_r' => time() - 1];
 
         try {
-            self::assertFalse($this->build()->regenerationDue());
+            $session = new HordeSession(new SessionId('rd-test'), []);
+            // No setScoped; HordeSession has no idea about the deadline.
+            self::assertFalse($this->build(session: $session)->regenerationDue());
         } finally {
             if ($previous === null) {
                 unset($_SESSION);
@@ -231,5 +216,169 @@ class SessionLifecycleTest extends TestCase
                 $_SESSION = $previous;
             }
         }
+    }
+
+    // ---------------------------------------------------------------
+    // processFlags()
+    //
+    // The dispatch policy is tested via a recording subclass that
+    // overrides the synchronous executors. Dispatching to the real
+    // executors requires a live PHP session (session_regenerate_id /
+    // session_destroy fail in CLI), which is the integration suite's
+    // territory. Unit tests stay focused on the policy: who gets
+    // called, in what order, and when nothing should happen.
+    // ---------------------------------------------------------------
+
+    private function buildRecording(?HordeSession $session = null): RecordingSessionLifecycle
+    {
+        $injector = new Injector(new TopLevel());
+        $session ??= new HordeSession(new SessionId('process-flags-test'), []);
+        $injector->setInstance(HordeSession::class, $session);
+        $handler = new SessionHandler(new BuiltinBackend());
+        return new RecordingSessionLifecycle($injector, $handler, new State([]));
+    }
+
+    #[Test]
+    public function testProcessFlagsNoOpWhenNoFlagsSet(): void
+    {
+        $session = new HordeSession(new SessionId('pf-noop'), []);
+        $lifecycle = $this->buildRecording($session);
+
+        $lifecycle->processFlags($session);
+
+        self::assertSame([], $lifecycle->calls);
+    }
+
+    #[Test]
+    public function testProcessFlagsDispatchesToRegenerateWhenFlagSet(): void
+    {
+        $session = new HordeSession(new SessionId('pf-regen'), []);
+        $session->scheduleRegeneration();
+        $lifecycle = $this->buildRecording($session);
+
+        $lifecycle->processFlags($session);
+
+        self::assertSame(['regenerate'], $lifecycle->calls);
+    }
+
+    #[Test]
+    public function testProcessFlagsDispatchesToDestroyWhenFlagSet(): void
+    {
+        $session = new HordeSession(new SessionId('pf-destroy'), []);
+        $session->markDestroyed();
+        $lifecycle = $this->buildRecording($session);
+
+        $lifecycle->processFlags($session);
+
+        self::assertSame(['destroy'], $lifecycle->calls);
+    }
+
+    #[Test]
+    public function testProcessFlagsPrefersDestroyOverRegenerate(): void
+    {
+        // Resolution policy: destruction wins. A session being destroyed
+        // need not bother rotating its id.
+        $session = new HordeSession(new SessionId('pf-both'), []);
+        $session->scheduleRegeneration();
+        $session->markDestroyed();
+        $lifecycle = $this->buildRecording($session);
+
+        $lifecycle->processFlags($session);
+
+        self::assertSame(['destroy'], $lifecycle->calls);
+    }
+
+    #[Test]
+    public function testProcessFlagsIsIdempotentOnRepeatedCall(): void
+    {
+        // Once executors clear flags after acting, a second processFlags()
+        // call sees no flags and dispatches nothing.
+        $session = new HordeSession(new SessionId('pf-idempotent'), []);
+        $session->scheduleRegeneration();
+        $lifecycle = $this->buildRecording($session);
+
+        $lifecycle->processFlags($session);
+        $lifecycle->processFlags($session);
+
+        self::assertSame(['regenerate'], $lifecycle->calls);
+    }
+
+    #[Test]
+    public function testShutdownDoesNotFireProcessFlags(): void
+    {
+        // Regression sentinel for the "no magic last-minute behaviour"
+        // rule. shutdown() mirrors only; lifecycle dispatch must be
+        // explicit, called by middleware or controllers, never auto-fired
+        // from a shutdown hook.
+        $session = new HordeSession(new SessionId('shutdown-no-dispatch'), []);
+        $session->scheduleRegeneration();
+        $session->markDestroyed();
+        $lifecycle = $this->buildRecording($session);
+
+        // Force active=true so shutdown() does its mirror; processFlags
+        // should still NOT fire.
+        $r = new \ReflectionProperty(SessionLifecycle::class, 'active');
+        $r->setAccessible(true);
+        $r->setValue($lifecycle, true);
+
+        $previous = $_SESSION ?? null;
+        $_SESSION = [];
+
+        try {
+            $lifecycle->shutdown();
+        } finally {
+            if ($previous === null) {
+                unset($_SESSION);
+            } else {
+                $_SESSION = $previous;
+            }
+        }
+
+        self::assertSame([], $lifecycle->calls);
+        self::assertTrue($session->shouldRegenerate());
+        self::assertTrue($session->isDestroyed());
+    }
+}
+
+/**
+ * Test double that records calls to the synchronous executors instead of
+ * invoking PHP's session module. Lets us verify processFlags()'s dispatch
+ * policy at unit-test scope without requiring a live session.
+ */
+class RecordingSessionLifecycle extends SessionLifecycle
+{
+    /** @var list<string> */
+    public array $calls = [];
+
+    public function clean(): bool
+    {
+        $this->calls[] = 'clean';
+        $this->getHordeSessionForTest()->clearLifecycleFlags();
+        return true;
+    }
+
+    public function destroy(): void
+    {
+        $this->calls[] = 'destroy';
+        $this->getHordeSessionForTest()->clearLifecycleFlags();
+    }
+
+    public function regenerate(): void
+    {
+        $this->calls[] = 'regenerate';
+        $this->getHordeSessionForTest()->clearLifecycleFlags();
+    }
+
+    /**
+     * Resolve the modern session via the same injector path the parent
+     * uses. A small accessor because the parent's getSession() is private.
+     */
+    private function getHordeSessionForTest(): HordeSession
+    {
+        $r = new \ReflectionMethod(parent::class, 'getSession');
+        $r->setAccessible(true);
+        /** @var HordeSession $session */
+        $session = $r->invoke($this);
+        return $session;
     }
 }
