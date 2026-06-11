@@ -69,6 +69,25 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
     private ?Closure $decryptor;
 
     /**
+     * Lifecycle intent flag set by {@see scheduleRegeneration()}.
+     *
+     * Runtime-only. Never serialised to the backend. Read by a future
+     * SessionPersistenceService during response emission to decide
+     * whether to rotate the session id.
+     */
+    private bool $regenerationScheduled = false;
+
+    /**
+     * Lifecycle intent flag set by {@see markDestroyed()}.
+     *
+     * Runtime-only. Never serialised to the backend. Read by a future
+     * SessionPersistenceService and the session middleware during
+     * response emission to destroy the backend row and emit a
+     * clearing Set-Cookie.
+     */
+    private bool $destroyed = false;
+
+    /**
      * Pack/unpack service used to serialise arrays, objects, and the
      * plaintext side of encrypted values, matching the wire format
      * produced by the legacy Horde_Session for cross-compatibility.
@@ -410,5 +429,67 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
             $this->data[$app][$name] = $encrypted;
             $this->dirty = true;
         }
+    }
+
+    // ---------------------------------------------------------------
+    // Lifecycle intent flags
+    //
+    // Runtime-only state set by login / logout flows to signal that
+    // the session id should be rotated, or that the session row
+    // should be destroyed, when the response is emitted. The flags
+    // are read by a future SessionPersistenceService and the session
+    // middleware; setting a flag has no immediate side effect.
+    //
+    // Never serialised to the backend. Always start as false in a
+    // fresh HordeSession instance, including when the factory's
+    // restore() path rebuilds an instance from a stored payload.
+    // ---------------------------------------------------------------
+
+    /**
+     * Mark the session as needing a fresh ID.
+     *
+     * Called by login flows after successful authentication to defeat
+     * session fixation. The actual rotation is performed downstream by
+     * SessionPersistenceService during response emission. Setting this
+     * flag does NOT change the session ID immediately.
+     *
+     * Idempotent.
+     */
+    public function scheduleRegeneration(): void
+    {
+        $this->regenerationScheduled = true;
+    }
+
+    /**
+     * Whether {@see scheduleRegeneration()} has been called this request.
+     */
+    public function shouldRegenerate(): bool
+    {
+        return $this->regenerationScheduled;
+    }
+
+    /**
+     * Mark the session for destruction.
+     *
+     * Called by logout flows. The actual destruction (backend row delete
+     * plus clearing Set-Cookie) is performed downstream by
+     * SessionPersistenceService during response emission. Setting this
+     * flag does NOT clear the data immediately; readers continue to see
+     * whatever was in scope before the call until the response phase
+     * runs.
+     *
+     * Idempotent.
+     */
+    public function markDestroyed(): void
+    {
+        $this->destroyed = true;
+    }
+
+    /**
+     * Whether {@see markDestroyed()} has been called this request.
+     */
+    public function isDestroyed(): bool
+    {
+        return $this->destroyed;
     }
 }

@@ -68,9 +68,9 @@ class HordeSessionFactory extends DefaultSessionFactory
     public function create(Injector $injector): HordeSession
     {
         $secret = $injector->getInstance('Horde_Secret_Cbc');
-        $encryptor = static fn (string $plaintext): string
+        $encryptor = static fn(string $plaintext): string
             => (string) $secret->write($secret->getKey(), $plaintext);
-        $decryptor = static fn (string $ciphertext): string
+        $decryptor = static fn(string $ciphertext): string
             => (string) $secret->read($secret->getKey(), $ciphertext);
 
         return new HordeSession(
