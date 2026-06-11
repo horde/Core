@@ -20,7 +20,7 @@ use Horde\Core\Config\State;
 use Horde\Core\Service\HordeDbService;
 use Horde\Core\Session\HordeSessionFactory;
 use Horde\HashTable\LockableHashTable;
-use Horde\SessionHandler\NativePhpSessionSerializer;
+use Horde\SessionHandler\DefaultSessionSerializer;
 use Horde\SessionHandler\SessionHandler;
 use Horde\SessionHandler\SessionStorageBackend;
 use Horde\SessionHandler\Storage\BuiltinBackend;
@@ -90,7 +90,7 @@ class SessionHandlerFactory
 
         return new SessionHandler(
             backend: $backend,
-            serializer: new NativePhpSessionSerializer(),
+            serializer: new DefaultSessionSerializer(),
             sessionFactory: $this->createSessionFactory($injector),
             events: $this->getEventDispatcher($injector),
         );
