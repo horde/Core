@@ -3196,6 +3196,21 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             throw new Horde_ActiveSync_Exception('Unknown error locating vEvent.');
         }
 
+        // EAS 14.1+ may target a single occurrence of a recurring meeting.
+        if (!empty($response['instanceid'])
+            && $this->_version >= Horde_ActiveSync::VERSION_FOURTEENONE) {
+            try {
+                new Horde_Date($response['instanceid'], 'UTC');
+                $vEvent->setAttribute('RECURRENCE-ID', $response['instanceid']);
+            } catch (Horde_Date_Exception $e) {
+                $this->_logger->err(sprintf(
+                    'Invalid MeetingResponse InstanceId %s: %s',
+                    $response['instanceid'],
+                    $e->getMessage()
+                ));
+            }
+        }
+
         // Update the vCal so the response will be reflected when imported.
         $ident = $injector->getInstance('Horde_Core_Factory_Identity')->create($this->_user);
         //$cn = $ident->getValue('fullname');
