@@ -20,8 +20,10 @@ declare(strict_types=1);
 
 namespace Horde\Core\Auth\Jwt;
 
+use Horde\Injector\Attribute\Factory;
 use InvalidArgumentException;
 
+#[Factory(factory: JwtServiceFactory::class, method: 'create')]
 class JwtService
 {
     private Hs256Generator $generator;
