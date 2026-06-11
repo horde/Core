@@ -1,0 +1,432 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Copyright 2026 The Horde Project (http://www.horde.org/)
+ *
+ * See the enclosed file LICENSE for license information (LGPL). If you
+ * did not receive this file, see http://www.horde.org/licenses/lgpl21.
+ *
+ * @category  Horde
+ * @copyright 2026 The Horde Project
+ * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
+ * @package   Core
+ */
+
+namespace Horde\Core\Session;
+
+use Horde\Core\Config\State;
+use Horde\Injector\Attribute\Factory;
+use Horde\Injector\Injector;
+use Horde\SessionHandler\SessionHandler;
+use Horde\SessionHandler\SessionId;
+use Horde_Exception;
+use Horde_Secret_Cbc;
+use Horde_Shutdown;
+use Horde_Shutdown_Task;
+
+/**
+ * Orchestrates the lifecycle of the current PHP session under Horde control.
+ *
+ * Composes the modern {@see SessionHandler} (registered with PHP) and
+ * {@see HordeSession} (the per-request data layer) plus Horde-application
+ * glue: PHP ini tuning, the cookie-domain/single-label-hostname guard, the
+ * shutdown task that mirrors {@see HordeSession} payload back into
+ * `$_SESSION`, optional {@see Horde_Secret_Cbc} re-keying on `clean()` /
+ * `destroy()`, and the relogin auth-changed guard that arms in `close()` and
+ * fires in `start()`.
+ *
+ * Replaces the lifecycle role previously carried by the legacy
+ * `Horde_Session` shim. Modern callers (Registry bootstrap, LoginService,
+ * Auth_Application, Ajax/Application) consume this class directly. The shim
+ * keeps its public lifecycle methods as thin delegates for BC.
+ *
+ * The class deliberately does NOT do:
+ * - Data reads/writes (use {@see HordeSession}).
+ * - Token generation/verification (use {@see \Horde\Token\Token}).
+ * - Offline session administration (use
+ *   {@see \Horde\SessionHandler\SessionAdministrator}).
+ * - The save-handler callback side (that lives on {@see SessionHandler}).
+ */
+#[Factory(factory: SessionLifecycleFactory::class, method: 'create')]
+class SessionLifecycle implements Horde_Shutdown_Task
+{
+    /** Default deadline (in seconds) for periodic session ID rotation. */
+    private const DEFAULT_REGENERATE_INTERVAL = 21600; // 6 hours
+
+    /** Marker for a string scoped value (matches HordeSession). */
+    private const NOT_SERIALIZED = "\0";
+
+    /** $_SESSION top-level key holding the begin-timestamp. */
+    private const BEGIN_KEY = '_b';
+
+    /** $_SESSION top-level key holding the regenerate-at deadline. */
+    private const REGENERATE_KEY = '_r';
+
+    /**
+     * Whether PHP's session machinery is currently open for read/write.
+     *
+     * Mirrors PHP's session_status() but tracked locally so the lifecycle
+     * shutdown task can branch on it cheaply.
+     */
+    private bool $active = false;
+
+    /** Whether {@see clean()} has run this request. Idempotency guard. */
+    private bool $cleaned = false;
+
+    /**
+     * Auth-state captured at {@see close()} so {@see start()} can detect a
+     * change-of-user across early-close-and-reopen sequences. Null = no
+     * relogin guard armed.
+     */
+    private ?bool $relogin = null;
+
+    /** Whether {@see setup()} has installed the save handler this request. */
+    private bool $handlerRegistered = false;
+
+    /** Whether the request-shutdown mirror task is registered. */
+    private bool $shutdownRegistered = false;
+
+    /**
+     * @param Injector              $injector Injector for resolving the
+     *                                        current {@see HordeSession}
+     *                                        on each call. The lifecycle
+     *                                        does not cache the session
+     *                                        because {@see clean()} and
+     *                                        {@see destroy()} replace it.
+     * @param SessionHandler        $handler  Modern save handler. Registered
+     *                                        with PHP via setup().
+     * @param State                 $config   Loaded Horde config. setup()
+     *                                        reads cookie.*, server.name,
+     *                                        session.*, use_ssl from it.
+     * @param Horde_Secret_Cbc|null $secret   Optional. Re-keyed on clean(),
+     *                                        cleared on destroy().
+     */
+    public function __construct(
+        private readonly Injector $injector,
+        private readonly SessionHandler $handler,
+        private readonly State $config,
+        private readonly ?Horde_Secret_Cbc $secret = null,
+    ) {}
+
+    /**
+     * Bootstrap the current PHP session under Horde control.
+     *
+     * Tunes PHP session ini settings, applies the cookie-domain / single-
+     * label-hostname guard, registers the modern save handler with PHP,
+     * registers a request-shutdown mirror task, and optionally calls
+     * {@see start()}.
+     *
+     * Idempotent — repeat calls in the same request reapply the ini tuning
+     * but do not re-register the handler or the shutdown task.
+     *
+     * @param bool        $start        Open the session immediately.
+     * @param string|null $cacheLimiter Override for session.cache_limiter.
+     *                                  Null falls back to conf.session.cache_limiter.
+     * @param string|null $sessionId    Force a specific session ID.
+     *
+     * @throws Horde_Exception When the cookie-domain guard fails.
+     */
+    public function setup(
+        bool $start = true,
+        ?string $cacheLimiter = null,
+        ?string $sessionId = null,
+    ): void {
+        ini_set('url_rewriter.tags', 0);
+
+        $cookieDomain = (string) ($this->config->get('cookie.domain', '') ?? '');
+        $serverName = (string) ($this->config->get('server.name', '') ?? '');
+        if ($cookieDomain !== '' && strpos($serverName, '.') === false) {
+            throw new Horde_Exception(sprintf(
+                'Session cookies will not work because the server name "%s" '
+                . 'is a single-label hostname (no dot) but a cookie domain '
+                . '("%s") is configured. Browsers reject Domain= cookie '
+                . 'attributes on hostnames without a dot. This typically '
+                . 'affects http://localhost and other single-label hostnames. '
+                . 'Either: (1) use a fully qualified hostname like '
+                . 'http://horde.localhost or http://example.test, '
+                . '(2) clear $conf[\'cookie\'][\'domain\'] to let the browser '
+                . 'scope the cookie to the exact hostname, or '
+                . '(3) enable URL-based sessions by clearing '
+                . '$conf[\'session\'][\'use_only_cookies\'] (not recommended).',
+                $serverName,
+                $cookieDomain,
+            ));
+        }
+
+        $timeout = (int) ($this->config->get('session.timeout', 0) ?? 0);
+        if ($timeout > 0) {
+            ini_set('session.gc_maxlifetime', (string) $timeout);
+        }
+
+        session_set_cookie_params(
+            $timeout,
+            (string) ($this->config->get('cookie.path', '') ?? ''),
+            $cookieDomain,
+            (int) ($this->config->get('use_ssl', 0) ?? 0) === 1,
+            true,
+        );
+        session_cache_limiter(
+            $cacheLimiter
+                ?? (string) ($this->config->get('session.cache_limiter', '') ?? ''),
+        );
+        session_name(urlencode((string) ($this->config->get('session.name', '') ?? '')));
+        if ($sessionId !== null && $sessionId !== '') {
+            session_id($sessionId);
+        }
+
+        if (!$this->handlerRegistered) {
+            session_set_save_handler($this->handler, true);
+            $this->handlerRegistered = true;
+        }
+
+        if (!$this->shutdownRegistered) {
+            Horde_Shutdown::add($this);
+            $this->shutdownRegistered = true;
+        }
+
+        if ($start) {
+            $this->start();
+            $this->initialiseTimestamps();
+        }
+    }
+
+    /**
+     * Open the actual PHP session.
+     *
+     * Calls {@see session_start()}, marks the lifecycle active, rebuilds
+     * the modern {@see HordeSession} instance from the now-populated
+     * `$_SESSION` payload, and runs the relogin auth-changed guard.
+     */
+    public function start(): void
+    {
+        // Limit session ID to 32 bytes. Session IDs are NOT cryptographically
+        // secure hashes; they are just a way to generate random strings.
+        ini_set('session.hash_function', '0');
+        ini_set('session.hash_bits_per_character', '5');
+
+        session_start();
+        $this->active = true;
+
+        // Rebuild HordeSession over the now-populated $_SESSION so encryptor
+        // closures from HordeSessionFactory are preserved on the fresh
+        // instance.
+        $this->rebuildHordeSession();
+
+        // Relogin guard: if the auth state changed across an early-close
+        // -and-reopen, mark the legacy shim's data view read-only so any
+        // accidental writes during the rest of this request are dropped.
+        // The shim still owns the readonly flag — we just signal.
+        if ($this->relogin !== null && isset($GLOBALS['registry'])) {
+            $authedNow = $GLOBALS['registry']->getAuth() !== false;
+            if ($authedNow !== $this->relogin
+                && isset($GLOBALS['session'])
+                && property_exists($GLOBALS['session'], '_readonly')) {
+                // Best-effort flag flip on the shim. Out-of-tree code that
+                // mutates state inside this request will silently no-op.
+                // Matches the shim's prior behaviour bit-for-bit.
+                try {
+                    $r = new \ReflectionProperty($GLOBALS['session'], '_readonly');
+                    $r->setAccessible(true);
+                    $r->setValue($GLOBALS['session'], true);
+                } catch (\ReflectionException) {
+                    // Shim shape changed under us. Ignore.
+                }
+            }
+        }
+    }
+
+    /**
+     * Mirror the modern session payload to `$_SESSION` and call
+     * `session_write_close()`. Used by SESSION_READONLY mode.
+     */
+    public function close(): void
+    {
+        $this->active = false;
+        $this->relogin = isset($GLOBALS['registry'])
+            && ($GLOBALS['registry']->getAuth() !== false);
+        $this->mirrorToSession();
+        session_write_close();
+    }
+
+    /**
+     * Login-fixation guard.
+     *
+     * Regenerates the session ID, clears all session data, rebuilds the
+     * modern session over the now-empty `$_SESSION`, writes fresh
+     * `_b`/`_r` timestamps, and rotates the {@see Horde_Secret_Cbc} key.
+     * Idempotent: returns false on repeat calls within the same request.
+     *
+     * @return bool True if cleaned, false if already cleaned this request.
+     */
+    public function clean(): bool
+    {
+        if ($this->cleaned) {
+            return false;
+        }
+
+        session_regenerate_id(true);
+        session_unset();
+        $_SESSION = [];
+        $this->rebuildHordeSession();
+        $this->initialiseTimestamps();
+
+        $this->secret?->setKey();
+
+        $this->cleaned = true;
+
+        return true;
+    }
+
+    /**
+     * Hard logout. Destroys the PHP session, clears `$_SESSION`, rebuilds
+     * the modern session over the empty payload, and clears the
+     * {@see Horde_Secret_Cbc} key.
+     */
+    public function destroy(): void
+    {
+        if (isset($_SESSION)) {
+            session_destroy();
+        }
+        $_SESSION = [];
+        $this->rebuildHordeSession();
+        $this->cleaned = true;
+        $this->active = false;
+
+        $this->secret?->clearKey();
+    }
+
+    /**
+     * Periodic session ID rotation. Updates the regenerate-at deadline.
+     *
+     * Used by paths that detect {@see regenerationDue()} and want to
+     * proactively rotate without going through clean()/destroy().
+     */
+    public function regenerate(): void
+    {
+        $this->mirrorToSession();
+        session_regenerate_id(true);
+        $regenAt = time() + $this->regenerateInterval();
+        $_SESSION[self::REGENERATE_KEY] = $regenAt;
+        $this->getSession()->setScoped(self::REGENERATE_KEY, '', $regenAt);
+    }
+
+    /**
+     * Whether the current session is past its regenerate-at deadline.
+     *
+     * Replaces the legacy `$session->regenerate_due` magic property.
+     */
+    public function regenerationDue(): bool
+    {
+        $regen = $_SESSION[self::REGENERATE_KEY] ?? null;
+        return is_int($regen) && time() >= $regen;
+    }
+
+    /**
+     * Whether PHP's session is currently open for read/write.
+     *
+     * Convenience over {@see session_status()}. Modern callers can use
+     * `session_status() === PHP_SESSION_ACTIVE` directly; this exists for
+     * symmetry with the legacy `$session->isActive()` API.
+     */
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    /**
+     * Horde_Shutdown_Task: mirror HordeSession's payload into `$_SESSION` so
+     * PHP's native save handler picks up scoped/encrypted writes when it
+     * runs at request shutdown.
+     *
+     * close() does the same thing but also explicitly calls
+     * session_write_close(). For requests that never call close(), this
+     * shutdown hook carries the modern data across to the persisted
+     * session.
+     */
+    public function shutdown(): void
+    {
+        if ($this->active) {
+            $this->mirrorToSession();
+        }
+    }
+
+    /**
+     * The deadline interval (seconds) between forced session ID rotations.
+     *
+     * Reads `session.regenerate_interval` from config if set, else falls
+     * back to the 6-hour default. Matches the legacy shim's default.
+     */
+    private function regenerateInterval(): int
+    {
+        $configured = $this->config->get('session.regenerate_interval');
+        return is_int($configured) && $configured > 0
+            ? $configured
+            : self::DEFAULT_REGENERATE_INTERVAL;
+    }
+
+    /**
+     * Resolve the current {@see HordeSession} from the injector.
+     *
+     * Lazily looked up on every call because {@see clean()} and
+     * {@see destroy()} replace the injector singleton with a fresh
+     * instance.
+     */
+    private function getSession(): HordeSession
+    {
+        return $this->injector->getInstance(HordeSession::class);
+    }
+
+    /**
+     * Rebuild the modern session from the current `$_SESSION`.
+     *
+     * Used after session_start() (when `$_SESSION` is now populated from
+     * the persisted backend), after clean() / destroy() (when `$_SESSION`
+     * is cleared), and any other moment where the previous HordeSession
+     * instance no longer reflects the data the rest of the request will
+     * see.
+     *
+     * Sets the freshly-built instance as the injector singleton so callers
+     * resolving HordeSession via getInstance see the same object the
+     * lifecycle synchronises with.
+     */
+    private function rebuildHordeSession(): void
+    {
+        $fresh = $this->injector->createInstance(HordeSession::class);
+        $this->injector->setInstance(HordeSession::class, $fresh);
+    }
+
+    /**
+     * Write the begin and regenerate-at timestamps on first session start.
+     *
+     * No-op when either timestamp is already present, so re-running setup()
+     * or restoring a persisted session does not reset the begin time.
+     */
+    private function initialiseTimestamps(): void
+    {
+        if (isset($_SESSION[self::BEGIN_KEY])) {
+            return;
+        }
+
+        $now = time();
+        $regenAt = $now + $this->regenerateInterval();
+
+        $_SESSION[self::BEGIN_KEY] = $now;
+        $_SESSION[self::REGENERATE_KEY] = $regenAt;
+
+        $session = $this->getSession();
+        $session->setScoped(self::BEGIN_KEY, '', $now);
+        $session->setScoped(self::REGENERATE_KEY, '', $regenAt);
+    }
+
+    /**
+     * Copy the modern session payload into `$_SESSION` so PHP's save
+     * handler persists the up-to-date data. Used by close() and the
+     * shutdown task.
+     */
+    private function mirrorToSession(): void
+    {
+        $_SESSION = $this->getSession()->toPayload();
+    }
+}
