@@ -12,6 +12,7 @@
  * @package   Core
  */
 
+use Horde\Core\Secret\SessionSecret;
 use Horde\Crypt\Blowfish\Blowfish;
 
 /**
@@ -32,7 +33,7 @@ use Horde\Crypt\Blowfish\Blowfish;
  * @package   Core
  * @since     2.20.0
  */
-class Horde_Core_Secret_Cbc extends Horde_Core_Secret
+class Horde_Core_Secret_Cbc extends Horde_Core_Secret implements SessionSecret
 {
     /**
      * Key used for current cached cipher object.

@@ -16,9 +16,9 @@ declare(strict_types=1);
 
 namespace Horde\Core\Session;
 
+use Horde\Core\Secret\SessionSecret;
 use Horde\Injector\Injector;
 use Horde\SessionHandler\SessionHandler;
-use Horde_Secret_Cbc;
 
 /**
  * DI factory for {@see SessionLifecycle}.
@@ -26,13 +26,16 @@ use Horde_Secret_Cbc;
  * Wires the modern {@see SessionHandler}, the {@see Injector} (used for
  * lazy {@see HordeSession} resolution), the typed
  * {@see SessionConfig} built by {@see SessionConfigFactory}, and the
- * optional {@see Horde_Secret_Cbc} into a single per-request lifecycle
- * orchestrator.
+ * optional {@see SessionSecret} cipher into a single per-request
+ * lifecycle orchestrator.
  *
- * The legacy binding name `Horde_Secret_Cbc` is used deliberately. Asking
- * for the `Horde_Core_Secret_Cbc` class directly bypasses the binding and
- * yields an instance with no IV configured. Matches what
- * {@see HordeSessionFactory::create()} does.
+ * The legacy `Horde_Secret_Cbc` binding name is queried first because
+ * existing installs configure the cipher under that string. The
+ * resolved instance is checked against {@see SessionSecret} (which the
+ * real `Horde_Core_Secret_Cbc` implements) before being passed to the
+ * lifecycle: tests and minimal bootstraps may bind the legacy name to
+ * a fixture that does not implement the contract, in which case the
+ * lifecycle runs without re-keying.
  */
 class SessionLifecycleFactory
 {
@@ -50,7 +53,13 @@ class SessionLifecycleFactory
 
         $secret = null;
         try {
-            $secret = $injector->getInstance('Horde_Secret_Cbc');
+            $resolved = $injector->getInstance('Horde_Secret_Cbc');
+            if ($resolved instanceof SessionSecret) {
+                $secret = $resolved;
+            }
+            // Resolved-but-not-SessionSecret: legacy fixture or test
+            // double. Treat as if no cipher were available; lifecycle
+            // no-ops the setKey/clearKey calls.
         } catch (\Throwable) {
             // No Horde_Secret_Cbc binding configured. Tests and
             // bootstrap-time contexts may run without one. Lifecycle
