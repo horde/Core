@@ -556,7 +556,7 @@ class Horde_PageOutput
     {
         global $injector, $language, $registry, $session;
 
-        $tokenService = $injector->getInstance(\Horde\Token\Token::class);
+        $tokenService = $injector->getInstance(Horde\Token\Token::class);
 
         $view = new Horde_View([
             'templatePath' => $registry->get('templates', 'horde') . '/common',
@@ -624,7 +624,7 @@ class Horde_PageOutput
                         'ajax_url' => $registry->getServiceLink('ajax', $registry->getApp())->url,
                         'logout_url' => strval($registry->getServiceLink('logout')),
                         'sid' => SID,
-                        'token' => (string) $tokenService->generate(\Horde\Core\Session\HordeSession::CSRF_SEED),
+                        'token' => (string) $tokenService->generate(Horde\Core\Session\HordeSession::CSRF_SEED),
                     ],
                 ]);
 
@@ -672,7 +672,7 @@ class Horde_PageOutput
 
                 /* Other constants */
                 'SID' => $SID,
-                'TOKEN' => (string) $tokenService->generate(\Horde\Core\Session\HordeSession::CSRF_SEED),
+                'TOKEN' => (string) $tokenService->generate(Horde\Core\Session\HordeSession::CSRF_SEED),
 
                 /* Other config. */
                 'growler_log' => $this->topbar,

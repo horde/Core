@@ -22,6 +22,7 @@ use Horde_Core_Secret_Cbc;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Horde_Pack;
 
 #[CoversClass(HordeSessionFactory::class)]
 class HordeSessionFactoryTest extends TestCase
@@ -115,7 +116,7 @@ class HordeSessionFactoryTest extends TestCase
         // Encrypted plaintext is Horde_Pack-packed (matching the legacy
         // Horde_Session::set(..., ENCRYPT) wire format). Reproduce that here
         // rather than using bare serialize().
-        $pack = new \Horde_Pack();
+        $pack = new Horde_Pack();
         $packed = $pack->pack('password', ['compress' => 0]);
 
         $factory = new HordeSessionFactory(null, $decryptor);

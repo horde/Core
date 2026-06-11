@@ -234,4 +234,36 @@ class AuthCredentialStoreTest extends TestCase
         self::assertFalse($session->isEncrypted('horde', 'auth_app_init/horde'));
         self::assertTrue($session->getScoped('horde', 'auth_app_init/horde'));
     }
+
+    #[Test]
+    public function getReturnsFalseWhenSlotHoldsCorruptedScalar(): void
+    {
+        // Reproduces what happens when an encrypted slot decrypts to a
+        // string (wrong horde_secret_key, legacy wire format, or otherwise
+        // corrupted bytes). The declared array|false return type would be
+        // violated if the store passed the string through.
+        $session = $this->sessionWithBaseApp('horde');
+        $store = new AuthCredentialStore($session);
+
+        // Poke a raw string into the credentials slot, bypassing set()'s
+        // encryption path. Mirrors a corrupt-decryption outcome at read
+        // time.
+        $session->setScoped('horde', 'auth_app/horde', 'not-an-array');
+
+        self::assertFalse($store->get('horde'));
+    }
+
+    #[Test]
+    public function getReturnsFalseWhenDedupMarkerPointsAtBaseApp(): void
+    {
+        // Pathological case: the dedup marker `true` was written into the
+        // base-app slot itself. Resolving it would mean recursing into the
+        // same slot. Treat as missing rather than loop or surface `true`.
+        $session = $this->sessionWithBaseApp('horde');
+        $store = new AuthCredentialStore($session);
+
+        $session->setScoped('horde', 'auth_app/horde', true);
+
+        self::assertFalse($store->get('horde'));
+    }
 }

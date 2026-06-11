@@ -62,4 +62,3 @@ class DemandSessionToken implements MiddlewareInterface
         return $handler->handle($request);
     }
 }
-
