@@ -22,6 +22,8 @@ use Horde\Core\Config\ConfigLoader;
 use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Driver\DriverRepository;
 use Horde\Core\Config\RegistryConfigLoader;
+use Horde\Core\Config\State;
+use Horde\Core\Config\StateFactory;
 use Horde\Core\Editor\TinymcePageBinder;
 use Horde\Core\Factory\ApiRegistryFactory;
 use Horde\Core\Factory\ApplicationServiceFactory;
@@ -265,6 +267,7 @@ class DefaultInjectorBindings implements InjectorBindings
             JwtService::class => JwtServiceFactory::class,
             AuthenticationService::class => AuthenticationServiceFactory::class,
             ConfigLoader::class => ConfigLoaderFactory::class,
+            State::class => StateFactory::class,
             DriverRepository::class => DriverRepositoryFactory::class,
             ConfigMetadataProvider::class => ConfigMetadataProviderFactory::class,
             HordeDbService::class => DbServiceFactory::class,
