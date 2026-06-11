@@ -16,7 +16,7 @@
 
 use Horde\Core\Session\HordeSession;
 
-class Horde_Core_Factory_ShareBase extends Horde_Core_Factory_Base
+class Horde_Core_Factory_ShareBase extends Horde_Core_Factory_Base implements Horde_Shutdown_Task
 {
     /** Session storage key. */
     public const STORAGE_KEY = 'horde_share/';
@@ -75,7 +75,14 @@ class Horde_Core_Factory_ShareBase extends Horde_Core_Factory_Base
             $ob->setListCache($listCache);
 
             if (empty($this->_toCache)) {
-                register_shutdown_function([$this, 'shutdown']);
+                /* Register through Horde_Shutdown rather than raw
+                 * register_shutdown_function: the latter fires *after*
+                 * Horde_Shutdown::runTasks() (which includes the pinned-final
+                 * session shim mirror), and the setScoped() writes in
+                 * shutdown() would be dropped from $_SESSION. Going through
+                 * Horde_Shutdown puts this task inside the regular queue
+                 * that the addFinal mirror consumes from. */
+                Horde_Shutdown::add($this);
             }
 
             $this->_toCache[$sig] = [$app, $cache_sig];
@@ -87,7 +94,11 @@ class Horde_Core_Factory_ShareBase extends Horde_Core_Factory_Base
     }
 
     /**
-     * Shutdown function.
+     * Persist any pending share-list caches into the session.
+     *
+     * Implements Horde_Shutdown_Task. Called from Horde_Shutdown::runTasks()
+     * before the pinned-final session shim mirror copies the modern
+     * HordeSession payload into $_SESSION.
      */
     public function shutdown()
     {
