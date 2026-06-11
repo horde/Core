@@ -16,8 +16,6 @@ declare(strict_types=1);
 
 namespace Horde\Core\Session;
 
-use Horde\Core\Config\ConfigLoader;
-use Horde\Core\Config\State;
 use Horde\Injector\Injector;
 use Horde\SessionHandler\SessionHandler;
 use Horde_Secret_Cbc;
@@ -26,9 +24,10 @@ use Horde_Secret_Cbc;
  * DI factory for {@see SessionLifecycle}.
  *
  * Wires the modern {@see SessionHandler}, the {@see Injector} (used for
- * lazy {@see HordeSession} resolution), the loaded `horde` config
- * {@see State}, and the optional {@see Horde_Secret_Cbc} into a single
- * per-request lifecycle orchestrator.
+ * lazy {@see HordeSession} resolution), the typed
+ * {@see SessionConfig} built by {@see SessionConfigFactory}, and the
+ * optional {@see Horde_Secret_Cbc} into a single per-request lifecycle
+ * orchestrator.
  *
  * The legacy binding name `Horde_Secret_Cbc` is used deliberately. Asking
  * for the `Horde_Core_Secret_Cbc` class directly bypasses the binding and
@@ -40,15 +39,14 @@ class SessionLifecycleFactory
     /**
      * Build the request-scoped {@see SessionLifecycle}.
      *
-     * Resolves the `horde` config {@see State} through {@see ConfigLoader}
-     * rather than reading `$GLOBALS['conf']` directly. Tests that need a
-     * different config shape can construct {@see SessionLifecycle}
-     * directly with their own {@see State}.
+     * Resolves {@see SessionConfig} through the injector. Tests that
+     * need a different config shape can construct {@see SessionLifecycle}
+     * directly with their own {@see SessionConfig}.
      */
     public function create(Injector $injector): SessionLifecycle
     {
         $handler = $injector->getInstance(SessionHandler::class);
-        $config = $this->loadConfig($injector);
+        $config = $injector->getInstance(SessionConfig::class);
 
         $secret = null;
         try {
@@ -60,12 +58,5 @@ class SessionLifecycleFactory
         }
 
         return new SessionLifecycle($injector, $handler, $config, $secret);
-    }
-
-    private function loadConfig(Injector $injector): State
-    {
-        $loader = $injector->getInstance(ConfigLoader::class);
-
-        return $loader->load('horde');
     }
 }
