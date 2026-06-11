@@ -16,12 +16,12 @@ declare(strict_types=1);
 
 namespace Horde\Core\Session;
 
+use Horde\Core\Secret\SessionSecret;
 use Horde\Injector\Attribute\Factory;
 use Horde\Injector\Injector;
 use Horde\SessionHandler\SessionHandler;
 use Horde\SessionHandler\SessionId;
 use Horde_Exception;
-use Horde_Secret_Cbc;
 use Horde_Shutdown;
 use Horde_Shutdown_Task;
 
@@ -32,7 +32,7 @@ use Horde_Shutdown_Task;
  * {@see HordeSession} (the per-request data layer) plus Horde-application
  * glue: PHP ini tuning, the cookie-domain/single-label-hostname guard, the
  * shutdown task that mirrors {@see HordeSession} payload back into
- * `$_SESSION`, and optional {@see Horde_Secret_Cbc} re-keying on `clean()` /
+ * `$_SESSION`, and optional {@see SessionSecret} re-keying on `clean()` /
  * `destroy()`.
  *
  * Registry-agnostic. The legacy stack's relogin auth-changed guard lives
@@ -122,14 +122,14 @@ class SessionLifecycle implements Horde_Shutdown_Task
      *                                        {@see SessionConfigFactory} from
      *                                        the same `ConfigLoader` state
      *                                        {@see SessionHandlerFactory} uses.
-     * @param Horde_Secret_Cbc|null $secret   Optional. Re-keyed on clean(),
+     * @param SessionSecret|null    $secret   Optional. Re-keyed on clean(),
      *                                        cleared on destroy().
      */
     public function __construct(
         private readonly Injector $injector,
         private readonly SessionHandler $handler,
         private readonly SessionConfig $config,
-        private readonly ?Horde_Secret_Cbc $secret = null,
+        private readonly ?SessionSecret $secret = null,
     ) {}
 
     /**
@@ -256,7 +256,7 @@ class SessionLifecycle implements Horde_Shutdown_Task
      *
      * Regenerates the session ID, clears all session data, rebuilds the
      * modern session over the now-empty `$_SESSION`, writes fresh
-     * `_b`/`_r` timestamps, and rotates the {@see Horde_Secret_Cbc} key.
+     * `_b`/`_r` timestamps, and rotates the {@see SessionSecret} key.
      * Idempotent: returns false on repeat calls within the same request.
      *
      * @return bool True if cleaned, false if already cleaned this request.
@@ -297,7 +297,7 @@ class SessionLifecycle implements Horde_Shutdown_Task
     /**
      * Hard logout. Destroys the PHP session, clears `$_SESSION`, rebuilds
      * the modern session over the empty payload, and clears the
-     * {@see Horde_Secret_Cbc} key.
+     * {@see SessionSecret} key.
      */
     public function destroy(): void
     {
