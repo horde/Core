@@ -17,6 +17,7 @@ use Horde\Core\Factory\TokenServiceFactory;
 use Horde\Core\Horde;
 use Horde\Core\Session\HordeSession;
 use Horde\Core\Session\HordeSessionFactory;
+use Horde\Core\Session\SessionLifecycle;
 use Horde\SessionHandler\SessionHandler as ModernSessionHandler;
 use Horde\SessionHandler\SessionId;
 use Horde\Token\Exception\TokenException;
@@ -210,6 +211,22 @@ class Horde_Session implements Horde_Shutdown_Task
     }
 
     /**
+     * Resolve the modern SessionLifecycle from the global injector.
+     *
+     * The shim wraps the lifecycle: setup/start/clean/destroy/regenerate/
+     * close all delegate the actual PHP-session work to it. Returns null
+     * for legacy/test contexts without an injector — the caller falls
+     * back to inline session_*() calls in that case.
+     */
+    private function _resolveLifecycle(): ?SessionLifecycle
+    {
+        if (isset($GLOBALS['injector'])) {
+            return $GLOBALS['injector']->getInstance(SessionLifecycle::class);
+        }
+        return null;
+    }
+
+    /**
      */
     public function __get($name)
     {
@@ -274,70 +291,77 @@ class Horde_Session implements Horde_Shutdown_Task
         $cache_limiter = null,
         $session_id = null
     ) {
-        global $conf, $injector;
+        $lifecycle = $this->_resolveLifecycle();
+        if ($lifecycle !== null) {
+            // Delegate the PHP-session work (cookie params, ini tuning,
+            // save handler, cookie-domain guard, optional session_start)
+            // to the lifecycle. Pass start=false: the shim drives start()
+            // itself so its own bookkeeping (_active, _data, relogin
+            // guard) stays in lock-step with the rest of the shim's
+            // public surface.
+            $lifecycle->setup(
+                start: false,
+                cacheLimiter: $cache_limiter,
+                sessionId: $session_id,
+            );
+        } else {
+            // Fallback for legacy/test contexts without an injector. The
+            // shim opens the session directly; this branch matches the
+            // pre-delegation behaviour bit-for-bit so existing tests that
+            // bypass the injector keep working.
+            global $conf;
 
-        ini_set('url_rewriter.tags', 0);
+            ini_set('url_rewriter.tags', 0);
 
-        if (!empty($conf['cookie']['domain'])
-            && (strpos($conf['server']['name'], '.') === false)) {
-            throw new Horde_Exception(sprintf(
-                'Session cookies will not work because the server name "%s" '
-                . 'is a single-label hostname (no dot) but a cookie domain '
-                . '("%s") is configured. Browsers reject Domain= cookie '
-                . 'attributes on hostnames without a dot. This typically '
-                . 'affects http://localhost and other single-label hostnames. '
-                . 'Either: (1) use a fully qualified hostname like '
-                . 'http://horde.localhost or http://example.test, '
-                . '(2) clear $conf[\'cookie\'][\'domain\'] to let the browser '
-                . 'scope the cookie to the exact hostname, or '
-                . '(3) enable URL-based sessions by clearing '
-                . '$conf[\'session\'][\'use_only_cookies\'] (not recommended).',
-                (string) ($conf['server']['name'] ?? ''),
-                (string) $conf['cookie']['domain']
-            ));
+            if (!empty($conf['cookie']['domain'])
+                && (strpos($conf['server']['name'], '.') === false)) {
+                throw new Horde_Exception(sprintf(
+                    'Session cookies will not work because the server name "%s" '
+                    . 'is a single-label hostname (no dot) but a cookie domain '
+                    . '("%s") is configured. Browsers reject Domain= cookie '
+                    . 'attributes on hostnames without a dot. This typically '
+                    . 'affects http://localhost and other single-label hostnames. '
+                    . 'Either: (1) use a fully qualified hostname like '
+                    . 'http://horde.localhost or http://example.test, '
+                    . '(2) clear $conf[\'cookie\'][\'domain\'] to let the browser '
+                    . 'scope the cookie to the exact hostname, or '
+                    . '(3) enable URL-based sessions by clearing '
+                    . '$conf[\'session\'][\'use_only_cookies\'] (not recommended).',
+                    (string) ($conf['server']['name'] ?? ''),
+                    (string) $conf['cookie']['domain']
+                ));
+            }
+
+            if (!empty($conf['session']['timeout'])) {
+                ini_set('session.gc_maxlifetime', $conf['session']['timeout']);
+            }
+
+            session_set_cookie_params(
+                (int) ($conf['session']['timeout'] ?? 0),
+                (string) ($conf['cookie']['path'] ?? ''),
+                (string) ($conf['cookie']['domain'] ?? ''),
+                !empty($conf['use_ssl']) && $conf['use_ssl'] == 1,
+                true
+            );
+            session_cache_limiter(
+                is_null($cache_limiter)
+                    ? (string) ($conf['session']['cache_limiter'] ?? '')
+                    : $cache_limiter
+            );
+            session_name(urlencode((string) ($conf['session']['name'] ?? '')));
+            if ($session_id) {
+                session_id($session_id);
+            }
         }
 
-        if (!empty($conf['session']['timeout'])) {
-            ini_set('session.gc_maxlifetime', $conf['session']['timeout']);
+        /* Pin the shim's mirror to the addFinal() slot. This is the
+         * legacy-stack contract: regular Horde_Shutdown_Tasks may write
+         * through the shim's API; addFinal() runs last so those writes
+         * land in HordeSession before this mirror copies them back to
+         * $_SESSION. addFinal() is single-slot last-writer-wins. */
+        if (isset($GLOBALS['injector'])) {
+            $GLOBALS['injector']->getInstance('Horde_Shutdown')->addFinal($this);
         }
-
-        session_set_cookie_params(
-            (int) ($conf['session']['timeout'] ?? 0),
-            (string) ($conf['cookie']['path'] ?? ''),
-            (string) ($conf['cookie']['domain'] ?? ''),
-            !empty($conf['use_ssl']) && $conf['use_ssl'] == 1,
-            true
-        );
-        session_cache_limiter(
-            is_null($cache_limiter)
-                ? (string) ($conf['session']['cache_limiter'] ?? '')
-                : $cache_limiter
-        );
-        session_name(urlencode((string) ($conf['session']['name'] ?? '')));
-        if ($session_id) {
-            session_id($session_id);
-        }
-
-        /* Install the modern handler. The legacy
-         * Horde_Core_Factory_SessionHandler is no longer wire-bound; the modern
-         * SessionHandlerFactory already covers every backend except mongo. */
-        $modernHandler = $injector->getInstance(ModernSessionHandler::class);
-        session_set_save_handler($modernHandler, true);
-
-        /* Mirror the modern HordeSession payload back into $_SESSION before
-         * PHP runs its own session save. The shim treats $_SESSION as a
-         * write-only mirror at end-of-request: HordeSession owns the data,
-         * and PHP's native save handler serialises whatever sits in $_SESSION
-         * when it runs. Without a shutdown task here, only data written
-         * directly to $_SESSION (e.g. _b/_r) survives across requests, and
-         * scoped/encrypted writes that live in HordeSession are lost.
-         *
-         * Pinned to run after every regular Horde_Shutdown_Task so that any
-         * task writing through the shim (e.g. IMP's per-factory shutdown
-         * writers) lands in HordeSession before this mirror copies it back
-         * to $_SESSION. addFinal() is a single-slot last-writer-wins API
-         * reserved for this kind of framework-owned end-of-request work. */
-        $injector->getInstance('Horde_Shutdown')->addFinal($this);
 
         if ($start) {
             $this->start();
@@ -353,19 +377,26 @@ class Horde_Session implements Horde_Shutdown_Task
      */
     public function start()
     {
-        /* Limit session ID to 32 bytes. Session IDs are NOT cryptographically
-         * secure hashes. Instead, they are nothing more than a way to
-         * generate random strings. */
-        ini_set('session.hash_function', 0);
-        ini_set('session.hash_bits_per_character', 5);
+        $lifecycle = $this->_resolveLifecycle();
+        if ($lifecycle !== null) {
+            // Lifecycle does session_start(), sets its own active flag,
+            // and rebuilds HordeSession over the now-populated $_SESSION.
+            $lifecycle->start();
+        } else {
+            // Fallback for legacy/test contexts without an injector.
+            ini_set('session.hash_function', 0);
+            ini_set('session.hash_bits_per_character', 5);
+            session_start();
+        }
 
-        session_start();
         $this->_active = true;
         $this->_data = &$_SESSION;
         $this->_rebuildModern();
 
         /* We have reopened a session. Check to make sure that authentication
-         * status has not changed in the meantime. */
+         * status has not changed in the meantime. The relogin guard is a
+         * legacy-stack concern; it lives here in the shim, NOT in
+         * SessionLifecycle. */
         if (!$this->_readonly
             && !is_null($this->_relogin)
             && (($GLOBALS['registry']->getAuth() !== false) !== $this->_relogin)) {
@@ -407,15 +438,24 @@ class Horde_Session implements Horde_Shutdown_Task
      */
     public function regenerate()
     {
+        $lifecycle = $this->_resolveLifecycle();
+        if ($lifecycle !== null) {
+            // Lifecycle does mirror + session_regenerate_id(true) + writes
+            // the new _r deadline via HordeSession::setScoped() + clears
+            // lifecycle markers.
+            $lifecycle->regenerate();
+            $this->_data = &$_SESSION;
+            $this->_data[self::REGENERATE] = $this->modern->getScoped(self::REGENERATE, '');
+            return;
+        }
+
+        /* Fallback for legacy/test contexts without an injector. Mirrors
+         * the pre-delegation behaviour bit-for-bit. */
         $this->_mirrorToSession();
         session_regenerate_id(true);
         $regenAt = time() + $this->regenerate_interval;
         $this->_data[self::REGENERATE] = $regenAt;
         $this->modern->setScoped(self::REGENERATE, '', $regenAt);
-
-        /* Modern HordeSession handles re-encryption of values in its
-         * encryption map under the new $_SESSION id-derived key, if the
-         * factory wired encryptor/decryptor closures. */
     }
 
     /**
@@ -430,6 +470,27 @@ class Horde_Session implements Horde_Shutdown_Task
         if ($this->_cleansession) {
             return false;
         }
+
+        $lifecycle = $this->_resolveLifecycle();
+        if ($lifecycle !== null) {
+            // Lifecycle does session_regenerate_id, session_unset,
+            // $_SESSION reset, rebuild HordeSession, initialiseTimestamps,
+            // Horde_Secret_Cbc::setKey, and clears lifecycle markers.
+            // It also sets its own _active flag and idempotency state.
+            $lifecycle->clean();
+
+            // Refresh the shim's bookkeeping to match the now-cleaned
+            // PHP session. _data must rebind to $_SESSION because
+            // session_unset() detached the previous binding; modern must
+            // be re-resolved because rebuildHordeSession() created a fresh
+            // singleton.
+            $this->_data = &$_SESSION;
+            $this->modern = $this->_resolveModern();
+            $this->_cleansession = true;
+            return true;
+        }
+
+        /* Fallback for legacy/test contexts without an injector. */
 
         // login.php and Auth_Application::transparent can call clean() before
         // setup() has opened the session. session_regenerate_id() then fails
@@ -448,10 +509,6 @@ class Horde_Session implements Horde_Shutdown_Task
         $this->_rebuildModern();
         $this->_start();
 
-        if (isset($GLOBALS['injector'])) {
-            $GLOBALS['injector']->getInstance('Horde_Secret_Cbc')->setKey();
-        }
-
         $this->_cleansession = true;
 
         return true;
@@ -466,8 +523,19 @@ class Horde_Session implements Horde_Shutdown_Task
     public function close()
     {
         $this->_active = false;
+        // The shim's relogin guard depends on this; record before we
+        // hand off to the lifecycle. Legacy concern, lives here.
         $this->_relogin = isset($GLOBALS['registry'])
             && ($GLOBALS['registry']->getAuth() !== false);
+
+        $lifecycle = $this->_resolveLifecycle();
+        if ($lifecycle !== null) {
+            // Lifecycle does the mirror + session_write_close().
+            $lifecycle->close();
+            return;
+        }
+
+        /* Fallback for legacy/test contexts without an injector. */
         $this->_mirrorToSession();
         session_write_close();
     }
@@ -494,6 +562,19 @@ class Horde_Session implements Horde_Shutdown_Task
      */
     public function destroy()
     {
+        $lifecycle = $this->_resolveLifecycle();
+        if ($lifecycle !== null) {
+            // Lifecycle does session_destroy + $_SESSION reset + rebuild
+            // HordeSession + Horde_Secret_Cbc::clearKey + clears lifecycle
+            // markers. It also flips its own active flag and cleaned flag.
+            $lifecycle->destroy();
+            $this->_data = &$_SESSION;
+            $this->modern = $this->_resolveModern();
+            $this->_cleansession = true;
+            return;
+        }
+
+        /* Fallback for legacy/test contexts without an injector. */
         if (isset($_SESSION)) {
             session_destroy();
         }
@@ -501,9 +582,6 @@ class Horde_Session implements Horde_Shutdown_Task
         $this->_data = &$_SESSION;
         $this->_rebuildModern();
         $this->_cleansession = true;
-        if (isset($GLOBALS['injector'])) {
-            $GLOBALS['injector']->getInstance('Horde_Secret_Cbc')->clearKey();
-        }
     }
 
     /**
