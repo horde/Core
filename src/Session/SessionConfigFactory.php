@@ -69,6 +69,8 @@ class SessionConfigFactory
         $limiter = $state->get('session.cache_limiter');
         $cacheLimiter = (is_string($limiter) && $limiter !== '') ? $limiter : null;
 
+        $serverName = (string) ($state->get('server.name', '') ?? '');
+
         return new SessionConfig(
             cookieName: $cookieName,
             cookieDomain: $cookieDomainRaw === '' ? null : $cookieDomainRaw,
@@ -77,6 +79,7 @@ class SessionConfigFactory
             lifetime: $lifetime,
             regenerateInterval: $regenerateInterval,
             cacheLimiter: $cacheLimiter,
+            serverName: $serverName,
         );
     }
 }
