@@ -122,7 +122,7 @@ class Horde_Core_ActiveSync_Mail_Draft extends Horde_Core_ActiveSync_Mail
         foreach ($base as $part) {
             if ($part->isAttachment()
                 && !empty($atc_map[$part->getName()])) {
-                $atc_hash['add'][$atc_map[$part->getName()]] = $folderid . ':' . $stat['id'] . ':' . $part->getMimeId();
+                $atc_hash['add'][$atc_map[$part->getName()]] = $folderid . ':' . $new_uid . ':' . $part->getMimeId();
             }
         }
 
@@ -165,6 +165,23 @@ class Horde_Core_ActiveSync_Mail_Draft extends Horde_Core_ActiveSync_Mail
         if ($draft->importance) {
             $this->_headers->addHeader('importance', $draft->importance);
         }
+
+        $bodyType = !empty($draft->airsyncbasebody)
+            ? $draft->airsyncbasebody->type
+            : null;
+        if ($bodyType == Horde_ActiveSync::BODYPREF_TYPE_MIME) {
+            $this->_importMimeDraftBody($draft);
+        } else {
+            // Get the text part and create a mime object for it.
+            $this->_textPart = new Horde_Mime_Part();
+            $this->_textPart->setContents($draft->airsyncbasebody->data);
+            $this->_textPart->setType(
+                $bodyType == Horde_ActiveSync::BODYPREF_TYPE_HTML
+                    ? 'text/html'
+                    : 'text/plain'
+            );
+        }
+
         if ($from = $this->_getIdentityFromAddress()) {
             $this->_headers->removeHeader('From');
             $this->_headers->addHeader('From', $from);
@@ -176,17 +193,41 @@ class Horde_Core_ActiveSync_Mail_Draft extends Horde_Core_ActiveSync_Mail
         $this->_headers->addHeaderOb(Horde_Mime_Headers_ContentId::create());
         $this->_headers->addHeader('X-IMP-Draft', 'Yes');
 
-        // Get the text part and create a mime object for it.
-        $this->_textPart = new Horde_Mime_Part();
-        $this->_textPart->setContents($draft->airsyncbasebody->data);
-        $this->_textPart->setType(
-            $draft->airsyncbasebody->type == Horde_ActiveSync::BODYPREF_TYPE_HTML
-                ? 'text/html'
-                : 'text/plain'
-        );
-
         // Attachments.
         $this->_handleAttachments();
+    }
+
+    /**
+     * Parse a Type-4 (MIME) draft body from the client.
+     *
+     * iOS sends a full RFC822 message in the body; POOMMAIL header fields are
+     * often omitted. Extract envelope headers and preserve the MIME structure
+     * for round-trip sync (see EasMessageBuilder/Mime export path).
+     *
+     * @param Horde_ActiveSync_Message_Mail $draft
+     */
+    protected function _importMimeDraftBody(Horde_ActiveSync_Message_Mail $draft)
+    {
+        $data = $draft->airsyncbasebody->data;
+        if (is_resource($data)) {
+            $data = stream_get_contents($data);
+        }
+        if ($data === '' || $data === false) {
+            $this->_textPart = new Horde_Mime_Part();
+            return;
+        }
+
+        $rfc822 = new Horde_ActiveSync_Rfc822($data, false);
+        $mimeHeaders = $rfc822->getHeaders();
+
+        foreach (['To', 'Cc', 'Bcc', 'Subject'] as $name) {
+            if (!$this->_headers->getValue($name)
+                && ($val = $mimeHeaders->getValue($name))) {
+                $this->_headers->addHeader($name, $val);
+            }
+        }
+
+        $this->_textPart = $rfc822->getMimeObject();
     }
 
     protected function _handleAttachments()

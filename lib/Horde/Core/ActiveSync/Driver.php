@@ -2258,9 +2258,15 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                             );
                             $draft->setDraftMessage($message);
 
-                            // Do we need an existing Draft message?
-                            if ($id && !empty($message->airsyncbaseattachments)) {
-                                $draft->getExistingDraftMessage($draft_folder, $id);
+                            if ($id) {
+                                try {
+                                    $draft->getExistingDraftMessage(
+                                        $draft_folder,
+                                        $id
+                                    );
+                                } catch (Horde_ActiveSync_Exception $e) {
+                                    // Stale UID from client; treat as new.
+                                }
                             }
 
                             // Append the message and return results.
