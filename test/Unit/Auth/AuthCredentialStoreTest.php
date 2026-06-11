@@ -12,6 +12,10 @@ declare(strict_types=1);
 namespace Horde\Core\Test\Unit\Auth;
 
 use Horde\Core\Auth\AuthCredentialStore;
+use Horde\Core\Auth\CredentialResult;
+use Horde\Core\Auth\CredentialStateMetadata;
+use Horde\Core\Auth\HasCredentialsState;
+use Horde\Core\Auth\InvalidationReason;
 use Horde\Core\Session\HordeSession;
 use Horde\SessionHandler\SessionId;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -265,5 +269,195 @@ class AuthCredentialStoreTest extends TestCase
         $session->setScoped('horde', 'auth_app/horde', true);
 
         self::assertFalse($store->get('horde'));
+    }
+
+    // ---------------------------------------------------------------
+    // Per-app credential state (HasCredentialsState + InvalidationReason)
+    // ---------------------------------------------------------------
+
+    #[Test]
+    public function getStateDefaultsToNeverHadWhenNoSlot(): void
+    {
+        $session = $this->sessionWithBaseApp('horde');
+        $store = new AuthCredentialStore($session);
+
+        // No state slot has been written; the implicit default is NeverHad.
+        self::assertSame(HasCredentialsState::NeverHad, $store->getState('imp'));
+    }
+
+    #[Test]
+    public function setMarksStateAsPresent(): void
+    {
+        $session = $this->sessionWithBaseApp('horde');
+        $store = new AuthCredentialStore($session);
+
+        $store->set('horde', ['password' => 'secret']);
+
+        self::assertSame(HasCredentialsState::Present, $store->getState('horde'));
+    }
+
+    #[Test]
+    public function setCredentialsAliasMarksStateAsPresent(): void
+    {
+        $session = $this->sessionWithBaseApp('horde');
+        $store = new AuthCredentialStore($session);
+
+        $store->setCredentials('horde', ['password' => 'secret']);
+
+        self::assertSame(HasCredentialsState::Present, $store->getState('horde'));
+        self::assertSame(['password' => 'secret'], $store->get('horde'));
+    }
+
+    #[Test]
+    public function markInvalidatedFlipsStateAndDropsCredentials(): void
+    {
+        $session = $this->sessionWithBaseApp('horde');
+        $store = new AuthCredentialStore($session);
+
+        $store->set('imp', ['password' => 'secret']);
+        $store->markInvalidated('imp', InvalidationReason::BackendRejected);
+
+        self::assertSame(HasCredentialsState::Invalidated, $store->getState('imp'));
+        // Credentials are no longer present in the slot.
+        self::assertFalse($session->hasScoped('horde', 'auth_app/imp'));
+    }
+
+    #[Test]
+    public function markInvalidatedRecordsReasonAndDetail(): void
+    {
+        $session = $this->sessionWithBaseApp('horde');
+        $store = new AuthCredentialStore($session);
+
+        $store->set('imp', ['password' => 'secret']);
+        $store->markInvalidated('imp', InvalidationReason::PasswordChanged, 'changed via passwd/');
+
+        $metadata = $store->getStateMetadata('imp');
+        self::assertNotNull($metadata);
+        self::assertSame(HasCredentialsState::Invalidated, $metadata->state);
+        self::assertSame(InvalidationReason::PasswordChanged, $metadata->reason);
+        self::assertSame('changed via passwd/', $metadata->detail);
+        self::assertNotNull($metadata->since);
+    }
+
+    #[Test]
+    public function markInvalidatedIsIdempotent(): void
+    {
+        $session = $this->sessionWithBaseApp('horde');
+        $store = new AuthCredentialStore($session);
+
+        $store->set('imp', ['password' => 'secret']);
+        $store->markInvalidated('imp', InvalidationReason::BackendRejected);
+        $store->markInvalidated('imp', InvalidationReason::AdminForced, 'admin clicked clear');
+
+        $metadata = $store->getStateMetadata('imp');
+        self::assertNotNull($metadata);
+        self::assertSame(InvalidationReason::AdminForced, $metadata->reason);
+        self::assertSame('admin clicked clear', $metadata->detail);
+    }
+
+    #[Test]
+    public function markNeverHadFlipsStateWithoutReason(): void
+    {
+        $session = $this->sessionWithBaseApp('horde');
+        $store = new AuthCredentialStore($session);
+
+        $store->markNeverHad('imp');
+
+        self::assertSame(HasCredentialsState::NeverHad, $store->getState('imp'));
+        $metadata = $store->getStateMetadata('imp');
+        self::assertNotNull($metadata);
+        self::assertNull($metadata->reason);
+        self::assertNull($metadata->detail);
+    }
+
+    #[Test]
+    public function clearRemovesStateSlots(): void
+    {
+        $session = $this->sessionWithBaseApp('horde');
+        $store = new AuthCredentialStore($session);
+
+        $store->set('imp', ['password' => 'secret']);
+        $store->markInvalidated('imp', InvalidationReason::BackendRejected, 'rejected');
+        $store->clear('imp');
+
+        // After clear, no metadata is recorded; getState falls back to
+        // the implicit NeverHad default.
+        self::assertSame(HasCredentialsState::NeverHad, $store->getState('imp'));
+        self::assertNull($store->getStateMetadata('imp'));
+    }
+
+    #[Test]
+    public function getStateMetadataReturnsNullWhenNoSlot(): void
+    {
+        $session = $this->sessionWithBaseApp('horde');
+        $store = new AuthCredentialStore($session);
+
+        // No state has been recorded for this app; metadata is null even
+        // though getState() returns NeverHad as the safe default.
+        self::assertNull($store->getStateMetadata('imp'));
+        self::assertSame(HasCredentialsState::NeverHad, $store->getState('imp'));
+    }
+
+    #[Test]
+    public function getOrExplainReturnsCredentialsWhenPresent(): void
+    {
+        $session = $this->sessionWithBaseApp('horde');
+        $store = new AuthCredentialStore($session);
+
+        $store->set('horde', ['password' => 'secret']);
+        $result = $store->getOrExplain('horde');
+
+        self::assertInstanceOf(CredentialResult::class, $result);
+        self::assertSame(HasCredentialsState::Present, $result->state);
+        self::assertSame(['password' => 'secret'], $result->credentials);
+        self::assertNull($result->reason);
+    }
+
+    #[Test]
+    public function getOrExplainReturnsInvalidatedReasonWhenInvalidated(): void
+    {
+        $session = $this->sessionWithBaseApp('horde');
+        $store = new AuthCredentialStore($session);
+
+        $store->set('imp', ['password' => 'secret']);
+        $store->markInvalidated('imp', InvalidationReason::BackendRejected, 'imap rejected');
+
+        $result = $store->getOrExplain('imp');
+
+        self::assertSame(HasCredentialsState::Invalidated, $result->state);
+        self::assertNull($result->credentials);
+        self::assertSame(InvalidationReason::BackendRejected, $result->reason);
+        self::assertSame('imap rejected', $result->detail);
+    }
+
+    #[Test]
+    public function getOrExplainReturnsNeverHadByDefault(): void
+    {
+        $session = $this->sessionWithBaseApp('horde');
+        $store = new AuthCredentialStore($session);
+
+        $result = $store->getOrExplain('kronolith');
+
+        self::assertSame(HasCredentialsState::NeverHad, $result->state);
+        self::assertNull($result->credentials);
+        self::assertNull($result->reason);
+    }
+
+    #[Test]
+    public function setRecoversFromInvalidatedState(): void
+    {
+        // After a backend rejects credentials and the user re-enters them,
+        // a fresh set() should clear the Invalidated state and reason.
+        $session = $this->sessionWithBaseApp('horde');
+        $store = new AuthCredentialStore($session);
+
+        $store->set('imp', ['password' => 'old']);
+        $store->markInvalidated('imp', InvalidationReason::BackendRejected, 'wrong password');
+        $store->set('imp', ['password' => 'new']);
+
+        self::assertSame(HasCredentialsState::Present, $store->getState('imp'));
+        $metadata = $store->getStateMetadata('imp');
+        self::assertNotNull($metadata);
+        self::assertNull($metadata->reason, 'reason must be cleared on re-set to Present');
     }
 }
