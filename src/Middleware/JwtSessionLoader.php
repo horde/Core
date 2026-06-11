@@ -64,7 +64,7 @@ class JwtSessionLoader implements MiddlewareInterface
     public const COOKIE_NAME = 'horde_jwt_refresh';
 
     public function __construct(
-        private readonly JwtService $jwtService,
+        private readonly ?JwtService $jwtService,
         private readonly SessionHandler $sessionHandler,
         private readonly LoggerInterface $logger,
     ) {}
@@ -90,6 +90,13 @@ class JwtSessionLoader implements MiddlewareInterface
      */
     private function resolveSession(ServerRequestInterface $request): ?HordeSession
     {
+        if ($this->jwtService === null) {
+            // JWT is not configured for this install. Nothing to verify.
+            // Downstream middleware (e.g. HordeSessionMiddleware) will
+            // mint a fresh session via the cookie path.
+            return null;
+        }
+
         $cookies = $request->getCookieParams();
         $jwt = $cookies[self::COOKIE_NAME] ?? null;
         if (!is_string($jwt) || $jwt === '') {
