@@ -33,9 +33,13 @@ use Horde_Shutdown_Task;
  * {@see HordeSession} (the per-request data layer) plus Horde-application
  * glue: PHP ini tuning, the cookie-domain/single-label-hostname guard, the
  * shutdown task that mirrors {@see HordeSession} payload back into
- * `$_SESSION`, optional {@see Horde_Secret_Cbc} re-keying on `clean()` /
- * `destroy()`, and the relogin auth-changed guard that arms in `close()` and
- * fires in `start()`.
+ * `$_SESSION`, and optional {@see Horde_Secret_Cbc} re-keying on `clean()` /
+ * `destroy()`.
+ *
+ * Registry-agnostic. The legacy stack's relogin auth-changed guard lives
+ * on the `Horde_Session` shim, not here. SessionLifecycle is the engine
+ * both flows leverage; it does not reach upward into Registry or sideways
+ * into the shim.
  *
  * Replaces the lifecycle role previously carried by the legacy
  * `Horde_Session` shim. Modern callers (Registry bootstrap, LoginService,
@@ -74,13 +78,6 @@ class SessionLifecycle implements Horde_Shutdown_Task
 
     /** Whether {@see clean()} has run this request. Idempotency guard. */
     private bool $cleaned = false;
-
-    /**
-     * Auth-state captured at {@see close()} so {@see start()} can detect a
-     * change-of-user across early-close-and-reopen sequences. Null = no
-     * relogin guard armed.
-     */
-    private ?bool $relogin = null;
 
     /** Whether {@see setup()} has installed the save handler this request. */
     private bool $handlerRegistered = false;
@@ -195,9 +192,13 @@ class SessionLifecycle implements Horde_Shutdown_Task
     /**
      * Open the actual PHP session.
      *
-     * Calls {@see session_start()}, marks the lifecycle active, rebuilds
+     * Calls {@see session_start()}, marks the lifecycle active, and rebuilds
      * the modern {@see HordeSession} instance from the now-populated
-     * `$_SESSION` payload, and runs the relogin auth-changed guard.
+     * `$_SESSION` payload.
+     *
+     * The relogin auth-changed guard for the legacy stack lives on the
+     * `Horde_Session` shim, where it belongs. SessionLifecycle is
+     * Registry-agnostic.
      */
     public function start(): void
     {
@@ -213,28 +214,6 @@ class SessionLifecycle implements Horde_Shutdown_Task
         // closures from HordeSessionFactory are preserved on the fresh
         // instance.
         $this->rebuildHordeSession();
-
-        // Relogin guard: if the auth state changed across an early-close
-        // -and-reopen, mark the legacy shim's data view read-only so any
-        // accidental writes during the rest of this request are dropped.
-        // The shim still owns the readonly flag — we just signal.
-        if ($this->relogin !== null && isset($GLOBALS['registry'])) {
-            $authedNow = $GLOBALS['registry']->getAuth() !== false;
-            if ($authedNow !== $this->relogin
-                && isset($GLOBALS['session'])
-                && property_exists($GLOBALS['session'], '_readonly')) {
-                // Best-effort flag flip on the shim. Out-of-tree code that
-                // mutates state inside this request will silently no-op.
-                // Matches the shim's prior behaviour bit-for-bit.
-                try {
-                    $r = new \ReflectionProperty($GLOBALS['session'], '_readonly');
-                    $r->setAccessible(true);
-                    $r->setValue($GLOBALS['session'], true);
-                } catch (\ReflectionException) {
-                    // Shim shape changed under us. Ignore.
-                }
-            }
-        }
     }
 
     /**
@@ -244,8 +223,6 @@ class SessionLifecycle implements Horde_Shutdown_Task
     public function close(): void
     {
         $this->active = false;
-        $this->relogin = isset($GLOBALS['registry'])
-            && ($GLOBALS['registry']->getAuth() !== false);
         $this->mirrorToSession();
         session_write_close();
     }
@@ -317,7 +294,9 @@ class SessionLifecycle implements Horde_Shutdown_Task
         $this->mirrorToSession();
         session_regenerate_id(true);
         $regenAt = time() + $this->regenerateInterval();
-        $_SESSION[self::REGENERATE_KEY] = $regenAt;
+        // The deadline is canonical on HordeSession via the scoped slot.
+        // The shim's addFinal() shutdown task mirrors HordeSession to
+        // $_SESSION for legacy code that reads the superglobal directly.
         $this->getSession()->setScoped(self::REGENERATE_KEY, '', $regenAt);
     }
 
@@ -414,17 +393,15 @@ class SessionLifecycle implements Horde_Shutdown_Task
      */
     private function initialiseTimestamps(): void
     {
-        if (isset($_SESSION[self::BEGIN_KEY])) {
+        $session = $this->getSession();
+
+        if ($session->getScoped(self::BEGIN_KEY, '') !== null) {
             return;
         }
 
         $now = time();
         $regenAt = $now + $this->regenerateInterval();
 
-        $_SESSION[self::BEGIN_KEY] = $now;
-        $_SESSION[self::REGENERATE_KEY] = $regenAt;
-
-        $session = $this->getSession();
         $session->setScoped(self::BEGIN_KEY, '', $now);
         $session->setScoped(self::REGENERATE_KEY, '', $regenAt);
     }
