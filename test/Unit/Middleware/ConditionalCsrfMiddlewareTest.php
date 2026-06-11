@@ -266,4 +266,3 @@ class ConditionalCsrfMiddlewareTest extends TestCase
         self::assertSame(403, $response->getStatusCode());
     }
 }
-

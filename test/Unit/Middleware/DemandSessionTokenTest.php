@@ -89,5 +89,3 @@ class DemandSessionTokenTest extends TestCase
         $this->assertNotNull($this->recentlyHandledRequest);
     }
 }
-
-

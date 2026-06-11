@@ -435,7 +435,7 @@ class UrlTest extends TestCase
         $urlQuery = 'http://www.example.com?hello=world';
         $signedUrlQuery = 'http://www.example.com?hello=world&_t=1000000000&_h=_wQyvcO90UF7S2sdhRr-X4rRT9k';
 
-        $signed = Horde\Core\Horde::signQueryString($query, $now);
+        $signed = CoreHorde::signQueryString($query, $now);
         $this->assertEquals($query, $signed);
 
         $signed = Horde::signUrl($url, $now);
@@ -446,23 +446,23 @@ class UrlTest extends TestCase
         $GLOBALS['conf']['secret_key'] = 'abcdefghijklmnopqrstuvwxyz';
         $GLOBALS['conf']['urls']['hmac_lifetime'] = '30';
 
-        $signed = Horde\Core\Horde::signQueryString($query, $now);
+        $signed = CoreHorde::signQueryString($query, $now);
         $this->assertEquals($signedQuery, $signed);
-        $this->assertTrue(Horde\Core\Horde::verifySignedQueryString($signedQuery, $now));
-        $this->assertFalse(Horde\Core\Horde::verifySignedQueryString($query, $now));
-        $this->assertFalse(Horde\Core\Horde::verifySignedQueryString($signedQuery, $now + $GLOBALS['conf']['urls']['hmac_lifetime'] * 60 + 1));
+        $this->assertTrue(CoreHorde::verifySignedQueryString($signedQuery, $now));
+        $this->assertFalse(CoreHorde::verifySignedQueryString($query, $now));
+        $this->assertFalse(CoreHorde::verifySignedQueryString($signedQuery, $now + $GLOBALS['conf']['urls']['hmac_lifetime'] * 60 + 1));
 
         $signed = Horde::signUrl($url, $now);
         $this->assertEquals($signedUrl, $signed);
-        $this->assertEquals($url, Horde\Core\Horde::verifySignedUrl($signedUrl, $now));
-        $this->assertFalse(Horde\Core\Horde::verifySignedUrl($url, $now));
-        $this->assertFalse(Horde\Core\Horde::verifySignedUrl($signedUrl, $now + $GLOBALS['conf']['urls']['hmac_lifetime'] * 60 + 1));
+        $this->assertEquals($url, CoreHorde::verifySignedUrl($signedUrl, $now));
+        $this->assertFalse(CoreHorde::verifySignedUrl($url, $now));
+        $this->assertFalse(CoreHorde::verifySignedUrl($signedUrl, $now + $GLOBALS['conf']['urls']['hmac_lifetime'] * 60 + 1));
 
         $signed = Horde::signUrl($urlQuery, $now);
         $this->assertEquals($signedUrlQuery, $signed);
-        $this->assertEquals($urlQuery, Horde\Core\Horde::verifySignedUrl($signedUrlQuery, $now));
-        $this->assertFalse(Horde\Core\Horde::verifySignedUrl($urlQuery, $now));
-        $this->assertFalse(Horde\Core\Horde::verifySignedUrl($signedUrlQuery, $now + $GLOBALS['conf']['urls']['hmac_lifetime'] * 60 + 1));
+        $this->assertEquals($urlQuery, CoreHorde::verifySignedUrl($signedUrlQuery, $now));
+        $this->assertFalse(CoreHorde::verifySignedUrl($urlQuery, $now));
+        $this->assertFalse(CoreHorde::verifySignedUrl($signedUrlQuery, $now + $GLOBALS['conf']['urls']['hmac_lifetime'] * 60 + 1));
     }
 }
 

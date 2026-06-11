@@ -144,7 +144,7 @@ class AuthCredentialStore
      * app's slot is absent, matching the legacy `_getAuthCredentials`
      * resolver.
      *
-     * @return array<string,mixed>|true|false
+     * @return array<string,mixed>|false
      */
     public function get(?string $app): array|bool
     {
@@ -172,15 +172,18 @@ class AuthCredentialStore
         }
 
         if ($value === true) {
-            return ($app !== $baseApp) ? $this->get($baseApp) : false;
+            // Resolve the dedup marker once. If app *is* the base app, the
+            // marker is corrupt (it would point at itself); treat as missing.
+            return $app !== $baseApp ? $this->get($baseApp) : false;
         }
 
         if (is_array($value)) {
             return $value;
         }
 
-        // Wrong encryption key, legacy wire format, or corrupted slot: treat as
-        // missing credentials instead of violating the array|bool return type.
+        // Wrong encryption key, legacy wire format, or otherwise corrupted
+        // slot data. Treat as missing credentials rather than violating the
+        // declared array|false return type.
         return false;
     }
 

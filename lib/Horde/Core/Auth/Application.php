@@ -14,7 +14,6 @@
  */
 
 use Horde\Core\Session\HordeSession;
-
 /**
  * The Horde_Core_Auth_Application class provides application-specific
  * authentication built on top of the horde/Auth API.

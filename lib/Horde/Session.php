@@ -425,6 +425,10 @@ class Horde_Session implements Horde_Shutdown_Task
             return false;
         }
 
+        // login.php and Auth_Application::transparent can call clean() before
+        // setup() has opened the session. session_regenerate_id() then fails
+        // with "Session ID cannot be regenerated when there is no active
+        // session" and the cleanup is incomplete. Open the session first.
         if (!$this->_active) {
             $this->start();
         }
