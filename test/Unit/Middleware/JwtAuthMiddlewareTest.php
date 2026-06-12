@@ -17,6 +17,12 @@ use InvalidArgumentException;
 /**
  * Unit Test: JwtAuthMiddleware
  *
+ * Each test builds its own mocks and asserts concrete expects() counts
+ * per the testing convention. The shared setUp() pattern was retired
+ * because PHPUnit 13 raises notices on mocks with no expectations
+ * configured, and the test contract is clearer when each test owns
+ * its collaborators outright.
+ *
  * Copyright 2026 The Horde Project (http://www.horde.org/)
  *
  * @category Horde
@@ -26,62 +32,72 @@ use InvalidArgumentException;
 #[CoversClass(JwtAuthMiddleware::class)]
 class JwtAuthMiddlewareTest extends TestCase
 {
-    private JwtService $jwtService;
-    private ServerRequestInterface $request;
-    private RequestHandlerInterface $handler;
-    private ResponseInterface $response;
-
-    protected function setUp(): void
-    {
-        $this->jwtService = $this->createMock(JwtService::class);
-        $this->request = $this->createMock(ServerRequestInterface::class);
-        $this->handler = $this->createMock(RequestHandlerInterface::class);
-        $this->response = $this->createMock(ResponseInterface::class);
-    }
-
     public function testProcessWithNoAuthHeaderAndNotRequired(): void
     {
-        // No Authorization header
-        $this->request->method('getHeaderLine')
+        $jwtService = $this->createMock(JwtService::class);
+        $request = $this->createMock(ServerRequestInterface::class);
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
+
+        $request->expects($this->once())
+            ->method('getHeaderLine')
             ->with('Authorization')
             ->willReturn('');
 
-        $this->handler->expects($this->once())
+        // Required: false. Empty header. Middleware must NOT consult
+        // jwtService and must hand the request to the inner handler.
+        $jwtService->expects($this->never())->method('extractTokenFromHeader');
+        $jwtService->expects($this->never())->method('verifyAccessToken');
+
+        $handler->expects($this->once())
             ->method('handle')
-            ->with($this->request)
-            ->willReturn($this->response);
+            ->with($request)
+            ->willReturn($response);
 
-        $middleware = new JwtAuthMiddleware($this->jwtService, required: false);
-        $result = $middleware->process($this->request, $this->handler);
+        $middleware = new JwtAuthMiddleware($jwtService, required: false);
+        $result = $middleware->process($request, $handler);
 
-        $this->assertSame($this->response, $result);
+        $this->assertSame($response, $result);
     }
 
     public function testProcessWithNoAuthHeaderAndRequired(): void
     {
-        // No Authorization header
-        $this->request->method('getHeaderLine')
+        $jwtService = $this->createMock(JwtService::class);
+        $request = $this->createMock(ServerRequestInterface::class);
+        $handler = $this->createMock(RequestHandlerInterface::class);
+
+        $request->expects($this->once())
+            ->method('getHeaderLine')
             ->with('Authorization')
             ->willReturn('');
 
-        $this->jwtService->expects($this->never())
-            ->method('extractTokenFromHeader');
+        // Required: true. Empty header. Middleware must short-circuit
+        // before touching jwtService and must NOT call the inner handler.
+        $jwtService->expects($this->never())->method('extractTokenFromHeader');
+        $jwtService->expects($this->never())->method('verifyAccessToken');
+        $handler->expects($this->never())->method('handle');
 
-        $middleware = new JwtAuthMiddleware($this->jwtService, required: true);
-        $result = $middleware->process($this->request, $this->handler);
+        $middleware = new JwtAuthMiddleware($jwtService, required: true);
+        $result = $middleware->process($request, $handler);
 
-        // Should return 401 Unauthorized
         $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertEquals(401, $result->getStatusCode());
     }
 
     public function testProcessWithValidJwtToken(): void
     {
-        $this->request->method('getHeaderLine')
+        $jwtService = $this->createMock(JwtService::class);
+        $request = $this->createMock(ServerRequestInterface::class);
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
+
+        $request->expects($this->once())
+            ->method('getHeaderLine')
             ->with('Authorization')
             ->willReturn('Bearer valid-jwt-token');
 
-        $this->jwtService->method('extractTokenFromHeader')
+        $jwtService->expects($this->once())
+            ->method('extractTokenFromHeader')
             ->with('Bearer valid-jwt-token')
             ->willReturn('valid-jwt-token');
 
@@ -91,107 +107,109 @@ class JwtAuthMiddlewareTest extends TestCase
             'iss' => 'horde.example.com',
         ]);
 
-        $this->jwtService->method('verifyAccessToken')
+        $jwtService->expects($this->once())
+            ->method('verifyAccessToken')
             ->with('valid-jwt-token')
             ->willReturn($verifiedJwt);
 
-        // Mock withAttribute calls
-        $requestWithJwt = $this->createMock(ServerRequestInterface::class);
-        $requestWithUserId = $this->createMock(ServerRequestInterface::class);
-        $requestWithClaims = $this->createMock(ServerRequestInterface::class);
-        $requestWithAuthType = $this->createMock(ServerRequestInterface::class);
+        // Middleware threads four request attributes through chained
+        // withAttribute calls (jwt, jwt_user_id, jwt_claims, auth_type).
+        // We don't care about the exact intermediate request objects,
+        // only that the chain reaches the handler. Returning $request
+        // from each withAttribute() lets the chain collapse onto itself.
+        $request->expects($this->exactly(4))
+            ->method('withAttribute')
+            ->willReturn($request);
 
-        $this->request->method('withAttribute')
-            ->willReturnCallback(function ($key, $value) use (
-                $requestWithJwt,
-                $requestWithUserId,
-                $requestWithClaims,
-                $requestWithAuthType
-            ) {
-                if ($key === 'jwt') {
-                    return $requestWithJwt;
-                }
-                if ($key === 'jwt_user_id') {
-                    return $requestWithUserId;
-                }
-                if ($key === 'jwt_claims') {
-                    return $requestWithClaims;
-                }
-                if ($key === 'auth_type') {
-                    return $requestWithAuthType;
-                }
-                return $this->request;
-            });
-
-        $requestWithJwt->method('withAttribute')->willReturn($requestWithUserId);
-        $requestWithUserId->method('withAttribute')->willReturn($requestWithClaims);
-        $requestWithClaims->method('withAttribute')->willReturn($requestWithAuthType);
-
-        $this->handler->expects($this->once())
+        $handler->expects($this->once())
             ->method('handle')
-            ->willReturn($this->response);
+            ->willReturn($response);
 
-        $middleware = new JwtAuthMiddleware($this->jwtService);
-        $result = $middleware->process($this->request, $this->handler);
+        $middleware = new JwtAuthMiddleware($jwtService);
+        $result = $middleware->process($request, $handler);
 
-        $this->assertSame($this->response, $result);
+        $this->assertSame($response, $result);
     }
 
     public function testProcessWithInvalidJwtTokenAndNotRequired(): void
     {
-        $this->request->method('getHeaderLine')
+        $jwtService = $this->createMock(JwtService::class);
+        $request = $this->createMock(ServerRequestInterface::class);
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
+
+        $request->expects($this->once())
+            ->method('getHeaderLine')
             ->with('Authorization')
             ->willReturn('Bearer invalid-token');
 
-        $this->jwtService->method('extractTokenFromHeader')
+        $jwtService->expects($this->once())
+            ->method('extractTokenFromHeader')
             ->with('Bearer invalid-token')
             ->willReturn('invalid-token');
 
-        $this->jwtService->method('verifyAccessToken')
+        $jwtService->expects($this->once())
+            ->method('verifyAccessToken')
             ->with('invalid-token')
             ->willThrowException(new InvalidArgumentException('Token expired'));
 
-        // Should fall back to session auth
-        $this->handler->expects($this->once())
+        // Required: false. Verification failure falls back to session auth.
+        $handler->expects($this->once())
             ->method('handle')
-            ->with($this->request)
-            ->willReturn($this->response);
+            ->with($request)
+            ->willReturn($response);
 
-        $middleware = new JwtAuthMiddleware($this->jwtService, required: false);
-        $result = $middleware->process($this->request, $this->handler);
+        $middleware = new JwtAuthMiddleware($jwtService, required: false);
+        $result = $middleware->process($request, $handler);
 
-        $this->assertSame($this->response, $result);
+        $this->assertSame($response, $result);
     }
 
     public function testProcessWithInvalidJwtTokenAndRequired(): void
     {
-        $this->request->method('getHeaderLine')
+        $jwtService = $this->createMock(JwtService::class);
+        $request = $this->createMock(ServerRequestInterface::class);
+        $handler = $this->createMock(RequestHandlerInterface::class);
+
+        $request->expects($this->once())
+            ->method('getHeaderLine')
             ->with('Authorization')
             ->willReturn('Bearer invalid-token');
 
-        $this->jwtService->method('extractTokenFromHeader')
+        $jwtService->expects($this->once())
+            ->method('extractTokenFromHeader')
             ->with('Bearer invalid-token')
             ->willReturn('invalid-token');
 
-        $this->jwtService->method('verifyAccessToken')
+        $jwtService->expects($this->once())
+            ->method('verifyAccessToken')
             ->with('invalid-token')
             ->willThrowException(new InvalidArgumentException('Token expired'));
 
-        $middleware = new JwtAuthMiddleware($this->jwtService, required: true);
-        $result = $middleware->process($this->request, $this->handler);
+        // Required: true. Verification failure short-circuits with 401.
+        $handler->expects($this->never())->method('handle');
 
-        // Should return 401 Unauthorized
+        $middleware = new JwtAuthMiddleware($jwtService, required: true);
+        $result = $middleware->process($request, $handler);
+
         $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertEquals(401, $result->getStatusCode());
     }
 
     public function testProcessWithHordeClaims(): void
     {
-        $this->request->method('getHeaderLine')
+        $jwtService = $this->createMock(JwtService::class);
+        $request = $this->createMock(ServerRequestInterface::class);
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
+
+        $request->expects($this->once())
+            ->method('getHeaderLine')
             ->with('Authorization')
             ->willReturn('Bearer token-with-horde-claims');
 
-        $this->jwtService->method('extractTokenFromHeader')
+        $jwtService->expects($this->once())
+            ->method('extractTokenFromHeader')
             ->willReturn('token-with-horde-claims');
 
         $verifiedJwt = new VerifiedJwt('token-with-horde-claims', [
@@ -202,61 +220,82 @@ class JwtAuthMiddlewareTest extends TestCase
             ],
         ]);
 
-        $this->jwtService->method('verifyAccessToken')
+        $jwtService->expects($this->once())
+            ->method('verifyAccessToken')
             ->willReturn($verifiedJwt);
 
-        // Mock withAttribute chain
-        $mockRequest = $this->createMock(ServerRequestInterface::class);
-        $mockRequest->method('withAttribute')->willReturn($mockRequest);
-        $this->request->method('withAttribute')->willReturn($mockRequest);
+        // Five withAttribute calls when horde claims are present:
+        // jwt, jwt_user_id, jwt_claims, auth_type, plus
+        // jwt_horde_claims for the embedded horde namespace.
+        $request->expects($this->exactly(5))
+            ->method('withAttribute')
+            ->willReturn($request);
 
-        $this->handler->expects($this->once())
+        $handler->expects($this->once())
             ->method('handle')
-            ->willReturn($this->response);
+            ->willReturn($response);
 
-        $middleware = new JwtAuthMiddleware($this->jwtService);
-        $result = $middleware->process($this->request, $this->handler);
+        $middleware = new JwtAuthMiddleware($jwtService);
+        $result = $middleware->process($request, $handler);
 
-        $this->assertSame($this->response, $result);
+        $this->assertSame($response, $result);
     }
 
     public function testProcessWithNullTokenFromHeader(): void
     {
-        $this->request->method('getHeaderLine')
+        $jwtService = $this->createMock(JwtService::class);
+        $request = $this->createMock(ServerRequestInterface::class);
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
+
+        $request->expects($this->once())
+            ->method('getHeaderLine')
             ->with('Authorization')
             ->willReturn('InvalidHeader');
 
-        $this->jwtService->method('extractTokenFromHeader')
+        $jwtService->expects($this->once())
+            ->method('extractTokenFromHeader')
             ->with('InvalidHeader')
             ->willReturn(null);
 
-        // Should fall back to session auth
-        $this->handler->expects($this->once())
+        // Header was non-empty so extractTokenFromHeader was consulted,
+        // but it returned null. With required:false the middleware
+        // forwards to session auth.
+        $jwtService->expects($this->never())->method('verifyAccessToken');
+
+        $handler->expects($this->once())
             ->method('handle')
-            ->with($this->request)
-            ->willReturn($this->response);
+            ->with($request)
+            ->willReturn($response);
 
-        $middleware = new JwtAuthMiddleware($this->jwtService, required: false);
-        $result = $middleware->process($this->request, $this->handler);
+        $middleware = new JwtAuthMiddleware($jwtService, required: false);
+        $result = $middleware->process($request, $handler);
 
-        $this->assertSame($this->response, $result);
+        $this->assertSame($response, $result);
     }
 
     public function testProcessRequiredModePreventsSessionFallback(): void
     {
-        $this->request->method('getHeaderLine')
+        $jwtService = $this->createMock(JwtService::class);
+        $request = $this->createMock(ServerRequestInterface::class);
+        $handler = $this->createMock(RequestHandlerInterface::class);
+
+        $request->expects($this->once())
+            ->method('getHeaderLine')
             ->with('Authorization')
             ->willReturn('InvalidHeader');
 
-        $this->jwtService->method('extractTokenFromHeader')
+        $jwtService->expects($this->once())
+            ->method('extractTokenFromHeader')
             ->willReturn(null);
 
-        // Handler should NOT be called
-        $this->handler->expects($this->never())
-            ->method('handle');
+        // Required: true. Null token short-circuits with 401; the inner
+        // handler must not be called.
+        $jwtService->expects($this->never())->method('verifyAccessToken');
+        $handler->expects($this->never())->method('handle');
 
-        $middleware = new JwtAuthMiddleware($this->jwtService, required: true);
-        $result = $middleware->process($this->request, $this->handler);
+        $middleware = new JwtAuthMiddleware($jwtService, required: true);
+        $result = $middleware->process($request, $handler);
 
         $this->assertEquals(401, $result->getStatusCode());
     }
