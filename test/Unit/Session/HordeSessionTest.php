@@ -248,6 +248,30 @@ class HordeSessionTest extends TestCase
     }
 
     #[Test]
+    public function testSetSessionBeginRoundTrips(): void
+    {
+        $session = $this->createSession([]);
+        $session->setSessionBegin(1700000123);
+        $ts = $session->getSessionBegin();
+        self::assertNotNull($ts);
+        self::assertSame(1700000123, $ts->getTimestamp());
+        self::assertTrue($session->isDirty(), 'setSessionBegin must mark session dirty');
+    }
+
+    #[Test]
+    public function testGetSessionBeginIgnoresLegacyArrayShape(): void
+    {
+        // The pre-fix legacy shim wrote the begin slot via
+        // setScoped(BEGIN, '', $ts) which produces $data['_b'][''] = $ts.
+        // getSessionBegin only honours the canonical top-level int shape;
+        // sessions in the legacy shape return null from this getter
+        // until they are rewritten by setSessionBegin during the next
+        // initialiseTimestamps pass.
+        $session = $this->createSession(['_b' => ['' => 1700000000]]);
+        self::assertNull($session->getSessionBegin());
+    }
+
+    #[Test]
     public function testGetAuthenticatedApps(): void
     {
         $session = $this->createSession([

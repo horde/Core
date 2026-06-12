@@ -486,21 +486,25 @@ class SessionLifecycle implements Horde_Shutdown_Task
     /**
      * Write the begin and regenerate-at timestamps on first session start.
      *
-     * No-op when either timestamp is already present, so re-running setup()
-     * or restoring a persisted session does not reset the begin time.
+     * No-op when the begin timestamp is already present, so re-running
+     * setup() or restoring a persisted session does not reset it. Reads
+     * via {@see HordeSession::getSessionBegin()} so the legacy
+     * scoped-with-empty-subkey shape (`$data['_b']['']`) is treated as
+     * absent and gets overwritten on the next setup; over time, all
+     * sessions converge on the canonical top-level int shape.
      */
     private function initialiseTimestamps(): void
     {
         $session = $this->getSession();
 
-        if ($session->getScoped(self::BEGIN_KEY, '') !== null) {
+        if ($session->getSessionBegin() !== null) {
             return;
         }
 
         $now = time();
         $regenAt = $now + $this->regenerateInterval();
 
-        $session->setScoped(self::BEGIN_KEY, '', $now);
+        $session->setSessionBegin($now);
         $session->setScoped(self::REGENERATE_KEY, '', $regenAt);
     }
 

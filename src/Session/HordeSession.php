@@ -300,6 +300,24 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
         return (new DateTimeImmutable())->setTimestamp($value);
     }
 
+    /**
+     * Record the session-begin timestamp.
+     *
+     * Writes the {@see BEGIN_KEY} slot at the top level as a bare int.
+     * Pairs with {@see getSessionBegin}, which reads the same shape.
+     * Use this in preference to {@see set()} so the begin slot's wire
+     * format stays internal to this class.
+     *
+     * Idempotent and dirty-marking. The legacy `Horde_Session` shim
+     * and {@see SessionLifecycle::initialiseTimestamps} both call this
+     * to converge on a single shape across all writers.
+     */
+    public function setSessionBegin(int $timestamp): void
+    {
+        $this->data[self::BEGIN_KEY] = $timestamp;
+        $this->dirty = true;
+    }
+
     public function getAuthenticatedApps(): array
     {
         $appData = $this->data['horde'] ?? [];
