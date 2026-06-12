@@ -109,12 +109,10 @@ use Horde\HashTable\HashTable;
 use Horde\HashTable\LockableHashTable;
 use Horde\HashTable\RedisHashTable;
 use Horde\Horde\Factory\AuthenticationServiceFactory;
-use Horde\Horde\Factory\JwtServiceFactory;
 use Horde\Horde\Factory\OAuthHttpClientServiceFactory as BaseOAuthHttpClientServiceFactory;
 use Horde\Horde\Factory\OAuthTokenServiceFactory as BaseOAuthTokenServiceFactory;
 use Horde\Horde\Service\AuthenticationService;
 use Horde\Horde\Service\AuthLinkRepository;
-use Horde\Horde\Service\JwtService;
 use Horde\Identity\IdentityHistoryRepository;
 use Horde\Identity\IdentityRepository;
 use Horde\Jwt\Key\PrivateKey;
@@ -264,7 +262,6 @@ class DefaultInjectorBindings implements InjectorBindings
             Middleware\AuthHttpBasic::class => Factory\AuthHttpBasicFactory::class,
             HordeLogger::class => LoggerFactory::class,
             PsrLoggerInterface::class => LoggerFactory::class,
-            JwtService::class => JwtServiceFactory::class,
             AuthenticationService::class => AuthenticationServiceFactory::class,
             ConfigLoader::class => ConfigLoaderFactory::class,
             State::class => StateFactory::class,
