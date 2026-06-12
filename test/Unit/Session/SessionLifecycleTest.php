@@ -136,6 +136,44 @@ class SessionLifecycleTest extends TestCase
         $lifecycle->setup(start: false);
     }
 
+    #[Test]
+    public function testSetupIsIdempotentOnRepeatedCall(): void
+    {
+        // Build with FQDN config so the first setup() succeeds.
+        $lifecycle = $this->build([
+            'session' => ['name' => 'Horde'],
+            'cookie' => ['domain' => '.example.com'],
+            'server' => ['name' => 'horde.example.com'],
+        ]);
+
+        // setup() registers a Horde_Shutdown task which reaches for
+        // $GLOBALS['injector']. Provide a minimal stub to satisfy that
+        // path; the shutdown task itself never fires under unit test.
+        $injector = new Injector(new TopLevel());
+        $injector->setInstance('Horde_Shutdown', new \Horde_Shutdown());
+        $previousInjector = $GLOBALS['injector'] ?? null;
+        $GLOBALS['injector'] = $injector;
+
+        try {
+            $lifecycle->setup(start: false);
+
+            // First call set the flag.
+            $r = new \ReflectionProperty(SessionLifecycle::class, 'setupApplied');
+            $r->setAccessible(true);
+            self::assertTrue($r->getValue($lifecycle));
+
+            // Second call must not throw and must not mutate state.
+            $lifecycle->setup(start: false);
+            self::assertTrue($r->getValue($lifecycle));
+        } finally {
+            if ($previousInjector === null) {
+                unset($GLOBALS['injector']);
+            } else {
+                $GLOBALS['injector'] = $previousInjector;
+            }
+        }
+    }
+
     // The happy paths through setup() (FQDN hostname, empty cookie domain)
     // touch session_set_cookie_params, session_set_save_handler and the
     // global Horde_Shutdown registry. They are covered in the integration
