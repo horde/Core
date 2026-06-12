@@ -14,6 +14,10 @@ use InvalidArgumentException;
 /**
  * Unit Test: JwtServiceFactory
  *
+ * The factory reads its configuration from `$GLOBALS['conf']` and never
+ * touches the injector. Each test owns its injector stub locally so
+ * the contract is explicit per test rather than implied by setUp.
+ *
  * Copyright 2026 The Horde Project (http://www.horde.org/)
  *
  * @category Horde
@@ -23,31 +27,21 @@ use InvalidArgumentException;
 #[CoversClass(JwtServiceFactory::class)]
 class JwtServiceFactoryTest extends TestCase
 {
-    private Injector $injector;
     private array $originalConf;
     private array $originalServer;
     private string $testSecretFile;
 
     protected function setUp(): void
     {
-        // Save original globals
         $this->originalConf = $GLOBALS['conf'] ?? [];
         $this->originalServer = $_SERVER;
-
-        // Create mock injector
-        $this->injector = $this->createMock(Injector::class);
-
-        // Create a temporary secret file for tests
         $this->testSecretFile = sys_get_temp_dir() . '/jwt_test_secret_' . uniqid();
     }
 
     protected function tearDown(): void
     {
-        // Restore original globals
         $GLOBALS['conf'] = $this->originalConf;
         $_SERVER = $this->originalServer;
-
-        // Clean up test secret file
         if (file_exists($this->testSecretFile)) {
             unlink($this->testSecretFile);
         }
@@ -57,6 +51,17 @@ class JwtServiceFactoryTest extends TestCase
     {
         file_put_contents($this->testSecretFile, $content);
         chmod($this->testSecretFile, 0o600);
+    }
+
+    /**
+     * Build an injector stub. The factory under test reads
+     * `$GLOBALS['conf']` directly and never calls any injector
+     * method, so a stub is the truthful descriptor of the test
+     * contract.
+     */
+    private function injectorStub(): Injector
+    {
+        return $this->createStub(Injector::class);
     }
 
     public function testCreateReturnsNullWhenJwtNotEnabled(): void
@@ -70,7 +75,7 @@ class JwtServiceFactoryTest extends TestCase
         ];
 
         $factory = new JwtServiceFactory();
-        $result = $factory->create($this->injector);
+        $result = $factory->create($this->injectorStub());
 
         $this->assertNull($result);
     }
@@ -82,7 +87,7 @@ class JwtServiceFactoryTest extends TestCase
         ];
 
         $factory = new JwtServiceFactory();
-        $result = $factory->create($this->injector);
+        $result = $factory->create($this->injectorStub());
 
         $this->assertNull($result);
     }
@@ -104,7 +109,7 @@ class JwtServiceFactoryTest extends TestCase
         ];
 
         $factory = new JwtServiceFactory();
-        $result = $factory->create($this->injector);
+        $result = $factory->create($this->injectorStub());
 
         $this->assertInstanceOf(JwtService::class, $result);
     }
@@ -119,13 +124,12 @@ class JwtServiceFactoryTest extends TestCase
                 'jwt' => [
                     'enabled' => true,
                     'secret_file' => $this->testSecretFile,
-                    // issuer not specified
                 ],
             ],
         ];
 
         $factory = new JwtServiceFactory();
-        $result = $factory->create($this->injector);
+        $result = $factory->create($this->injectorStub());
 
         $this->assertInstanceOf(JwtService::class, $result);
     }
@@ -140,13 +144,12 @@ class JwtServiceFactoryTest extends TestCase
                 'jwt' => [
                     'enabled' => true,
                     'secret_file' => $this->testSecretFile,
-                    // issuer not specified
                 ],
             ],
         ];
 
         $factory = new JwtServiceFactory();
-        $result = $factory->create($this->injector);
+        $result = $factory->create($this->injectorStub());
 
         $this->assertInstanceOf(JwtService::class, $result);
     }
@@ -161,13 +164,12 @@ class JwtServiceFactoryTest extends TestCase
                     'enabled' => true,
                     'secret_file' => $this->testSecretFile,
                     'issuer' => 'test.com',
-                    // TTL values not specified
                 ],
             ],
         ];
 
         $factory = new JwtServiceFactory();
-        $result = $factory->create($this->injector);
+        $result = $factory->create($this->injectorStub());
 
         $this->assertInstanceOf(JwtService::class, $result);
     }
@@ -187,7 +189,7 @@ class JwtServiceFactoryTest extends TestCase
         $this->expectExceptionMessage('JWT is enabled but secret file does not exist');
 
         $factory = new JwtServiceFactory();
-        $factory->create($this->injector);
+        $factory->create($this->injectorStub());
     }
 
     public function testCreateThrowsWhenSecretEmpty(): void
@@ -207,7 +209,7 @@ class JwtServiceFactoryTest extends TestCase
         $this->expectExceptionMessage('JWT secret file is empty');
 
         $factory = new JwtServiceFactory();
-        $factory->create($this->injector);
+        $factory->create($this->injectorStub());
     }
 
     public function testCreateThrowsWhenSecretTooShort(): void
@@ -227,7 +229,7 @@ class JwtServiceFactoryTest extends TestCase
         $this->expectExceptionMessage('JWT secret must be at least 256 bits (32 bytes)');
 
         $factory = new JwtServiceFactory();
-        $factory->create($this->injector);
+        $factory->create($this->injectorStub());
     }
 
     public function testCreateThrowsWhenSecret31Bytes(): void
@@ -247,7 +249,7 @@ class JwtServiceFactoryTest extends TestCase
         $this->expectExceptionMessage('JWT secret must be at least 256 bits (32 bytes)');
 
         $factory = new JwtServiceFactory();
-        $factory->create($this->injector);
+        $factory->create($this->injectorStub());
     }
 
     public function testCreateSucceedsWithExactly32ByteSecret(): void
@@ -265,7 +267,7 @@ class JwtServiceFactoryTest extends TestCase
         ];
 
         $factory = new JwtServiceFactory();
-        $result = $factory->create($this->injector);
+        $result = $factory->create($this->injectorStub());
 
         $this->assertInstanceOf(JwtService::class, $result);
     }
@@ -285,7 +287,7 @@ class JwtServiceFactoryTest extends TestCase
         ];
 
         $factory = new JwtServiceFactory();
-        $result = $factory->create($this->injector);
+        $result = $factory->create($this->injectorStub());
 
         $this->assertInstanceOf(JwtService::class, $result);
     }
