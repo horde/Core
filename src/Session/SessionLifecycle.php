@@ -422,15 +422,30 @@ class SessionLifecycle implements Horde_Shutdown_Task
      * session_write_close(). For requests that never call close(), this
      * shutdown hook carries the modern data across to the persisted
      * session.
+     *
+     * Honours {@see HordeSession::isDestroyed()}: when a controller
+     * has marked the session destroyed but no synchronous executor
+     * (clean / destroy / clearAuth) has acted on the marker yet, the
+     * mirror is skipped. This catches the usage error where a legacy
+     * controller calls markDestroyed() without going through
+     * processFlags or a synchronous executor. Re-mirroring the
+     * about-to-be-destroyed payload would leave the row in a worse
+     * state than skipping. The marker stays set and the operator's
+     * next request through the modern middleware actually destroys
+     * the row.
      */
     public function shutdown(): void
     {
-        if ($this->active) {
-            $this->mirrorToSession();
+        if (!$this->active) {
+            return;
         }
+        if ($this->getSession()->isDestroyed()) {
+            return;
+        }
+        $this->mirrorToSession();
     }
 
-        /**
+    /**
      * Resolve the current {@see HordeSession} from the injector.
      *
      * Lazily looked up on every call because {@see clean()} and
