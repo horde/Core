@@ -725,11 +725,7 @@ class Horde_Registry implements Horde_Shutdown_Task
 
         $this->applications = $this->_apiList = $this->_cache['conf'] = $this->_cache['ob'] = $this->_interfaces = [];
 
-        foreach ($session->keysForApp('horde') as $key) {
-            if (str_starts_with($key, 'nls/') || str_starts_with($key, 'registry/')) {
-                $session->removeScoped('horde', $key);
-            }
-        }
+        $session->clearScopeWithPrefixes('horde', ['nls/', 'registry/']);
         $session->removeScoped('horde', self::REGISTRY_CACHE);
 
         $this->_loadApplications();
@@ -2255,14 +2251,7 @@ class Horde_Registry implements Horde_Shutdown_Task
             'auth_app_state_reason/',
             'auth_app_state_detail/',
         ];
-        foreach ($session->keysForApp('horde') as $key) {
-            foreach ($authPrefixes as $prefix) {
-                if (str_starts_with($key, $prefix)) {
-                    $session->removeScoped('horde', $key);
-                    continue 2;
-                }
-            }
-        }
+        $session->clearScopeWithPrefixes('horde', $authPrefixes);
 
         $this->_cache['auth'] = null;
         $this->_cache['existing'] = $this->_cache['isauth'] = [];
@@ -2306,9 +2295,7 @@ class Horde_Registry implements Horde_Shutdown_Task
         if ($this->isAuthenticated(['app' => $app, 'notransparent' => true])) {
             $this->callAppMethod($app, 'logout');
             // Wipe the app's entire session scope.
-            foreach ($session->keysForApp($app) as $key) {
-                $session->removeScoped($app, $key);
-            }
+            $session->clearScope($app);
             // Drop the credentials slots via the canonical store.
             $this->_credentialStore()->clear($app);
         }
@@ -3185,11 +3172,7 @@ class Horde_Registry implements Horde_Shutdown_Task
         }
 
         $session = $GLOBALS['injector']->getInstance(HordeSession::class);
-        foreach ($session->keysForApp('horde') as $key) {
-            if (str_starts_with($key, 'nls/')) {
-                $session->removeScoped('horde', $key);
-            }
-        }
+        $session->clearScopeWithPrefixes('horde', ['nls/']);
     }
 
     /**
