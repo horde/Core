@@ -298,6 +298,45 @@ class SessionLifecycleTest extends TestCase
         }
     }
 
+    #[Test]
+    public function testShutdownSkipsMirrorWhenSessionMarkedDestroyed(): void
+    {
+        // Usage error scenario: a controller calls markDestroyed()
+        // without going through a synchronous executor, so the marker
+        // is still pending when the request-shutdown task fires. The
+        // shutdown task must NOT mirror the about-to-be-destroyed
+        // payload back into $_SESSION; otherwise the session row gets
+        // re-persisted with stale data the controller already
+        // declared dead.
+        $session = new HordeSession(new SessionId('destroyed-mirror'), []);
+        $session->setScoped('horde', 'auth/userId', 'alice');
+        $session->markDestroyed();
+
+        $lifecycle = $this->build(session: $session);
+
+        $r = new \ReflectionProperty($lifecycle, 'active');
+        $r->setAccessible(true);
+        $r->setValue($lifecycle, true);
+
+        $previous = $_SESSION ?? null;
+        $_SESSION = ['untouched' => 'sentinel'];
+
+        try {
+            $lifecycle->shutdown();
+            self::assertSame(
+                ['untouched' => 'sentinel'],
+                $_SESSION,
+                'shutdown must not mirror when isDestroyed() is set'
+            );
+        } finally {
+            if ($previous === null) {
+                unset($_SESSION);
+            } else {
+                $_SESSION = $previous;
+            }
+        }
+    }
+
     // ---------------------------------------------------------------
     // processFlags()
     //
