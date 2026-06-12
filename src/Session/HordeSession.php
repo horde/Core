@@ -246,6 +246,59 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
         return array_keys($this->data[$app]);
     }
 
+    /**
+     * Remove every key in the given application scope.
+     *
+     * Equivalent to iterating {@see keysForApp} and calling
+     * {@see removeScoped} for each key. Marks the session dirty when
+     * the scope had any keys. Cheaper to read at the call site than
+     * the explicit loop.
+     */
+    public function clearScope(string $app): void
+    {
+        if (!isset($this->data[$app]) || !is_array($this->data[$app])) {
+            return;
+        }
+        unset($this->data[$app]);
+        if (isset($this->data[self::ENCRYPTED_KEY][$app])) {
+            unset($this->data[self::ENCRYPTED_KEY][$app]);
+            if (empty($this->data[self::ENCRYPTED_KEY])) {
+                unset($this->data[self::ENCRYPTED_KEY]);
+            }
+        }
+        $this->dirty = true;
+    }
+
+    /**
+     * Remove every key in the given application scope whose name
+     * starts with any of the supplied prefixes.
+     *
+     * Centralises the filter-and-remove pattern used by Registry's
+     * auth-key sweeps, the locale reset, and the registry-cache
+     * teardown. Marks the session dirty when at least one key was
+     * removed.
+     *
+     * @param array<int, string> $prefixes Prefixes to match. Empty
+     *                                     array is a no-op.
+     */
+    public function clearScopeWithPrefixes(string $app, array $prefixes): void
+    {
+        if ($prefixes === []) {
+            return;
+        }
+        if (!isset($this->data[$app]) || !is_array($this->data[$app])) {
+            return;
+        }
+        foreach ($this->keysForApp($app) as $key) {
+            foreach ($prefixes as $prefix) {
+                if (str_starts_with($key, $prefix)) {
+                    $this->removeScoped($app, $key);
+                    continue 2;
+                }
+            }
+        }
+    }
+
     // ---------------------------------------------------------------
     // SessionMetaInterface
     // ---------------------------------------------------------------

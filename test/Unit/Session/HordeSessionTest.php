@@ -696,4 +696,67 @@ class HordeSessionTest extends TestCase
         self::assertFalse($session->shouldRegenerate());
         self::assertFalse($session->isDestroyed());
     }
+
+    // ---------------------------------------------------------------
+    // clearScope() / clearScopeWithPrefixes()
+    // ---------------------------------------------------------------
+
+    #[Test]
+    public function testClearScopeWipesEntireApp(): void
+    {
+        $session = $this->createSession();
+        $session->setScoped('imp', 'auth/userId', 'alice');
+        $session->setScoped('imp', 'mailbox', 'INBOX');
+        $session->setScoped('horde', 'auth/userId', 'alice');
+
+        $session->clearScope('imp');
+
+        self::assertSame([], $session->keysForApp('imp'));
+        // horde scope must remain untouched.
+        self::assertSame(['auth/userId'], $session->keysForApp('horde'));
+        self::assertTrue($session->isDirty());
+    }
+
+    #[Test]
+    public function testClearScopeIsNoOpWhenScopeAbsent(): void
+    {
+        $session = $this->createSession();
+        $session->clearScope('never-touched');
+        self::assertFalse($session->isDirty());
+    }
+
+    #[Test]
+    public function testClearScopeWithPrefixesRemovesMatching(): void
+    {
+        $session = $this->createSession();
+        $session->setScoped('horde', 'auth/userId', 'alice');
+        $session->setScoped('horde', 'auth_app/imp', 'imp-creds');
+        $session->setScoped('horde', 'nls/curr_default', 'en_US');
+        $session->setScoped('horde', 'theme', 'default');
+
+        $session->clearScopeWithPrefixes('horde', ['auth/', 'auth_app/']);
+
+        $remaining = $session->keysForApp('horde');
+        sort($remaining);
+        self::assertSame(['nls/curr_default', 'theme'], $remaining);
+    }
+
+    #[Test]
+    public function testClearScopeWithPrefixesEmptyArrayIsNoOp(): void
+    {
+        $session = $this->createSession();
+        $session->setScoped('horde', 'auth/userId', 'alice');
+
+        $session->clearScopeWithPrefixes('horde', []);
+
+        self::assertSame(['auth/userId'], $session->keysForApp('horde'));
+    }
+
+    #[Test]
+    public function testClearScopeWithPrefixesIsNoOpWhenScopeAbsent(): void
+    {
+        $session = $this->createSession();
+        $session->clearScopeWithPrefixes('never-touched', ['auth/']);
+        self::assertFalse($session->isDirty());
+    }
 }
