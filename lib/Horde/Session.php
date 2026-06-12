@@ -152,16 +152,6 @@ class Horde_Session implements Horde_Shutdown_Task
     protected $_data;
 
     /**
-     * Indicates that session data is read-only.
-     */
-    protected bool $_readonly = false;
-
-    /**
-     * On re-login, indicate whether we were previously authenticated.
-     */
-    protected ?bool $_relogin = null;
-
-    /**
      * Constructor.
      *
      * All dependencies are optional: when omitted they are resolved from the
@@ -232,13 +222,14 @@ class Horde_Session implements Horde_Shutdown_Task
     {
         switch ($name) {
             case 'begin':
-                if (!$this->_active && !$this->_relogin) {
+                if (!$this->_active) {
                     return 0;
                 }
-                $value = $this->modern->getScoped(self::BEGIN, '');
-                if ($value === null) {
-                    $value = $this->_data[self::BEGIN] ?? 0;
+                $begin = $this->modern->getSessionBegin();
+                if ($begin !== null) {
+                    return $begin->getTimestamp();
                 }
+                $value = $this->_data[self::BEGIN] ?? 0;
 
                 return is_int($value) ? $value : 0;
 
@@ -296,9 +287,8 @@ class Horde_Session implements Horde_Shutdown_Task
             // Delegate the PHP-session work (cookie params, ini tuning,
             // save handler, cookie-domain guard, optional session_start)
             // to the lifecycle. Pass start=false: the shim drives start()
-            // itself so its own bookkeeping (_active, _data, relogin
-            // guard) stays in lock-step with the rest of the shim's
-            // public surface.
+            // itself so its own bookkeeping (_active, _data) stays in
+            // lock-step with the rest of the shim's public surface.
             $lifecycle->setup(
                 start: false,
                 cacheLimiter: $cache_limiter,
@@ -392,21 +382,6 @@ class Horde_Session implements Horde_Shutdown_Task
         $this->_active = true;
         $this->_data = &$_SESSION;
         $this->_rebuildModern();
-
-        /* We have reopened a session. Check to make sure that authentication
-         * status has not changed in the meantime. The relogin guard is a
-         * legacy-stack concern; it lives here in the shim, NOT in
-         * SessionLifecycle. */
-        if (!$this->_readonly
-            && !is_null($this->_relogin)
-            && (($GLOBALS['registry']->getAuth() !== false) !== $this->_relogin)) {
-            Horde::log(
-                'Previous session attempted to be reopened after authentication'
-                . ' status change. All session modifications will be ignored.',
-                Horde_Log::DEBUG
-            );
-            $this->_readonly = true;
-        }
     }
 
     /**
@@ -532,10 +507,6 @@ class Horde_Session implements Horde_Shutdown_Task
     public function close()
     {
         $this->_active = false;
-        // The shim's relogin guard depends on this; record before we
-        // hand off to the lifecycle. Legacy concern, lives here.
-        $this->_relogin = isset($GLOBALS['registry'])
-            && ($GLOBALS['registry']->getAuth() !== false);
 
         $lifecycle = $this->_resolveLifecycle();
         if ($lifecycle !== null) {
@@ -691,10 +662,6 @@ class Horde_Session implements Horde_Shutdown_Task
      */
     public function set($app, $name, $value, $mask = 0)
     {
-        if ($this->_readonly) {
-            return;
-        }
-
         if ($mask & self::ENCRYPT) {
             $this->modern->setEncrypted($app, $name, $value);
             $this->sessionHandler->changed = true;
@@ -713,10 +680,6 @@ class Horde_Session implements Horde_Shutdown_Task
      */
     public function remove($app, $name = null)
     {
-        if ($this->_readonly) {
-            return;
-        }
-
         if (is_null($name)) {
             foreach ($this->modern->keysForApp($app) as $key) {
                 $this->modern->removeScoped($app, $key);
