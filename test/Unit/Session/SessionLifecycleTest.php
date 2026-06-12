@@ -196,7 +196,7 @@ class SessionLifecycleTest extends TestCase
     public function testRegenerationDueIsFalseWhenDeadlineInFuture(): void
     {
         $session = new HordeSession(new SessionId('rd-test'), []);
-        $session->setScoped('_r', '', time() + 3600);
+        $session->setRegenerationDeadline(time() + 3600);
         self::assertFalse($this->build(session: $session)->regenerationDue());
     }
 
@@ -204,15 +204,20 @@ class SessionLifecycleTest extends TestCase
     public function testRegenerationDueIsTrueWhenDeadlineInPast(): void
     {
         $session = new HordeSession(new SessionId('rd-test'), []);
-        $session->setScoped('_r', '', time() - 1);
+        $session->setRegenerationDeadline(time() - 1);
         self::assertTrue($this->build(session: $session)->regenerationDue());
     }
 
     #[Test]
-    public function testRegenerationDueIgnoresNonIntegerDeadlines(): void
+    public function testRegenerationDueIgnoresLegacyScopedShape(): void
     {
+        // Pre-fix _r writers used setScoped(REGENERATE_KEY, '', $ts).
+        // Sessions still on disk in that shape return null from
+        // getRegenerationDeadline and false from regenerationDue. Both
+        // shapes converge on the next regenerate() / initialiseTimestamps
+        // pass once the typed setters land.
         $session = new HordeSession(new SessionId('rd-test'), []);
-        $session->setScoped('_r', '', 'not-a-timestamp');
+        $session->setScoped('_r', '', time() - 1);
         self::assertFalse($this->build(session: $session)->regenerationDue());
     }
 
@@ -227,7 +232,7 @@ class SessionLifecycleTest extends TestCase
 
         try {
             $session = new HordeSession(new SessionId('rd-test'), []);
-            // No setScoped; HordeSession has no idea about the deadline.
+            // No setRegenerationDeadline; HordeSession has no idea about the deadline.
             self::assertFalse($this->build(session: $session)->regenerationDue());
         } finally {
             if ($previous === null) {

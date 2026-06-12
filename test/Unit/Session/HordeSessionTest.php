@@ -272,6 +272,36 @@ class HordeSessionTest extends TestCase
     }
 
     #[Test]
+    public function testGetRegenerationDeadlineRoundTrips(): void
+    {
+        $session = $this->createSession([]);
+        self::assertNull($session->getRegenerationDeadline());
+
+        $session->setRegenerationDeadline(1700001234);
+        self::assertSame(1700001234, $session->getRegenerationDeadline());
+        self::assertTrue($session->isDirty());
+    }
+
+    #[Test]
+    public function testGetRegenerationDeadlineFromInitialPayload(): void
+    {
+        $session = $this->createSession(['_r' => 1700001234]);
+        self::assertSame(1700001234, $session->getRegenerationDeadline());
+    }
+
+    #[Test]
+    public function testGetRegenerationDeadlineIgnoresLegacyArrayShape(): void
+    {
+        // Pre-fix writers used setScoped(REGENERATE_KEY, '', $ts) which
+        // produced $data['_r']['']. The reader was internally consistent
+        // (also via getScoped) but the shape disagreed with how _b is
+        // stored. Sessions still on disk in the legacy shape return null
+        // from this getter until the next setRegenerationDeadline pass.
+        $session = $this->createSession(['_r' => ['' => 1700001234]]);
+        self::assertNull($session->getRegenerationDeadline());
+    }
+
+    #[Test]
     public function testGetAuthenticatedApps(): void
     {
         $session = $this->createSession([
