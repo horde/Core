@@ -3165,7 +3165,9 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      *   - response:  The user's response to the request. One of the response
      *                code constants.
      *   - folderid:  The collection id that contains the meeting request.
-     *   -
+     *   - longid:    (EAS 16) mailbox:uid when responding from a search result.
+     *   - instanceid: (EAS 14.1+) Recurring instance UTC timestamp.
+     *   - sendresponse: (EAS 16) Optional iTip reply email body/flag.
      *
      * @return string  The UID of any created calendar entries, otherwise false.
      * @throws Horde_ActiveSync_Exception, Horde_Exception_NotFound
@@ -3173,6 +3175,18 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     public function meetingResponse(array $response)
     {
         global $injector;
+
+        if (!empty($response['longid']) && strpos($response['longid'], ':') !== false) {
+            [$mailbox, $uid] = explode(':', $response['longid'], 2);
+            if ($mailbox !== '' && $uid !== '') {
+                if (empty($response['folderid'])) {
+                    $response['folderid'] = $mailbox;
+                }
+                if (empty($response['requestid'])) {
+                    $response['requestid'] = $uid;
+                }
+            }
+        }
 
         if (empty($response['folderid']) || empty($response['requestid'])
             || empty($response['response'])) {
