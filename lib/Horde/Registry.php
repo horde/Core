@@ -60,6 +60,7 @@ use Horde\Core\Service\OAuthHttpClientService;
 use Horde\Core\Service\OAuthProviderConfigRepository;
 use Horde\Core\Service\OAuthTokenService;
 use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionLifecycle;
 use Horde\Token\Token;
 use Horde\Db\Adapter as DbAdapter;
 use Horde\Horde\Factory\OAuthHttpClientServiceFactory as BaseOAuthHttpClientServiceFactory;
@@ -2267,10 +2268,23 @@ class Horde_Registry implements Horde_Shutdown_Task
         $this->_cache['existing'] = $this->_cache['isauth'] = [];
 
         if ($destroy) {
-            // session_destroy() is a lifecycle operation that the shim
-            // wraps; HordeSession does not yet expose a lifecycle surface,
-            // so this stays on the shim until the shim itself is removed.
-            $GLOBALS['session']->destroy();
+            // Resolve the modern engine through the injector. The legacy
+            // shim's `$GLOBALS['session']->destroy()` wrapped exactly this
+            // call; reaching for SessionLifecycle directly removes the
+            // last shim hop inside Registry::clearAuth.
+            $lifecycle = $GLOBALS['injector']->getInstance(SessionLifecycle::class);
+            $lifecycle->destroy();
+
+            // Mark the modern HordeSession destroyed so
+            // HordeSessionMiddleware::finaliseDestroyed emits Set-Cookie:
+            // cleared on the response. SessionLifecycle::destroy() above
+            // wiped the data layer and rebuilt HordeSession over the
+            // empty payload, so the marker has to be set on the freshly
+            // rebuilt instance, not the one we resolved at the top of
+            // this method.
+            $GLOBALS['injector']
+                ->getInstance(HordeSession::class)
+                ->markDestroyed();
         }
     }
 
