@@ -318,6 +318,35 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
         $this->dirty = true;
     }
 
+    /**
+     * Read the session-id regeneration deadline as a Unix timestamp,
+     * or null when no deadline has been recorded.
+     *
+     * Pairs with {@see setRegenerationDeadline}. The slot is a top-level
+     * int. Pre-fix code wrote the deadline via
+     * `setScoped(REGENERATE_KEY, '', $ts)` which produced
+     * `$data['_r']['']` and was internally consistent (same writer used
+     * the same getScoped reader) but inconsistent with `_b`. Both keys
+     * now use the same top-level int shape.
+     */
+    public function getRegenerationDeadline(): ?int
+    {
+        $value = $this->data[self::REGENERATE_KEY] ?? null;
+        return is_int($value) ? $value : null;
+    }
+
+    /**
+     * Record the session-id regeneration deadline.
+     *
+     * Writes the {@see REGENERATE_KEY} slot at the top level as a bare
+     * int. Pairs with {@see getRegenerationDeadline}.
+     */
+    public function setRegenerationDeadline(int $timestamp): void
+    {
+        $this->data[self::REGENERATE_KEY] = $timestamp;
+        $this->dirty = true;
+    }
+
     public function getAuthenticatedApps(): array
     {
         $appData = $this->data['horde'] ?? [];

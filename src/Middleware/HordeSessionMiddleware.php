@@ -67,9 +67,6 @@ final class HordeSessionMiddleware implements MiddlewareInterface
     /** Request attribute carrying the active {@see HordeSession}. */
     public const ATTRIBUTE_SESSION = JwtSessionLoader::ATTRIBUTE_SESSION;
 
-    /** Internal scope and key for the regenerate-at deadline. Matches HordeSession's wire format. */
-    private const REGENERATE_KEY = '_r';
-
     public function __construct(
         private readonly SessionHandler $handler,
         private readonly SessionConfig $config,
@@ -251,9 +248,7 @@ final class HordeSessionMiddleware implements MiddlewareInterface
         //      actually persists the row at the new id; without this,
         //      the rotated session has no backend representation
         //      because the old row was deleted by regenerate().
-        $rotated->setScoped(
-            self::REGENERATE_KEY,
-            '',
+        $rotated->setRegenerationDeadline(
             time() + $this->config->regenerateInterval,
         );
 

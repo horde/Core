@@ -85,12 +85,6 @@ class SessionLifecycle implements Horde_Shutdown_Task
     /** Marker for a string scoped value (matches HordeSession). */
     private const NOT_SERIALIZED = "\0";
 
-    /** $_SESSION top-level key holding the begin-timestamp. */
-    private const BEGIN_KEY = '_b';
-
-    /** $_SESSION top-level key holding the regenerate-at deadline. */
-    private const REGENERATE_KEY = '_r';
-
     /**
      * Whether PHP's session machinery is currently open for read/write.
      *
@@ -348,10 +342,10 @@ class SessionLifecycle implements Horde_Shutdown_Task
         $this->mirrorToSession();
         session_regenerate_id(true);
         $regenAt = time() + $this->regenerateInterval();
-        // The deadline is canonical on HordeSession via the scoped slot.
+        // The deadline is canonical on HordeSession at the top level.
         // The shim's addFinal() shutdown task mirrors HordeSession to
         // $_SESSION for legacy code that reads the superglobal directly.
-        $this->getSession()->setScoped(self::REGENERATE_KEY, '', $regenAt);
+        $this->getSession()->setRegenerationDeadline($regenAt);
 
         // Synchronous executor: clear pending intent so a downstream
         // processFlags() call sees a coherent no-op.
@@ -407,8 +401,8 @@ class SessionLifecycle implements Horde_Shutdown_Task
      */
     public function regenerationDue(): bool
     {
-        $regen = $this->getSession()->getScoped(self::REGENERATE_KEY, '');
-        return is_int($regen) && time() >= $regen;
+        $regen = $this->getSession()->getRegenerationDeadline();
+        return $regen !== null && time() >= $regen;
     }
 
     /**
@@ -505,7 +499,7 @@ class SessionLifecycle implements Horde_Shutdown_Task
         $regenAt = $now + $this->regenerateInterval();
 
         $session->setSessionBegin($now);
-        $session->setScoped(self::REGENERATE_KEY, '', $regenAt);
+        $session->setRegenerationDeadline($regenAt);
     }
 
     /**

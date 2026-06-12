@@ -422,15 +422,15 @@ class Horde_Session implements Horde_Shutdown_Task
             $this->_data[self::BEGIN] = $curr_time;
             $this->_data[self::REGENERATE] = $curr_time
                 + $this->regenerate_interval;
-            // Begin slot is the canonical top-level int shape that
-            // HordeSession::getSessionBegin reads. The legacy
-            // setScoped(BEGIN, '', ...) call wrote the wrong shape
-            // ($data['_b'][''] instead of $data['_b']) and broke modern
-            // readers; setSessionBegin keeps both writers aligned.
+            // Begin and regenerate slots are top-level ints on the
+            // modern HordeSession (matching what getSessionBegin and
+            // getRegenerationDeadline read). The legacy setScoped(_,
+            // '', ...) calls wrote the wrong shape ($data['_b']['']
+            // and $data['_r'][''] instead of $data['_b'] / $data['_r'])
+            // and broke modern readers. The typed setters keep all
+            // writers aligned.
             $this->modern->setSessionBegin($curr_time);
-            $this->modern->setScoped(
-                self::REGENERATE,
-                '',
+            $this->modern->setRegenerationDeadline(
                 $curr_time + $this->regenerate_interval
             );
         }
@@ -445,12 +445,16 @@ class Horde_Session implements Horde_Shutdown_Task
     {
         $lifecycle = $this->_resolveLifecycle();
         if ($lifecycle !== null) {
-            // Lifecycle does mirror + session_regenerate_id(true) + writes
-            // the new _r deadline via HordeSession::setScoped() + clears
-            // lifecycle markers.
+            // Lifecycle does mirror + session_regenerate_id(true) +
+            // writes the new _r deadline via
+            // HordeSession::setRegenerationDeadline + clears lifecycle
+            // markers.
             $lifecycle->regenerate();
             $this->_data = &$_SESSION;
-            $this->_data[self::REGENERATE] = $this->modern->getScoped(self::REGENERATE, '');
+            $deadline = $this->modern->getRegenerationDeadline();
+            if ($deadline !== null) {
+                $this->_data[self::REGENERATE] = $deadline;
+            }
             return;
         }
 
@@ -460,7 +464,7 @@ class Horde_Session implements Horde_Shutdown_Task
         session_regenerate_id(true);
         $regenAt = time() + $this->regenerate_interval;
         $this->_data[self::REGENERATE] = $regenAt;
-        $this->modern->setScoped(self::REGENERATE, '', $regenAt);
+        $this->modern->setRegenerationDeadline($regenAt);
     }
 
     /**
