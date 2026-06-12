@@ -109,6 +109,15 @@ class SessionLifecycle implements Horde_Shutdown_Task
     private bool $shutdownRegistered = false;
 
     /**
+     * Whether the one-time setup work (ini tuning, cookie params,
+     * cache_limiter, session_name, optional session_id forcing) has
+     * already been applied this request. Guards against repeated
+     * setup() calls overlapping the legacy shim and the modern
+     * middleware on the same request.
+     */
+    private bool $setupApplied = false;
+
+    /**
      * @param Injector              $injector Injector for resolving the
      *                                        current {@see HordeSession}
      *                                        on each call. The lifecycle
@@ -155,59 +164,63 @@ class SessionLifecycle implements Horde_Shutdown_Task
         ?string $cacheLimiter = null,
         ?string $sessionId = null,
     ): void {
-        ini_set('url_rewriter.tags', 0);
+        if (!$this->setupApplied) {
+            ini_set('url_rewriter.tags', 0);
 
-        $cookieDomain = $this->config->cookieDomain ?? '';
-        $serverName = $this->config->serverName;
-        if ($cookieDomain !== '' && strpos($serverName, '.') === false) {
-            throw new Horde_Exception(sprintf(
-                'Session cookies will not work because the server name "%s" '
-                . 'is a single-label hostname (no dot) but a cookie domain '
-                . '("%s") is configured. Browsers reject Domain= cookie '
-                . 'attributes on hostnames without a dot. This typically '
-                . 'affects http://localhost and other single-label hostnames. '
-                . 'Either: (1) use a fully qualified hostname like '
-                . 'http://horde.localhost or http://example.test, '
-                . '(2) clear $conf[\'cookie\'][\'domain\'] to let the browser '
-                . 'scope the cookie to the exact hostname, or '
-                . '(3) enable URL-based sessions by clearing '
-                . '$conf[\'session\'][\'use_only_cookies\'] (not recommended).',
-                $serverName,
+            $cookieDomain = $this->config->cookieDomain ?? '';
+            $serverName = $this->config->serverName;
+            if ($cookieDomain !== '' && strpos($serverName, '.') === false) {
+                throw new Horde_Exception(sprintf(
+                    'Session cookies will not work because the server name "%s" '
+                    . 'is a single-label hostname (no dot) but a cookie domain '
+                    . '("%s") is configured. Browsers reject Domain= cookie '
+                    . 'attributes on hostnames without a dot. This typically '
+                    . 'affects http://localhost and other single-label hostnames. '
+                    . 'Either: (1) use a fully qualified hostname like '
+                    . 'http://horde.localhost or http://example.test, '
+                    . '(2) clear $conf[\'cookie\'][\'domain\'] to let the browser '
+                    . 'scope the cookie to the exact hostname, or '
+                    . '(3) enable URL-based sessions by clearing '
+                    . '$conf[\'session\'][\'use_only_cookies\'] (not recommended).',
+                    $serverName,
+                    $cookieDomain,
+                ));
+            }
+
+            $timeout = $this->config->lifetime;
+            if ($timeout > 0) {
+                ini_set('session.gc_maxlifetime', (string) $timeout);
+            }
+
+            session_set_cookie_params(
+                $timeout,
+                $this->config->cookiePath,
                 $cookieDomain,
-            ));
+                $this->config->secure,
+                true,
+            );
+            session_cache_limiter(
+                $cacheLimiter ?? ($this->config->cacheLimiter ?? ''),
+            );
+            session_name(urlencode($this->config->cookieName));
+            if ($sessionId !== null && $sessionId !== '') {
+                session_id($sessionId);
+            }
+
+            if (!$this->handlerRegistered) {
+                session_set_save_handler($this->handler, true);
+                $this->handlerRegistered = true;
+            }
+
+            if (!$this->shutdownRegistered) {
+                Horde_Shutdown::add($this);
+                $this->shutdownRegistered = true;
+            }
+
+            $this->setupApplied = true;
         }
 
-        $timeout = $this->config->lifetime;
-        if ($timeout > 0) {
-            ini_set('session.gc_maxlifetime', (string) $timeout);
-        }
-
-        session_set_cookie_params(
-            $timeout,
-            $this->config->cookiePath,
-            $cookieDomain,
-            $this->config->secure,
-            true,
-        );
-        session_cache_limiter(
-            $cacheLimiter ?? ($this->config->cacheLimiter ?? ''),
-        );
-        session_name(urlencode($this->config->cookieName));
-        if ($sessionId !== null && $sessionId !== '') {
-            session_id($sessionId);
-        }
-
-        if (!$this->handlerRegistered) {
-            session_set_save_handler($this->handler, true);
-            $this->handlerRegistered = true;
-        }
-
-        if (!$this->shutdownRegistered) {
-            Horde_Shutdown::add($this);
-            $this->shutdownRegistered = true;
-        }
-
-        if ($start) {
+        if ($start && !$this->active) {
             $this->start();
             $this->initialiseTimestamps();
         }
@@ -226,6 +239,14 @@ class SessionLifecycle implements Horde_Shutdown_Task
      */
     public function start(): void
     {
+        if ($this->active) {
+            // Idempotency: session_start() emits a notice if called
+            // twice. The legacy shim and the modern setup() can both
+            // drive start(); guard so the second call is a coherent
+            // no-op rather than a runtime warning.
+            return;
+        }
+
         // Limit session ID to 32 bytes. Session IDs are NOT cryptographically
         // secure hashes; they are just a way to generate random strings.
         ini_set('session.hash_function', '0');
