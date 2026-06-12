@@ -146,7 +146,7 @@ to defeat session fixation), the controller calls
 middleware acts on the marker before emitting the response and the
 new id lands in the next `Set-Cookie`.
 
-## Truely Session-Less Routes
+## Truly Session-Less Routes
 
 The simplest example is the readiness probe in horde/base:
 

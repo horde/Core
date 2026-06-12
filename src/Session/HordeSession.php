@@ -308,9 +308,11 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
      * Use this in preference to {@see set()} so the begin slot's wire
      * format stays internal to this class.
      *
-     * Idempotent and dirty-marking. The legacy `Horde_Session` shim
-     * and {@see SessionLifecycle::initialiseTimestamps} both call this
-     * to converge on a single shape across all writers.
+     * Marks the session dirty. Overwrites unconditionally. Callers
+     * that want to set the begin only once per session check
+     * {@see getSessionBegin} first; see
+     * {@see SessionLifecycle::initialiseTimestamps()} for the
+     * canonical guard.
      */
     public function setSessionBegin(int $timestamp): void
     {
