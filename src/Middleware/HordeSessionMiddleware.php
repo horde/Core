@@ -249,7 +249,7 @@ final class HordeSessionMiddleware implements MiddlewareInterface
         //      the rotated session has no backend representation
         //      because the old row was deleted by regenerate().
         $rotated->setRegenerationDeadline(
-            time() + $this->config->regenerateInterval,
+            $this->config->nextRegenerationDeadline(),
         );
 
         try {

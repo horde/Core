@@ -169,4 +169,41 @@ class SessionConfigFactoryTest extends TestCase
         // assertion is documentary.
         self::assertSame('Horde', $config->cookieName);
     }
+
+    #[Test]
+    public function testNextRegenerationDeadlineHonoursExplicitNow(): void
+    {
+        $config = new SessionConfig(
+            cookieName: 'Horde',
+            cookieDomain: null,
+            cookiePath: '/',
+            secure: false,
+            lifetime: 0,
+            regenerateInterval: 3600,
+            cacheLimiter: null,
+        );
+
+        self::assertSame(1700003600, $config->nextRegenerationDeadline(1700000000));
+    }
+
+    #[Test]
+    public function testNextRegenerationDeadlineDefaultsToNow(): void
+    {
+        $config = new SessionConfig(
+            cookieName: 'Horde',
+            cookieDomain: null,
+            cookiePath: '/',
+            secure: false,
+            lifetime: 0,
+            regenerateInterval: 3600,
+            cacheLimiter: null,
+        );
+
+        $before = time();
+        $deadline = $config->nextRegenerationDeadline();
+        $after = time();
+
+        self::assertGreaterThanOrEqual($before + 3600, $deadline);
+        self::assertLessThanOrEqual($after + 3600, $deadline);
+    }
 }

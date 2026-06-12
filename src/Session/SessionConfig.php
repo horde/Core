@@ -108,4 +108,21 @@ final class SessionConfig
         public readonly string $serverName = '',
         public readonly bool $cookieDisabled = false,
     ) {}
+
+    /**
+     * Compute the next session-id regeneration deadline as a Unix
+     * timestamp.
+     *
+     * Centralises the `$now + $regenerateInterval` math so the
+     * lifecycle engine and the modern middleware do not drift on
+     * what "next deadline" means. Callers that already have a
+     * captured `$now` pass it in. Callers acting at the moment of
+     * call leave the argument null to read `time()` here.
+     *
+     * @param int|null $now Unix timestamp anchor. Null means now.
+     */
+    public function nextRegenerationDeadline(?int $now = null): int
+    {
+        return ($now ?? time()) + $this->regenerateInterval;
+    }
 }

@@ -336,11 +336,12 @@ class SessionLifecycle implements Horde_Shutdown_Task
     {
         $this->mirrorToSession();
         session_regenerate_id(true);
-        $regenAt = time() + $this->regenerateInterval();
         // The deadline is canonical on HordeSession at the top level.
         // The shim's addFinal() shutdown task mirrors HordeSession to
         // $_SESSION for legacy code that reads the superglobal directly.
-        $this->getSession()->setRegenerationDeadline($regenAt);
+        $this->getSession()->setRegenerationDeadline(
+            $this->config->nextRegenerationDeadline(),
+        );
 
         // Synchronous executor: clear pending intent so a downstream
         // processFlags() call sees a coherent no-op.
@@ -429,19 +430,7 @@ class SessionLifecycle implements Horde_Shutdown_Task
         }
     }
 
-    /**
-     * The deadline interval (seconds) between forced session ID rotations.
-     *
-     * Reads from {@see SessionConfig::$regenerateInterval}, which the
-     * factory builds from `session.regenerate_interval` with a 6-hour
-     * fallback (the legacy shim's default).
-     */
-    private function regenerateInterval(): int
-    {
-        return $this->config->regenerateInterval;
-    }
-
-    /**
+        /**
      * Resolve the current {@see HordeSession} from the injector.
      *
      * Lazily looked up on every call because {@see clean()} and
@@ -491,10 +480,10 @@ class SessionLifecycle implements Horde_Shutdown_Task
         }
 
         $now = time();
-        $regenAt = $now + $this->regenerateInterval();
-
         $session->setSessionBegin($now);
-        $session->setRegenerationDeadline($regenAt);
+        $session->setRegenerationDeadline(
+            $this->config->nextRegenerationDeadline($now),
+        );
     }
 
     /**
