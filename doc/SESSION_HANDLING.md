@@ -231,8 +231,6 @@ Here `HordeCore` middleware calls
 - Opens the PHP session via the shim's `setup()`, which delegates to
   `SessionLifecycle::setup()` for the actual save-handler registration
   and `session_start()`.
-- Applies the `Horde_Session` shim's relogin guard for sessions whose
-  auth state changed mid-request.
 
 `AuthHordeSession` middleware then reads the auth slot from
 `$_SESSION` (mirrored from the modern session by the shim's `addFinal`
@@ -286,9 +284,8 @@ want a minimal surface use the explicit flow above.
   token, sets `verified_jwt` and `user_id` request attributes. Does
   NOT load a session.
 - `Horde_Session` (`lib/Horde/Session.php`): legacy shim. Delegates
-  lifecycle work to `SessionLifecycle`. Carries its own relogin
-  guard and `addFinal` mirror task for legacy callers that read
-  `$_SESSION` directly.
+  lifecycle work to `SessionLifecycle`. Carries the `addFinal` mirror
+  task for legacy callers that read `$_SESSION` directly.
 
 ## Lifecycle Markers
 

@@ -35,10 +35,9 @@ use Horde_Shutdown_Task;
  * `$_SESSION`, and optional {@see SessionSecret} re-keying on `clean()` /
  * `destroy()`.
  *
- * Registry-agnostic. The legacy stack's relogin auth-changed guard lives
- * on the `Horde_Session` shim, not here. SessionLifecycle is the engine
- * both flows leverage; it does not reach upward into Registry or sideways
- * into the shim.
+ * Registry-agnostic. SessionLifecycle is the engine both legacy and
+ * modern flows leverage. It does not reach upward into Registry or
+ * sideways into the shim.
  *
  * Two flavours of lifecycle methods coexist:
  *
@@ -226,10 +225,6 @@ class SessionLifecycle implements Horde_Shutdown_Task
      * Calls {@see session_start()}, marks the lifecycle active, and rebuilds
      * the modern {@see HordeSession} instance from the now-populated
      * `$_SESSION` payload.
-     *
-     * The relogin auth-changed guard for the legacy stack lives on the
-     * `Horde_Session` shim, where it belongs. SessionLifecycle is
-     * Registry-agnostic.
      */
     public function start(): void
     {
