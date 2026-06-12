@@ -467,6 +467,132 @@ class HordeSessionMiddlewareTest extends TestCase
             'cookieDisabled must suppress Set-Cookie emission on rotation',
         );
     }
+
+    // ---------------------------------------------------------------
+    // Cookie attribute wire-format coverage
+    // ---------------------------------------------------------------
+
+    #[Test]
+    public function testSetCookieReflectsSessionConfigAttributes(): void
+    {
+        // Construct a SessionConfig with non-default values for every
+        // attribute the middleware emits. Run the mint path. Assert the
+        // resulting Set-Cookie carries each attribute exactly. Locks
+        // the wire-format contract documented in
+        // doc/SESSION_HANDLING.md.
+        $config = new SessionConfig(
+            cookieName: 'CustomSid',
+            cookieDomain: '.example.com',
+            cookiePath: '/horde',
+            secure: true,
+            lifetime: 7200,
+            regenerateInterval: SessionConfig::DEFAULT_REGENERATE_INTERVAL,
+            cacheLimiter: null,
+            serverName: 'horde.example.com',
+        );
+
+        $handler = $this->realHandler();
+        $response = $this->middleware($handler, $config)->process(
+            $this->requestWithCookies([]),
+            $this->defaultPayloadHandler,
+        );
+
+        $setCookie = $this->setCookieFor('CustomSid', $response);
+        self::assertNotNull($setCookie, 'mint must emit Set-Cookie');
+
+        // Cookie value: the session id mint produced. Verify shape
+        // through the request attribute.
+        $session = $this->recentlyHandledRequest
+            ->getAttribute(HordeSessionMiddleware::ATTRIBUTE_SESSION);
+        self::assertInstanceOf(HordeSession::class, $session);
+        $sid = (string) $session->getId();
+
+        self::assertStringContainsString("CustomSid={$sid}", $setCookie);
+        self::assertStringContainsString('Max-Age=7200', $setCookie);
+        self::assertStringContainsString('Path=/horde', $setCookie);
+        self::assertStringContainsString('Domain=.example.com', $setCookie);
+        self::assertStringContainsString('Secure', $setCookie);
+        self::assertStringContainsString('HttpOnly', $setCookie);
+        self::assertStringContainsString('SameSite=Lax', $setCookie);
+    }
+
+    #[Test]
+    public function testSetCookieOmitsMaxAgeWhenLifetimeIsZero(): void
+    {
+        // lifetime=0 means "browser session cookie": no Max-Age, no
+        // Expires. The cookie disappears when the browser closes.
+        $config = new SessionConfig(
+            cookieName: 'Horde',
+            cookieDomain: null,
+            cookiePath: '/',
+            secure: false,
+            lifetime: 0,
+            regenerateInterval: SessionConfig::DEFAULT_REGENERATE_INTERVAL,
+            cacheLimiter: null,
+        );
+
+        $handler = $this->realHandler();
+        $response = $this->middleware($handler, $config)->process(
+            $this->requestWithCookies([]),
+            $this->defaultPayloadHandler,
+        );
+
+        $setCookie = $this->setCookieFor('Horde', $response);
+        self::assertNotNull($setCookie);
+        self::assertStringNotContainsString('Max-Age', $setCookie);
+        self::assertStringNotContainsString('Expires', $setCookie);
+    }
+
+    #[Test]
+    public function testSetCookieOmitsDomainWhenNull(): void
+    {
+        // cookieDomain: null tells the browser to scope the cookie to
+        // the exact request host. The Domain= attribute must be
+        // absent on the wire.
+        $config = new SessionConfig(
+            cookieName: 'Horde',
+            cookieDomain: null,
+            cookiePath: '/',
+            secure: false,
+            lifetime: 0,
+            regenerateInterval: SessionConfig::DEFAULT_REGENERATE_INTERVAL,
+            cacheLimiter: null,
+        );
+
+        $handler = $this->realHandler();
+        $response = $this->middleware($handler, $config)->process(
+            $this->requestWithCookies([]),
+            $this->defaultPayloadHandler,
+        );
+
+        $setCookie = $this->setCookieFor('Horde', $response);
+        self::assertNotNull($setCookie);
+        self::assertStringNotContainsString('Domain=', $setCookie);
+    }
+
+    #[Test]
+    public function testSetCookieOmitsSecureWhenSecureIsFalse(): void
+    {
+        $config = new SessionConfig(
+            cookieName: 'Horde',
+            cookieDomain: null,
+            cookiePath: '/',
+            secure: false,
+            lifetime: 0,
+            regenerateInterval: SessionConfig::DEFAULT_REGENERATE_INTERVAL,
+            cacheLimiter: null,
+        );
+
+        $handler = $this->realHandler();
+        $response = $this->middleware($handler, $config)->process(
+            $this->requestWithCookies([]),
+            $this->defaultPayloadHandler,
+        );
+
+        $setCookie = $this->setCookieFor('Horde', $response);
+        self::assertNotNull($setCookie);
+        self::assertStringNotContainsString('Secure', $setCookie);
+    }
 }
 
 /**
