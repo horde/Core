@@ -311,6 +311,14 @@ module that the modern middleware avoids) and dispatches to
 `SessionHandler::regenerate` / `SessionHandler::destroySession`
 directly. Same outcome, different code path.
 
+`SessionLifecycle::shutdown()` (the legacy-stack `addFinal()` mirror)
+honours `isDestroyed()`. When a controller marks the session destroyed
+but no synchronous executor acts on the marker before request
+shutdown, the mirror is skipped rather than re-persisting the
+about-to-be-cleared payload back into `$_SESSION`. The session row
+keeps its previous on-disk state. The next request through the
+modern middleware actually destroys the row.
+
 ## Cookie Emission Contract
 
 `HordeSessionMiddleware` emits `Set-Cookie` on three paths:
