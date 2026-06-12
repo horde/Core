@@ -1,4 +1,260 @@
 ---
+3.0.0-RC9:
+  api: 3.0.0-RC9
+  state:
+    release: RC
+    api: RC
+  date: 2026-06-12
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    fix(core): improve MeetingResponse for EAS 16 LongId and recurring instances
+    Merge pull request #156 from horde/docs/session-handling-shutdown-marker
+    test(session): exercise deadline-elapsed rotation end-to-end
+    feat(session): add HordeSession::clearScope and clearScopeWithPrefixes
+    docs(session): document load failure modes and ATTRIBUTE_SESSION constant
+    docs(session): note shutdown-skips-mirror on isDestroyed
+    fix(session): SessionLifecycle::shutdown skips mirror when destroyed
+    docs(session): address PR #155 review comments
+    test(jwt): clean up deprecations and notices in migrated tests
+    test(session): lock HordeSessionMiddleware Set-Cookie wire format
+    refactor(session): centralise regeneration-deadline math on SessionConfig
+    refactor(session): drop relogin guard from Horde_Session shim
+    fix(session): converge _r regenerate-deadline shape across all writers
+    docs(session): fill in SESSION_HANDLING for app developers and LLMs
+    fix(session): converge _b begin-slot shape across all writers
+    feat(session): make SessionLifecycle::setup idempotent
+    feat(session): add cookieDisabled mode to SessionConfig
+    refactor(registry): clearAuth resolves SessionLifecycle via injector
+    test(jwt): migrate JwtService, JwtServiceFactory, JwtAuthMiddleware tests from base
+    refactor(jwt): drop base JwtService binding from DefaultInjectorBindings
+    fix(registry): clearAuth removes literal 'auth' instead of auth/ keys
+    Merge pull request #152 from horde/fix/EAS16_draft_mail
+    fix(activesync): parse MIME draft bodies and replace drafts on Change
+    fixup! fix(session): type SessionLifecycle secret against an interface
+    feat(session): wire DefaultSessionSerializer in SessionHandlerFactory
+    fix(session): type SessionLifecycle secret against an interface
+    fix(config): autowire State outside HordeCore bootstrap
+    fix(jwt): wire JwtService autowiring for modern routes
+    feat(middleware): add HordeSessionMiddleware for modern PSR-15 routes
+    refactor(session): SessionLifecycle consumes SessionConfig instead of State
+    fixup! feat(session): add SessionConfig value object built by SessionConfigFactory
+    feat(middleware): add JwtSessionLoader for modern PSR-15 routes
+    feat(auth): add HasCredentialsState/InvalidationReason on AuthCredentialStore
+    feat(session): add SessionConfig value object built by SessionConfigFactory
+    refactor(session): make Horde_Session shim delegate to SessionLifecycle
+    feat(session): add processFlags() engine on SessionLifecycle
+    refactor(session): make SessionLifecycle Registry-agnostic
+    feat: Move the ShareBase factory to a Horde_Shutdown task
+    fix(activesync): map MeetingResponse InstanceId to RECURRENCE-ID
+    refactor(logintasks): Run LoginTasks through Horde_Shutdown rather than php's register_shutdown
+    feat: Add an "ultimate" slot for the Horde_Session shim
+    fix(core): use ActiveSync user identity for meeting iTip reply
+    fix: Mirror the guard against not-yet-started sessions from the shim9
+    feat: Add lifecycle flags to HordeSession to indicate scheduled regeneration and marking a session as destroyed
+    feat(session): Improve upon previous horde/core#144 fix
+    fix(session): harden login bootstrap and credential reads
+    feat: Add a SessionLifecycle utility
+3.0.0-RC8:
+  api: 3.0.0-RC8
+  state:
+    release: RC
+    api: RC
+  date: 2026-06-10
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    refactor(registry): Port Registry data and token sites off shim
+    refactor(block): Port Block_Layout_Manager CSRF check to Horde\Token\Token
+    refactor(auth): Port Auth_Application view-init check to HordeSession
+    refactor(registry): Port Registry_Application::updateSessVars to HordeSession
+    refactor(prefs): Port Factory_Prefs no_prefs flag to HordeSession
+    refactor(config): Port Horde_Config session fallback to HordeSession
+    refactor(logintasks): Port LoginTasks to HordeSession
+    refactor(logintasks): Port LoginTasks_Backend_Horde to HordeSession
+    refactor(token): Resolve session via HordeSession in legacy create()
+    refactor: Explicitly flush the HordeSession to the backend on request shutdown.
+    refactor: Get the AuthCredentialStore encryptor via injector
+    refactor(auth): Introduce AuthCredentialStore; Registry delegates
+    refactor(session): Adopt Horde_Pack natively in HordeSession
+    feat(core): wire EAS 16.0 Find command to IMP search backend
+    test(assets): Tighten PrefsThemeResolver and CascadeGraphic mocks
+    test(factory): Remove Kolab Session and Server placeholder tests
+    test(mocks): Tighten expectations across four notice-heavy files
+    test(page-output): Tighten ResponsiveChromeRendererTest mock expectations
+    test(active-sync): Tighten driver-mock expectations across two files
+    test(coverage): Upgrade CoversNothing to CoversClass/CoversMethod
+    test(topbar): Tighten TopbarBuilder mock expectations
+    test(page-output): Tighten DesktopChromeRendererTest mock expectations
+    refactor(horde): Port src/Horde.php gc_tempfiles to HordeSession
+    refactor(registry): Port Horde_Registry_Nlsconfig to HordeSession
+    refactor(registry): Port Horde_Registry_Logout to HordeSession
+    refactor(ui): Port Horde_Core_Ui_Language to HordeSession
+    refactor(tree): Port Horde_Core_Tree_Renderer_Javascript to HordeSession
+    refactor(prefs): Port Horde_Core_Prefs_Ui to HordeSession
+    refactor(prefs): Port Horde_Core_Prefs_Cache_Session to HordeSession
+    refactor(share): Port Horde_Core_Factory_ShareBase to HordeSession
+    refactor(alarm): Port Horde_Core_Factory_Alarm to HordeSession
+    refactor(tagbrowser): Port Horde_Core_TagBrowser to HordeSession
+    refactor(notification): Port Horde_Core_Notification_Handler to HordeSession
+    test(sidebar): Tighten SidebarBuilderTest mock expectations
+    test(page-output): Tighten ViewModeConfiguratorTest mock expectations
+    test(active-sync): Tighten DriverVersionCallbackTest mock expectations
+    test(page-output): Tighten RenderingModeResolverTest mock expectations
+    test(factory): Tighten SessionHandlerFactoryTest mock expectations
+    test(config): Surface deprecation, notice, error, warning details
+    test(integration): Update RampageIntegrationTest to current router shape
+    refactor(notification): Port Horde_Core_Notification_Storage_Session to HordeSession
+    refactor(hashtable): Port Horde_Core_HashTable_PersistentSession to HordeSession
+    refactor(cache): Port Horde_Core_Cache_Session to HordeSession
+    refactor(ajax): Use Horde\Token\Token for the AJAX request token check
+    refactor(pageoutput): Use Horde\Token\Token for the JS-exposed CSRF token
+    refactor(middleware): Port ConditionalCsrfMiddleware to Horde\Token\Token
+    refactor(middleware): Port DemandSessionToken to Horde\Token\Token
+    refactor(session/csrf): Move the constant for the CSRF seed string from Horde_Session to HordeSession
+    refactor(sessions): Simplify registry bootstrap of sessions
+    chore(metadata): Drop kolab dev-dependencies and add horde/form.
+    test: Fix various tests outdated by refactorings
+    feat: Make StrftimeDetector signature support what the phpdoc comments hint at
+    refactor(session): reshape Horde_Session as shim over modern PSR-4 stack
+    refactor(Core): use sha1(session_id()) instead of getToken() as session cache prefix
+    fix(Core): correct SessionStorageBackend namespace in SessionHandlerFactory
+    feat(Core): TokenServiceFactory exposes named secret-source methods
+    refactor(Core): deprecate legacy HashTable factory and Wrapper
+    refactor(Core): Cache factory prefers modern Horde\HashTable when available
+    feat(Core): prefer ModernHashtableBackend in SessionHandlerFactory
+3.0.0-RC7:
+  api: 3.0.0-RC7
+  state:
+    release: RC
+    api: RC
+  date: 2026-05-29
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    style: Empty method oneline format
+    Merge pull request #130 from horde/fix/perms_array
+    Ensure info is an array before processing
+3.0.0-RC6:
+  api: 3.0.0-RC6
+  state:
+    release: RC
+    api: RC
+  date: 2026-05-28
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    fix(security): restrict unserialize allowed_classes (ZDI-20-1051)
+    feat: Amend jcdelepine's previous patch for the very odd chance somebody does HTTPS on 80 or HTTP on 443
+    feat(hashtable): delegate Redis client creation to HashTable package
+    fix: Strip default port from Url
+    Merge pull request #126 from horde/fix/notes_deletion
+    Modify notes_delete to include notepad parameter
+    Refactor notes deletion to handle exceptions individually
+    Merge pull request #124 from horde/fix/misc
+    Refactor SimpleFormatter initialization in LogHandlerFactory
+    Handle missing config values in prefs loading
+    Check for flags before modifying results array
+3.0.0-RC5:
+  api: 3.0.0-RC5
+  state:
+    release: RC
+    api: RC
+  date: 2026-05-25
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    fix(responsive): resolve translated app name via RegistryConfigLoader
+    refactor(responsive): switch CSS discovery from responsive.css to screen.css
+    fix(routes): resolve RegistryState via RegistryConfigLoader in factories
+    docs: add ROUTING.md covering the complete route chain
+    fix(routes): validate registry keys, add service routes, support legacy path
+    refactor(routes): migrate Mapper type-hints to RoutesProvider interface
+    feat(pageoutput): add PageOutputAssetManager bridging Form AssetManager to AssetCollector
+    refactor(routes): rely on RuntimeRoutesProvider for URL generation
+    Merge pull request #120 from horde/feat/adopt-nls-psr4
+    refactor: Use PSR-4 version of horde/nls
+    fix: Autoload more correctly
+    chore: Update workflow dependency
+    feat: Simple CLI script for the Cached Routes Compiler
+3.0.0-RC4:
+  api: 3.0.0-RC4
+  state:
+    release: RC
+    api: RC
+  date: 2026-05-22
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    refactor: Rebase RuntimeRoutesMapper on horde/routes#7 GroupMapper
+    Merge pull request #113 from horde/fix/wrong_property-breaks_EAS
+    Rename 'desc' key to 'description' in task info
+    Update default log handler to include line break
+3.0.0-RC3:
+  api: 3.0.0-RC3
+  state:
+    release: RC
+    api: RC
+  date: 2026-05-21
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    style: ws
+    feat(mail): add XOAUTH2 support to SMTP factory
+    Refactor route prefixing logic in RuntimeRoutesMapper
+    Use null coalescing operator in currentProcessAuth
+    Update logout_url to use service link
+    Refactor logout URL generation in Helper.php
+    style: use "use" for IcuFormatter
+    style: mostly whitespace
+    feat: Support PSR-4 and FQCN identity drivers in factory
+3.0.0-RC2:
+  api: 3.0.0-RC2
+  state:
+    release: RC
+    api: RC
+  date: 2026-05-19
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    refactor: Simplify fix by Torben on withSecondaryRoute
+    Implement route path prefixing for secondary routes
+    fix: Harden handling of session_cache_limiter key against not-defined
+    refactor: Allow modern injector in all factories
+    fix: Always cast to string before trying to trim
+    fix: Cast to string before emitting a log
+    Merge pull request #105 from horde/fix/permission-aware-redirect
+    refactor(strftime): Migrate to native usage of IntlDateFormatter and DateTime
+    refactor(middleware): extract isAuthenticated to local variable in AuthHordeSession
+    fix(middleware): admin users bypass permission checks in RedirectToLogin
+    Add unit tests for versionCallback method
+3.0.0-RC1:
+  api: 3.0.0-RC1
+  state:
+    release: RC
+    api: RC
+  date: 2026-05-16
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    Fix authentication username check in versionCallback
+    feat: RedirectToLogin now honors guest READ permission
+    refactor: Transition to Horde\Injector\Injector and a lean middleware stack
+    docs: Mark this old-style service as deprecated
+    refactor: Improve getDriverConfig()
+    Merge pull request #100 from horde/fix/migration_Forms_V3
+    Refactor variable method calls in Html.php
+    Fix header retrieval in tableset rendering
+    Fix method call to get variable type name
 3.0.0-beta25:
   api: 3.0.0-beta25
   state:
@@ -732,205 +988,6 @@
     [rla] Adapt schema migrations to work in new H6 installation layout.
     [rla] Added injectable wrapper around Config to reduce globals access.
     [rla] With Marco Abbrancati: Upgraded test cases for phpunit 9.x utility.
-3.0.0-RC8:
-  api: 3.0.0-RC8
-  state:
-    release: RC
-    api: RC
-  date: 2026-06-10
-  license:
-    identifier: LGPL-2.1-only
-    uri: https://spdx.org/licenses/LGPL-2.1-only.html
-  notes: |-
-    refactor(registry): Port Registry data and token sites off shim
-    refactor(block): Port Block_Layout_Manager CSRF check to Horde\Token\Token
-    refactor(auth): Port Auth_Application view-init check to HordeSession
-    refactor(registry): Port Registry_Application::updateSessVars to HordeSession
-    refactor(prefs): Port Factory_Prefs no_prefs flag to HordeSession
-    refactor(config): Port Horde_Config session fallback to HordeSession
-    refactor(logintasks): Port LoginTasks to HordeSession
-    refactor(logintasks): Port LoginTasks_Backend_Horde to HordeSession
-    refactor(token): Resolve session via HordeSession in legacy create()
-    refactor: Explicitly flush the HordeSession to the backend on request shutdown.
-    refactor: Get the AuthCredentialStore encryptor via injector
-    refactor(auth): Introduce AuthCredentialStore; Registry delegates
-    refactor(session): Adopt Horde_Pack natively in HordeSession
-    feat(core): wire EAS 16.0 Find command to IMP search backend
-    test(assets): Tighten PrefsThemeResolver and CascadeGraphic mocks
-    test(factory): Remove Kolab Session and Server placeholder tests
-    test(mocks): Tighten expectations across four notice-heavy files
-    test(page-output): Tighten ResponsiveChromeRendererTest mock expectations
-    test(active-sync): Tighten driver-mock expectations across two files
-    test(coverage): Upgrade CoversNothing to CoversClass/CoversMethod
-    test(topbar): Tighten TopbarBuilder mock expectations
-    test(page-output): Tighten DesktopChromeRendererTest mock expectations
-    refactor(horde): Port src/Horde.php gc_tempfiles to HordeSession
-    refactor(registry): Port Horde_Registry_Nlsconfig to HordeSession
-    refactor(registry): Port Horde_Registry_Logout to HordeSession
-    refactor(ui): Port Horde_Core_Ui_Language to HordeSession
-    refactor(tree): Port Horde_Core_Tree_Renderer_Javascript to HordeSession
-    refactor(prefs): Port Horde_Core_Prefs_Ui to HordeSession
-    refactor(prefs): Port Horde_Core_Prefs_Cache_Session to HordeSession
-    refactor(share): Port Horde_Core_Factory_ShareBase to HordeSession
-    refactor(alarm): Port Horde_Core_Factory_Alarm to HordeSession
-    refactor(tagbrowser): Port Horde_Core_TagBrowser to HordeSession
-    refactor(notification): Port Horde_Core_Notification_Handler to HordeSession
-    test(sidebar): Tighten SidebarBuilderTest mock expectations
-    test(page-output): Tighten ViewModeConfiguratorTest mock expectations
-    test(active-sync): Tighten DriverVersionCallbackTest mock expectations
-    test(page-output): Tighten RenderingModeResolverTest mock expectations
-    test(factory): Tighten SessionHandlerFactoryTest mock expectations
-    test(config): Surface deprecation, notice, error, warning details
-    test(integration): Update RampageIntegrationTest to current router shape
-    refactor(notification): Port Horde_Core_Notification_Storage_Session to HordeSession
-    refactor(hashtable): Port Horde_Core_HashTable_PersistentSession to HordeSession
-    refactor(cache): Port Horde_Core_Cache_Session to HordeSession
-    refactor(ajax): Use Horde\Token\Token for the AJAX request token check
-    refactor(pageoutput): Use Horde\Token\Token for the JS-exposed CSRF token
-    refactor(middleware): Port ConditionalCsrfMiddleware to Horde\Token\Token
-    refactor(middleware): Port DemandSessionToken to Horde\Token\Token
-    refactor(session/csrf): Move the constant for the CSRF seed string from Horde_Session to HordeSession
-    refactor(sessions): Simplify registry bootstrap of sessions
-    chore(metadata): Drop kolab dev-dependencies and add horde/form.
-    test: Fix various tests outdated by refactorings
-    feat: Make StrftimeDetector signature support what the phpdoc comments hint at
-    refactor(session): reshape Horde_Session as shim over modern PSR-4 stack
-    refactor(Core): use sha1(session_id()) instead of getToken() as session cache prefix
-    fix(Core): correct SessionStorageBackend namespace in SessionHandlerFactory
-    feat(Core): TokenServiceFactory exposes named secret-source methods
-    refactor(Core): deprecate legacy HashTable factory and Wrapper
-    refactor(Core): Cache factory prefers modern Horde\HashTable when available
-    feat(Core): prefer ModernHashtableBackend in SessionHandlerFactory
-3.0.0-RC7:
-  api: 3.0.0-RC7
-  state:
-    release: RC
-    api: RC
-  date: 2026-05-29
-  license:
-    identifier: LGPL-2.1-only
-    uri: https://spdx.org/licenses/LGPL-2.1-only.html
-  notes: |-
-    style: Empty method oneline format
-    Merge pull request #130 from horde/fix/perms_array
-    Ensure info is an array before processing
-3.0.0-RC6:
-  api: 3.0.0-RC6
-  state:
-    release: RC
-    api: RC
-  date: 2026-05-28
-  license:
-    identifier: LGPL-2.1-only
-    uri: https://spdx.org/licenses/LGPL-2.1-only.html
-  notes: |-
-    fix(security): restrict unserialize allowed_classes (ZDI-20-1051)
-    feat: Amend jcdelepine's previous patch for the very odd chance somebody does HTTPS on 80 or HTTP on 443
-    feat(hashtable): delegate Redis client creation to HashTable package
-    fix: Strip default port from Url
-    Merge pull request #126 from horde/fix/notes_deletion
-    Modify notes_delete to include notepad parameter
-    Refactor notes deletion to handle exceptions individually
-    Merge pull request #124 from horde/fix/misc
-    Refactor SimpleFormatter initialization in LogHandlerFactory
-    Handle missing config values in prefs loading
-    Check for flags before modifying results array
-3.0.0-RC5:
-  api: 3.0.0-RC5
-  state:
-    release: RC
-    api: RC
-  date: 2026-05-25
-  license:
-    identifier: LGPL-2.1-only
-    uri: https://spdx.org/licenses/LGPL-2.1-only.html
-  notes: |-
-    fix(responsive): resolve translated app name via RegistryConfigLoader
-    refactor(responsive): switch CSS discovery from responsive.css to screen.css
-    fix(routes): resolve RegistryState via RegistryConfigLoader in factories
-    docs: add ROUTING.md covering the complete route chain
-    fix(routes): validate registry keys, add service routes, support legacy path
-    refactor(routes): migrate Mapper type-hints to RoutesProvider interface
-    feat(pageoutput): add PageOutputAssetManager bridging Form AssetManager to AssetCollector
-    refactor(routes): rely on RuntimeRoutesProvider for URL generation
-    Merge pull request #120 from horde/feat/adopt-nls-psr4
-    refactor: Use PSR-4 version of horde/nls
-    fix: Autoload more correctly
-    chore: Update workflow dependency
-    feat: Simple CLI script for the Cached Routes Compiler
-3.0.0-RC4:
-  api: 3.0.0-RC4
-  state:
-    release: RC
-    api: RC
-  date: 2026-05-22
-  license:
-    identifier: LGPL-2.1-only
-    uri: https://spdx.org/licenses/LGPL-2.1-only.html
-  notes: |-
-    refactor: Rebase RuntimeRoutesMapper on horde/routes#7 GroupMapper
-    Merge pull request #113 from horde/fix/wrong_property-breaks_EAS
-    Rename 'desc' key to 'description' in task info
-    Update default log handler to include line break
-3.0.0-RC3:
-  api: 3.0.0-RC3
-  state:
-    release: RC
-    api: RC
-  date: 2026-05-21
-  license:
-    identifier: LGPL-2.1-only
-    uri: https://spdx.org/licenses/LGPL-2.1-only.html
-  notes: |-
-    style: ws
-    feat(mail): add XOAUTH2 support to SMTP factory
-    Refactor route prefixing logic in RuntimeRoutesMapper
-    Use null coalescing operator in currentProcessAuth
-    Update logout_url to use service link
-    Refactor logout URL generation in Helper.php
-    style: use "use" for IcuFormatter
-    style: mostly whitespace
-    feat: Support PSR-4 and FQCN identity drivers in factory
-3.0.0-RC2:
-  api: 3.0.0-RC2
-  state:
-    release: RC
-    api: RC
-  date: 2026-05-19
-  license:
-    identifier: LGPL-2.1-only
-    uri: https://spdx.org/licenses/LGPL-2.1-only.html
-  notes: |-
-    refactor: Simplify fix by Torben on withSecondaryRoute
-    Implement route path prefixing for secondary routes
-    fix: Harden handling of session_cache_limiter key against not-defined
-    refactor: Allow modern injector in all factories
-    fix: Always cast to string before trying to trim
-    fix: Cast to string before emitting a log
-    Merge pull request #105 from horde/fix/permission-aware-redirect
-    refactor(strftime): Migrate to native usage of IntlDateFormatter and DateTime
-    refactor(middleware): extract isAuthenticated to local variable in AuthHordeSession
-    fix(middleware): admin users bypass permission checks in RedirectToLogin
-    Add unit tests for versionCallback method
-3.0.0-RC1:
-  api: 3.0.0-RC1
-  state:
-    release: RC
-    api: RC
-  date: 2026-05-16
-  license:
-    identifier: LGPL-2.1-only
-    uri: https://spdx.org/licenses/LGPL-2.1-only.html
-  notes: |-
-    Fix authentication username check in versionCallback
-    feat: RedirectToLogin now honors guest READ permission
-    refactor: Transition to Horde\Injector\Injector and a lean middleware stack
-    docs: Mark this old-style service as deprecated
-    refactor: Improve getDriverConfig()
-    Merge pull request #100 from horde/fix/migration_Forms_V3
-    Refactor variable method calls in Html.php
-    Fix header retrieval in tableset rendering
-    Fix method call to get variable type name
 2.31.15:
   api: 2.31.0
   state:
@@ -1959,6 +2016,37 @@
     [jan] Fix botched 2.12.0 release.
     [mjr] Fix closing smartmobile dialog pages (Bug #13316).
     [mjr] Fix issue that could cause multiple tabs to be shown as active when tab_name could be a mix of integers or strings.
+2.12.0-RC2:
+  api: 2.12.0
+  state:
+    release: beta
+    api: beta
+  date: 2014-07-01
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    Original version string was 2.12.0RC2
+    [mjr] Fix issue sending email via EAS when the imap client throws an error when synchronizing the maillog (Bug #13276).
+    [mjr] Improvements to vcard mime handler to allow for ajax updating (Bug #13101).
+    [jan] Fix delay when fading the same dialog more than once.
+    [jan] Catch exceptions from NoSQL backends when building indices.
+2.12.0-RC1:
+  api: 2.12.0
+  state:
+    release: beta
+    api: beta
+  date: 2014-06-17
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    Original version string was 2.12.0RC1
+    [mjr] Fix incorrect processing of autocompleted data when using prettyautocompleter (Bug #13256).
+    [mjr] Fix updating attendee response status when received via ActiveSync.
+    [jan] Add <configldapuser> configuration item.
+    [jan] Add base DN to LDAP configuration for searching user DNs.
+    [jan] Allow to specify port for PostgreSQL socket connections (Request #13250).
 2.12.0-beta3:
   api: 2.12.0
   state:
@@ -2055,37 +2143,6 @@
     [mms] Fix jquerymobile icons (Bug #12876).
     [mms] Don't add 2 entries to history when opening a jquery mobile dialog (Bug #12877).
     [jan] Fix padding of drop down lists with scrollbars (Bug #11971).
-2.12.0-RC2:
-  api: 2.12.0
-  state:
-    release: beta
-    api: beta
-  date: 2014-07-01
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    Original version string was 2.12.0RC2
-    [mjr] Fix issue sending email via EAS when the imap client throws an error when synchronizing the maillog (Bug #13276).
-    [mjr] Improvements to vcard mime handler to allow for ajax updating (Bug #13101).
-    [jan] Fix delay when fading the same dialog more than once.
-    [jan] Catch exceptions from NoSQL backends when building indices.
-2.12.0-RC1:
-  api: 2.12.0
-  state:
-    release: beta
-    api: beta
-  date: 2014-06-17
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    Original version string was 2.12.0RC1
-    [mjr] Fix incorrect processing of autocompleted data when using prettyautocompleter (Bug #13256).
-    [mjr] Fix updating attendee response status when received via ActiveSync.
-    [jan] Add <configldapuser> configuration item.
-    [jan] Add base DN to LDAP configuration for searching user DNs.
-    [jan] Allow to specify port for PostgreSQL socket connections (Request #13250).
 2.11.2:
   api: 2.11.0
   state:
@@ -2308,6 +2365,30 @@
     [mjr] Fix incorrect offsets when generating free/busy data for ActiveSync clients.
     [mms] Add Horde_HashTable to dependency list (Bug #12314).
     [jan] Don't overwrite host part of parsed email addresses (Bug #12302).
+2.5.0:
+  api: 2.5.0
+  state:
+    release: stable
+    api: stable
+  date: 2013-06-04
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    [jan] Don't break existing unchanged sources in the preferences.
+2.5.0-RC1:
+  api: 2.5.0
+  state:
+    release: beta
+    api: beta
+  date: 2013-05-28
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    Original version string was 2.5.0RC1
+    [mms] Added Horde_Core_Factory_Mail factory to allow for alternative mailer configurations.
+    [mms] Fix honoring the sendmail_eol configuration option.
 2.5.0-beta3:
   api: 2.5.0
   state:
@@ -2368,30 +2449,6 @@
     [jan] Use PEAR package information to retrieve packages names in Horde_Core_Db_Migration.
     [jan] Get version list from pear.horde.org when checking for updates.
     [mms] Add support for 'ajaxaction_data' hook (won't be documented in Horde until 5.1+).
-2.5.0-RC1:
-  api: 2.5.0
-  state:
-    release: beta
-    api: beta
-  date: 2013-05-28
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    Original version string was 2.5.0RC1
-    [mms] Added Horde_Core_Factory_Mail factory to allow for alternative mailer configurations.
-    [mms] Fix honoring the sendmail_eol configuration option.
-2.5.0:
-  api: 2.5.0
-  state:
-    release: stable
-    api: stable
-  date: 2013-06-04
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    [jan] Don't break existing unchanged sources in the preferences.
 2.4.3:
   api: 2.4.0
   state:
@@ -2632,6 +2689,38 @@
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
     [jan] Re-release of version 2.0.0 due to broken PEAR packager.
+2.0.0:
+  api: 2.0.0
+  state:
+    release: stable
+    api: stable
+  date: 2012-10-30
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    First stable release for Horde 5.
+    [mms] Confirmation link for new identity requires the full URL as it is intended to be accessed outside of the Horde application (Bug #11593).
+    [mms] Need to unescape JSON data returned in a text/html response.
+    [jan] Update Polish translation (Krzysztof Kozera <krzysztof113@o2.pl>).
+2.0.0-RC1:
+  api: 2.0.0beta1
+  state:
+    release: beta
+    api: beta
+  date: 2012-10-26
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    Original version string was 2.0.0RC1
+    [jan] Fix dynamic updating of portal blocks.
+    [mms] Allow AJAX handler methods to be marked externally accessible (i.e. no session token checking) (Bug #11538).
+    [mjr] Fix copying ActiveSync email to sent folder in certain cases (Bug #11529).
+    [jan] Catch exceptions from Horde_Crypt (Bug #11530).
+    [jan] Support non-padding operators in JavaScript date formatting (Bug #10435).
+    [mms] Add generic CSS class insertion to Help system.
+    [mms] Fix handling active error reporting codes in Horde_ErrorHandler.
 2.0.0-beta6:
   api: 2.0.0beta1
   state:
@@ -2754,38 +2843,6 @@
     [mjr] Allow restricting pretty autocompleter to available choices.
     [mms] Add language detection to AJAX spellchecker if no language is selected by the user (Request #7137).
     [mms] Add Horde_Core_Block_Layout_View::getStylesheets().
-2.0.0-RC1:
-  api: 2.0.0beta1
-  state:
-    release: beta
-    api: beta
-  date: 2012-10-26
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    Original version string was 2.0.0RC1
-    [jan] Fix dynamic updating of portal blocks.
-    [mms] Allow AJAX handler methods to be marked externally accessible (i.e. no session token checking) (Bug #11538).
-    [mjr] Fix copying ActiveSync email to sent folder in certain cases (Bug #11529).
-    [jan] Catch exceptions from Horde_Crypt (Bug #11530).
-    [jan] Support non-padding operators in JavaScript date formatting (Bug #10435).
-    [mms] Add generic CSS class insertion to Help system.
-    [mms] Fix handling active error reporting codes in Horde_ErrorHandler.
-2.0.0:
-  api: 2.0.0
-  state:
-    release: stable
-    api: stable
-  date: 2012-10-30
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    First stable release for Horde 5.
-    [mms] Confirmation link for new identity requires the full URL as it is intended to be accessed outside of the Horde application (Bug #11593).
-    [mms] Need to unescape JSON data returned in a text/html response.
-    [jan] Update Polish translation (Krzysztof Kozera <krzysztof113@o2.pl>).
 1.9.3:
   api: 1.9.0
   state:
@@ -3125,6 +3182,54 @@
     [cjh] Fix cyrsql configuration, rename cyrus host and port parameters to not clash with Horde_Db parameters (Bug #9864).
     [cjh] Fix signups, and update style on signup and reset password pages to match the login page (Bug #9856, partially from Ian Roth <iron_hat@hotmail.com>).
     [cjh] Show an unknown app icon rather than a broken image if an application doesn't have an icon (Bug #9867).
+1.0.0:
+  api: 1.0.0
+  state:
+    release: stable
+    api: stable
+  date: 2011-04-06
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    First stable release for Horde 4.
+    [mms] Add Horde_Core_Notification_Handler_Decorator_Base.
+    [mms] Add listAlarms() to methods provided by Horde_Core_Registry_Application.
+    [jan] Delay sidebar creation if the sidebar is generated through JavaScript.
+    [jan] Use localized application names when sorting the preference menu tree.
+    [mms] Fix adding port to certain urls passed to Horde::url() (Bug #9712).
+1.0.0-RC2:
+  api: 1.0.0
+  state:
+    release: beta
+    api: beta
+  date: 2011-03-29
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    Original version string was 1.0.0RC2
+    Second release candidate for Horde 4.
+    [jan] Fix loading of Horde's vhost conf.php file (Bug #9704).
+    [jan] Sort applications in preference menu by name.
+    [mms] Fix identities pref UI when default_identity is locked (Bug #9701).
+    [mms] Added Horde::debug().
+1.0.0-RC1:
+  api: 1.0.0
+  state:
+    release: beta
+    api: beta
+  date: 2011-03-22
+  license:
+    identifier: LGPL-2.1
+    uri: http://www.horde.org/licenses/lgpl21
+  notes: |
+    Original version string was 1.0.0RC1
+    First release candidate for Horde 4.
+    [jan] Fix converting identities with non-ascii characters to new format.
+    [mjr] Fix IMSP Auth driver.
+    [jan] Don't show sub-permissions for adding that exist already.
+    [jan] Fix listing more than one sub-permission (Bug #9671).
 1.0.0-beta1:
   api: 1.0.0
   state:
@@ -3174,51 +3279,3 @@
     Renamed Help:: as Horde_Help::.
     Removed Text::/Horde_Text::.
     Converted Horde to Horde 4 coding conventions.
-1.0.0-RC2:
-  api: 1.0.0
-  state:
-    release: beta
-    api: beta
-  date: 2011-03-29
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    Original version string was 1.0.0RC2
-    Second release candidate for Horde 4.
-    [jan] Fix loading of Horde's vhost conf.php file (Bug #9704).
-    [jan] Sort applications in preference menu by name.
-    [mms] Fix identities pref UI when default_identity is locked (Bug #9701).
-    [mms] Added Horde::debug().
-1.0.0-RC1:
-  api: 1.0.0
-  state:
-    release: beta
-    api: beta
-  date: 2011-03-22
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    Original version string was 1.0.0RC1
-    First release candidate for Horde 4.
-    [jan] Fix converting identities with non-ascii characters to new format.
-    [mjr] Fix IMSP Auth driver.
-    [jan] Don't show sub-permissions for adding that exist already.
-    [jan] Fix listing more than one sub-permission (Bug #9671).
-1.0.0:
-  api: 1.0.0
-  state:
-    release: stable
-    api: stable
-  date: 2011-04-06
-  license:
-    identifier: LGPL-2.1
-    uri: http://www.horde.org/licenses/lgpl21
-  notes: |
-    First stable release for Horde 4.
-    [mms] Add Horde_Core_Notification_Handler_Decorator_Base.
-    [mms] Add listAlarms() to methods provided by Horde_Core_Registry_Application.
-    [jan] Delay sidebar creation if the sidebar is generated through JavaScript.
-    [jan] Use localized application names when sorting the preference menu tree.
-    [mms] Fix adding port to certain urls passed to Horde::url() (Bug #9712).
