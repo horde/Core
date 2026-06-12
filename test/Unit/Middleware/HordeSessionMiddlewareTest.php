@@ -54,6 +54,21 @@ class HordeSessionMiddlewareTest extends TestCase
         );
     }
 
+    private function configCookieDisabled(string $cookieName = 'Horde'): SessionConfig
+    {
+        return new SessionConfig(
+            cookieName: $cookieName,
+            cookieDomain: null,
+            cookiePath: '/',
+            secure: false,
+            lifetime: 0,
+            regenerateInterval: SessionConfig::DEFAULT_REGENERATE_INTERVAL,
+            cacheLimiter: null,
+            serverName: '',
+            cookieDisabled: true,
+        );
+    }
+
     private function realHandler(): SessionHandler
     {
         return new SessionHandler(
@@ -367,5 +382,130 @@ class HordeSessionMiddlewareTest extends TestCase
         // status 200. The middleware may have added Set-Cookie headers
         // but the body/status is preserved.
         self::assertSame(200, $response->getStatusCode());
+    }
+
+    // ---------------------------------------------------------------
+    // cookieDisabled mode: no Set-Cookie on any path
+    // ---------------------------------------------------------------
+
+    #[Test]
+    public function testCookieDisabledOmitsSetCookieOnFreshSession(): void
+    {
+        $handler = $this->realHandler();
+        $response = $this->middleware($handler, $this->configCookieDisabled())->process(
+            $this->requestWithCookies([]),
+            $this->defaultPayloadHandler,
+        );
+
+        $session = $this->recentlyHandledRequest
+            ->getAttribute(HordeSessionMiddleware::ATTRIBUTE_SESSION);
+
+        self::assertInstanceOf(HordeSession::class, $session);
+        self::assertNull(
+            $this->setCookieFor('Horde', $response),
+            'cookieDisabled must suppress Set-Cookie when minting a fresh session',
+        );
+    }
+
+    #[Test]
+    public function testCookieDisabledOmitsSetCookieOnDestroy(): void
+    {
+        $handler = $this->realHandler();
+        $cfg = $this->configCookieDisabled();
+
+        // First request mints a session.
+        $first = $this->middleware($handler, $cfg)->process(
+            $this->requestWithCookies([]),
+            $this->defaultPayloadHandler,
+        );
+        $session = $this->recentlyHandledRequest
+            ->getAttribute(HordeSessionMiddleware::ATTRIBUTE_SESSION);
+        self::assertInstanceOf(HordeSession::class, $session);
+        $sid = (string) $session->getId();
+
+        // Mark the session destroyed and re-run middleware to exercise
+        // the destroy path. A named test handler that calls
+        // markDestroyed on the session attribute satisfies the no-
+        // anonymous-classes-in-DI guidance and also keeps the test
+        // body readable.
+        $destroyHandler = new MarkDestroyedHandler($this->defaultPayloadResponse);
+
+        $secondRequest = $this->requestFactory
+            ->createServerRequest('GET', '/test')
+            ->withCookieParams(['Horde' => $sid]);
+        $second = $this->middleware($handler, $cfg)->process($secondRequest, $destroyHandler);
+
+        self::assertNull(
+            $this->setCookieFor('Horde', $second),
+            'cookieDisabled must suppress clearing-cookie emission on destroy',
+        );
+    }
+
+    #[Test]
+    public function testCookieDisabledOmitsSetCookieOnRegenerate(): void
+    {
+        $handler = $this->realHandler();
+        $cfg = $this->configCookieDisabled();
+
+        $first = $this->middleware($handler, $cfg)->process(
+            $this->requestWithCookies([]),
+            $this->defaultPayloadHandler,
+        );
+        $session = $this->recentlyHandledRequest
+            ->getAttribute(HordeSessionMiddleware::ATTRIBUTE_SESSION);
+        $sid = (string) $session->getId();
+
+        $regenHandler = new ScheduleRegenerationHandler($this->defaultPayloadResponse);
+
+        $secondRequest = $this->requestFactory
+            ->createServerRequest('GET', '/test')
+            ->withCookieParams(['Horde' => $sid]);
+        $second = $this->middleware($handler, $cfg)->process($secondRequest, $regenHandler);
+
+        self::assertNull(
+            $this->setCookieFor('Horde', $second),
+            'cookieDisabled must suppress Set-Cookie emission on rotation',
+        );
+    }
+}
+
+/**
+ * Test handler that marks the loaded session destroyed and returns a
+ * fixed response. Named (not anonymous) so DI / autoloader rules are
+ * satisfied.
+ */
+final class MarkDestroyedHandler implements \Psr\Http\Server\RequestHandlerInterface
+{
+    public function __construct(
+        private readonly \Psr\Http\Message\ResponseInterface $response,
+    ) {}
+
+    public function handle(\Psr\Http\Message\ServerRequestInterface $request): \Psr\Http\Message\ResponseInterface
+    {
+        $session = $request->getAttribute(HordeSessionMiddleware::ATTRIBUTE_SESSION);
+        if ($session instanceof HordeSession) {
+            $session->markDestroyed();
+        }
+        return $this->response;
+    }
+}
+
+/**
+ * Test handler that schedules session-id regeneration and returns a
+ * fixed response.
+ */
+final class ScheduleRegenerationHandler implements \Psr\Http\Server\RequestHandlerInterface
+{
+    public function __construct(
+        private readonly \Psr\Http\Message\ResponseInterface $response,
+    ) {}
+
+    public function handle(\Psr\Http\Message\ServerRequestInterface $request): \Psr\Http\Message\ResponseInterface
+    {
+        $session = $request->getAttribute(HordeSessionMiddleware::ATTRIBUTE_SESSION);
+        if ($session instanceof HordeSession) {
+            $session->scheduleRegeneration();
+        }
+        return $this->response;
     }
 }

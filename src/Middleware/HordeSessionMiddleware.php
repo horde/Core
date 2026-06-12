@@ -208,6 +208,13 @@ final class HordeSessionMiddleware implements MiddlewareInterface
             ]);
         }
 
+        if ($this->config->cookieDisabled) {
+            // Cookieless mode: client identifies via Authorization header.
+            // The backend row was destroyed above; nothing to clear on
+            // the wire.
+            return $response;
+        }
+
         return Cookies::clear(
             $response,
             $this->config->cookieName,
@@ -259,6 +266,13 @@ final class HordeSessionMiddleware implements MiddlewareInterface
             ]);
         }
 
+        if ($this->config->cookieDisabled) {
+            // Cookieless mode: rotated id lives only on the backend row.
+            // The client carries no cookie to update; the next request
+            // continues to identify via Authorization header.
+            return $response;
+        }
+
         return Cookies::with($response, $this->buildSessionCookie((string) $rotated->getId()));
     }
 
@@ -268,6 +282,12 @@ final class HordeSessionMiddleware implements MiddlewareInterface
         bool $hadCookie,
     ): ResponseInterface {
         $this->saveIfDirty($session);
+
+        if ($this->config->cookieDisabled) {
+            // Cookieless mode: never emit Set-Cookie regardless of
+            // whether the request arrived with one.
+            return $response;
+        }
 
         if (!$hadCookie) {
             // First request, or cookie was missing/invalid: emit the

@@ -81,6 +81,21 @@ final class SessionConfig
      *                                        single-label-host plus
      *                                        Domain-attribute combination.
      *                                        From `$conf['server']['name']`.
+     * @param bool        $cookieDisabled     When true,
+     *                                        {@see HordeSessionMiddleware}
+     *                                        does NOT emit `Set-Cookie` on
+     *                                        any of its lifecycle paths
+     *                                        (steady-state, regenerated,
+     *                                        destroyed). Used by pure API
+     *                                        routes that identify clients
+     *                                        via `Authorization: Bearer`
+     *                                        tokens and do not want a
+     *                                        session cookie. The session
+     *                                        row is still loaded and saved
+     *                                        through {@see SessionHandler};
+     *                                        only the cookie transport
+     *                                        layer is suppressed. Default
+     *                                        false (cookie path active).
      */
     public function __construct(
         public readonly string $cookieName,
@@ -91,5 +106,6 @@ final class SessionConfig
         public readonly int $regenerateInterval,
         public readonly ?string $cacheLimiter,
         public readonly string $serverName = '',
+        public readonly bool $cookieDisabled = false,
     ) {}
 }
