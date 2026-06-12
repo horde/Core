@@ -312,6 +312,65 @@ class HordeSessionMiddlewareTest extends TestCase
     }
 
     // ---------------------------------------------------------------
+    // Deadline-elapsed rotation: a controller that consults the
+    // regeneration deadline and schedules a rotation when it has
+    // passed. End-to-end against a real BuiltinBackend.
+    // ---------------------------------------------------------------
+
+    #[Test]
+    public function testDeadlineElapsedTriggersRotationAndRefreshesDeadline(): void
+    {
+        $handler = $this->realHandler();
+        $existing = $handler->create();
+        $existing->setScoped('horde', 'auth/userId', 'alice');
+        // Drive _r into the past so the deadline check fires.
+        $existing->setRegenerationDeadline(time() - 60);
+        $handler->save($existing);
+        $oldSid = (string) $existing->getId();
+
+        // Controller pattern: read the deadline marker, schedule a
+        // rotation if it has elapsed. The middleware acts on the
+        // marker on response emit.
+        $this->defaultPayloadHandler = $this->createStub(\Psr\Http\Server\RequestHandlerInterface::class);
+        $this->defaultPayloadHandler->method('handle')->willReturnCallback(function ($request) {
+            $this->recentlyHandledRequest = $request;
+            $session = $request->getAttribute(HordeSessionMiddleware::ATTRIBUTE_SESSION);
+            $deadline = $session->getRegenerationDeadline();
+            if ($deadline !== null && time() >= $deadline) {
+                $session->scheduleRegeneration();
+            }
+            return $this->defaultPayloadResponse;
+        });
+
+        $response = $this->middleware($handler)->process(
+            $this->requestWithCookies(['Horde' => $oldSid]),
+            $this->defaultPayloadHandler,
+        );
+
+        // Old row is gone.
+        self::assertNull($handler->load($existing->getId()));
+
+        // Set-Cookie carries a different id.
+        $setCookie = $this->setCookieFor('Horde', $response);
+        self::assertNotNull($setCookie);
+        self::assertStringNotContainsString($oldSid, $setCookie);
+
+        preg_match('/^Horde=([^;]+);/', $setCookie, $m);
+        $newSid = $m[1];
+        $reloaded = $handler->load(new \Horde\SessionHandler\SessionId($newSid));
+        self::assertInstanceOf(HordeSession::class, $reloaded);
+
+        // Payload preserved.
+        self::assertSame('alice', $reloaded->getScoped('horde', 'auth/userId'));
+
+        // Deadline refreshed: new row's _r is in the future, anchored
+        // at finaliseRegenerated's nextRegenerationDeadline call.
+        $newDeadline = $reloaded->getRegenerationDeadline();
+        self::assertNotNull($newDeadline);
+        self::assertGreaterThan(time(), $newDeadline);
+    }
+
+    // ---------------------------------------------------------------
     // JwtSessionLoader already populated the attribute
     // ---------------------------------------------------------------
 
