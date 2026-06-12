@@ -417,12 +417,17 @@ class Horde_Session implements Horde_Shutdown_Task
         $curr_time = time();
 
         /* Create internal data arrays. */
-        if ($this->modern->getScoped(self::BEGIN, '') === null
+        if ($this->modern->getSessionBegin() === null
             && !isset($this->_data[self::BEGIN])) {
             $this->_data[self::BEGIN] = $curr_time;
             $this->_data[self::REGENERATE] = $curr_time
                 + $this->regenerate_interval;
-            $this->modern->setScoped(self::BEGIN, '', $curr_time);
+            // Begin slot is the canonical top-level int shape that
+            // HordeSession::getSessionBegin reads. The legacy
+            // setScoped(BEGIN, '', ...) call wrote the wrong shape
+            // ($data['_b'][''] instead of $data['_b']) and broke modern
+            // readers; setSessionBegin keeps both writers aligned.
+            $this->modern->setSessionBegin($curr_time);
             $this->modern->setScoped(
                 self::REGENERATE,
                 '',

@@ -39,7 +39,7 @@ class HordeSessionFactory extends DefaultSessionFactory
     public function createNew(SessionId $id): Session
     {
         $session = new HordeSession($id, [], $this->encryptor, $this->decryptor);
-        $session->set('_b', time());
+        $session->setSessionBegin(time());
 
         return $session;
     }
