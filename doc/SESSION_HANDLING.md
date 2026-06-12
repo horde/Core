@@ -146,6 +146,37 @@ to defeat session fixation), the controller calls
 middleware acts on the marker before emitting the response and the
 new id lands in the next `Set-Cookie`.
 
+### Session-load failure modes
+
+`HordeSessionMiddleware::safeLoad` swallows three distinct failure
+modes when the request cookie cannot be turned into a session row.
+All three result in the same fallback (mint a fresh session) but
+they log at different severities so an operator can tell signal
+from noise.
+
+- **Malformed session id** (`Horde\SessionHandler\SessionId`'s
+  constructor throws `InvalidArgumentException` because the cookie
+  value did not match the expected id pattern). Logged at `debug`
+  because this is normal when a client carries a truncated or
+  rewritten cookie. No operator action.
+- **Backend storage error** (`SessionException` from
+  `SessionHandler::load`). The cookie was syntactically valid and
+  the backend was reached, but a read failed. Logged at `warning`.
+  Recurring entries point at a misconfigured or unreachable
+  storage driver.
+- **Unexpected session class** (`SessionHandler` returned an
+  instance that is not a `HordeSession`). Logged at `warning`.
+  Indicates the configured `SessionFactory` is wrong. In production
+  it must always be the `HordeSessionFactory`. Defensive check.
+  A recurring entry means something rebuilt the factory wiring at
+  runtime.
+
+A null return from `safeLoad` causes `HordeSessionMiddleware` to
+mint a fresh session via `SessionHandler::create()`. The downstream
+controller sees a `HordeSession` request attribute regardless of
+whether the cookie was honoured. The freshly minted row gets a new
+id and a new `Set-Cookie` on the response.
+
 ## Truly Session-Less Routes
 
 The simplest example is the readiness probe in horde/base:
@@ -403,6 +434,13 @@ not. If it does, every controller behind it can assume the legacy
 globals exist. If it does not, the controller must take its
 collaborators via constructor injection through a `#[Factory]` and
 must read request-scoped state from PSR-7 attributes.
+
+In the explicit flow, the session attribute name is the constant
+`Horde\Core\Middleware\HordeSessionMiddleware::ATTRIBUTE_SESSION`
+(defined as `JwtSessionLoader::ATTRIBUTE_SESSION` so the two
+middlewares always agree on the name). Import the constant rather
+than hard-coding the literal string `'session'` so that a future
+rename is a one-site change.
 
 ## Common Pitfalls
 
