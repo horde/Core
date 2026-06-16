@@ -311,7 +311,10 @@ class SessionLifecycle implements Horde_Shutdown_Task
      */
     public function destroy(): void
     {
-        if (isset($_SESSION)) {
+        // $_SESSION may be initialised (Horde_Session constructor sets it to
+        // []) without an active PHP session. session_status() is the
+        // authoritative guard; $this->active mirrors it for the normal path.
+        if ($this->active || session_status() === PHP_SESSION_ACTIVE) {
             session_destroy();
         }
         $_SESSION = [];
