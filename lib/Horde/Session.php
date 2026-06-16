@@ -555,7 +555,7 @@ class Horde_Session implements Horde_Shutdown_Task
         }
 
         /* Fallback for legacy/test contexts without an injector. */
-        if (isset($_SESSION)) {
+        if (session_status() === PHP_SESSION_ACTIVE) {
             session_destroy();
         }
         $_SESSION = [];
