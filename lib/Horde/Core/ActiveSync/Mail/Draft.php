@@ -74,9 +74,59 @@ class Horde_Core_ActiveSync_Mail_Draft extends Horde_Core_ActiveSync_Mail
      */
     public function append($folderid)
     {
-        // Init
-        $atc_map = [];
+        [$base, $atc_map] = $this->_buildDraftMime();
+        $stream = $base->toString([
+            'stream' => true,
+            'headers' => $this->_headers->toString(),
+        ]);
+
+        $new_uid = $this->_imap->appendMessage(
+            $folderid,
+            $stream,
+            ['\draft', '\seen']
+        );
+
         $atc_hash = [];
+        foreach ($base as $part) {
+            if ($part->isAttachment()
+                && !empty($atc_map[$part->getName()])) {
+                $atc_hash['add'][$atc_map[$part->getName()]] = $folderid . ':' . $new_uid . ':' . $part->getMimeId();
+            }
+        }
+
+        // If we pulled down an existing Draft, delete it now since the
+        // new one will replace it.
+        if (!empty($this->_imapMessage)) {
+            $this->_imap->deleteMessages([$this->_draftUid], $folderid);
+        }
+
+        return [
+            'uid' => $new_uid,
+            'atchash' => $atc_hash,
+        ];
+    }
+
+    /**
+     * Build the RFC822 representation of the current draft.
+     *
+     * @return resource  Stream containing the full RFC822 message.
+     */
+    public function toRfc822Stream()
+    {
+        [$base] = $this->_buildDraftMime();
+
+        return $base->toString([
+            'stream' => true,
+            'headers' => $this->_headers->toString(),
+        ]);
+    }
+
+    /**
+     * @return array{0: Horde_Mime_Part, 1: array<string, string>}
+     */
+    protected function _buildDraftMime()
+    {
+        $atc_map = [];
 
         // Create the wrapper part.
         $base = new Horde_Mime_Part();
@@ -108,34 +158,7 @@ class Horde_Core_ActiveSync_Mail_Draft extends Horde_Core_ActiveSync_Mail
             $atc_map[$atc->displayname] = $atc->clientid;
         }
 
-        $stream = $base->toString([
-            'stream' => true,
-            'headers' => $this->_headers->toString(),
-        ]);
-
-        $new_uid = $this->_imap->appendMessage(
-            $folderid,
-            $stream,
-            ['\draft', '\seen']
-        );
-
-        foreach ($base as $part) {
-            if ($part->isAttachment()
-                && !empty($atc_map[$part->getName()])) {
-                $atc_hash['add'][$atc_map[$part->getName()]] = $folderid . ':' . $new_uid . ':' . $part->getMimeId();
-            }
-        }
-
-        // If we pulled down an existing Draft, delete it now since the
-        // new one will replace it.
-        if (!empty($this->_imapMessage)) {
-            $this->_imap->deleteMessages([$this->_draftUid], $folderid);
-        }
-
-        return [
-            'uid' => $new_uid,
-            'atchash' => $atc_hash,
-        ];
+        return [$base, $atc_map];
     }
 
     /**
