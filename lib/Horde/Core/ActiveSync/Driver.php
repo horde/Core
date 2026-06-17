@@ -3531,6 +3531,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 Horde_ActiveSync::VERSION_FOURTEEN,
                 Horde_ActiveSync::VERSION_FOURTEENONE,
                 Horde_ActiveSync::VERSION_SIXTEEN,
+                Horde_ActiveSync::VERSION_SIXTEENONE,
             ]
         );
 
