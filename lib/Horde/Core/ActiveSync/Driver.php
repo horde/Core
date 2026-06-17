@@ -3226,6 +3226,8 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      *   - longid:    (EAS 16) mailbox:uid when responding from a search result.
      *   - instanceid: (EAS 14.1+) Recurring instance UTC timestamp.
      *   - sendresponse: (EAS 16) Optional iTip reply email body/flag.
+     *   - proposedstarttime: (EAS 16.1) Optional proposed meeting start time.
+     *   - proposedendtime: (EAS 16.1) Optional proposed meeting end time.
      *
      * @return string  The UID of any created calendar entries, otherwise false.
      * @throws Horde_ActiveSync_Exception, Horde_Exception_NotFound
@@ -3289,6 +3291,68 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             }
         }
 
+        $proposedStart = null;
+        $proposedEnd = null;
+        if ($this->_version >= Horde_ActiveSync::VERSION_SIXTEENONE
+            && !empty($response['proposedstarttime'])) {
+            try {
+                $proposedStart = new Horde_Date($response['proposedstarttime'], 'UTC');
+            } catch (Horde_Date_Exception $e) {
+                $this->_logger->err(sprintf(
+                    'Invalid MeetingResponse ProposedStartTime %s: %s',
+                    $response['proposedstarttime'],
+                    $e->getMessage()
+                ));
+            }
+        }
+        if ($this->_version >= Horde_ActiveSync::VERSION_SIXTEENONE
+            && !empty($response['proposedendtime'])) {
+            try {
+                $proposedEnd = new Horde_Date($response['proposedendtime'], 'UTC');
+            } catch (Horde_Date_Exception $e) {
+                $this->_logger->err(sprintf(
+                    'Invalid MeetingResponse ProposedEndTime %s: %s',
+                    $response['proposedendtime'],
+                    $e->getMessage()
+                ));
+            }
+        }
+        if (!empty($proposedEnd) && empty($proposedStart)) {
+            $this->_logger->notice('MeetingResponse ProposedEndTime sent without ProposedStartTime; ignoring proposal.');
+            $proposedEnd = null;
+        }
+        if (!empty($proposedStart)) {
+            foreach (['DISALLOW-COUNTER', 'X-MICROSOFT-DISALLOW-COUNTER', 'X-MS-DISALLOW-COUNTER'] as $counterFlag) {
+                try {
+                    $flagValue = $vEvent->getAttribute($counterFlag);
+                } catch (Horde_Icalendar_Exception $e) {
+                    continue;
+                }
+                if (is_string($flagValue)
+                    && in_array(strtoupper(trim($flagValue)), ['1', 'TRUE', 'YES'], true)) {
+                    $this->_logger->notice(sprintf(
+                        'MeetingResponse proposal ignored because %s forbids new time proposals.',
+                        $counterFlag
+                    ));
+                    $proposedStart = null;
+                    $proposedEnd = null;
+                    break;
+                }
+            }
+        }
+        if (!empty($proposedStart) && empty($proposedEnd)) {
+            try {
+                $origStart = new Horde_Date($vEvent->getAttribute('DTSTART'));
+                $origEnd = new Horde_Date($vEvent->getAttribute('DTEND'));
+                $proposedEnd = clone $proposedStart;
+                $proposedEnd->timestamp = $proposedStart->timestamp
+                    + ($origEnd->timestamp - $origStart->timestamp);
+            } catch (Horde_Icalendar_Exception $e) {
+                $this->_logger->err('Unable to derive proposed end time from meeting request.');
+                $proposedEnd = null;
+            }
+        }
+
         // Update the vCal so the response will be reflected when imported.
         $ident = $injector->getInstance('Horde_Core_Factory_Identity')->create($this->_user);
         //$cn = $ident->getValue('fullname');
@@ -3316,8 +3380,8 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             throw new Horde_ActiveSync_Exception($e);
         }
 
-        if (!empty($response['sendresponse'])) {
-            if ($response['sendresponse'] !== true) {
+        if (!empty($response['sendresponse']) || !empty($proposedStart)) {
+            if (!empty($response['sendresponse']) && $response['sendresponse'] !== true) {
                 $comment = $response['sendresponse']->data;
                 if ($response['sendresponse']->type == Horde_ActiveSync::BODYPREF_TYPE_HTML) {
                     $comment = Horde_Text_Filter::filter(
@@ -3359,16 +3423,32 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     $type = new Horde_Itip_Response_Type_Tentative($resource, $comment);
                     break;
             }
-            try {
-                // Send the reply.
-                Horde_Itip::factory($vEvent, $resource)->sendMultiPartResponse(
-                    $type,
-                    new Horde_Core_Itip_Response_Options_Horde('UTF-8', []),
-                    $injector->getInstance('Horde_Mail')
-                );
-                $this->_logger->meta('Reply sent.');
-            } catch (Horde_Itip_Exception $e) {
-                $this->_logger->err(sprintf('Error sending reply: %s.', $e->getMessage()), 'horde.error');
+            $itip = Horde_Itip::factory($vEvent, $resource);
+            $itipOptions = new Horde_Core_Itip_Response_Options_Horde('UTF-8', []);
+            $mail = $injector->getInstance('Horde_Mail');
+
+            if (!empty($response['sendresponse'])) {
+                try {
+                    $itip->sendMultiPartResponse($type, $itipOptions, $mail);
+                    $this->_logger->meta('Reply sent.');
+                } catch (Horde_Itip_Exception $e) {
+                    $this->_logger->err(sprintf('Error sending reply: %s.', $e->getMessage()), 'horde.error');
+                }
+            }
+
+            if (!empty($proposedStart)) {
+                try {
+                    $itip->sendCounterMultiPartResponse(
+                        $type,
+                        $itipOptions,
+                        $mail,
+                        $proposedStart,
+                        $proposedEnd
+                    );
+                    $this->_logger->meta('Counter proposal sent.');
+                } catch (Horde_Itip_Exception $e) {
+                    $this->_logger->err(sprintf('Error sending counter proposal: %s.', $e->getMessage()), 'horde.error');
+                }
             }
         }
 
