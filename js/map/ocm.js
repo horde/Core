@@ -9,22 +9,22 @@
  * @author Michael J. Rubinsky <mrubinsk@horde.org>
  */
 HordeMap.Ocm = Class.create(
-{
-    initialize: function(opts){},
-
-    /**
-     * Provide a very basic base set of layers from open sources.
-     */
-    getLayers: function(layers)
     {
-        return {
-            'streets': new OpenLayers.Layer.OSM(
-                'OpenCycleMap',
-                [
-                    'http://tile.openstreetmap.org/${z}/${x}/${y}.png'
-                ],
-                { 'minZoomLevel': 1, 'numZoomLevels': 18 }
-            )
+        initialize: function(opts){},
+    
+        /**
+         * Provide a very basic base set of layers from open sources.
+         */
+        getLayers: function(layers)
+        {
+            return {
+                'streets': new OpenLayers.Layer.OSM(
+                    'OpenCycleMap',
+                    [
+                        'https://tile.openstreetmap.org/${z}/${x}/${y}.png'
+                    ],
+                    { 'minZoomLevel': 1, 'numZoomLevels': 18 }
+                )
+            }
         }
-    }
-});
+    });
