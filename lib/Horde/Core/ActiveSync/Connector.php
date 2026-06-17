@@ -90,13 +90,14 @@ class Horde_Core_ActiveSync_Connector
      * @param integer $endstamp      The end of time period
      * @param string  $calendar      The calendar id. If null, uses multiplexed.
      *                               @since 2.12.0
+     * @param array   $options       Options passed to listUids().
      *
      * @return array
      */
-    public function calendar_listUids($startstamp, $endstamp, $calendar)
+    public function calendar_listUids($startstamp, $endstamp, $calendar, array $options = [])
     {
         try {
-            return $this->_registry->calendar->listUids($calendar, $startstamp, $endstamp);
+            return $this->_registry->calendar->listUids($calendar, $startstamp, $endstamp, $options);
         } catch (Exception $e) {
             return [];
         }
@@ -132,32 +133,9 @@ class Horde_Core_ActiveSync_Connector
      * @param string $calendar                               The calendar id.
      *                                                       @since 2.12.0
      *
-     * @return string  The event's UID.
+     * @return array  uid and atchash keys.
      */
     public function calendar_import(
-        Horde_ActiveSync_Message_Appointment $content,
-        $calendar = null
-    ) {
-        return $this->_registry->calendar->import(
-            $content,
-            'activesync',
-            $calendar
-        );
-    }
-
-    /**
-     * Version of calendar_import capable of returning an array of values.
-     * Needed for EAS 16 support in order to deal with the fact that
-     * attachment actions are handled within the Message object.
-     *
-     * @param Horde_ActiveSync_Message_Appointment $content  The event content
-     * @param string $calendar                               The calendar id.
-     *
-     * @return  array
-     * @since  2.27.0
-     * @todo  Remove for H6 and make calendar_import return this structure.
-     */
-    public function calendar_import16(
         Horde_ActiveSync_Message_Appointment $content,
         $calendar = null
     ) {
@@ -169,13 +147,23 @@ class Horde_Core_ActiveSync_Connector
         );
 
         if (!is_array($result)) {
-            $result = [
+            return [
                 'uid' => $result,
                 'atchash' => false,
             ];
         }
 
         return $result;
+    }
+
+    /**
+     * @deprecated Use calendar_import()
+     */
+    public function calendar_import16(
+        Horde_ActiveSync_Message_Appointment $content,
+        $calendar = null
+    ) {
+        return $this->calendar_import($content, $calendar);
     }
 
     /**

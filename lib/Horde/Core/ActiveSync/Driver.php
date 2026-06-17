@@ -1137,7 +1137,14 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     $startstamp = (int) $cutoffdate;
                     $endstamp = time() + 32140800; //60 * 60 * 24 * 31 * 12 == one year
                     try {
-                        $changes['add'] = $this->_connector->calendar_listUids($startstamp, $endstamp, $server_id);
+                        $changes['add'] = $this->_connector->calendar_listUids(
+                            $startstamp,
+                            $endstamp,
+                            $server_id,
+                            [
+                                'hide_exceptions' => $this->_version < Horde_ActiveSync::VERSION_SIXTEEN,
+                            ]
+                        );
                     } catch (Horde_Exception_AuthenticationFailure $e) {
                         $this->_endBuffer();
                         throw $e;
@@ -1416,12 +1423,21 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             ];
         }
 
-        // For CLASS_EMAIL, all changes are a change in flags, categories or
-        // softdelete. @todo: draft edits?
+        // For CLASS_EMAIL, flag/category changes are exported separately.
+        // Draft folder content changes use CHANGE_TYPE_DRAFT for EAS 16.0+.
         if ($folder->collectionClass() == Horde_ActiveSync::CLASS_EMAIL) {
             $flags = $folder->flags();
             $categories = $folder->categories();
+            $isDrafts = $this->_version >= Horde_ActiveSync::VERSION_SIXTEEN
+                && $folder->serverid() == $this->getSpecialFolderNameByType(self::SPECIAL_DRAFTS);
             foreach ($changes['modify'] as $uid) {
+                if ($isDrafts) {
+                    $results[] = [
+                        'id' => $uid,
+                        'type' => Horde_ActiveSync::CHANGE_TYPE_DRAFT,
+                    ];
+                    continue;
+                }
                 if (!isset($flags[$uid])) {
                     continue;
                 }
@@ -2127,8 +2143,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             case Horde_ActiveSync::CLASS_CALENDAR:
                 if (!$id) {
                     try {
-                        // @todo, remove 'import16' hack for H6
-                        $results  = $this->_connector->calendar_import16($message, $server_id);
+                        $results = $this->_connector->calendar_import($message, $server_id);
                     } catch (Horde_Exception $e) {
                         $this->_logger->err($e->getMessage());
                         $this->_endBuffer();
@@ -2240,13 +2255,56 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     if ($this->_version >= Horde_ActiveSync::VERSION_SIXTEEN
                         && $folderid == $this->getSpecialFolderNameByType(self::SPECIAL_DRAFTS)) {
 
-                        // @todo Does this only happen on drafts?
+                        // POOMMAIL2:Send on a Drafts-folder Sync Add/Modify
+                        // sends via SMTP and removes the draft (not SendMail).
                         if ($message->send) {
-                            $this->_logger->err('NOT YET SUPPORTED.');
-                            return $stat;
+                            $draft_folder = $this->getSpecialFolderNameByType(
+                                self::SPECIAL_DRAFTS
+                            );
+                            $draft = new Horde_Core_ActiveSync_Mail_Draft(
+                                $this->_imap,
+                                $this->_user,
+                                $this->_version
+                            );
+                            $draft->setDraftMessage($message);
+                            if ($id) {
+                                try {
+                                    $draft->getExistingDraftMessage(
+                                        $draft_folder,
+                                        $id
+                                    );
+                                } catch (Horde_ActiveSync_Exception $e) {
+                                    // Stale UID from client; treat as new.
+                                }
+                            }
+
+                            try {
+                                $this->sendMail(
+                                    $draft->toRfc822Stream(),
+                                    false,
+                                    false,
+                                    false,
+                                    true
+                                );
+                            } catch (Horde_ActiveSync_Exception $e) {
+                                $this->_logger->err($e->getMessage());
+                                $this->_endBuffer();
+                                return false;
+                            }
+
+                            if ($id) {
+                                $this->deleteMessage($draft_folder, [$id]);
+                            }
+
+                            $this->_endBuffer();
+                            return [
+                                'id' => $id ?: 0,
+                                'mod' => 0,
+                                'flags' => [],
+                            ];
                         }
 
-                        // Are we addding/changing a draft email?
+                        // Adding or changing a draft email.
                         if ($message->airsyncbasebody) {
                             $draft_folder = $this->getSpecialFolderNameByType(
                                 self::SPECIAL_DRAFTS
