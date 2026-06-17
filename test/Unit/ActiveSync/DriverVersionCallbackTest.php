@@ -154,6 +154,38 @@ class DriverVersionCallbackTest extends TestCase
     }
 
     /**
+     * Per-user horde:activesync:version 16.1 must raise MS-ASProtocolVersions
+     * above global 16.0 for this request.
+     */
+    public function testVersionCallbackAppliesSixteenOnePermission(): void
+    {
+        if (!class_exists('Horde_ActiveSync_State_Sql')) {
+            $this->markTestSkipped('horde/activesync not available');
+        }
+
+        $server = $this->createActiveSyncServer(
+            [
+                'PHP_AUTH_USER' => 'alice',
+                'PHP_AUTH_PW' => 'secret',
+            ],
+            [],
+            Horde_ActiveSync::VERSION_SIXTEEN
+        );
+        $this->assertSupportedVersionsUpTo($server, Horde_ActiveSync::VERSION_SIXTEEN);
+
+        $driver = $this->createDriver();
+        $this->setupGlobals(
+            permsVersion: Horde_ActiveSync::VERSION_SIXTEENONE,
+            expectedUsername: 'alice',
+            globalVersion: Horde_ActiveSync::VERSION_SIXTEEN
+        );
+
+        $driver->versionCallback($server);
+
+        $this->assertSupportedVersionsUpTo($server, Horde_ActiveSync::VERSION_SIXTEENONE);
+    }
+
+    /**
      * Global admin ceiling is 16.0; per-user horde:activesync:version is
      * 14.1. versionCallback() must lower the advertised protocol versions for
      * this user below the global setting.
@@ -370,6 +402,7 @@ class DriverVersionCallbackTest extends TestCase
             Horde_ActiveSync::VERSION_FOURTEEN,
             Horde_ActiveSync::VERSION_FOURTEENONE,
             Horde_ActiveSync::VERSION_SIXTEEN,
+            Horde_ActiveSync::VERSION_SIXTEENONE,
         ];
 
         $index = array_search($maxVersion, $supported, true);
