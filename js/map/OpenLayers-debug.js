@@ -28666,7 +28666,7 @@ OpenLayers.Layer.OSM = OpenLayers.Class(OpenLayers.Layer.XYZ, {
      name: "OpenStreetMap",
      attribution: "Data CC-By-SA by <a href='http://openstreetmap.org/'>OpenStreetMap</a>",
      sphericalMercator: true,
-     url: 'http://tile.openstreetmap.org/${z}/${x}/${y}.png',
+     url: 'https://tile.openstreetmap.org/${z}/${x}/${y}.png',
      clone: function(obj) {
          if (obj == null) {
              obj = new OpenLayers.Layer.OSM(

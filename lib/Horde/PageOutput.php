@@ -750,7 +750,9 @@ class Horde_PageOutput
             header('Vary: Accept-Language');
         }
 
-        header('Referrer-Policy: same-origin');
+        // OSM and other map tile providers require a Referer on cross-origin
+        // tile requests; same-origin suppresses it.
+        header('Referrer-Policy: strict-origin-when-cross-origin');
 
         echo $view->render('header');
         if ($this->topbar) {
