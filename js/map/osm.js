@@ -21,6 +21,7 @@ HordeMap.Osm = Class.create(
                 'streets': new OpenLayers.Layer.OSM(
                     'OpenStreetMap (Mapnik)',
                     [
+                         // TODO: Do not hardcode the URI (or allow an override variable with fallback to hardcode)
                         'https://tile.openstreetmap.org/${z}/${x}/${y}.png'
                     ],
                     { 'minZoomLevel': 1, 'numZoomLevels': 18 }
