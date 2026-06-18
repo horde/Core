@@ -145,7 +145,19 @@ var RedBox = {
 
     htmlWindowContents: function(html)
     {
-        $('RB_window').update(html);
+        html = $(html).show();
+        var win = $('RB_window'), child;
+
+        // Move dialog into RB_window without Element#update(), which
+        // removeChild()s children and breaks autocompleter state on reopen.
+        while ((child = win.firstChild)) {
+            if (child === html) {
+                win.removeChild(child);
+            } else {
+                document.body.insert($(child).hide());
+            }
+        }
+        win.insert(html);
         this.setWindowPosition();
     },
 
