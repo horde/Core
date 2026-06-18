@@ -113,12 +113,30 @@ var PrettyAutocompleter = Class.create({
      */
     reset: function(existing)
     {
+        if (this.initialized
+            && (!this.input || !this.input.parentNode || !this.box || !this.box.parentNode)) {
+            if (this.aac && this.aac.knl) {
+                try {
+                    this.aac.knl.destroy();
+                } catch (e) {}
+                this.aac.knl = null;
+            }
+            if (this.box && this.box.parentNode) {
+                try {
+                    this.box.remove();
+                } catch (e) {}
+            }
+            this.box = null;
+            this.input = null;
+            this.initialized = false;
+        }
         if (!this.initialized) {
             this.init();
         }
-        this.currentEntries().each(function(elt) {
-            this.removeItemNode(elt);
-        }.bind(this));
+        var entries = this.currentEntries(), i;
+        for (i = entries.length - 1; i >= 0; i--) {
+            this.removeItemNode(entries[i]);
+        }
         this.updateInput('');
 
         // Add any initial values
@@ -227,6 +245,9 @@ var PrettyAutocompleter = Class.create({
 
     removeItemNode: function(elt)
     {
+        if (!elt || !elt.parentNode) {
+            return;
+        }
         var value = elt.remove().retrieve('raw');
         this.updateHiddenInput();
         this.p.onRemove(value);
@@ -253,11 +274,11 @@ var PrettyAutocompleter = Class.create({
         if (Object.isElement(input)) {
             raw = input.retrieve('raw');
             this.removeItemNode(input);
-        } else {
+        } else if (this.input) {
             raw = input;
+            this.input.setValue(raw);
+            this.resize();
         }
-        this.input.setValue(raw);
-        this.resize();
     },
 
     updateHiddenInput: function()
@@ -267,7 +288,14 @@ var PrettyAutocompleter = Class.create({
 
     currentEntries: function()
     {
-        return this.input.up('ul').select('li.' + this.p.listClassItem);
+        if (!this.input || !this.input.parentNode) {
+            return [];
+        }
+        var ul = this.input.up('ul');
+        if (!ul) {
+            return [];
+        }
+        return ul.select('li.' + this.p.listClassItem);
     },
 
     currentValues: function()

@@ -88,8 +88,10 @@ var KeyNavList = Class.create({
         document.stopObserving('click', this.onClickFunc);
         document.stopObserving('keydown', this.onKeyDownFunc);
         Event.stopObserving(window, 'resize', this.resizeFunc);
-        this.div.remove();
-        if (this.iefix) {
+        if (this.div && this.div.parentNode) {
+            this.div.remove();
+        }
+        if (this.iefix && this.iefix.parentNode) {
             this.iefix.remove();
         }
     },
