@@ -3380,7 +3380,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             throw new Horde_ActiveSync_Exception($e);
         }
 
-        if (!empty($proposedStart)) {
+        if (!empty($proposedStart) && !empty($proposedEnd)) {
             try {
                 $this->_registry->call('calendar/storeAttendeeProposal', [
                     $uid,
@@ -3390,7 +3390,9 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 ]);
             } catch (Horde_Exception $e) {
                 $this->_logger->warn(sprintf(
-                    'Unable to store attendee counter-proposal on calendar: %s',
+                    'Unable to store attendee counter-proposal on calendar (uid=%s, attendee=%s): %s',
+                    $uid,
+                    $email,
                     $e->getMessage()
                 ));
             }
