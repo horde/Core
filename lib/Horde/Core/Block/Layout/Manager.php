@@ -1,8 +1,5 @@
 <?php
 
-use Horde\Core\Session\HordeSession;
-use Horde\Token\Exception\TokenException;
-use Horde\Token\Token;
 use Horde\Util\Util;
 
 /**
@@ -83,13 +80,22 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
     protected $_changedCol = null;
 
     /**
+     * Session instance for CSRF validation.
+     *
+     * @var Horde_Session|null
+     */
+    protected $_session;
+
+    /**
      * Constructor.
      *
      * @param Horde_Core_Block_Collection $collection  TODO
+     * @param Horde_Session|null $session  Session for CSRF token checks.
      */
-    public function __construct(Horde_Core_Block_Collection $collection)
+    public function __construct(Horde_Core_Block_Collection $collection, ?Horde_Session $session = null)
     {
         $this->_collection = $collection;
+        $this->_session = $session;
         $this->_editUrl = Horde::selfUrl();
         $this->_layout = $collection->getLayout();
 
@@ -218,19 +224,11 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
             case 'save':
                 // Save the changes made to a block and continue editing.
             case 'save-resume':
-                // Check form token.
-                $tokenService = $GLOBALS['injector']->getInstance(Token::class);
-                try {
-                    $valid = $tokenService->isValid(
-                        (string) Util::getFormData('token'),
-                        HordeSession::CSRF_SEED
-                    );
-                } catch (TokenException $e) {
+                // Check form token (same path as Horde_Session::getToken()).
+                if ($this->_session === null) {
                     throw new Horde_Exception('Invalid token!');
                 }
-                if (!$valid) {
-                    throw new Horde_Exception('Invalid token!');
-                }
+                $this->_session->checkToken((string) Util::getFormData('token'));
 
                 // Get requested block type.
                 [$newapp, $newtype] = explode(':', Util::getFormData('app'));

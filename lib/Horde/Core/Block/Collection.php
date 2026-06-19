@@ -87,11 +87,17 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
     /**
      * Return the layout manager for this collection.
      *
+     * @param Horde_Session|null $session  Session for CSRF token checks.
+     *
      * @return Horde_Core_Block_Layout_Manager  Layout manager object.
      */
-    public function getLayoutManager()
+    public function getLayoutManager(?Horde_Session $session = null)
     {
-        return new Horde_Core_Block_Layout_Manager($this);
+        if ($session === null && isset($GLOBALS['injector'])) {
+            $session = $GLOBALS['injector']->getInstance('Horde_Session');
+        }
+
+        return new Horde_Core_Block_Layout_Manager($this, $session);
     }
 
     /**
