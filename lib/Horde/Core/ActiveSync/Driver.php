@@ -3380,6 +3380,22 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             throw new Horde_ActiveSync_Exception($e);
         }
 
+        if (!empty($proposedStart)) {
+            try {
+                $this->_registry->call('calendar/storeAttendeeProposal', [
+                    $uid,
+                    $email,
+                    $proposedStart,
+                    $proposedEnd,
+                ]);
+            } catch (Horde_Exception $e) {
+                $this->_logger->warn(sprintf(
+                    'Unable to store attendee counter-proposal on calendar: %s',
+                    $e->getMessage()
+                ));
+            }
+        }
+
         if (!empty($response['sendresponse']) || !empty($proposedStart)) {
             if (!empty($response['sendresponse']) && $response['sendresponse'] !== true) {
                 $comment = $response['sendresponse']->data;
