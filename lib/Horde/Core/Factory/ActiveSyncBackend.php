@@ -46,6 +46,7 @@ class Horde_Core_Factory_ActiveSyncBackend extends Horde_Core_Factory_Injector
                 ? new Horde_ActiveSync_Imap_Adapter($adapter_params)
                 : null,
             'ping' => $conf['activesync']['ping'],
+            'sync' => $conf['activesync']['sync'] ?? [],
             'state' => $injector->get('Horde_ActiveSyncState'),
             'auth' => $this->_getAuth(),
             'cache' => $injector->get('Horde_Cache')];
