@@ -644,9 +644,22 @@ class Horde_Core_ActiveSync_Connector
      *
      * @return array  An array of task uids.
      */
-    public function tasks_listUids($tasklist = null)
+    public function tasks_listUids($tasklist = null, $completed = null)
     {
-        return $this->_registry->tasks->listUids($tasklist);
+        return $this->_registry->tasks->listUids($tasklist, $completed);
+    }
+
+    /**
+     * Returns whether the specified task is marked complete.
+     *
+     * @param string $uid       The task uid.
+     * @param string $tasklist  The tasklist id, or null to search sync lists.
+     *
+     * @return boolean
+     */
+    public function tasks_isComplete($uid, $tasklist = null)
+    {
+        return $this->_registry->tasks->isComplete($uid, $tasklist);
     }
 
     /**

@@ -1070,6 +1070,8 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      *                                  for new items within the (newly changed)
      *                                  current FilterType interval.
      *                                  @since 2.19.0
+     * @param integer $filtertype     The collection FilterType from the client.
+     *                                  @since 3.0.0
      *
      * @return array  An array of hashes that contain the ids of items that have
      *                changed in the specified collection along with a 'type'
@@ -1099,11 +1101,12 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         $ping,
         $ignoreFirstSync = false,
         $maxitems = 100,
-        $refreshFilter = false
+        $refreshFilter = false,
+        $filtertype = 0
     ) {
         $this->_logger->meta(
             sprintf(
-                'Horde_Core_ActiveSync_Driver::getServerChanges(%s, %u, %u, %u, %d, %s, %u, %s)',
+                'Horde_Core_ActiveSync_Driver::getServerChanges(%s, %u, %u, %u, %d, %s, %u, %s, %u)',
                 $folder->serverid(),
                 $from_ts,
                 $to_ts,
@@ -1111,7 +1114,8 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 $ping,
                 $ignoreFirstSync,
                 $maxitems,
-                $refreshFilter
+                $refreshFilter,
+                $filtertype
             )
         );
 
@@ -1247,7 +1251,14 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 // Can't use History for first sync
                 if ($from_ts == 0 && !$ignoreFirstSync) {
                     try {
-                        $changes['add'] = $this->_connector->tasks_listUids($server_id);
+                        $taskView = ((int) $filtertype
+                            === Horde_ActiveSync::FILTERTYPE_INCOMPLETETASKS)
+                            ? 0 // Nag::VIEW_INCOMPLETE
+                            : 1; // Nag::VIEW_ALL
+                        $changes['add'] = $this->_connector->tasks_listUids(
+                            $server_id,
+                            $taskView
+                        );
                     } catch (Horde_Exception_AuthenticationFailure $e) {
                         $this->_endBuffer();
                         throw $e;
@@ -1266,6 +1277,23 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                         $this->_logger->err($e->getMessage());
                         $this->_endBuffer();
                         return [];
+                    }
+
+                    if ((int) $filtertype === Horde_ActiveSync::FILTERTYPE_INCOMPLETETASKS) {
+                        $changes = $this->_filterIncompleteTaskChanges($changes, $server_id);
+                    }
+                }
+
+                if (!$ping
+                    && $refreshFilter
+                    && (int) $filtertype === Horde_ActiveSync::FILTERTYPE_INCOMPLETETASKS) {
+                    try {
+                        $changes['soft'] = array_values(array_unique(array_merge(
+                            $changes['soft'],
+                            $this->_connector->tasks_listUids($server_id, 2) // Nag::VIEW_COMPLETE
+                        )));
+                    } catch (Horde_Exception $e) {
+                        $this->_logger->err($e->getMessage());
                     }
                 }
                 break;
@@ -4202,6 +4230,45 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         }
 
         return $return;
+    }
+
+    /**
+     * Apply FILTERTYPE_INCOMPLETETASKS to a task changeset.
+     *
+     * Completed tasks are removed from add/modify lists; completed modifies
+     * become soft deletes so the client drops them from the filtered view.
+     *
+     * @param array  $changes    A changes hash with add/modify/delete/soft keys.
+     * @param string $server_id  The backend tasklist id, if not multiplexed.
+     *
+     * @return array  The filtered changes hash.
+     */
+    protected function _filterIncompleteTaskChanges(array $changes, $server_id)
+    {
+        foreach (['add', 'modify'] as $type) {
+            if (empty($changes[$type])) {
+                continue;
+            }
+
+            foreach ($changes[$type] as $idx => $uid) {
+                if (!$this->_connector->tasks_isComplete($uid, $server_id)) {
+                    continue;
+                }
+
+                if ($type === 'modify') {
+                    $changes['soft'][] = $uid;
+                }
+                unset($changes[$type][$idx]);
+            }
+
+            $changes[$type] = array_values($changes[$type]);
+        }
+
+        if (!isset($changes['soft'])) {
+            $changes['soft'] = [];
+        }
+
+        return $changes;
     }
 
     /**
