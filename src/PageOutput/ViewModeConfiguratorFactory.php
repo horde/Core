@@ -21,6 +21,7 @@ use Horde\Core\Service\PrefsService;
 use Horde\Core\Session\HordeSession;
 use Horde_Injector;
 use Horde\Injector\Injector;
+use Horde\Token\Token;
 use Horde_Registry;
 
 /**
@@ -40,6 +41,7 @@ class ViewModeConfiguratorFactory
             $injector->getInstance(PrefsService::class),
             $injector->getInstance(HordeSession::class),
             $injector->getInstance(JsDiscoverer::class),
+            $injector->getInstance(Token::class),
         );
     }
 }

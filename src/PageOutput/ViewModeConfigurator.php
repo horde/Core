@@ -20,6 +20,7 @@ use Horde\Core\Assets\JsDiscoverer;
 use Horde\Core\Service\PrefsService;
 use Horde\Core\Session\HordeSession;
 use Horde\Injector\Attribute\Factory;
+use Horde\Token\Token;
 use Horde_Registry;
 use Exception;
 
@@ -42,6 +43,7 @@ class ViewModeConfigurator
         private readonly PrefsService $prefs,
         private readonly HordeSession $session,
         private readonly JsDiscoverer $jsDiscoverer,
+        private readonly Token $tokenService,
     ) {}
 
     public function configure(AssetCollector $collector, ViewMode $mode): void
@@ -95,7 +97,7 @@ class ViewModeConfigurator
             'URI_AJAX' => $this->getServiceLinkUrl('ajax', $app),
             'URI_DLOAD' => $this->getServiceLinkUrl('download', $app),
             'URI_LOGOUT' => $this->getServiceLinkUrl('logout'),
-            'TOKEN' => $this->session->getScoped('horde', 'token') ?? '',
+            'TOKEN' => (string) $this->tokenService->generate(HordeSession::CSRF_SEED)->token,
             'growler_log' => true,
             'popup_height' => 610,
             'popup_width' => 820,

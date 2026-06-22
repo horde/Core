@@ -22,6 +22,8 @@ use Horde\Core\PageOutput\ViewMode;
 use Horde\Core\PageOutput\ViewModeConfigurator;
 use Horde\Core\Service\PrefsService;
 use Horde\Core\Session\HordeSession;
+use Horde\Token\GeneratedToken;
+use Horde\Token\Token;
 use Horde\Url\Url;
 use Horde_Registry;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -54,6 +56,16 @@ class ViewModeConfiguratorTest extends TestCase
         return $jsDiscoverer;
     }
 
+    private function createTokenServiceMock(string $token = 'token123'): MockObject
+    {
+        $tokenService = $this->createMock(Token::class);
+        $tokenService->expects($this->any())
+            ->method('generate')
+            ->willReturn(new GeneratedToken($token, time()));
+
+        return $tokenService;
+    }
+
     public function testBasicModeAddsPrototypeAndHorde(): void
     {
         $registry = $this->createMock(Horde_Registry::class);
@@ -72,6 +84,7 @@ class ViewModeConfiguratorTest extends TestCase
             $prefs,
             $session,
             $jsDiscoverer,
+            $this->createTokenServiceMock(),
         );
         $collector = new AssetCollector();
 
@@ -101,6 +114,7 @@ class ViewModeConfiguratorTest extends TestCase
             $prefs,
             $session,
             $this->createJsDiscovererMock(),
+            $this->createTokenServiceMock(),
         );
         $collector = new AssetCollector();
 
@@ -128,6 +142,7 @@ class ViewModeConfiguratorTest extends TestCase
             $prefs,
             $session,
             $this->createJsDiscovererMock(),
+            $this->createTokenServiceMock(),
         );
         $collector = new AssetCollector();
 
@@ -147,10 +162,6 @@ class ViewModeConfiguratorTest extends TestCase
         $session = $this->createMock(HordeSession::class);
         // getAuthId fires for BASIC's accesskey check AND for DYNAMIC's uid lookup.
         $session->expects($this->exactly(2))->method('getAuthId')->willReturn('testuser');
-        $session->expects($this->once())
-            ->method('getScoped')
-            ->with('horde', 'token')
-            ->willReturn('token123');
 
         $prefs = $this->createMock(PrefsService::class);
         $prefs->expects($this->once())
@@ -163,6 +174,7 @@ class ViewModeConfiguratorTest extends TestCase
             $prefs,
             $session,
             $this->createJsDiscovererMock(),
+            $this->createTokenServiceMock(),
         );
         $collector = new AssetCollector();
 
@@ -185,10 +197,6 @@ class ViewModeConfiguratorTest extends TestCase
 
         $session = $this->createMock(HordeSession::class);
         $session->expects($this->exactly(2))->method('getAuthId')->willReturn('testuser');
-        $session->expects($this->once())
-            ->method('getScoped')
-            ->with('horde', 'token')
-            ->willReturn('mytoken');
 
         $prefs = $this->createMock(PrefsService::class);
         $prefs->expects($this->once())
@@ -201,6 +209,7 @@ class ViewModeConfiguratorTest extends TestCase
             $prefs,
             $session,
             $this->createJsDiscovererMock(),
+            $this->createTokenServiceMock('mytoken'),
         );
         $collector = new AssetCollector();
 

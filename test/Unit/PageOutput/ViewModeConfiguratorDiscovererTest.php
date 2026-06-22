@@ -10,6 +10,8 @@ use Horde\Core\PageOutput\ViewMode;
 use Horde\Core\PageOutput\ViewModeConfigurator;
 use Horde\Core\Service\PrefsService;
 use Horde\Core\Session\HordeSession;
+use Horde\Token\GeneratedToken;
+use Horde\Token\Token;
 use Horde\Url\Url;
 use Horde_Registry;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -44,6 +46,15 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
         };
     }
 
+    private function createTokenServiceMock(string $token = 'token123'): Token
+    {
+        $tokenService = $this->createMock(Token::class);
+        $tokenService->method('generate')
+            ->willReturn(new GeneratedToken($token, time()));
+
+        return $tokenService;
+    }
+
     #[Test]
     public function basicModeResolvesPrototypeAndHorde(): void
     {
@@ -64,7 +75,13 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
         $session->expects(self::once())->method('getAuthId')->willReturn(null);
         $session->expects(self::never())->method('getScoped');
 
-        $configurator = new ViewModeConfigurator($registry, $prefs, $session, $discoverer);
+        $configurator = new ViewModeConfigurator(
+            $registry,
+            $prefs,
+            $session,
+            $discoverer,
+            $this->createTokenServiceMock()
+        );
         $collector = new AssetCollector();
 
         $configurator->configure($collector, ViewMode::BASIC);
@@ -90,7 +107,13 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
         $session->expects(self::once())->method('getAuthId')->willReturn(null);
         $session->expects(self::never())->method('getScoped');
 
-        $configurator = new ViewModeConfigurator($registry, $prefs, $session, $discoverer);
+        $configurator = new ViewModeConfigurator(
+            $registry,
+            $prefs,
+            $session,
+            $discoverer,
+            $this->createTokenServiceMock()
+        );
         $collector = new AssetCollector();
 
         $configurator->configure($collector, ViewMode::BASIC);
@@ -124,12 +147,14 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
 
         $session = $this->createMock(HordeSession::class);
         $session->expects(self::exactly(2))->method('getAuthId')->willReturn(null);
-        $session->expects(self::once())
-            ->method('getScoped')
-            ->with('horde', 'token')
-            ->willReturn(null);
 
-        $configurator = new ViewModeConfigurator($registry, $prefs, $session, $discoverer);
+        $configurator = new ViewModeConfigurator(
+            $registry,
+            $prefs,
+            $session,
+            $discoverer,
+            $this->createTokenServiceMock()
+        );
         $collector = new AssetCollector();
 
         $configurator->configure($collector, ViewMode::DYNAMIC);
@@ -168,7 +193,13 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
         $session->expects(self::once())->method('getAuthId')->willReturn('testuser');
         $session->expects(self::never())->method('getScoped');
 
-        $configurator = new ViewModeConfigurator($registry, $prefs, $session, $discoverer);
+        $configurator = new ViewModeConfigurator(
+            $registry,
+            $prefs,
+            $session,
+            $discoverer,
+            $this->createTokenServiceMock()
+        );
         $collector = new AssetCollector();
 
         $configurator->configure($collector, ViewMode::BASIC);
@@ -207,7 +238,13 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
         $session->expects(self::once())->method('getAuthId')->willReturn(null);
         $session->expects(self::never())->method('getScoped');
 
-        $configurator = new ViewModeConfigurator($registry, $prefs, $session, $discoverer);
+        $configurator = new ViewModeConfigurator(
+            $registry,
+            $prefs,
+            $session,
+            $discoverer,
+            $this->createTokenServiceMock()
+        );
         $collector = new AssetCollector();
         $configurator->configure($collector, ViewMode::BASIC);
 
