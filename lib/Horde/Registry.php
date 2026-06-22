@@ -603,6 +603,17 @@ class Horde_Registry implements Horde_Shutdown_Task
         } else {
             $GLOBALS['session'] = $session = new Horde_Session();
             $session->setup(true, $args['session_cache_limiter'] ?? null);
+
+            /* Ensure the per-session CSRF secret exists before closing a
+             * read-only session, so view/download scripts can validate
+             * tokens generated on full page views. */
+            try {
+                $injector->getInstance(Horde\Core\Factory\TokenServiceFactory::class)
+                    ->createForSession($injector->getInstance(Horde\Core\Session\HordeSession::class));
+            } catch (Throwable $e) {
+                Horde::log($e, Horde_Log::WARN);
+            }
+
             if ($session_flags & self::SESSION_READONLY) {
                 /* Close the session immediately so no changes can be made but
                    values are still available. */

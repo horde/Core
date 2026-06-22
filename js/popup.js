@@ -49,6 +49,12 @@ var HordePopup = {
         if (opts.params) {
             params.update(opts.params);
         }
+
+        /* Add session ID and CSRF token at click time (not page render time). */
+        if (typeof HordeCore !== 'undefined' && HordeCore.addRequestParams) {
+            HordeCore.addRequestParams(params);
+        }
+
         params.set('uniq', uniq);
 
         win = window.open(
