@@ -50,9 +50,9 @@ var HordePopup = {
             params.update(opts.params);
         }
 
-        /* Add session ID and CSRF token at click time (not page render time). */
-        if (typeof HordeCore !== 'undefined' && HordeCore.addRequestParams) {
-            HordeCore.addRequestParams(params);
+        /* Fresh CSRF token at click time; session auth uses cookies, not SID. */
+        if (typeof HordeCore !== 'undefined' && HordeCore.addCsrfToken) {
+            HordeCore.addCsrfToken(params);
         }
 
         params.set('uniq', uniq);
