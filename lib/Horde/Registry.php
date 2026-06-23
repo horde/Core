@@ -53,6 +53,7 @@ use Horde\Core\Factory\OAuthScopeClaimsMappingFactory;
 use Horde\Core\Factory\OAuthIdTokenBuilderFactory;
 use Horde\Core\Factory\OAuthConsentMiddlewareFactory;
 use Horde\Core\Factory\OAuthFlowStoreFactory;
+use Horde\Core\Factory\TokenServiceFactory;
 use Horde\Core\Middleware\OAuthConsentMiddleware;
 use Horde\OAuth\Client\OAuthFlowStore;
 use Horde\Core\Factory\SecretManagerFactory;
@@ -607,12 +608,8 @@ class Horde_Registry implements Horde_Shutdown_Task
             /* Ensure the per-session CSRF secret exists before closing a
              * read-only session, so view/download scripts can validate
              * tokens generated on full page views. */
-            try {
-                $injector->getInstance(Horde\Core\Factory\TokenServiceFactory::class)
-                    ->createForSession($injector->getInstance(Horde\Core\Session\HordeSession::class));
-            } catch (Throwable $e) {
-                Horde::log($e, Horde_Log::WARN);
-            }
+            $injector->getInstance(TokenServiceFactory::class)
+                ->createForSession($injector->getInstance(HordeSession::class));
 
             if ($session_flags & self::SESSION_READONLY) {
                 /* Close the session immediately so no changes can be made but

@@ -84,6 +84,7 @@ use Horde\Core\Factory\SessionHandlerFactory;
 use Horde\Core\Factory\SimpleCacheFactory;
 use Horde\Core\Factory\TinymceFactory;
 use Horde\Core\Factory\TinymcePageBinderFactory;
+use Horde\Core\Factory\TokenServiceFactory;
 use Horde\Core\Factory\VersionServiceFactory;
 use Horde\Core\Middleware\AuthIsGlobalAdmin;
 use Horde\Core\Middleware\ErrorFilter;
@@ -252,7 +253,7 @@ class DefaultInjectorBindings implements InjectorBindings
             'Horde_Template' => 'Horde_Core_Factory_Template',
             'Horde_Timezone' => 'Horde_Core_Factory_Timezone',
             'Horde_Token' => 'Horde_Core_Factory_Token',
-            Token::class => Factory\TokenServiceFactory::class,
+            Token::class => TokenServiceFactory::class,
             'Horde_Variables' => 'Horde_Core_Factory_Variables',
             'Horde_View' => 'Horde_Core_Factory_View',
             'Horde_View_Base' => 'Horde_Core_Factory_View',

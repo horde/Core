@@ -206,6 +206,17 @@ var HordeCore = {
         params.set('token', this.conf.TOKEN);
     },
 
+    // params: (Hash) URL parameters
+    // Append only the CSRF token for same-origin navigation (popups, GET
+    // views). Session identity is carried by cookies — do not add legacy
+    // SID query parameters to these URLs.
+    addCsrfToken: function(params)
+    {
+        if (this.conf.TOKEN) {
+            params.set('token', this.conf.TOKEN);
+        }
+    },
+
     sessionId: function(sid)
     {
         var conf = this.baseWindow().HordeCore.conf;
