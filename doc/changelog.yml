@@ -1,4 +1,42 @@
 ---
+3.0.0-RC10:
+  api: 3.0.0-RC10
+  state:
+    release: RC
+    api: RC
+  date: 2026-06-24
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: |-
+    fix: Ensure absolute URLs from registry are used correctly in withAppWebroot & friends
+    fix(core): popup CSRF without SID in URL query
+    fix(core): add CSRF token to HordePopup.popup at click time
+    fix(core): honor FILTERTYPE_INCOMPLETETASKS in task sync
+    fix(core): honor FILTERTYPE_INCOMPLETETASKS in task sync
+    feat(core): pass ActiveSync sync config to driver
+    feat(core): pass ActiveSync sync config to driver
+    Merge pull request #168 from horde/feat/polish_EAS16.1
+    Potential fix for pull request finding
+    Merge pull request #169 from horde/fix/portal-layout-csrf-token
+    refactor(core): inject session for portal layout CSRF check
+    Add meeting response proposal tests
+    fix(core): validate portal layout CSRF with session checkToken
+    Implement attendee counter-proposal storage
+    Merge pull request #167 from horde/fix/redbox-autocompleter-dialog-reopen
+    Delete doc/pr directory
+    fix(core): harden RedBox and autocompleter dialog DOM handling
+    fix(activesync): honor per-user EAS 16.1 permission in versionCallback
+    feat(core): add EAS 16.1 meeting proposal handling in MeetingResponse
+    fix(session): guard session_destroy() when no active PHP session
+    Merge pull request #164 from horde/fix/map_OSM
+    Update js/map/osm.js
+    Update js/map/ocm.js
+    Update js/map/owm.js
+    Merge pull request #163 from horde/feat/finish_EAS16.0
+    fix(maps): allow OSM tile Referer and use HTTPS tile URLs
+    feat(activesync): EAS 16.0 draft sync and calendar initial-sync in core driver
+    refactor: shrink base factory class to accept "Injector" (of which Horde_Injector is a duck type)
 3.0.0-RC9:
   api: 3.0.0-RC9
   state:
