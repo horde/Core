@@ -197,6 +197,99 @@ class UriBuilderTest extends TestCase
         $this->builder()->withAppWebroot('nonexistent');
     }
 
+    // --- withAppWebroot with absolute URL configured ---
+
+    #[Test]
+    public function withAppWebrootAbsoluteUrlReplacesAuthority(): void
+    {
+        $registry = new RegistryState([
+            'horde' => ['webroot' => 'https://dev.horde.org/horde'],
+        ]);
+        $requestUri = $this->createMock(UriInterface::class);
+        $requestUri->method('getScheme')->willReturn('https');
+        $requestUri->method('getAuthority')->willReturn('dev.horde.org');
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->method('getUri')->willReturn($requestUri);
+
+        $builder = new UriBuilder($registry, $this->routeProvider, $request);
+        $result = $builder->withAppWebroot('horde')->withPart('admin/config/config.php');
+
+        self::assertSame('https', $result->getScheme());
+        self::assertSame('dev.horde.org', $result->getHost());
+        self::assertSame('/horde/admin/config/config.php', $result->getPath());
+        self::assertSame(
+            'https://dev.horde.org/horde/admin/config/config.php',
+            (string) $result
+        );
+    }
+
+    #[Test]
+    public function withAppWebrootAbsoluteUrlWithDifferentHostOverridesRequestHost(): void
+    {
+        $registry = new RegistryState([
+            'horde' => ['webroot' => 'https://assets.example.com/horde'],
+        ]);
+        $requestUri = $this->createMock(UriInterface::class);
+        $requestUri->method('getScheme')->willReturn('https');
+        $requestUri->method('getAuthority')->willReturn('dev.horde.org');
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->method('getUri')->willReturn($requestUri);
+
+        $builder = new UriBuilder($registry, $this->routeProvider, $request);
+        $result = $builder->withAppWebroot('horde')->withPart('static/foo.css');
+
+        self::assertSame('assets.example.com', $result->getHost());
+        self::assertSame('/horde/static/foo.css', $result->getPath());
+    }
+
+    #[Test]
+    public function withAppWebrootAbsoluteUrlWithPort(): void
+    {
+        $registry = new RegistryState([
+            'horde' => ['webroot' => 'https://horde.example.com:8443/horde'],
+        ]);
+        $builder = new UriBuilder($registry, $this->routeProvider);
+        $result = $builder->withAppWebroot('horde');
+
+        self::assertSame('https', $result->getScheme());
+        self::assertSame('horde.example.com', $result->getHost());
+        self::assertSame(8443, $result->getPort());
+        self::assertSame('/horde', $result->getPath());
+    }
+
+    #[Test]
+    public function withStaticUriAbsoluteWebrootProducesCleanUrl(): void
+    {
+        $registry = new RegistryState([
+            'horde' => ['webroot' => 'https://assets.example.com/horde'],
+        ]);
+        $requestUri = $this->createMock(UriInterface::class);
+        $requestUri->method('getScheme')->willReturn('https');
+        $requestUri->method('getAuthority')->willReturn('app.example.com');
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->method('getUri')->willReturn($requestUri);
+
+        $builder = new UriBuilder($registry, $this->routeProvider, $request);
+        $result = $builder->withStaticUri();
+
+        self::assertSame('assets.example.com', $result->getHost());
+        self::assertSame('/horde/static', $result->getPath());
+    }
+
+    #[Test]
+    public function withThemesUriAbsoluteWebrootProducesCleanUrl(): void
+    {
+        $registry = new RegistryState([
+            'turba' => ['webroot' => 'https://assets.example.com/horde/turba'],
+        ]);
+        $builder = new UriBuilder($registry, $this->routeProvider);
+        $result = $builder->withThemesUri('turba');
+
+        self::assertSame('https', $result->getScheme());
+        self::assertSame('assets.example.com', $result->getHost());
+        self::assertSame('/horde/turba/themes', $result->getPath());
+    }
+
     // --- withThemesUri ---
 
     #[Test]

@@ -107,32 +107,37 @@ class UriBuilder extends Uri implements UriBuilderInterface
 
     public function withAppWebroot(string $app): static
     {
-        $webroot = $this->resolveKey($app, 'webroot', '/' . $app);
-        return $this->withPath($webroot);
+        return $this->applyBase($this->resolveKey($app, 'webroot', '/' . $app));
     }
 
     public function withThemesUri(string $app): static
     {
         $appConfig = $this->requireApp($app);
-        $themesUri = $appConfig['themesuri']
-            ?? ($appConfig['webroot'] ?? ('/' . $app)) . '/themes';
-        return $this->withPath($themesUri);
+        if (isset($appConfig['themesuri'])) {
+            return $this->applyBase($appConfig['themesuri']);
+        }
+        $webroot = $appConfig['webroot'] ?? ('/' . $app);
+        return $this->applyBase($webroot)->withPart('themes');
     }
 
     public function withJsUri(string $app): static
     {
         $appConfig = $this->requireApp($app);
-        $jsUri = $appConfig['jsuri']
-            ?? ($appConfig['webroot'] ?? ('/' . $app)) . '/js';
-        return $this->withPath($jsUri);
+        if (isset($appConfig['jsuri'])) {
+            return $this->applyBase($appConfig['jsuri']);
+        }
+        $webroot = $appConfig['webroot'] ?? ('/' . $app);
+        return $this->applyBase($webroot)->withPart('js');
     }
 
     public function withStaticUri(): static
     {
         $hordeConfig = $this->requireApp('horde');
-        $staticUri = $hordeConfig['staticuri']
-            ?? ($hordeConfig['webroot'] ?? '/horde') . '/static';
-        return $this->withPath($staticUri);
+        if (isset($hordeConfig['staticuri'])) {
+            return $this->applyBase($hordeConfig['staticuri']);
+        }
+        $webroot = $hordeConfig['webroot'] ?? '/horde';
+        return $this->applyBase($webroot)->withPart('static');
     }
 
     public function withNamedRoute(string $app, string $name, array $params = []): static
@@ -191,6 +196,37 @@ class UriBuilder extends Uri implements UriBuilderInterface
     {
         $appConfig = $this->requireApp($app);
         return $appConfig[$key] ?? $default;
+    }
+
+    /**
+     * Apply a configured base to the builder.
+     *
+     * Webroot/themesuri/jsuri/staticuri values may be either a path
+     * ("/horde") or a fully qualified URL ("https://assets.example.com/horde",
+     * documented for proxy/asset-host deployments). A path replaces only
+     * the path component; an absolute URL replaces scheme, userinfo, host,
+     * port and path so the configured asset host wins over the request host.
+     */
+    private function applyBase(string $base): static
+    {
+        if (preg_match('#^[a-z][a-z0-9+.\-]*://#i', $base) !== 1) {
+            return $this->withPath($base);
+        }
+
+        $parsed = new Uri($base);
+        $clone = $this->withScheme($parsed->getScheme())
+            ->withHost($parsed->getHost());
+
+        $port = $parsed->getPort();
+        $clone = $port !== null ? $clone->withPort($port) : $clone->withPort(null);
+
+        $userInfo = $parsed->getUserInfo();
+        if ($userInfo !== '') {
+            [$user, $pass] = array_pad(explode(':', $userInfo, 2), 2, null);
+            $clone = $clone->withUserInfo($user, $pass);
+        }
+
+        return $clone->withPath($parsed->getPath());
     }
 
     private static function normalizePath(string $path): string
