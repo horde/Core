@@ -700,6 +700,24 @@ class Horde_Core_ActiveSync_Connector
     }
 
     /**
+     * Resolve a task UID to its recurring series master when appropriate.
+     *
+     * @param string $uid  The mapped server UID
+     * @param Horde_ActiveSync_Message_Task $message  The task object
+     *
+     * @return string
+     */
+    public function tasks_resolveSeriesMasterUid(
+        $uid,
+        Horde_ActiveSync_Message_Task $message
+    ) {
+        return $this->_registry->tasks->resolveActiveSyncSeriesMasterUid(
+            $uid,
+            $message
+        );
+    }
+
+    /**
      * Delete a task from the backend.
      *
      * @param string $id  The task's uid

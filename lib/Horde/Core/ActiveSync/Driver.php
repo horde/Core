@@ -388,6 +388,21 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     }
 
     /**
+     * Resolve a task UID to its recurring series master when appropriate.
+     *
+     * @param string $uid  The mapped server UID
+     * @param Horde_ActiveSync_Message_Task $message  The task object
+     *
+     * @return string
+     */
+    public function resolveTaskSeriesMasterUid(
+        $uid,
+        Horde_ActiveSync_Message_Task $message
+    ) {
+        return $this->_connector->tasks_resolveSeriesMasterUid($uid, $message);
+    }
+
+    /**
      * Setup sync parameters. The user provided here is the user the backend
      * will sync with. This allows you to authenticate as one user, and sync as
      * another, if the backend supports this (Horde does not).
