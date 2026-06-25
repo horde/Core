@@ -9,38 +9,33 @@ list: dev
 type: horde-library
 homepage: https://www.horde.org/libraries/Horde_Core
 authors:
-  -
-    name: Ralf Lang
+  - name: Ralf Lang
     user: rlang
     email: ralf.lang@ralf-lang.de
     active: true
     role: maintainer
-  -
-    name: Jan Schneider
+  - name: Jan Schneider
     user: jan
     email: jan@horde.org
     active: true
     role: lead
-  -
-    name: Michael J Rubinsky
+  - name: Michael J Rubinsky
     user: mrubinsk
     email: mrubinsk@horde.org
     active: true
     role: developer
-  -
-    name: Chuck Hagenbuch
+  - name: Chuck Hagenbuch
     user: chuck
     email: chuck@horde.org
     active: false
     role: lead
-  -
-    name: Michael Slusarz
+  - name: Michael Slusarz
     user: slusarz
     email: slusarz@horde.org
     active: false
     role: developer
 version:
-  release: 3.0.0-RC10
+  release: 3.0.0-RC11
   api: 3.0.0alpha1
 state:
   release: RC
