@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace Horde\Core\Secret;
 
+use Horde\Core\Session\HordeSession;
+
 /**
  * Session-key cipher used by {@see \Horde\Core\Session\SessionLifecycle}
  * to re-key encrypted session payloads on `clean()` / `destroy()`.
@@ -60,4 +62,22 @@ interface SessionSecret
      *               (legacy returns bool).
      */
     public function clearKey($keyname = 'generic');
+
+    /**
+     * Wire the modern session into this secret service.
+     *
+     * After this call, the implementation MUST read and write the
+     * per-session key in the session payload (e.g. via
+     * {@see HordeSession::getScoped()} / {@see HordeSession::setScoped()}
+     * at a slot of its choosing) instead of relying exclusively on a
+     * parallel cookie. Implementations MAY keep the legacy cookie path
+     * as a backwards-compatible fallback and SHOULD migrate any value
+     * found in the cookie into the session payload on first read.
+     *
+     * Called by {@see \Horde\Core\Session\HordeSessionFactory::create()}
+     * right after the modern session is built; subsequent encrypted
+     * reads and writes therefore land on a session that already knows
+     * how to source its key without depending on the user's cookie jar.
+     */
+    public function setSession(HordeSession $session): void;
 }

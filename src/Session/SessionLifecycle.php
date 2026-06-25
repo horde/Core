@@ -337,18 +337,36 @@ class SessionLifecycle implements Horde_Shutdown_Task
      */
     public function regenerate(): void
     {
-        $this->mirrorToSession();
-        session_regenerate_id(true);
+        $session = $this->getSession();
+
+        // Drain encrypted slots under the OLD key, rotate the PHP
+        // session id (and re-mint the per-session Blowfish key), then
+        // re-encrypt the surviving plaintexts under the NEW key. The
+        // encryption closures themselves stay the same — they capture
+        // the secret service by reference and resolve getKey() lazily,
+        // so the second pass reads the fresh key automatically.
+        // Without this dance, the session id rotates while the
+        // ciphertext stays bound to the OLD key, and every encrypted
+        // slot becomes unreadable on the next read (imp #66).
+        $session->reEncryptAll(function (): void {
+            session_regenerate_id(true);
+            $this->secret?->setKey();
+        });
+
         // The deadline is canonical on HordeSession at the top level.
         // The shim's addFinal() shutdown task mirrors HordeSession to
         // $_SESSION for legacy code that reads the superglobal directly.
-        $this->getSession()->setRegenerationDeadline(
+        $session->setRegenerationDeadline(
             $this->config->nextRegenerationDeadline(),
         );
 
+        // Mirror AFTER re-encryption so the save handler picks up the
+        // freshly re-encrypted payload, not the old ciphertext.
+        $this->mirrorToSession();
+
         // Synchronous executor: clear pending intent so a downstream
         // processFlags() call sees a coherent no-op.
-        $this->getSession()->clearLifecycleFlags();
+        $session->clearLifecycleFlags();
     }
 
     /**

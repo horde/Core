@@ -458,6 +458,136 @@ class SessionLifecycleTest extends TestCase
         self::assertTrue($session->shouldRegenerate());
         self::assertTrue($session->isDestroyed());
     }
+
+    // ---------------------------------------------------------------
+    // regenerate() — wiring the re-encryption dance
+    //
+    // The real regenerate() calls session_regenerate_id(true), which
+    // fails in CLI without a live PHP session. To exercise the wiring
+    // without booting one, we install a CapturingHordeSession test
+    // double in the injector. The double captures the callback that
+    // SessionLifecycle::regenerate() hands to reEncryptAll(), so the
+    // test can pin (a) that reEncryptAll IS called, and (b) that the
+    // callback wires through to the secret service's setKey() — both
+    // without invoking session_regenerate_id.
+    // ---------------------------------------------------------------
+
+    #[Test]
+    public function testRegenerateDelegatesToReEncryptAll(): void
+    {
+        $session = new CapturingHordeSession(new SessionId('regen-wiring'), []);
+        $secret = new RecordingSessionSecret();
+        $lifecycle = $this->build([], $session, $secret);
+
+        try {
+            $lifecycle->regenerate();
+        } catch (\Throwable $e) {
+            self::fail('regenerate threw unexpectedly: ' . $e->getMessage());
+        }
+
+        self::assertTrue($session->reEncryptAllCalled, 'reEncryptAll invoked');
+        self::assertNotNull($session->capturedRotation, 'rotation callback captured');
+    }
+
+    #[Test]
+    public function testRegenerateCallbackInvokesSecretSetKey(): void
+    {
+        $session = new CapturingHordeSession(new SessionId('regen-setkey'), []);
+        $secret = new RecordingSessionSecret();
+        $lifecycle = $this->build([], $session, $secret);
+
+        $lifecycle->regenerate();
+
+        self::assertTrue($secret->setKeyCalled, 'rotation callback calls secret->setKey()');
+    }
+
+    #[Test]
+    public function testRegenerateUpdatesDeadline(): void
+    {
+        $session = new CapturingHordeSession(new SessionId('regen-deadline'), []);
+        $lifecycle = $this->build(
+            ['session' => ['regenerate_interval' => 60]],
+            $session,
+        );
+
+        $beforeDeadline = $session->getRegenerationDeadline();
+
+        $lifecycle->regenerate();
+
+        $afterDeadline = $session->getRegenerationDeadline();
+        self::assertNotSame($beforeDeadline, $afterDeadline);
+        self::assertIsInt($afterDeadline);
+    }
+
+    #[Test]
+    public function testRegenerateClearsLifecycleFlags(): void
+    {
+        $session = new CapturingHordeSession(new SessionId('regen-flags'), []);
+        $session->scheduleRegeneration();
+        $lifecycle = $this->build([], $session);
+
+        $lifecycle->regenerate();
+
+        self::assertFalse($session->shouldRegenerate());
+    }
+}
+
+/**
+ * HordeSession test double that captures the callback handed to
+ * reEncryptAll() and runs it under a warning-tolerant error handler.
+ * Lets us pin the SessionLifecycle::regenerate() wiring at unit
+ * scope without booting a real PHP session — session_regenerate_id()
+ * inside the callback emits a CLI warning that would otherwise trip
+ * phpunit.xml.dist's failOnWarning rule.
+ */
+class CapturingHordeSession extends HordeSession
+{
+    public bool $reEncryptAllCalled = false;
+    public ?\Closure $capturedRotation = null;
+
+    public function reEncryptAll(\Closure $rotate): void
+    {
+        $this->reEncryptAllCalled = true;
+        $this->capturedRotation = $rotate;
+
+        // Run the rotation but suppress the inevitable
+        // "Session ID cannot be regenerated when there is no active
+        // session" warning from session_regenerate_id(). The rest of
+        // the callback (e.g. secret->setKey) still runs.
+        set_error_handler(static fn() => true, \E_WARNING);
+        try {
+            $rotate();
+        } finally {
+            restore_error_handler();
+        }
+    }
+}
+
+/**
+ * SessionSecret test double that records setKey() invocations.
+ */
+class RecordingSessionSecret implements SessionSecret
+{
+    public bool $setKeyCalled = false;
+    public bool $clearKeyCalled = false;
+    public ?HordeSession $wiredSession = null;
+
+    public function setKey($keyname = 'generic')
+    {
+        $this->setKeyCalled = true;
+        return 'recorded-key';
+    }
+
+    public function clearKey($keyname = 'generic')
+    {
+        $this->clearKeyCalled = true;
+        return true;
+    }
+
+    public function setSession(HordeSession $session): void
+    {
+        $this->wiredSession = $session;
+    }
 }
 
 /**
