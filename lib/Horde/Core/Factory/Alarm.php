@@ -96,9 +96,9 @@ class Horde_Core_Factory_Alarm extends Horde_Core_Factory_Base
 
         $this->_alarm->addHandler(
             'mail',
-            new Horde_Alarm_Handler_Mail([
+            new Horde_Core_Alarm_Handler_Mail([
+                'injector' => $this->_injector,
                 'identity' => $this->_injector->getInstance('Horde_Core_Factory_Identity'),
-                'mail' => $this->_injector->getInstance('Horde_Mail'),
             ])
         );
 

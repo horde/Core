@@ -426,6 +426,21 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
     // EncryptedValuesInterface
     // ---------------------------------------------------------------
 
+    /**
+     * Read an encrypted slot.
+     *
+     * Returns `null` when the slot is absent, when the stored ciphertext
+     * cannot be decrypted under the current key (e.g. a stale key from
+     * before a session regenerate, or an upgrade boundary that dropped
+     * the per-session key cookie), or when a non-string sits at the slot
+     * (defensive). When the decrypt succeeds but the resulting bytes
+     * cannot be Horde_Pack-unpacked, the raw decrypted bytes are returned
+     * unchanged for legacy wire-format compatibility.
+     *
+     * Callers MUST be prepared to receive `null` even when
+     * {@see isEncrypted()} returned true, since the encryption-map flag
+     * and the underlying ciphertext can diverge across key changes.
+     */
     public function getEncrypted(string $app, string $name): mixed
     {
         $raw = $this->data[$app][$name] ?? null;
@@ -442,7 +457,15 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
             return $raw;
         }
 
-        $decrypted = ($this->decryptor)($raw);
+        try {
+            $decrypted = ($this->decryptor)($raw);
+        } catch (\Throwable) {
+            // Wrong key, corrupted ciphertext, or any other decrypt-side
+            // failure: fail closed. AuthCredentialStore::get() and similar
+            // consumers turn this into a "no credentials" signal so the
+            // request keeps going instead of crashing.
+            return null;
+        }
 
         try {
             return $this->pack->unpack($decrypted);
@@ -536,6 +559,89 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
         foreach ($plainValues as [$app, $name, $serialized]) {
             $encrypted = ($this->encryptor)($serialized);
             $this->data[$app][$name] = $encrypted;
+            $this->dirty = true;
+        }
+    }
+
+    /**
+     * Re-encrypt all encrypted slots around an externally-driven key
+     * rotation.
+     *
+     * Used when the encryption closures themselves stay the same (they
+     * capture the secret service by reference and call getKey() lazily),
+     * but the key the closures fetch is about to change underneath them.
+     * The canonical caller is {@see SessionLifecycle::regenerate()}, which
+     * rotates the PHP session id (and optionally re-mints the per-session
+     * Blowfish key) between drain and refill.
+     *
+     * Sequence:
+     *   1. Walk the encryption map and decrypt each slot using the
+     *      current decryptor (still bound to the OLD key).
+     *   2. Slots that cannot be decrypted under the current key are
+     *      dropped from `$data` and from the encryption map. Carrying
+     *      ciphertext nobody can read is strictly worse than dropping
+     *      it; consumers (e.g. AuthCredentialStore::get) already
+     *      degrade gracefully to a "no credentials" state.
+     *   3. Invoke `$rotate`. The callback's job is to make the next
+     *      `getKey()` call (inside the still-captured encryptor) yield
+     *      the NEW key.
+     *   4. Re-encrypt each surviving plaintext using the current
+     *      encryptor (now bound to the NEW key) and write it back.
+     *
+     * If `$rotate` throws, plaintexts are discarded and the encrypted
+     * slots stay as-is under the old key; the exception propagates to
+     * the caller. The session is left in a coherent pre-rotation state.
+     *
+     * @param Closure $rotate fn(): void — runs between drain and refill.
+     */
+    public function reEncryptAll(Closure $rotate): void
+    {
+        $map = $this->data[self::ENCRYPTED_KEY] ?? [];
+        if (!is_array($map)) {
+            $map = [];
+        }
+
+        $plainValues = [];
+        foreach ($map as $app => $names) {
+            if (!is_array($names)) {
+                continue;
+            }
+            foreach (array_keys($names) as $name) {
+                $raw = $this->data[$app][$name] ?? null;
+                if (!is_string($raw) || $this->decryptor === null) {
+                    continue;
+                }
+                try {
+                    $plainValues[] = [$app, $name, ($this->decryptor)($raw)];
+                } catch (\Throwable) {
+                    // Slot is unrecoverable under the current key. Drop
+                    // it from $data and from the encryption map; mark
+                    // the session dirty so the now-shrunken payload
+                    // makes it to the backend.
+                    unset($this->data[$app][$name]);
+                    if (empty($this->data[$app])) {
+                        unset($this->data[$app]);
+                    }
+                    unset($this->data[self::ENCRYPTED_KEY][$app][$name]);
+                    if (empty($this->data[self::ENCRYPTED_KEY][$app])) {
+                        unset($this->data[self::ENCRYPTED_KEY][$app]);
+                    }
+                    if (empty($this->data[self::ENCRYPTED_KEY])) {
+                        unset($this->data[self::ENCRYPTED_KEY]);
+                    }
+                    $this->dirty = true;
+                }
+            }
+        }
+
+        $rotate();
+
+        if ($this->encryptor === null) {
+            return;
+        }
+
+        foreach ($plainValues as [$app, $name, $plain]) {
+            $this->data[$app][$name] = ($this->encryptor)($plain);
             $this->dirty = true;
         }
     }

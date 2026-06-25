@@ -73,11 +73,23 @@ class HordeSessionFactory extends DefaultSessionFactory
         $decryptor = static fn(string $ciphertext): string
             => (string) $secret->read($secret->getKey(), $ciphertext);
 
-        return new HordeSession(
+        $session = new HordeSession(
             new SessionId(session_id() ?: 'none'),
             $_SESSION ?? [],
             $encryptor,
             $decryptor,
         );
+
+        // Wire the modern session into the secret service so subsequent
+        // getKey() / setKey() calls read and write the per-session key
+        // in the session payload instead of depending exclusively on
+        // the legacy horde_secret_key cookie. This is what makes the
+        // encrypted slots survive cookie eviction, RC5→RC7 upgrades,
+        // and session-id rotation done without re-encrypt (imp #66).
+        if (method_exists($secret, 'setSession')) {
+            $secret->setSession($session);
+        }
+
+        return $session;
     }
 }

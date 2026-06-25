@@ -371,6 +371,234 @@ class HordeSessionTest extends TestCase
     }
 
     #[Test]
+    public function testGetEncryptedReturnsNullWhenDecryptorThrowsBlowfishException(): void
+    {
+        // Simulates the imp #66 path: the stored ciphertext was encrypted
+        // under a key the current decryptor no longer holds, so unpad()
+        // throws "Invalid PKCS#7 padding byte". The session must fail
+        // closed to null instead of letting the throwable escape and kill
+        // the request.
+        $writer = new HordeSession(
+            new SessionId('enc-test'),
+            [],
+            fn(string $p): string => 'ENC:' . $p,
+            fn(string $c): string => substr($c, 4),
+        );
+        $writer->setEncrypted('horde', 'auth_app/imp', ['password' => 'secret']);
+
+        $brokenDecryptor = function (string $c): string {
+            throw new \Horde\Crypt\Blowfish\EncryptionException(
+                'Invalid PKCS#7 padding byte: 0x61',
+            );
+        };
+        $reader = new HordeSession(
+            new SessionId('enc-test'),
+            $writer->toPayload(),
+            fn(string $p): string => 'ENC:' . $p,
+            $brokenDecryptor,
+        );
+
+        self::assertNull($reader->getEncrypted('horde', 'auth_app/imp'));
+    }
+
+    #[Test]
+    public function testGetEncryptedReturnsNullOnArbitraryThrowableFromDecryptor(): void
+    {
+        // Defensive: any Throwable from the decryptor closure is contained,
+        // not just the Blowfish-specific exception.
+        $writer = new HordeSession(
+            new SessionId('enc-test'),
+            [],
+            fn(string $p): string => 'ENC:' . $p,
+            fn(string $c): string => substr($c, 4),
+        );
+        $writer->setEncrypted('horde', 'secret', 'value');
+
+        $reader = new HordeSession(
+            new SessionId('enc-test'),
+            $writer->toPayload(),
+            fn(string $p): string => 'ENC:' . $p,
+            function (string $c): string {
+                throw new \RuntimeException('decryptor blew up');
+            },
+        );
+
+        self::assertNull($reader->getEncrypted('horde', 'secret'));
+    }
+
+    #[Test]
+    public function testGetEncryptedReturnsDecryptedBytesWhenPackUnpackFails(): void
+    {
+        // Regression guard: a successful decrypt whose result is NOT
+        // Horde_Pack-formatted must keep returning the raw decrypted
+        // bytes (legacy wire format). The new outer Throwable catch
+        // must not accidentally swallow this case to null.
+        $writer = new HordeSession(
+            new SessionId('enc-test'),
+            [],
+            fn(string $p): string => 'ENC:' . $p,
+            fn(string $c): string => substr($c, 4),
+        );
+        $writer->setEncrypted('horde', 'secret', 'placeholder');
+
+        // Decrypt succeeds and returns bytes that Horde_Pack will reject.
+        $reader = new HordeSession(
+            new SessionId('enc-test'),
+            $writer->toPayload(),
+            fn(string $p): string => 'ENC:' . $p,
+            fn(string $c): string => 'not-a-pack-payload',
+        );
+
+        self::assertSame('not-a-pack-payload', $reader->getEncrypted('horde', 'secret'));
+    }
+
+    // ---------------------------------------------------------------
+    // reEncryptAll() — rotation of the underlying encryption key
+    // ---------------------------------------------------------------
+
+    /**
+     * Build a session whose closures read a key from a mutable
+     * holder. Mutating the holder simulates a key rotation between
+     * drain and refill phases of reEncryptAll().
+     *
+     * @return array{0: HordeSession, 1: \stdClass} The session and the
+     *                                              key holder.
+     */
+    private function sessionWithMutableKey(string $initialKey = 'KEY1'): array
+    {
+        $holder = new \stdClass();
+        $holder->key = $initialKey;
+        // Encryption: tag the plaintext with the active key on write.
+        $encryptor = static function (string $plaintext) use ($holder): string {
+            return $holder->key . '|' . $plaintext;
+        };
+        // Decryption: only succeeds if the active key matches the tag.
+        $decryptor = static function (string $ciphertext) use ($holder): string {
+            $prefix = $holder->key . '|';
+            if (!str_starts_with($ciphertext, $prefix)) {
+                throw new \RuntimeException('wrong key');
+            }
+            return substr($ciphertext, strlen($prefix));
+        };
+        $session = new HordeSession(
+            new SessionId('rotate-test'),
+            [],
+            $encryptor,
+            $decryptor,
+        );
+
+        return [$session, $holder];
+    }
+
+    #[Test]
+    public function testReEncryptAllRoundTripsPlaintextAcrossKeyRotation(): void
+    {
+        [$session, $holder] = $this->sessionWithMutableKey('KEY1');
+        $session->setEncrypted('horde', 'auth_app/imp', ['password' => 'p1']);
+        $session->setEncrypted('horde', 'auth_app/turba', 'p2');
+
+        $rawBefore = $session->getScoped('horde', 'auth_app/imp');
+        self::assertStringStartsWith('KEY1|', $rawBefore);
+
+        $session->reEncryptAll(function () use ($holder) {
+            $holder->key = 'KEY2';
+        });
+
+        // Ciphertext has been re-bound to the new key.
+        $rawAfter = $session->getScoped('horde', 'auth_app/imp');
+        self::assertStringStartsWith('KEY2|', $rawAfter);
+
+        // Plaintext round-trips under the new key.
+        self::assertSame(
+            ['password' => 'p1'],
+            $session->getEncrypted('horde', 'auth_app/imp'),
+        );
+        self::assertSame(
+            'p2',
+            $session->getEncrypted('horde', 'auth_app/turba'),
+        );
+    }
+
+    #[Test]
+    public function testReEncryptAllDropsUndecryptableSlots(): void
+    {
+        // Seed two slots under KEY1, then swap one out for ciphertext
+        // bound to an unknown key. After reEncryptAll, the unrecoverable
+        // slot is removed from both $data and the encryption map; the
+        // healthy slot survives and is re-encrypted under KEY2.
+        [$session, $holder] = $this->sessionWithMutableKey('KEY1');
+        $session->setEncrypted('horde', 'good', 'value');
+        $session->setEncrypted('horde', 'bad', 'placeholder');
+        $session->setScoped('horde', 'bad', 'UNKNOWN|garbage');
+
+        $session->reEncryptAll(function () use ($holder) {
+            $holder->key = 'KEY2';
+        });
+
+        self::assertNull($session->getScoped('horde', 'bad'));
+        self::assertFalse($session->isEncrypted('horde', 'bad'));
+        self::assertTrue($session->isEncrypted('horde', 'good'));
+        self::assertSame('value', $session->getEncrypted('horde', 'good'));
+    }
+
+    #[Test]
+    public function testReEncryptAllRunsCallbackBetweenDecryptAndEncrypt(): void
+    {
+        // Pin the sequence: the callback must observe the OLD key (drain
+        // already happened) and may install the NEW key (refill happens
+        // after the callback returns).
+        [$session, $holder] = $this->sessionWithMutableKey('KEY1');
+        $session->setEncrypted('horde', 'slot', 'value');
+
+        $observed = null;
+        $session->reEncryptAll(function () use ($holder, &$observed) {
+            $observed = $holder->key;
+            $holder->key = 'KEY2';
+        });
+
+        self::assertSame('KEY1', $observed, 'callback runs with the old key in scope');
+        self::assertStringStartsWith('KEY2|', $session->getScoped('horde', 'slot'));
+    }
+
+    #[Test]
+    public function testReEncryptAllPropagatesCallbackExceptionWithoutReEncrypting(): void
+    {
+        [$session, $holder] = $this->sessionWithMutableKey('KEY1');
+        $session->setEncrypted('horde', 'slot', 'value');
+        $rawBefore = $session->getScoped('horde', 'slot');
+
+        try {
+            $session->reEncryptAll(function () use ($holder) {
+                $holder->key = 'KEY2';
+                throw new \LogicException('rotation aborted');
+            });
+            self::fail('expected exception');
+        } catch (\LogicException $e) {
+            self::assertSame('rotation aborted', $e->getMessage());
+        }
+
+        // The encrypted slot stays as it was. It would be re-readable
+        // only if the key holder is rolled back to KEY1 (the caller's
+        // responsibility); the session itself made no further mutation
+        // after the callback threw.
+        self::assertSame($rawBefore, $session->getScoped('horde', 'slot'));
+    }
+
+    #[Test]
+    public function testReEncryptAllNoEncryptedSlotsStillRunsCallback(): void
+    {
+        [$session, $holder] = $this->sessionWithMutableKey('KEY1');
+        $called = false;
+
+        $session->reEncryptAll(function () use ($holder, &$called) {
+            $holder->key = 'KEY2';
+            $called = true;
+        });
+
+        self::assertTrue($called);
+    }
+
+    #[Test]
     public function testIsEncrypted(): void
     {
         $encryptor = fn(string $p): string => 'ENC:' . $p;

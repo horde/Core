@@ -220,4 +220,31 @@ class HordeSessionFactoryTest extends TestCase
 
         self::assertSame(['first-key', 'second-key'], $observedKeys);
     }
+
+    /**
+     * The factory must hand the freshly-built session to the secret service
+     * via setSession(), so the secret service can read and write the
+     * per-session key from the session payload instead of relying on the
+     * legacy horde_secret_key cookie. Without this wiring, encrypted slots
+     * are bound to a cookie that can disappear (imp #66).
+     */
+    #[Test]
+    public function testCreateWiresSecretToSession(): void
+    {
+        $captured = null;
+        $secret = $this->createMock(Horde_Core_Secret_Cbc::class);
+        $secret->expects(self::once())
+            ->method('setSession')
+            ->willReturnCallback(static function ($session) use (&$captured): void {
+                $captured = $session;
+            });
+
+        $injector = new Injector(new TopLevel());
+        $injector->setInstance('Horde_Secret_Cbc', $secret);
+
+        $factory = new HordeSessionFactory();
+        $session = $factory->create($injector);
+
+        self::assertSame($session, $captured);
+    }
 }
