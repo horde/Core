@@ -407,9 +407,24 @@ class Horde_PageOutput
 
     /**
      * Output META tags to page.
+     *
+     * Before emitting the accumulated tags, asks {@see
+     * \Horde\Core\PageOutput\SessionApiMetaRenderer} to populate the
+     * `session-api` and `csrf-api` tags so the standalone client-side
+     * JS (`SessionApiClient.fromMeta()`) has its bootstrap data. The
+     * helper resolves its dependencies (RegistryState, Token, current
+     * request) from the global injector — the legacy `Horde_PageOutput`
+     * is already a global-injector consumer, so this fits the existing
+     * idiom. Modern PSR-15 page-rendering controllers will inject the
+     * helper directly instead.
+     *
+     * Safe to call when no session exists: the helper renders nothing
+     * in that case.
      */
     public function outputMetaTags()
     {
+        $this->injectSessionApiMetaTags();
+
         foreach ($this->metaTags as $key => $val) {
             echo '<meta content="' . $val['c'] . '" '
                 . ($val['h'] ? 'http-equiv' : 'name')
@@ -417,6 +432,56 @@ class Horde_PageOutput
         }
 
         $this->metaTags = [];
+    }
+
+    /**
+     * Populate the modern session-api / csrf-api meta tags via the
+     * shared renderer.
+     *
+     * Resolves the renderer from the global injector (legacy stack
+     * idiom). Pulls the current `HordeSession` from the same place
+     * `Horde_Registry::__construct()` published it. Failures are
+     * swallowed: meta-tag rendering must never block page output.
+     */
+    private function injectSessionApiMetaTags()
+    {
+        if (!isset($GLOBALS['injector'])) {
+            return;
+        }
+        try {
+            $renderer = $GLOBALS['injector']->getInstance(
+                \Horde\Core\PageOutput\SessionApiMetaRenderer::class
+            );
+            $session = $GLOBALS['injector']->getInstance(
+                \Horde\Core\Session\HordeSession::class
+            );
+        } catch (\Throwable $e) {
+            return;
+        }
+
+        // Re-use the existing $metaTags accumulator so the renderer's
+        // output goes through the same HTML escaping + ordering path
+        // as every other tag this class emits. SessionApiMetaRenderer's
+        // own renderTags() composes the HTML directly; addToCollector()
+        // pushes into AssetCollector. Neither matches the legacy
+        // accumulator shape exactly, so we call the per-tag helper
+        // method via reflection-free direct duplication of the names.
+        //
+        // The renderer encapsulates the values; this class still owns
+        // the rendering format on the legacy path.
+        $this->addMetaTag(
+            \Horde\Core\PageOutput\SessionApiMetaRenderer::META_SESSION_API,
+            $renderer->getSessionApiUrl(),
+            false,
+        );
+        $token = $renderer->mintCsrfToken($session);
+        if ($token !== null) {
+            $this->addMetaTag(
+                \Horde\Core\PageOutput\SessionApiMetaRenderer::META_CSRF_API,
+                $token,
+                false,
+            );
+        }
     }
 
     /**
