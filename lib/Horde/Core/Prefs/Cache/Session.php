@@ -17,10 +17,18 @@ use Horde\Core\Session\HordeSession;
 /**
  * Cache storage implementation using HordeSession.
  *
- * Reads and writes go through the modern PSR-4 {@see HordeSession}. The wire
- * format diverges from values previously written through the legacy
- * `Horde_Session::set()` path. Stale entries from the prior format are
- * treated as missing on the first read after deploy.
+ * Reads go through the modern PSR-4 {@see HordeSession}. Writes invalidate
+ * the cached scope instead of replacing it, so the next request reloads the
+ * scope from storage. This avoids a write-ordering race against
+ * {@see \Horde\Core\Session\SessionLifecycle::shutdown()}, which mirrors
+ * {@see HordeSession} back into `$_SESSION` at request shutdown: a
+ * `store()` that ran after the mirror would never reach the persisted
+ * session row, leaving subsequent requests with stale prefs until the
+ * session was destroyed.
+ *
+ * The wire format diverges from values previously written through the
+ * legacy `Horde_Session::set()` path. Stale entries from the prior format
+ * are treated as missing on the first read after deploy.
  *
  * @author     Michael Slusarz <slusarz@horde.org>
  * @author     Ralf Lang <ralf.lang@ralf-lang.de>
@@ -48,13 +56,20 @@ class Horde_Core_Prefs_Cache_Session extends Horde_Prefs_Cache_Base
     }
 
     /**
+     * Invalidate the cached scope.
+     *
+     * {@see Horde_Prefs::store()} invokes this after a dirty scope has been
+     * written to storage. Rather than re-serializing the scope into the
+     * session here — which would race the lifecycle mirror at shutdown and
+     * could be lost before reaching the session row — drop the slot so the
+     * next request loads the scope fresh from storage and repopulates the
+     * cache on a clean read path.
      */
     public function store($scope_ob)
     {
-        $this->_session()->setScoped(
+        $this->_session()->removeScoped(
             'horde',
-            self::SESS_KEY . $this->_params['user'] . '/' . $scope_ob->scope,
-            $scope_ob
+            self::SESS_KEY . $this->_params['user'] . '/' . $scope_ob->scope
         );
     }
 
