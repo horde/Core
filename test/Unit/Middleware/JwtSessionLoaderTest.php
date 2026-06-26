@@ -278,4 +278,213 @@ class JwtSessionLoaderTest extends TestCase
         self::assertSame($this->defaultPayloadResponse, $response);
         self::assertNotNull($this->recentlyHandledRequest);
     }
+
+    // ===============================================================
+    // Bearer-header transport (added 2026-06-26)
+    //
+    // Authorization: Bearer <access-jwt> carries an access token whose
+    // `refresh_jti` claim points at the session row. The middleware
+    // verifies as an access token and loads the row by refresh_jti.
+    // ===============================================================
+
+    /** Stub a verified access token exposing a `refresh_jti` claim. */
+    private function verifiedAccessJwtWithRefreshJti(string $refreshJti): VerifiedJwt
+    {
+        $verified = $this->createStub(VerifiedJwt::class);
+        $verified->method('getClaim')->willReturnCallback(
+            static fn(string $name, mixed $default = null): mixed
+                => $name === 'refresh_jti' ? $refreshJti : $default,
+        );
+        return $verified;
+    }
+
+    /** Build a request with the given Authorization header. */
+    private function requestWithAuthHeader(string $value)
+    {
+        $request = $this->requestFactory->createServerRequest('GET', '/test');
+        return $request->withHeader('Authorization', $value);
+    }
+
+    #[Test]
+    public function testNoAuthorizationHeaderAndNoCookieLeavesAttributeUnset(): void
+    {
+        $jwt = $this->createMock(JwtService::class);
+        $jwt->expects(self::never())->method('verifyAccessToken');
+        $jwt->expects(self::never())->method('verifyRefreshToken');
+
+        $backend = $this->createMock(SessionStorageBackend::class);
+        $backend->expects(self::never())->method('load');
+
+        $this->middleware($jwt, $backend)->process(
+            $this->requestFactory->createServerRequest('GET', '/test'),
+            $this->defaultPayloadHandler,
+        );
+
+        self::assertNull(
+            $this->recentlyHandledRequest->getAttribute(JwtSessionLoader::ATTRIBUTE_SESSION),
+        );
+    }
+
+    #[Test]
+    public function testNonBearerAuthorizationHeaderIsIgnored(): void
+    {
+        // Basic auth, Digest auth, etc. — not our concern.
+        $jwt = $this->createMock(JwtService::class);
+        $jwt->expects(self::never())->method('verifyAccessToken');
+        $jwt->expects(self::never())->method('verifyRefreshToken');
+
+        $backend = $this->createMock(SessionStorageBackend::class);
+        $backend->expects(self::never())->method('load');
+
+        $this->middleware($jwt, $backend)->process(
+            $this->requestWithAuthHeader('Basic dXNlcjpwYXNz'),
+            $this->defaultPayloadHandler,
+        );
+
+        self::assertNull(
+            $this->recentlyHandledRequest->getAttribute(JwtSessionLoader::ATTRIBUTE_SESSION),
+        );
+    }
+
+    #[Test]
+    public function testEmptyBearerTokenIsIgnored(): void
+    {
+        $jwt = $this->createMock(JwtService::class);
+        $jwt->expects(self::never())->method('verifyAccessToken');
+        $jwt->expects(self::never())->method('verifyRefreshToken');
+
+        $backend = $this->createMock(SessionStorageBackend::class);
+        $backend->expects(self::never())->method('load');
+
+        $this->middleware($jwt, $backend)->process(
+            $this->requestWithAuthHeader('Bearer '),
+            $this->defaultPayloadHandler,
+        );
+
+        self::assertNull(
+            $this->recentlyHandledRequest->getAttribute(JwtSessionLoader::ATTRIBUTE_SESSION),
+        );
+    }
+
+    #[Test]
+    public function testValidBearerLoadsSessionViaRefreshJti(): void
+    {
+        $refreshJti = 'session-id-from-refresh-jti';
+        $serialised = new SerializedSessionPayload(
+            serialize(['horde' => ['auth/userId' => 'bob']])
+        );
+
+        $jwt = $this->createMock(JwtService::class);
+        $jwt->expects(self::once())
+            ->method('verifyAccessToken')
+            ->with('access-token-value')
+            ->willReturn($this->verifiedAccessJwtWithRefreshJti($refreshJti));
+        $jwt->expects(self::never())->method('verifyRefreshToken');
+
+        $backend = $this->createMock(SessionStorageBackend::class);
+        $backend->expects(self::once())->method('load')->willReturnCallback(
+            static fn(SessionId $id): ?SerializedSessionPayload
+                => (string) $id === $refreshJti ? $serialised : null,
+        );
+
+        $this->middleware($jwt, $backend)->process(
+            $this->requestWithAuthHeader('Bearer access-token-value'),
+            $this->defaultPayloadHandler,
+        );
+
+        $session = $this->recentlyHandledRequest
+            ->getAttribute(JwtSessionLoader::ATTRIBUTE_SESSION);
+
+        self::assertInstanceOf(HordeSession::class, $session);
+        self::assertSame('bob', $session->getAuthenticatedUser());
+    }
+
+    #[Test]
+    public function testBearerVerifyFailureLeavesAttributeUnsetAndDoesNotFallThroughToCookie(): void
+    {
+        // When the caller sent a Bearer header, they were explicit about
+        // which transport to use. A failure must NOT silently fall back
+        // to a cookie that may point at a different session.
+        $jwt = $this->createMock(JwtService::class);
+        $jwt->expects(self::once())
+            ->method('verifyAccessToken')
+            ->willThrowException(new InvalidArgumentException('signature mismatch'));
+        $jwt->expects(self::never())->method('verifyRefreshToken');
+
+        $backend = $this->createMock(SessionStorageBackend::class);
+        $backend->expects(self::never())->method('load');
+
+        $request = $this->requestWithAuthHeader('Bearer bad-token')
+            ->withCookieParams([JwtSessionLoader::COOKIE_NAME => 'cookie-token']);
+
+        $this->middleware($jwt, $backend)->process(
+            $request,
+            $this->defaultPayloadHandler,
+        );
+
+        self::assertNull(
+            $this->recentlyHandledRequest->getAttribute(JwtSessionLoader::ATTRIBUTE_SESSION),
+        );
+    }
+
+    #[Test]
+    public function testBearerAccessTokenWithoutRefreshJtiClaimLeavesAttributeUnset(): void
+    {
+        $verified = $this->createStub(VerifiedJwt::class);
+        $verified->method('getClaim')->willReturn(null);
+
+        $jwt = $this->createMock(JwtService::class);
+        $jwt->expects(self::once())->method('verifyAccessToken')->willReturn($verified);
+        $jwt->expects(self::never())->method('verifyRefreshToken');
+
+        $backend = $this->createMock(SessionStorageBackend::class);
+        $backend->expects(self::never())->method('load');
+
+        $this->middleware($jwt, $backend)->process(
+            $this->requestWithAuthHeader('Bearer access-token'),
+            $this->defaultPayloadHandler,
+        );
+
+        self::assertNull(
+            $this->recentlyHandledRequest->getAttribute(JwtSessionLoader::ATTRIBUTE_SESSION),
+        );
+    }
+
+    #[Test]
+    public function testBearerWinsWhenBothTransportsPresent(): void
+    {
+        // Both transports carry valid JWTs that resolve to *different*
+        // sessions. Bearer must win and the cookie path must NOT run.
+        $bearerRefreshJti = 'session-from-bearer';
+        $bearerSession = new SerializedSessionPayload(
+            serialize(['horde' => ['auth/userId' => 'bearer-user']])
+        );
+
+        $jwt = $this->createMock(JwtService::class);
+        $jwt->expects(self::once())
+            ->method('verifyAccessToken')
+            ->with('access-token')
+            ->willReturn($this->verifiedAccessJwtWithRefreshJti($bearerRefreshJti));
+        $jwt->expects(self::never())->method('verifyRefreshToken');
+
+        $backend = $this->createMock(SessionStorageBackend::class);
+        $backend->expects(self::once())->method('load')->willReturnCallback(
+            static fn(SessionId $id): ?SerializedSessionPayload
+                => (string) $id === $bearerRefreshJti ? $bearerSession : null,
+        );
+
+        $request = $this->requestWithAuthHeader('Bearer access-token')
+            ->withCookieParams([JwtSessionLoader::COOKIE_NAME => 'cookie-refresh-token']);
+
+        $this->middleware($jwt, $backend)->process(
+            $request,
+            $this->defaultPayloadHandler,
+        );
+
+        $session = $this->recentlyHandledRequest
+            ->getAttribute(JwtSessionLoader::ATTRIBUTE_SESSION);
+
+        self::assertInstanceOf(HordeSession::class, $session);
+        self::assertSame('bearer-user', $session->getAuthenticatedUser());
+    }
 }
