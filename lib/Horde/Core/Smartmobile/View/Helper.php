@@ -62,7 +62,7 @@ class Horde_Core_Smartmobile_View_Helper extends Horde_View_Helper_Base
         if (!empty($params['logout']) && $registry->showService('logout')) {
             $logout = $registry->getLogoutUrl([
                 'reason' => Horde_Auth::REASON_LOGOUT,
-            ])->setRaw(false);
+            ])->setRaw(true);
             $out .= '<a class="smartmobile-logout ui-btn-right" href="'
                 . htmlspecialchars((string) $logout)
                 . '" data-ajax="false" data-theme="e" data-icon="delete">'
