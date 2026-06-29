@@ -122,7 +122,7 @@ class ViewModeConfigurator
             $link = $app !== null
                 ? $this->registry->getServiceLink($service, $app)
                 : $this->registry->getServiceLink($service);
-            return (string) $link;
+            return (string) $link->setRaw(true);
         } catch (Exception) {
             return '';
         }
