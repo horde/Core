@@ -49,9 +49,9 @@ class Horde_Core_Smartmobile_View_Helper extends Horde_View_Helper_Base
         }
 
         if (!empty($params['portal'])
-            && ($portal = $registry->getServiceLink('portal', 'horde')->setRaw(false))) {
+            && ($portal = $registry->getServiceLink('portal', 'horde')->setRaw(true))) {
             $out .= '<a class="smartmobile-portal ui-btn-left" '
-                . 'data-ajax="false" href="' . $portal . '">'
+                . 'data-ajax="false" href="' . htmlspecialchars((string) $portal) . '">'
                 . Horde_Core_Translation::t('Applications') . '</a>';
         }
 
