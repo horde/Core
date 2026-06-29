@@ -63,7 +63,7 @@ class Horde_Core_Ajax_Response_HordeCore_NoAuth extends Horde_Core_Ajax_Response
         ])->add('url', Horde::url('', false, [
             'app' => $this->_app,
             'append_session' => -1,
-        ])));
+        ]))->setRaw(true));
         $msg->type = 'horde.noauth';
 
         $ob = new stdClass();

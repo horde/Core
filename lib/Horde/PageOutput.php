@@ -687,7 +687,7 @@ class Horde_PageOutput
                 $this->addInlineJsVars([
                     'HordeMobile.conf' => [
                         'ajax_url' => $registry->getServiceLink('ajax', $registry->getApp())->url,
-                        'logout_url' => strval($registry->getServiceLink('logout')),
+                        'logout_url' => strval($registry->getServiceLink('logout')->setRaw(true)),
                         'sid' => SID,
                         'token' => (string) $tokenService->generate(Horde\Core\Session\HordeSession::CSRF_SEED),
                     ],
@@ -731,8 +731,8 @@ class Horde_PageOutput
             $js_conf = array_filter([
                 /* URLs */
                 'URI_AJAX' => $registry->getServiceLink('ajax', $registry->getApp())->url,
-                'URI_DLOAD' => strval($registry->getServiceLink('download', $registry->getApp())),
-                'URI_LOGOUT' => strval($registry->getServiceLink('logout')),
+                'URI_DLOAD' => strval($registry->getServiceLink('download', $registry->getApp())->setRaw(true)),
+                'URI_LOGOUT' => strval($registry->getServiceLink('logout')->setRaw(true)),
                 'URI_SNOOZE' => strval(Horde::url($registry->get('webroot', 'horde') . '/services/snooze.php', true, -1)),
 
                 /* Other constants */

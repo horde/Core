@@ -577,7 +577,7 @@ class TopbarBuilder
                 return null;
             }
             $link = $this->registry->getServiceLink('logout');
-            return $link !== false ? (string) $link : null;
+            return $link !== false ? (string) $link->setRaw(true) : null;
         } catch (Exception) {
             return null;
         }
@@ -591,7 +591,7 @@ class TopbarBuilder
                 return null;
             }
             $link = $this->registry->getServiceLink('login');
-            return $link !== false ? (string) $link : null;
+            return $link !== false ? (string) $link->setRaw(true) : null;
         } catch (Exception) {
             return null;
         }
@@ -603,7 +603,7 @@ class TopbarBuilder
             $link = $app !== null
                 ? $this->registry->getServiceLink($service, $app)
                 : $this->registry->getServiceLink($service);
-            return $link !== false ? (string) $link : '';
+            return $link !== false ? (string) $link->setRaw(true) : '';
         } catch (Exception) {
             return '';
         }

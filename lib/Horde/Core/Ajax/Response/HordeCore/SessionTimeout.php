@@ -55,7 +55,7 @@ class Horde_Core_Ajax_Response_HordeCore_SessionTimeout extends Horde_Core_Ajax_
         ])->add('url', Horde::url('', false, [
             'app' => $this->_app,
             'append_session' => -1,
-        ])));
+        ]))->setRaw(true));
         $msg->type = 'horde.ajaxtimeout';
 
         $ob = new stdClass();
