@@ -74,6 +74,13 @@ class Horde_Themes_Cache implements Serializable
     protected $_theme;
 
     /**
+     * Cached result of the theme's "inherits default" flag.
+     *
+     * @var boolean
+     */
+    protected $_inherits;
+
+    /**
      * Constructor.
      *
      * @param string $app    The application name.
@@ -222,6 +229,31 @@ class Horde_Themes_Cache implements Serializable
     }
 
     /**
+     * Whether the current theme inherits CSS from the default theme.
+     *
+     * A theme can opt out of the default-theme fallback by setting
+     * `$theme_inherits = false;` in its info.php. Themes without the flag
+     * keep inheriting from the default theme (backwards compatible).
+     *
+     * @return boolean  True if the default-theme fallback applies.
+     */
+    protected function _inheritsDefault()
+    {
+        if (!isset($this->_inherits)) {
+            global $registry;
+
+            $theme_inherits = true;
+            $info = $registry->get('themesfs', 'horde') . '/' . $this->_theme . '/info.php';
+            if (is_readable($info)) {
+                include $info;
+            }
+            $this->_inherits = (bool)$theme_inherits;
+        }
+
+        return $this->_inherits;
+    }
+
+    /**
      */
     public function getAll($item, $mask = 0)
     {
@@ -240,10 +272,10 @@ class Horde_Themes_Cache implements Serializable
         if ($entry & self::HORDE_THEME) {
             $out[] = $this->_getOutput('horde', $this->_theme, $item);
         }
-        if (($this->_theme != 'default') && $entry & self::APP_DEFAULT) {
+        if (($this->_theme != 'default') && $this->_inheritsDefault() && ($entry & self::APP_DEFAULT)) {
             $out[] = $this->_getOutput($this->_app, 'default', $item);
         }
-        if (($this->_theme != 'default') && $entry & self::HORDE_DEFAULT) {
+        if (($this->_theme != 'default') && $this->_inheritsDefault() && ($entry & self::HORDE_DEFAULT)) {
             $out[] = $this->_getOutput('horde', 'default', $item);
         }
 
