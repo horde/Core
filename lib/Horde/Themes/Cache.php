@@ -240,13 +240,19 @@ class Horde_Themes_Cache implements Serializable
     protected function _inheritsDefault()
     {
         if (!isset($this->_inherits)) {
-            global $registry;
-
             $theme_inherits = true;
-            $info = $registry->get('themesfs', 'horde') . '/' . $this->_theme . '/info.php';
-            if (is_readable($info)) {
-                include $info;
+
+            /* Theme names originate from user prefs/options, so guard against
+             * path traversal: only include info.php for a plain directory name
+             * (no separators, no '..'). Anything else falls back to inheriting. */
+            if (preg_match('/^[A-Za-z0-9_-]+$/', (string)$this->_theme)) {
+                global $registry;
+                $info = $registry->get('themesfs', 'horde') . '/' . $this->_theme . '/info.php';
+                if (is_readable($info)) {
+                    include $info;
+                }
             }
+
             $this->_inherits = (bool)$theme_inherits;
         }
 
@@ -272,10 +278,10 @@ class Horde_Themes_Cache implements Serializable
         if ($entry & self::HORDE_THEME) {
             $out[] = $this->_getOutput('horde', $this->_theme, $item);
         }
-        if (($this->_theme != 'default') && $this->_inheritsDefault() && ($entry & self::APP_DEFAULT)) {
+        if (($entry & self::APP_DEFAULT) && ($this->_theme != 'default') && $this->_inheritsDefault()) {
             $out[] = $this->_getOutput($this->_app, 'default', $item);
         }
-        if (($this->_theme != 'default') && $this->_inheritsDefault() && ($entry & self::HORDE_DEFAULT)) {
+        if (($entry & self::HORDE_DEFAULT) && ($this->_theme != 'default') && $this->_inheritsDefault()) {
             $out[] = $this->_getOutput('horde', 'default', $item);
         }
 
