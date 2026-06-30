@@ -25,6 +25,14 @@ use Horde_Exception;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Closure;
+use Horde_Core_Secret_Cbc;
+use Horde_Shutdown;
+use ReflectionMethod;
+use ReflectionProperty;
+use Throwable;
+
+use const E_WARNING;
 
 /**
  * Unit tests for {@see SessionLifecycle}.
@@ -108,14 +116,14 @@ class SessionLifecycleTest extends TestCase
         // module needed for the constructor itself) so we can
         // instantiate it without arguments and confirm it satisfies
         // the lifecycle's type constraint.
-        if (!class_exists(\Horde_Core_Secret_Cbc::class)) {
+        if (!class_exists(Horde_Core_Secret_Cbc::class)) {
             self::markTestSkipped('Horde_Core_Secret_Cbc not loadable in this test environment');
         }
         // Construct with the minimum params the new validator
         // requires: a non-empty secret_key under the default HKDF
         // format. The test asserts the type contract, not the
         // encryption behaviour.
-        $secret = new \Horde_Core_Secret_Cbc([
+        $secret = new Horde_Core_Secret_Cbc([
             'iv' => str_repeat("\0", 8),
             'secret_key' => 'sessionlifecycle-test-master',
         ]);
@@ -157,7 +165,7 @@ class SessionLifecycleTest extends TestCase
         // $GLOBALS['injector']. Provide a minimal stub to satisfy that
         // path; the shutdown task itself never fires under unit test.
         $injector = new Injector(new TopLevel());
-        $injector->setInstance('Horde_Shutdown', new \Horde_Shutdown());
+        $injector->setInstance('Horde_Shutdown', new Horde_Shutdown());
         $previousInjector = $GLOBALS['injector'] ?? null;
         $GLOBALS['injector'] = $injector;
 
@@ -165,7 +173,7 @@ class SessionLifecycleTest extends TestCase
             $lifecycle->setup(start: false);
 
             // First call set the flag.
-            $r = new \ReflectionProperty(SessionLifecycle::class, 'setupApplied');
+            $r = new ReflectionProperty(SessionLifecycle::class, 'setupApplied');
             $r->setAccessible(true);
             self::assertTrue($r->getValue($lifecycle));
 
@@ -285,7 +293,7 @@ class SessionLifecycleTest extends TestCase
         // would require a real PHP session. The active flag is private
         // state owned by this class; flipping it via reflection mirrors
         // what start() would do.
-        $r = new \ReflectionProperty($lifecycle, 'active');
+        $r = new ReflectionProperty($lifecycle, 'active');
         $r->setAccessible(true);
         $r->setValue($lifecycle, true);
 
@@ -321,7 +329,7 @@ class SessionLifecycleTest extends TestCase
 
         $lifecycle = $this->build(session: $session);
 
-        $r = new \ReflectionProperty($lifecycle, 'active');
+        $r = new ReflectionProperty($lifecycle, 'active');
         $r->setAccessible(true);
         $r->setValue($lifecycle, true);
 
@@ -444,7 +452,7 @@ class SessionLifecycleTest extends TestCase
 
         // Force active=true so shutdown() does its mirror; processFlags
         // should still NOT fire.
-        $r = new \ReflectionProperty(SessionLifecycle::class, 'active');
+        $r = new ReflectionProperty(SessionLifecycle::class, 'active');
         $r->setAccessible(true);
         $r->setValue($lifecycle, true);
 
@@ -488,7 +496,7 @@ class SessionLifecycleTest extends TestCase
 
         try {
             $lifecycle->regenerate();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             self::fail('regenerate threw unexpectedly: ' . $e->getMessage());
         }
 
@@ -550,9 +558,9 @@ class SessionLifecycleTest extends TestCase
 class CapturingHordeSession extends HordeSession
 {
     public bool $reEncryptAllCalled = false;
-    public ?\Closure $capturedRotation = null;
+    public ?Closure $capturedRotation = null;
 
-    public function reEncryptAll(\Closure $rotate): void
+    public function reEncryptAll(Closure $rotate): void
     {
         $this->reEncryptAllCalled = true;
         $this->capturedRotation = $rotate;
@@ -561,7 +569,7 @@ class CapturingHordeSession extends HordeSession
         // "Session ID cannot be regenerated when there is no active
         // session" warning from session_regenerate_id(). The rest of
         // the callback (e.g. secret->setKey) still runs.
-        set_error_handler(static fn() => true, \E_WARNING);
+        set_error_handler(static fn() => true, E_WARNING);
         try {
             $rotate();
         } finally {
@@ -632,7 +640,7 @@ class RecordingSessionLifecycle extends SessionLifecycle
      */
     private function getHordeSessionForTest(): HordeSession
     {
-        $r = new \ReflectionMethod(parent::class, 'getSession');
+        $r = new ReflectionMethod(parent::class, 'getSession');
         $r->setAccessible(true);
         /** @var HordeSession $session */
         $session = $r->invoke($this);

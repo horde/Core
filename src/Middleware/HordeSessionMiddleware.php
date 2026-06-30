@@ -32,6 +32,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use LogicException;
 
 /**
  * Modern PSR-15 cookie-bearing session middleware.
@@ -163,7 +164,7 @@ final class HordeSessionMiddleware implements MiddlewareInterface
             // The configured factory is supposed to mint HordeSessions;
             // if it doesn't, the rest of the modern stack will fail
             // anyway. Surface the misconfiguration clearly.
-            throw new \LogicException(sprintf(
+            throw new LogicException(sprintf(
                 'SessionHandler::create() returned %s, expected HordeSession.',
                 get_debug_type($created),
             ));

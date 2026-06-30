@@ -249,12 +249,12 @@ class Horde_Themes_Cache implements Serializable
     protected function _coveredApps()
     {
         if (!isset($this->_covers)) {
-            $theme_covers = array();
+            $theme_covers = [];
 
             /* Theme names originate from user prefs/options, so guard against
              * path traversal: only include info.php for a plain directory name
              * (no separators, no '..'). Anything else inherits everything. */
-            if (preg_match('/^[A-Za-z0-9_-]+$/', (string)$this->_theme)) {
+            if (preg_match('/^[A-Za-z0-9_-]+$/', (string) $this->_theme)) {
                 global $registry;
                 $info = $registry->get('themesfs', 'horde') . '/' . $this->_theme . '/info.php';
                 if (is_readable($info)) {
@@ -262,7 +262,7 @@ class Horde_Themes_Cache implements Serializable
                 }
             }
 
-            $this->_covers = array_map('strtolower', (array)$theme_covers);
+            $this->_covers = array_map('strtolower', (array) $theme_covers);
         }
 
         return $this->_covers;

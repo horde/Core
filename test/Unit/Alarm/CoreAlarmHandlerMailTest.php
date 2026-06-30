@@ -21,6 +21,7 @@ use Horde_Mail_Transport_Mock;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 /**
  * Tests that Horde_Core_Alarm_Handler_Mail defers Horde_Mail resolution
@@ -35,7 +36,7 @@ class CoreAlarmHandlerMailTest extends TestCase
      * Build a real Injector pre-loaded with a counter so we can assert
      * how many times Horde_Mail was resolved.
      *
-     * @return array{0: Injector, 1: \stdClass} Injector + counter object
+     * @return array{0: Injector, 1: stdClass} Injector + counter object
      *                                          whose `count` property is
      *                                          incremented on each
      *                                          resolution.
@@ -43,18 +44,18 @@ class CoreAlarmHandlerMailTest extends TestCase
     private function injectorWithMailCounter(): array
     {
         $injector = new Injector(new TopLevel());
-        $counter = new \stdClass();
+        $counter = new stdClass();
         $counter->count = 0;
         $transport = new Horde_Mail_Transport_Mock();
         $injector->addBinder(
             'Horde_Mail',
             new class ($counter, $transport) implements \Horde\Injector\Binder {
                 public function __construct(
-                    private \stdClass $counter,
+                    private stdClass $counter,
                     private Horde_Mail_Transport_Mock $transport,
                 ) {}
 
-                public function create(\Horde\Injector\Injector $injector): mixed
+                public function create(Injector $injector): mixed
                 {
                     $this->counter->count++;
 
@@ -226,7 +227,7 @@ class CoreAlarmHandlerMailTest extends TestCase
         $this->expectException(Horde_Alarm_Exception::class);
         new Horde_Core_Alarm_Handler_Mail([
             'injector' => $injector,
-            'identity' => new \stdClass(),
+            'identity' => new stdClass(),
         ]);
     }
 }

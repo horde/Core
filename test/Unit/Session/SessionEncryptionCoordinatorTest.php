@@ -151,7 +151,5 @@ class RecordingSecret implements SessionSecret
         return true;
     }
 
-    public function setSession(HordeSession $session): void
-    {
-    }
+    public function setSession(HordeSession $session): void {}
 }

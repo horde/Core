@@ -25,6 +25,7 @@ use Horde_ActiveSync_Message_Mail;
 use Horde_Core_ActiveSync_Mail_Draft;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Horde_ActiveSync_Message_AirSyncBaseBody;
 
 /**
  * Unit tests for EAS 16.0 draft sync helpers in Horde_Core_ActiveSync_Mail_Draft.
@@ -127,10 +128,10 @@ class DraftSyncTest extends TestCase
             'PHASE-A-ONLY',
         ]);
 
-        $message = new \Horde_ActiveSync_Message_Mail([
+        $message = new Horde_ActiveSync_Message_Mail([
             'protocolversion' => Horde_ActiveSync::VERSION_SIXTEEN,
         ]);
-        $body = new \Horde_ActiveSync_Message_AirSyncBaseBody([
+        $body = new Horde_ActiveSync_Message_AirSyncBaseBody([
             'protocolversion' => Horde_ActiveSync::VERSION_SIXTEEN,
         ]);
         $body->type = Horde_ActiveSync::BODYPREF_TYPE_MIME;
@@ -155,7 +156,7 @@ class DraftSyncTest extends TestCase
     ): Horde_Core_ActiveSync_Mail_Draft {
         $imap ??= $this->getMockSkipConstructor(Horde_ActiveSync_Imap_Adapter::class);
 
-        return new class($imap, 'torben@dannhauer.info', Horde_ActiveSync::VERSION_SIXTEEN) extends Horde_Core_ActiveSync_Mail_Draft {
+        return new class ($imap, 'torben@dannhauer.info', Horde_ActiveSync::VERSION_SIXTEEN) extends Horde_Core_ActiveSync_Mail_Draft {
             protected function _getIdentityFromAddress()
             {
                 return null;
@@ -172,13 +173,13 @@ class DraftSyncTest extends TestCase
         string $body,
         string $subject
     ): Horde_ActiveSync_Message_Mail {
-        $message = new \Horde_ActiveSync_Message_Mail([
+        $message = new Horde_ActiveSync_Message_Mail([
             'protocolversion' => Horde_ActiveSync::VERSION_SIXTEEN,
         ]);
         $message->to = 'test@dannhauer.de';
         $message->subject = $subject;
 
-        $airsyncBody = new \Horde_ActiveSync_Message_AirSyncBaseBody([
+        $airsyncBody = new Horde_ActiveSync_Message_AirSyncBaseBody([
             'protocolversion' => Horde_ActiveSync::VERSION_SIXTEEN,
         ]);
         $airsyncBody->type = Horde_ActiveSync::BODYPREF_TYPE_PLAIN;

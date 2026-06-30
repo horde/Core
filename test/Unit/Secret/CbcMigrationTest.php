@@ -17,6 +17,7 @@ use Horde_Core_Secret_Cbc;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 /**
  * Pin the shape-2 → shape-3 migration path in Horde_Core_Secret_Cbc.
@@ -176,7 +177,7 @@ class CbcMigrationTest extends TestCase
         $recovered = null;
         try {
             $recovered = $cbcLegacyOff->read($cbcLegacyOff->getKey(), $cipher);
-        } catch (\Throwable) {
+        } catch (Throwable) {
             $recovered = null;
         }
 

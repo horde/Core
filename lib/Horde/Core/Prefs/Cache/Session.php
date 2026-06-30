@@ -20,7 +20,7 @@ use Horde\Core\Session\HordeSession;
  * Reads go through the modern PSR-4 {@see HordeSession}. Writes invalidate
  * the cached scope instead of replacing it, so the next request reloads the
  * scope from storage. This avoids a write-ordering race against
- * {@see \Horde\Core\Session\SessionLifecycle::shutdown()}, which mirrors
+ * {@see Horde\Core\Session\SessionLifecycle::shutdown()}, which mirrors
  * {@see HordeSession} back into `$_SESSION` at request shutdown: a
  * `store()` that ran after the mirror would never reach the persisted
  * session row, leaving subsequent requests with stale prefs until the

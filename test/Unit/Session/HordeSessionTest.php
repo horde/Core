@@ -21,6 +21,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Horde_Pack;
+use LogicException;
+use RuntimeException;
+use stdClass;
 
 #[CoversClass(HordeSession::class)]
 class HordeSessionTest extends TestCase
@@ -419,7 +422,7 @@ class HordeSessionTest extends TestCase
             $writer->toPayload(),
             fn(string $p): string => 'ENC:' . $p,
             function (string $c): string {
-                throw new \RuntimeException('decryptor blew up');
+                throw new RuntimeException('decryptor blew up');
             },
         );
 
@@ -461,12 +464,12 @@ class HordeSessionTest extends TestCase
      * holder. Mutating the holder simulates a key rotation between
      * drain and refill phases of reEncryptAll().
      *
-     * @return array{0: HordeSession, 1: \stdClass} The session and the
+     * @return array{0: HordeSession, 1: stdClass} The session and the
      *                                              key holder.
      */
     private function sessionWithMutableKey(string $initialKey = 'KEY1'): array
     {
-        $holder = new \stdClass();
+        $holder = new stdClass();
         $holder->key = $initialKey;
         // Encryption: tag the plaintext with the active key on write.
         $encryptor = static function (string $plaintext) use ($holder): string {
@@ -476,7 +479,7 @@ class HordeSessionTest extends TestCase
         $decryptor = static function (string $ciphertext) use ($holder): string {
             $prefix = $holder->key . '|';
             if (!str_starts_with($ciphertext, $prefix)) {
-                throw new \RuntimeException('wrong key');
+                throw new RuntimeException('wrong key');
             }
             return substr($ciphertext, strlen($prefix));
         };
@@ -570,10 +573,10 @@ class HordeSessionTest extends TestCase
         try {
             $session->reEncryptAll(function () use ($holder) {
                 $holder->key = 'KEY2';
-                throw new \LogicException('rotation aborted');
+                throw new LogicException('rotation aborted');
             });
             self::fail('expected exception');
-        } catch (\LogicException $e) {
+        } catch (LogicException $e) {
             self::assertSame('rotation aborted', $e->getMessage());
         }
 

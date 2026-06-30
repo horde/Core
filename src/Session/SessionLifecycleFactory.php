@@ -19,6 +19,7 @@ namespace Horde\Core\Session;
 use Horde\Core\Secret\SessionSecret;
 use Horde\Injector\Injector;
 use Horde\SessionHandler\SessionHandler;
+use Throwable;
 
 /**
  * DI factory for {@see SessionLifecycle}.
@@ -60,7 +61,7 @@ class SessionLifecycleFactory
             // Resolved-but-not-SessionSecret: legacy fixture or test
             // double. Treat as if no cipher were available; lifecycle
             // no-ops the setKey/clearKey calls.
-        } catch (\Throwable) {
+        } catch (Throwable) {
             // No Horde_Secret_Cbc binding configured. Tests and
             // bootstrap-time contexts may run without one. Lifecycle
             // gracefully no-ops the rekey/clearKey calls when null.
@@ -76,7 +77,7 @@ class SessionLifecycleFactory
             // to drain.
             try {
                 $coordinator = $injector->getInstance(SessionEncryptionCoordinator::class);
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 // No coordinator binding configured. Lifecycle falls
                 // back to its inline reEncryptAll path; behaviour is
                 // equivalent at the encryption-ceremony level, just

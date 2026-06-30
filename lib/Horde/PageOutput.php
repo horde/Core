@@ -450,12 +450,12 @@ class Horde_PageOutput
         }
         try {
             $renderer = $GLOBALS['injector']->getInstance(
-                \Horde\Core\PageOutput\SessionApiMetaRenderer::class
+                Horde\Core\PageOutput\SessionApiMetaRenderer::class
             );
             $session = $GLOBALS['injector']->getInstance(
-                \Horde\Core\Session\HordeSession::class
+                Horde\Core\Session\HordeSession::class
             );
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return;
         }
 
@@ -470,14 +470,14 @@ class Horde_PageOutput
         // The renderer encapsulates the values; this class still owns
         // the rendering format on the legacy path.
         $this->addMetaTag(
-            \Horde\Core\PageOutput\SessionApiMetaRenderer::META_SESSION_API,
+            Horde\Core\PageOutput\SessionApiMetaRenderer::META_SESSION_API,
             $renderer->getSessionApiUrl(),
             false,
         );
         $token = $renderer->mintCsrfToken($session);
         if ($token !== null) {
             $this->addMetaTag(
-                \Horde\Core\PageOutput\SessionApiMetaRenderer::META_CSRF_API,
+                Horde\Core\PageOutput\SessionApiMetaRenderer::META_CSRF_API,
                 $token,
                 false,
             );

@@ -18,6 +18,7 @@ namespace Horde\Core\Factory;
 
 use Horde\Core\Secret\SessionSecret;
 use Horde\Injector\Injector;
+use LogicException;
 
 /**
  * DI factory for {@see SessionSecret}.
@@ -39,7 +40,7 @@ class SessionSecretFactory
         $resolved = $injector->getInstance('Horde_Secret_Cbc');
 
         if (!$resolved instanceof SessionSecret) {
-            throw new \LogicException(
+            throw new LogicException(
                 'Horde_Secret_Cbc binding does not resolve to a '
                 . 'SessionSecret implementation. DI configuration error.'
             );

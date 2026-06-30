@@ -82,7 +82,5 @@ final class HkdfInfo
      * Block instantiation. This class is a registry of constants and
      * is never instantiated.
      */
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 }

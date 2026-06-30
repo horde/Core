@@ -24,6 +24,8 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use RuntimeException;
+use Horde_Core_Factory_Base;
+use ReflectionProperty;
 
 /**
  * Unit tests for {@see Horde_Core_Factory_Cache::_resolveHashTable()}.
@@ -119,7 +121,7 @@ class CacheResolveHashTableTest extends TestCase
      */
     private function injectorOf(Horde_Core_Factory_Cache $factory): Horde_Injector
     {
-        $prop = new \ReflectionProperty(\Horde_Core_Factory_Base::class, '_injector');
+        $prop = new ReflectionProperty(Horde_Core_Factory_Base::class, '_injector');
 
         return $prop->getValue($factory);
     }

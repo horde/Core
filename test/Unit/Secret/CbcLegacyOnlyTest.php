@@ -17,6 +17,7 @@ use Horde_Core_Secret_Cbc;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 /**
  * Pin the `key_format=legacy-only` rollback path.
@@ -182,7 +183,7 @@ class CbcLegacyOnlyTest extends TestCase
         $recovered = null;
         try {
             $recovered = $cbcHkdf->read($cbcHkdf->getKey(), $cipher);
-        } catch (\Throwable) {
+        } catch (Throwable) {
             $recovered = null;
         }
 

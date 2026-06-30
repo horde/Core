@@ -19,6 +19,7 @@ use Horde_Core_Secret_Cbc;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 /**
  * Pin the HKDF-SHA256 derivation used by Horde_Core_Secret_Cbc for
@@ -185,7 +186,7 @@ class CbcHkdfTest extends TestCase
         $recovered = null;
         try {
             $recovered = $attackerCbc->read($attackerCbc->getKey(), $cipher);
-        } catch (\Throwable) {
+        } catch (Throwable) {
             // Decrypt failed loudly under the wrong key.
             $recovered = null;
         }
@@ -214,7 +215,7 @@ class CbcHkdfTest extends TestCase
         $recovered = null;
         try {
             $recovered = $attackerCbc->read($attackerCbc->getKey(), $cipher);
-        } catch (\Throwable) {
+        } catch (Throwable) {
             $recovered = null;
         }
 

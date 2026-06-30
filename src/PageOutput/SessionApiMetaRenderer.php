@@ -55,7 +55,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * controllers inject this directly and call {@see addToCollector()}
  * with their request-attribute session.
  *
- * @see \Horde\Core\PageOutput\AssetCollector::addMetaTag()
+ * @see AssetCollector::addMetaTag()
  * @see \Horde\Base\Js\SessionApiClient.fromMeta() (consumer side)
  */
 final class SessionApiMetaRenderer

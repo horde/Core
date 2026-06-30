@@ -31,6 +31,7 @@ use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
+use RuntimeException;
 
 /**
  * Unit tests for Horde_Core_ActiveSync_Driver::meetingResponse().
@@ -220,21 +221,13 @@ class DriverMeetingResponseTest extends TestCase
         $this->setProperty($driver, '_user', 'attendee');
         $this->setProperty($driver, '_version', Horde_ActiveSync::VERSION_SIXTEENONE);
         $this->setProperty($driver, '_logger', new class {
-            public function err(string $message, ?string $priority = null): void
-            {
-            }
+            public function err(string $message, ?string $priority = null): void {}
 
-            public function meta(string $message): void
-            {
-            }
+            public function meta(string $message): void {}
 
-            public function notice(string $message): void
-            {
-            }
+            public function notice(string $message): void {}
 
-            public function warn(string $message): void
-            {
-            }
+            public function warn(string $message): void {}
         });
 
         return $driver;
@@ -256,9 +249,7 @@ class DriverMeetingResponseTest extends TestCase
         }
 
         $identity = new class ($email) {
-            public function __construct(private readonly string $email)
-            {
-            }
+            public function __construct(private readonly string $email) {}
 
             public function getValue(string $key): ?string
             {
@@ -272,9 +263,7 @@ class DriverMeetingResponseTest extends TestCase
         };
 
         $identityFactory = new class ($identity) {
-            public function __construct(private readonly object $identity)
-            {
-            }
+            public function __construct(private readonly object $identity) {}
 
             public function create(?string $user = null): object
             {
@@ -283,9 +272,7 @@ class DriverMeetingResponseTest extends TestCase
         };
 
         $GLOBALS['injector'] = new class ($identityFactory) {
-            public function __construct(private readonly object $identityFactory)
-            {
-            }
+            public function __construct(private readonly object $identityFactory) {}
 
             public function getInstance(string $class): object
             {
@@ -293,7 +280,7 @@ class DriverMeetingResponseTest extends TestCase
                     return $this->identityFactory;
                 }
 
-                throw new \RuntimeException(sprintf('Unexpected injector lookup: %s', $class));
+                throw new RuntimeException(sprintf('Unexpected injector lookup: %s', $class));
             }
         };
     }
@@ -304,9 +291,7 @@ class DriverMeetingResponseTest extends TestCase
     private function createImapMessage(string $requestId, string $ical): array
     {
         $part = new class ($ical) {
-            public function __construct(private readonly string $ical)
-            {
-            }
+            public function __construct(private readonly string $ical) {}
 
             public function getContents(): string
             {
@@ -320,9 +305,7 @@ class DriverMeetingResponseTest extends TestCase
         };
 
         $message = new class ($part) {
-            public function __construct(private readonly object $part)
-            {
-            }
+            public function __construct(private readonly object $part) {}
 
             public function hasiCalendar(): object
             {

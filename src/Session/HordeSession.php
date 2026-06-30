@@ -21,6 +21,7 @@ use Horde\SessionHandler\Exception\SessionException;
 use Horde\SessionHandler\SessionId;
 use Horde_Pack;
 use Horde_Pack_Exception;
+use Throwable;
 
 /**
  * Horde-specific session implementation with scoped keys and encryption.
@@ -459,7 +460,7 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
 
         try {
             $decrypted = ($this->decryptor)($raw);
-        } catch (\Throwable) {
+        } catch (Throwable) {
             // Wrong key, corrupted ciphertext, or any other decrypt-side
             // failure: fail closed. AuthCredentialStore::get() and similar
             // consumers turn this into a "no credentials" signal so the
@@ -607,7 +608,7 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
                 }
                 try {
                     $plainValues[] = [$app, $name, ($this->decryptor)($raw)];
-                } catch (\Throwable) {
+                } catch (Throwable) {
                     // Slot is unrecoverable under the current key. Drop
                     // it from $data and from the encryption map; mark
                     // the session dirty so the now-shrunken payload

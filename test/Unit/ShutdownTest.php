@@ -20,6 +20,7 @@ use Horde_Shutdown_Task;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 /**
  * A single shared sink the test fixtures append into.
@@ -51,34 +52,49 @@ abstract class ShutdownTestRecorder implements Horde_Shutdown_Task
 
 final class ShutdownTestRecorderA extends ShutdownTestRecorder
 {
-    protected function name(): string { return 'a'; }
+    protected function name(): string
+    {
+        return 'a';
+    }
 }
 
 final class ShutdownTestRecorderB extends ShutdownTestRecorder
 {
-    protected function name(): string { return 'b'; }
+    protected function name(): string
+    {
+        return 'b';
+    }
 }
 
 final class ShutdownTestRecorderC extends ShutdownTestRecorder
 {
-    protected function name(): string { return 'c'; }
+    protected function name(): string
+    {
+        return 'c';
+    }
 }
 
 final class ShutdownTestRecorderFinal extends ShutdownTestRecorder
 {
-    protected function name(): string { return 'final'; }
+    protected function name(): string
+    {
+        return 'final';
+    }
 }
 
 final class ShutdownTestRecorderFinalAlt extends ShutdownTestRecorder
 {
-    protected function name(): string { return 'replacement-final'; }
+    protected function name(): string
+    {
+        return 'replacement-final';
+    }
 }
 
 final class ShutdownTestThrower implements Horde_Shutdown_Task
 {
     public function shutdown(): void
     {
-        throw new \RuntimeException('boom');
+        throw new RuntimeException('boom');
     }
 }
 
