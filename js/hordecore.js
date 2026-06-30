@@ -236,6 +236,22 @@ var HordeCore = {
     {
         this.inAjaxCallback = true;
 
+        // Pick up a freshly minted CSRF token if the server emitted one.
+        // The legacy Horde_Core_Ajax_Application::send() and the modern
+        // CsrfRotationMiddleware both write X-Csrf-Token on successful
+        // responses. Storing the rotated token in conf.TOKEN means the
+        // next doAction() (read by addRequestParams / addCsrfToken) sends
+        // a token whose nonce timestamp resets the token_lifetime clock.
+        // Without this update, the page-render-stamped token aged past
+        // urls.token_lifetime and the next AJAX call surfaced as
+        // REASON_SESSION ("session expired") — see horde/base#99.
+        if (resp && typeof resp.getHeader === 'function') {
+            var freshToken = resp.getHeader('X-Csrf-Token');
+            if (freshToken) {
+                this.conf.TOKEN = freshToken;
+            }
+        }
+
         if (!resp.responseJSON) {
             if (++this.server_error == 3) {
                 this.notify(this.text.ajax_timeout, 'horde.error');

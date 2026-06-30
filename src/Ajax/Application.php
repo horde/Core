@@ -261,11 +261,42 @@ abstract class Application
 
     /**
      * Send AJAX response to the browser.
+     *
+     * Successful responses emit a freshly minted CSRF token in the
+     * `X-Csrf-Token` response header. HordeCore.js and the smartmobile
+     * client store this in their in-memory token slot so subsequent AJAX
+     * requests carry a token with a fresh nonce timestamp. Without this
+     * rotation, the page-render-stamped token aged past
+     * `urls.token_lifetime` and the next AJAX call surfaced as
+     * REASON_SESSION ("session expired") — see horde/base#99.
+     *
+     * The freshly minted token does not invalidate previously-issued
+     * tokens (signed URLs, embedded form tokens); each token still ages
+     * out on its own nonce timestamp.
+     *
+     * Kill paths (SessionTimeout, NoAuth, generic exception) are
+     * dispatched directly from `services/ajax.php` and never reach this
+     * method; rotation deliberately does not happen on those responses.
      */
     public function send()
     {
-        if ($GLOBALS['session']->regenerate_due) {
+        global $injector, $session;
+
+        if ($session->regenerate_due) {
             $this->addTask('regenerate_sid', true, 'horde');
+        }
+
+        if (!headers_sent()) {
+            try {
+                $fresh = $injector->getInstance(Token::class)
+                    ->generate(HordeSession::CSRF_SEED);
+                header('X-Csrf-Token: ' . (string) $fresh);
+            } catch (TokenException) {
+                // Token minting failed (no session secret, etc.). The
+                // response itself is still valid; the client will keep
+                // its current token and rotate on the next successful
+                // response.
+            }
         }
 
         if ($this->data instanceof Horde_Core_Ajax_Response) {

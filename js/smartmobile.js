@@ -72,7 +72,20 @@ var HordeMobile = {
         opts = $.extend({
             data: params,
             error: $.noop,
-            success: function(d) {
+            success: function(d, textStatus, jqXHR) {
+                // Pick up a freshly minted CSRF token if the server
+                // emitted one. The legacy Horde_Core_Ajax_Application::send()
+                // and the modern CsrfRotationMiddleware both write
+                // X-Csrf-Token on successful responses. Without this
+                // update, the page-render-stamped token aged past
+                // urls.token_lifetime and the next AJAX call surfaced as
+                // REASON_SESSION ("session expired") — see horde/base#99.
+                if (jqXHR && typeof jqXHR.getResponseHeader === 'function') {
+                    var freshToken = jqXHR.getResponseHeader('X-Csrf-Token');
+                    if (freshToken) {
+                        HordeMobile.conf.token = freshToken;
+                    }
+                }
                 HordeMobile.doActionComplete(action, d, callback);
             },
             type: 'post',
