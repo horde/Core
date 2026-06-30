@@ -35,10 +35,10 @@ authors:
     active: false
     role: developer
 version:
-  release: 3.0.0-RC11
+  release: 3.0.0
   api: 3.0.0alpha1
 state:
-  release: RC
+  release: stable
   api: alpha
 license:
   identifier: LGPL-2.1-only
@@ -127,3 +127,125 @@ keywords:
   - framework
   - config
   - errorhandler
+ci-platform:
+  '8.0':
+    - php: '>=7.2'
+    - composer-plugin-api: ^2.2.0
+    - ext-bcmath
+    - ext-ctype
+    - ext-dom
+    - ext-gettext
+    - ext-hash
+    - ext-iconv
+    - ext-intl
+    - ext-json
+    - ext-ldap
+    - ext-openssl
+    - ext-pcre
+    - ext-simplexml
+    - ext-spl
+    - ext-xml
+  '8.1':
+    - php: '>=7.2'
+    - composer-plugin-api: ^2.2.0
+    - ext-bcmath
+    - ext-ctype
+    - ext-dom
+    - ext-gettext
+    - ext-hash
+    - ext-iconv
+    - ext-intl
+    - ext-json
+    - ext-ldap
+    - ext-openssl
+    - ext-pcre
+    - ext-simplexml
+    - ext-spl
+    - ext-xml
+  '8.2':
+    - php: '>=7.2'
+    - composer-plugin-api: ^2.2.0
+    - ext-bcmath
+    - ext-ctype
+    - ext-dom
+    - ext-gettext
+    - ext-hash
+    - ext-iconv
+    - ext-intl
+    - ext-json
+    - ext-ldap
+    - ext-openssl
+    - ext-pcre
+    - ext-simplexml
+    - ext-spl
+    - ext-xml
+  '8.3':
+    - php: '>=7.2'
+    - composer-plugin-api: ^2.2.0
+    - ext-bcmath
+    - ext-ctype
+    - ext-dom
+    - ext-gettext
+    - ext-hash
+    - ext-iconv
+    - ext-intl
+    - ext-json
+    - ext-ldap
+    - ext-openssl
+    - ext-pcre
+    - ext-simplexml
+    - ext-spl
+    - ext-xml
+  '8.4':
+    - php: '>=7.2'
+    - composer-plugin-api: ^2.2.0
+    - ext-bcmath
+    - ext-ctype
+    - ext-dom
+    - ext-gettext
+    - ext-hash
+    - ext-iconv
+    - ext-intl
+    - ext-json
+    - ext-ldap
+    - ext-openssl
+    - ext-pcre
+    - ext-simplexml
+    - ext-spl
+    - ext-xml
+  '8.5':
+    - php: '>=7.2'
+    - composer-plugin-api: ^2.2.0
+    - ext-bcmath
+    - ext-ctype
+    - ext-dom
+    - ext-gettext
+    - ext-hash
+    - ext-iconv
+    - ext-intl
+    - ext-json
+    - ext-ldap
+    - ext-openssl
+    - ext-pcre
+    - ext-simplexml
+    - ext-spl
+    - ext-xml
+  '8.6':
+    - php: '>=7.2'
+    - composer-plugin-api: ^2.2.0
+    - ext-bcmath
+    - ext-ctype
+    - ext-dom
+    - ext-gettext
+    - ext-hash
+    - ext-iconv
+    - ext-intl
+    - ext-json
+    - ext-ldap
+    - ext-openssl
+    - ext-pcre
+    - ext-simplexml
+    - ext-spl
+    - ext-xml
+ci-platform-flags:
+  needs_installer_plugin: true

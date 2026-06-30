@@ -1,4 +1,14 @@
 ---
+3.0.0:
+  api: 3.0.0
+  state:
+    release: stable
+    api: stable
+  date: 2026-06-30
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: "style: php-cs-fixer\nRework: theme declares which apps it covers (per-app fallback opt-out)\nAddress review: guard theme name against path traversal, short-circuit checks\nLet a theme opt out of the default-theme CSS fallback\nfix(ajax): rotate CSRF token on every successful AJAX response (horde/base#99)\nfeat(session): HKDF per-session key with three-state key_format\nfix(core): emit raw URLs in JS and JSON configuration\nfix(smartmobile): align portal link with modern URL-escaping convention\nrefactor(Core): unwire deprecated HashTable wrapper from Cache factory\nfix: prevent double HTML encoding of logout URL in smartmobile header\nfeat(core): add SessionApiMetaRenderer and wire it into Horde_PageOutput\nfeat(core): add SessionLifetimeMiddleware touching _last_seen and emitting telemetry headers\nfeat(core): add CsrfRotationMiddleware emitting X-Csrf-Token\nfeat(core): JwtSessionLoader handles Authorization: Bearer alongside cookie\nfeat(core): add NoopController for middleware-driven routes\nfix: Don't cache outdated/changed prefs in session\nfix(core): keep encrypted session slots readable across key drift (imp #66)"
 3.0.0-RC11:
   api: 3.0.0-RC11
   state:
