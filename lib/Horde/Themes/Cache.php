@@ -74,11 +74,12 @@ class Horde_Themes_Cache implements Serializable
     protected $_theme;
 
     /**
-     * Cached result of the theme's "inherits default" flag.
+     * Cached list of apps the theme declares it covers completely (lower-cased,
+     * 'horde' meaning the shell). Read from the theme's info.php.
      *
-     * @var boolean
+     * @var string[]
      */
-    protected $_inherits;
+    protected $_covers;
 
     /**
      * Constructor.
@@ -229,22 +230,30 @@ class Horde_Themes_Cache implements Serializable
     }
 
     /**
-     * Whether the current theme inherits CSS from the default theme.
+     * Returns the list of "apps" (including the special 'horde' shell) that
+     * the current theme declares it covers completely.
      *
-     * A theme can opt out of the default-theme fallback by setting
-     * `$theme_inherits = false;` in its info.php. Themes without the flag
-     * keep inheriting from the default theme (backwards compatible).
+     * A theme opts out of the default-theme CSS fallback on a per-app basis by
+     * listing those apps in its info.php:
      *
-     * @return boolean  True if the default-theme fallback applies.
+     *   $theme_covers = array('horde', 'imp', 'kronolith');
+     *
+     * For a covered app the default-theme CSS is not loaded underneath the
+     * theme. Apps that are NOT listed keep inheriting their own default theme
+     * CSS, so a third-party app that ships its own default/ assets still works.
+     *
+     * Themes without the declaration inherit everything, exactly as before.
+     *
+     * @return string[]  Lower-cased app names fully covered by the theme.
      */
-    protected function _inheritsDefault()
+    protected function _coveredApps()
     {
-        if (!isset($this->_inherits)) {
-            $theme_inherits = true;
+        if (!isset($this->_covers)) {
+            $theme_covers = array();
 
             /* Theme names originate from user prefs/options, so guard against
              * path traversal: only include info.php for a plain directory name
-             * (no separators, no '..'). Anything else falls back to inheriting. */
+             * (no separators, no '..'). Anything else inherits everything. */
             if (preg_match('/^[A-Za-z0-9_-]+$/', (string)$this->_theme)) {
                 global $registry;
                 $info = $registry->get('themesfs', 'horde') . '/' . $this->_theme . '/info.php';
@@ -253,10 +262,23 @@ class Horde_Themes_Cache implements Serializable
                 }
             }
 
-            $this->_inherits = (bool)$theme_inherits;
+            $this->_covers = array_map('strtolower', (array)$theme_covers);
         }
 
-        return $this->_inherits;
+        return $this->_covers;
+    }
+
+    /**
+     * Whether the theme covers the given app (so the default-theme CSS
+     * fallback for that app should be skipped).
+     *
+     * @param string $app  The app name ('horde' for the shell).
+     *
+     * @return boolean  True if the theme fully covers $app.
+     */
+    protected function _covers($app)
+    {
+        return in_array(strtolower($app), $this->_coveredApps(), true);
     }
 
     /**
@@ -278,10 +300,13 @@ class Horde_Themes_Cache implements Serializable
         if ($entry & self::HORDE_THEME) {
             $out[] = $this->_getOutput('horde', $this->_theme, $item);
         }
-        if (($entry & self::APP_DEFAULT) && ($this->_theme != 'default') && $this->_inheritsDefault()) {
+        /* Load the default-theme CSS as a fallback, unless the theme declares
+         * it fully covers this app (app-level) or the horde shell. Apps not
+         * listed in the theme's $theme_covers keep their default fallback. */
+        if (($entry & self::APP_DEFAULT) && ($this->_theme != 'default') && !$this->_covers($this->_app)) {
             $out[] = $this->_getOutput($this->_app, 'default', $item);
         }
-        if (($entry & self::HORDE_DEFAULT) && ($this->_theme != 'default') && $this->_inheritsDefault()) {
+        if (($entry & self::HORDE_DEFAULT) && ($this->_theme != 'default') && !$this->_covers('horde')) {
             $out[] = $this->_getOutput('horde', 'default', $item);
         }
 
