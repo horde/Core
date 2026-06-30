@@ -20,15 +20,19 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Pin the session-payload key persistence added to fix imp #66.
+ * Pin the legacy-only key-format behaviour.
  *
- * The Blowfish key the per-session encrypted slots are bound to used to
- * live exclusively in the `horde_secret_key` cookie (falling back to
- * `session_id()` when the cookie was absent). Either path turned the key
- * into a moving target across upgrades, cookie eviction, and session-id
- * rotation. After this change the canonical home is the modern session
- * payload at slot `_secret`/`key`; the cookie remains as a BC fallback
- * and the value migrates into the payload on first read.
+ * These tests originally pinned the PR-#174 session-payload key
+ * persistence (`_secret/key` slot, cookie fallback). After HKDF
+ * landed, that behaviour is reachable via the `legacy-only` value
+ * of the `key_format` constructor param — kept as an operator-
+ * controlled rollback path for severe HKDF-side bugs. Pinning it
+ * here lets us confirm the rollback path stays intact independently
+ * of any HKDF changes.
+ *
+ * The HKDF default path is tested in {@see CbcHkdfTest}. The
+ * shape-2 → shape-3 migration path is tested in
+ * {@see CbcMigrationTest}.
  */
 #[CoversClass(Horde_Core_Secret_Cbc::class)]
 class CbcTest extends TestCase
@@ -58,6 +62,9 @@ class CbcTest extends TestCase
             'cookie_ssl' => false,
             'iv' => str_repeat("\0", 8),
             'session_name' => self::SESSION_COOKIE,
+            // legacy-only matches the original PR-#174 behaviour
+            // these tests were written to pin.
+            'key_format' => Horde_Core_Secret_Cbc::KEY_FORMAT_LEGACY_ONLY,
         ]);
         if ($session !== null) {
             $cbc->setSession($session);
@@ -81,17 +88,28 @@ class CbcTest extends TestCase
     }
 
     #[Test]
-    public function testGetKeyMigratesFromCookieWhenSessionSlotEmpty(): void
+    public function testGetKeyIgnoresCookieUnderLegacyOnlyMode(): void
     {
+        // legacy-only mode is a rollback path, not a continuation
+        // of any prior cookie state. The framework mints its own
+        // random key and never adopts a value from
+        // $_COOKIE['horde_secret_key']. A stale or attacker-planted
+        // cookie value therefore cannot become the encryption key.
+        $_COOKIE[self::SESSION_COOKIE] = 'sess';
         $_COOKIE[self::COOKIE_KEY] = 'cookie-key';
         $session = $this->buildSession();
         $cbc = $this->buildCbc($session);
 
-        self::assertSame('cookie-key', $cbc->getKey());
-        // The cookie value is now copied into the session payload so the
-        // next read no longer depends on the cookie surviving.
+        $key = $cbc->getKey();
+
+        // The cookie value did NOT become the key — a fresh random
+        // one was minted instead.
+        self::assertNotSame('cookie-key', $key);
+        self::assertNotSame('', $key);
+        // The minted key now sits in the slot, so subsequent reads
+        // are stable.
         self::assertTrue($session->hasScoped('_secret', 'key'));
-        self::assertSame('cookie-key', $session->getScoped('_secret', 'key'));
+        self::assertSame($key, $session->getScoped('_secret', 'key'));
     }
 
     #[Test]
@@ -135,8 +153,17 @@ class CbcTest extends TestCase
     }
 
     #[Test]
-    public function testSetKeyWritesToSessionAndCookie(): void
+    public function testSetKeyWritesToSessionSlotOnly(): void
     {
+        // Under legacy-only, setKey writes the freshly minted key
+        // to the session slot. It does NOT write to the legacy
+        // `horde_secret_key` cookie. The cookie was historically
+        // the authoritative key source pre-PR-#174; under the
+        // three-state design it is no longer trusted (an attacker
+        // who plants a cookie should not gain control of the
+        // session's encryption key). Operators rolling back to
+        // legacy-only get the PR-#174 slot behaviour without the
+        // pre-PR-#174 cookie behaviour.
         $_COOKIE[self::SESSION_COOKIE] = 'sess';
         $session = $this->buildSession();
         $cbc = $this->buildCbc($session);
@@ -145,8 +172,8 @@ class CbcTest extends TestCase
 
         self::assertNotSame('', $key);
         self::assertSame($key, $session->getScoped('_secret', 'key'));
-        self::assertArrayHasKey(self::COOKIE_KEY, $_COOKIE);
-        self::assertSame($key, $_COOKIE[self::COOKIE_KEY]);
+        // Cookie is NOT written.
+        self::assertArrayNotHasKey(self::COOKIE_KEY, $_COOKIE);
     }
 
     #[Test]
@@ -167,18 +194,25 @@ class CbcTest extends TestCase
     #[Test]
     public function testEncryptDecryptRoundTripAcrossCookieLoss(): void
     {
-        // Sanity-check the full happy path: write encrypted data while
-        // the cookie is present, then drop the cookie. The session-stored
-        // key must still let us decrypt.
+        // Sanity-check the full happy path: write encrypted data
+        // while the cookie is present, then drop the cookie. The
+        // session-stored key still lets us decrypt — and would
+        // even if the cookie had never been there, because under
+        // the new design the cookie is not a key source.
         $_COOKIE[self::SESSION_COOKIE] = 'sess';
+        // Plant a recognisable cookie value to prove it is ignored.
         $_COOKIE[self::COOKIE_KEY] = str_repeat('K', 32);
         $session = $this->buildSession();
         $cbc = $this->buildCbc($session);
 
-        $cipher = $cbc->write($cbc->getKey(), 'secret-payload');
+        $key1 = $cbc->getKey();
+        // The cookie's planted value did not become the key.
+        self::assertNotSame(str_repeat('K', 32), $key1);
 
-        // User refreshes; browser has dropped the key cookie. Session
-        // payload still carries the key.
+        $cipher = $cbc->write($key1, 'secret-payload');
+
+        // User refreshes; browser has dropped the key cookie. The
+        // session payload still carries the freshly minted key.
         unset($_COOKIE[self::COOKIE_KEY]);
 
         $cbc2 = $this->buildCbc($session);

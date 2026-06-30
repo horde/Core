@@ -66,6 +66,24 @@ class SessionLifecycleFactory
             // gracefully no-ops the rekey/clearKey calls when null.
         }
 
-        return new SessionLifecycle($injector, $handler, $config, $secret);
+        $coordinator = null;
+        if ($secret !== null) {
+            // Resolve the encryption coordinator through the injector
+            // so middleware (which auto-wires the same type) and the
+            // lifecycle share one instance. The lifecycle's regenerate()
+            // routes the drain / rotate / refill ceremony through it;
+            // clean() uses setKey directly because there's no payload
+            // to drain.
+            try {
+                $coordinator = $injector->getInstance(SessionEncryptionCoordinator::class);
+            } catch (\Throwable) {
+                // No coordinator binding configured. Lifecycle falls
+                // back to its inline reEncryptAll path; behaviour is
+                // equivalent at the encryption-ceremony level, just
+                // less decoupled.
+            }
+        }
+
+        return new SessionLifecycle($injector, $handler, $config, $secret, $coordinator);
     }
 }
