@@ -41,6 +41,15 @@ class HordeSessionFactory extends DefaultSessionFactory
         $session = new HordeSession($id, [], $this->encryptor, $this->decryptor);
         $session->setSessionBegin(time());
 
+        // HKDF-era seed: every freshly minted session gets a 32-byte
+        // random salt before any encrypted write can happen. The
+        // matching Horde_Core_Secret_Cbc::getKey() / setKey() derive
+        // the per-session Blowfish key from (configuredSecretKey,
+        // _secret/salt, session_id). Existing sessions migrated from
+        // pre-HKDF shapes get their salt synthesized later, on the
+        // first setKey() rotation event.
+        $session->setScoped('_secret', 'salt', random_bytes(32));
+
         return $session;
     }
 

@@ -126,12 +126,22 @@ class SessionLifecycle implements Horde_Shutdown_Task
      *                                        {@see SessionHandlerFactory} uses.
      * @param SessionSecret|null    $secret   Optional. Re-keyed on clean(),
      *                                        cleared on destroy().
+     * @param SessionEncryptionCoordinator|null $coordinator
+     *                                        Optional. Mediates the drain /
+     *                                        rotate-key / refill ceremony
+     *                                        used by {@see regenerate()}
+     *                                        and {@see clean()}. When null
+     *                                        (legacy / test contexts), the
+     *                                        lifecycle falls back to the
+     *                                        inline reEncryptAll +
+     *                                        secret->setKey path.
      */
     public function __construct(
         private readonly Injector $injector,
         private readonly SessionHandler $handler,
         private readonly SessionConfig $config,
         private readonly ?SessionSecret $secret = null,
+        private readonly ?SessionEncryptionCoordinator $coordinator = null,
     ) {}
 
     /**
@@ -339,19 +349,34 @@ class SessionLifecycle implements Horde_Shutdown_Task
     {
         $session = $this->getSession();
 
-        // Drain encrypted slots under the OLD key, rotate the PHP
-        // session id (and re-mint the per-session Blowfish key), then
-        // re-encrypt the surviving plaintexts under the NEW key. The
-        // encryption closures themselves stay the same — they capture
-        // the secret service by reference and resolve getKey() lazily,
-        // so the second pass reads the fresh key automatically.
-        // Without this dance, the session id rotates while the
-        // ciphertext stays bound to the OLD key, and every encrypted
-        // slot becomes unreadable on the next read (imp #66).
-        $session->reEncryptAll(function (): void {
+        if ($this->coordinator !== null) {
+            // Modern path: drain under the OLD key (the encryption
+            // closures captured by HordeSession resolve getKey()
+            // against the current salt + session_id), rotate the
+            // session id, then refill (which calls secret->setKey()
+            // — writes a fresh salt — and re-encrypts each slot
+            // under the new derivation).
+            //
+            // The drain-rotate-refill split (rather than the inline
+            // reEncryptAll closure used in the fallback below) is
+            // necessary because the modern PSR-15 middleware path
+            // uses the same coordinator and rotates the row via
+            // SessionHandler::regenerate() rather than
+            // session_regenerate_id(true). Both stacks converge on
+            // identical encryption ceremony.
+            $plain = $this->coordinator->drain($session);
             session_regenerate_id(true);
-            $this->secret?->setKey();
-        });
+            $this->coordinator->refill($session, $plain);
+        } else {
+            // Fallback for test / legacy contexts without a wired
+            // coordinator. Uses HordeSession::reEncryptAll's inline
+            // closure shape; semantically equivalent to the
+            // coordinator path, just less decoupled.
+            $session->reEncryptAll(function (): void {
+                session_regenerate_id(true);
+                $this->secret?->setKey();
+            });
+        }
 
         // The deadline is canonical on HordeSession at the top level.
         // The shim's addFinal() shutdown task mirrors HordeSession to

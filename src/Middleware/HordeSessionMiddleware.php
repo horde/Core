@@ -17,6 +17,7 @@ namespace Horde\Core\Middleware;
 
 use Horde\Core\Session\HordeSession;
 use Horde\Core\Session\SessionConfig;
+use Horde\Core\Session\SessionEncryptionCoordinator;
 use Horde\Http\SameSite;
 use Horde\Http\Server\Cookies;
 use Horde\Http\StrictCookie;
@@ -71,6 +72,7 @@ final class HordeSessionMiddleware implements MiddlewareInterface
         private readonly SessionHandler $handler,
         private readonly SessionConfig $config,
         private readonly LoggerInterface $logger = new NullLogger(),
+        private readonly ?SessionEncryptionCoordinator $coordinator = null,
     ) {}
 
     public function process(
@@ -224,19 +226,46 @@ final class HordeSessionMiddleware implements MiddlewareInterface
         ResponseInterface $response,
         HordeSession $session,
     ): ResponseInterface {
+        // Drain encrypted slots BEFORE the handler rotates the row.
+        // Under HKDF the session id is a derivation input, so after
+        // SessionHandler::regenerate() returns the rotated session,
+        // its slots would be unreadable until refilled under the
+        // new derivation. Draining here captures the plaintexts
+        // while the old key is still derivable.
+        //
+        // When the coordinator is not wired (legacy DI configurations,
+        // tests with the middleware constructed bare), skip the
+        // drain/refill. PR #174's key-in-row shape stays bound across
+        // id rotation because the key value travels with the row;
+        // only HKDF needs the drain/refill dance.
+        $plain = $this->coordinator?->drain($session) ?? [];
+
         try {
             $rotated = $this->handler->regenerate($session);
         } catch (SessionException $e) {
-            // Failed to rotate. Best-effort: persist what we have under
-            // the original id so the user's request work isn't lost,
-            // and don't emit a Set-Cookie. Next request retries
-            // rotation if the marker is set again.
+            // Failed to rotate. Best-effort: refill the original
+            // session (the drain emptied the cipher closures of any
+            // pending decryption; refill puts them back under the
+            // SAME unchanged key, since secret->setKey() inside
+            // refill is the only "new key" trigger and the original
+            // session has the old salt slot intact). Persist what we
+            // have under the original id so the user's request work
+            // isn't lost, and don't emit a Set-Cookie. Next request
+            // retries rotation if the marker is set again.
+            $this->coordinator?->refill($session, $plain);
             $this->logger->warning('Session regenerate failed; persisting under original id', [
                 'sid' => (string) $session->getId(),
                 'exception' => $e->getMessage(),
             ]);
             return $this->finaliseSteady($response, $session, hadCookie: true);
         }
+
+        // Refill on the rotated session. coordinator->refill() calls
+        // SessionSecret::setKey() (which under HKDF writes a fresh
+        // salt at _secret/salt on the rotated session) and re-encrypts
+        // each plaintext using the encryptor closure (which derives
+        // from the new salt + new session id).
+        $this->coordinator?->refill($rotated, $plain);
 
         // Refresh the regenerate-at deadline. Two reasons:
         //   1. Per-request rotations should reset the deadline; otherwise

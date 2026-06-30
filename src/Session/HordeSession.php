@@ -564,37 +564,31 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
     }
 
     /**
-     * Re-encrypt all encrypted slots around an externally-driven key
-     * rotation.
+     * Decrypt every encrypted slot under the current decryptor and
+     * return the plaintexts. Slots whose ciphertext cannot be decrypted
+     * are dropped from `$data` and from the encryption map.
      *
-     * Used when the encryption closures themselves stay the same (they
-     * capture the secret service by reference and call getKey() lazily),
-     * but the key the closures fetch is about to change underneath them.
-     * The canonical caller is {@see SessionLifecycle::regenerate()}, which
-     * rotates the PHP session id (and optionally re-mints the per-session
-     * Blowfish key) between drain and refill.
+     * The session's encrypted-slot ciphertexts are LEFT IN PLACE if
+     * decryption succeeded; the caller is expected to follow drain
+     * with {@see refillEncrypted()} or {@see reEncryptAll()} so the
+     * payload is re-bound to the post-rotation key.
      *
-     * Sequence:
-     *   1. Walk the encryption map and decrypt each slot using the
-     *      current decryptor (still bound to the OLD key).
-     *   2. Slots that cannot be decrypted under the current key are
-     *      dropped from `$data` and from the encryption map. Carrying
-     *      ciphertext nobody can read is strictly worse than dropping
-     *      it; consumers (e.g. AuthCredentialStore::get) already
-     *      degrade gracefully to a "no credentials" state.
-     *   3. Invoke `$rotate`. The callback's job is to make the next
-     *      `getKey()` call (inside the still-captured encryptor) yield
-     *      the NEW key.
-     *   4. Re-encrypt each surviving plaintext using the current
-     *      encryptor (now bound to the NEW key) and write it back.
+     * Used in pairs with {@see refillEncrypted()} by callers that
+     * need to perform some action between drain and refill (e.g. the
+     * modern PSR-15 middleware path, which calls
+     * `SessionHandler::regenerate()` to relocate the row between
+     * drain and refill). Single-step callers use the convenience
+     * {@see reEncryptAll()} wrapper instead.
      *
-     * If `$rotate` throws, plaintexts are discarded and the encrypted
-     * slots stay as-is under the old key; the exception propagates to
-     * the caller. The session is left in a coherent pre-rotation state.
+     * Slot-drop behaviour: carrying ciphertext nobody can read is
+     * strictly worse than dropping it; consumers (e.g.
+     * {@see \Horde\Core\Auth\AuthCredentialStore::get()}) already
+     * degrade gracefully to a "no credentials" state.
      *
-     * @param Closure $rotate fn(): void — runs between drain and refill.
+     * @return list<array{0: string, 1: string, 2: string}>
+     *     Opaque plaintext list. Pass back into {@see refillEncrypted()}.
      */
-    public function reEncryptAll(Closure $rotate): void
+    public function drainEncrypted(): array
     {
         $map = $this->data[self::ENCRYPTED_KEY] ?? [];
         if (!is_array($map)) {
@@ -634,8 +628,23 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
             }
         }
 
-        $rotate();
+        return $plainValues;
+    }
 
+    /**
+     * Re-encrypt the plaintexts returned by {@see drainEncrypted()}
+     * under the current encryptor (which by now is expected to derive
+     * from post-rotation key material).
+     *
+     * Callers that have already performed external rotation work
+     * (id rotation, salt rotation, secret-service rekey) between
+     * drain and refill route their plaintexts here.
+     *
+     * @param list<array{0: string, 1: string, 2: string}> $plainValues
+     *     The list returned by drainEncrypted().
+     */
+    public function refillEncrypted(array $plainValues): void
+    {
         if ($this->encryptor === null) {
             return;
         }
@@ -644,6 +653,35 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
             $this->data[$app][$name] = ($this->encryptor)($plain);
             $this->dirty = true;
         }
+    }
+
+    /**
+     * Re-encrypt all encrypted slots around an externally-driven key
+     * rotation.
+     *
+     * Convenience wrapper around {@see drainEncrypted()} +
+     * {@see refillEncrypted()} for callers that perform their rotation
+     * step entirely inside the closure. Used by
+     * {@see SessionLifecycle::regenerate()}.
+     *
+     * Sequence:
+     *   1. Drain (delegates to {@see drainEncrypted()}).
+     *   2. Invoke `$rotate`. The callback's job is to make the next
+     *      `getKey()` call (inside the still-captured encryptor) yield
+     *      the NEW key.
+     *   3. Refill (delegates to {@see refillEncrypted()}).
+     *
+     * If `$rotate` throws, plaintexts are discarded and the encrypted
+     * slots stay as-is under the old key; the exception propagates to
+     * the caller. The session is left in a coherent pre-rotation state.
+     *
+     * @param Closure $rotate fn(): void — runs between drain and refill.
+     */
+    public function reEncryptAll(Closure $rotate): void
+    {
+        $plainValues = $this->drainEncrypted();
+        $rotate();
+        $this->refillEncrypted($plainValues);
     }
 
     // ---------------------------------------------------------------

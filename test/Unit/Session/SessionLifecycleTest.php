@@ -111,7 +111,14 @@ class SessionLifecycleTest extends TestCase
         if (!class_exists(\Horde_Core_Secret_Cbc::class)) {
             self::markTestSkipped('Horde_Core_Secret_Cbc not loadable in this test environment');
         }
-        $secret = new \Horde_Core_Secret_Cbc();
+        // Construct with the minimum params the new validator
+        // requires: a non-empty secret_key under the default HKDF
+        // format. The test asserts the type contract, not the
+        // encryption behaviour.
+        $secret = new \Horde_Core_Secret_Cbc([
+            'iv' => str_repeat("\0", 8),
+            'secret_key' => 'sessionlifecycle-test-master',
+        ]);
         self::assertInstanceOf(SessionSecret::class, $secret);
 
         $lifecycle = $this->build(secret: $secret);
