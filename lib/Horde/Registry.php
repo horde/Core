@@ -1962,15 +1962,26 @@ class Horde_Registry implements Horde_Shutdown_Task
             $app = $this->getApp();
         }
 
-        if (!isset($this->_cache['cfile'][$app][$conf_file])) {
-            $this->_cache['cfile'][$app][$conf_file] = new Horde_Registry_Loadconfig(
+        /* Include $vars in the cache key. The Loadconfig object caches
+         * `compact($vars)` of the included file, so two callers requesting
+         * different variable sets from the same config file must not share
+         * a cache slot. The first caller's narrower snapshot would satisfy
+         * later callers with missing keys. Seen with prefs.php, where
+         * Horde_Core_Prefs_Storage_Configuration::get() asks for '_prefs'
+         * during app bootstrap and Horde_Core_Prefs_Ui::_loadPrefs() later
+         * asks for ['prefGroups', '_prefs']; sharing pinned prefGroups to
+         * an empty array and the prefs UI rendered no groups. */
+        $varsKey = is_null($vars) ? '' : md5(serialize($vars));
+
+        if (!isset($this->_cache['cfile'][$app][$conf_file][$varsKey])) {
+            $this->_cache['cfile'][$app][$conf_file][$varsKey] = new Horde_Registry_Loadconfig(
                 $app,
                 $conf_file,
                 $vars
             );
         }
 
-        return $this->_cache['cfile'][$app][$conf_file];
+        return $this->_cache['cfile'][$app][$conf_file][$varsKey];
     }
 
     /**
