@@ -145,11 +145,13 @@ var RedBox = {
 
     htmlWindowContents: function(html)
     {
-        // Accept either a DOM element/id or a raw HTML string. Passing a
-        // string to $() returns null (it is treated as an element id), so
-        // wrap string content in a container element first.
+        // Accept a DOM element, an element id, or a raw HTML string. $()
+        // resolves an element or an id; if it resolves to nothing (a raw HTML
+        // string is treated as an id and not found), wrap the string in a
+        // container element instead.
         if (Object.isString(html)) {
-            html = new Element('DIV').update(html);
+            var resolved = $(html);
+            html = resolved ? resolved : new Element('DIV').update(html);
         }
         html = $(html).show();
         var win = $('RB_window'), child;
