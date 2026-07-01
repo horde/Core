@@ -1,4 +1,14 @@
 ---
+3.0.1:
+  api: 3.0.1
+  state:
+    release: stable
+    api: stable
+  date: 2026-07-01
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: "fix(core): use prefixed key when removing session cache entries\nfix: horde/core#182 issues with incongruent session access."
 3.0.0:
   api: 3.0.0
   state:
