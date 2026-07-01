@@ -515,11 +515,26 @@ class SessionLifecycle implements Horde_Shutdown_Task
      * Sets the freshly-built instance as the injector singleton so callers
      * resolving HordeSession via getInstance see the same object the
      * lifecycle synchronises with.
+     *
+     * The instance is also published on `$GLOBALS['injector']` when that
+     * is a different scope. `SessionLifecycle` is resolved through a
+     * `#[Factory]` binder, which passes a fresh child injector into the
+     * factory (see {@see \Horde\Injector\Binder\Factory::create}), so
+     * `$this->injector` is typically a child of the top-level container.
+     * A `setInstance` on the child is invisible to consumers that resolve
+     * HordeSession via `$GLOBALS['injector']` — notably the
+     * `Horde_Session` shim's `_resolveModern()`. Publishing to both
+     * scopes keeps them in agreement after a rotation. See
+     * horde/Core#182.
      */
     private function rebuildHordeSession(): void
     {
         $fresh = $this->injector->createInstance(HordeSession::class);
         $this->injector->setInstance(HordeSession::class, $fresh);
+        if (isset($GLOBALS['injector'])
+            && $GLOBALS['injector'] !== $this->injector) {
+            $GLOBALS['injector']->setInstance(HordeSession::class, $fresh);
+        }
     }
 
     /**

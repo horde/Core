@@ -605,11 +605,24 @@ class Horde_Registry implements Horde_Shutdown_Task
             $GLOBALS['session'] = $session = new Horde_Session();
             $session->setup(true, $args['session_cache_limiter'] ?? null);
 
+            /* Resolve HordeSession once and pin it as the top-level
+             * injector singleton. Every subsequent lookup — including
+             * from child injectors created by `#[Factory]` binders —
+             * falls through to this instance via parent-scope lookup,
+             * so there is only ever one HordeSession per request. Under
+             * HKDF derivation the per-session key is bound to the
+             * `_secret/salt` slot on the specific HordeSession
+             * instance; two divergent instances for the same PHP
+             * session id decrypt each other's ciphertext with
+             * different keys. See horde/Core#182. */
+            $hordeSession = $injector->getInstance(HordeSession::class);
+            $injector->setInstance(HordeSession::class, $hordeSession);
+
             /* Ensure the per-session CSRF secret exists before closing a
              * read-only session, so view/download scripts can validate
              * tokens generated on full page views. */
             $injector->getInstance(TokenServiceFactory::class)
-                ->createForSession($injector->getInstance(HordeSession::class));
+                ->createForSession($hordeSession);
 
             if ($session_flags & self::SESSION_READONLY) {
                 /* Close the session immediately so no changes can be made but
