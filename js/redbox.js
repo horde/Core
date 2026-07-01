@@ -147,11 +147,12 @@ var RedBox = {
     {
         // Accept a DOM element, an element id, or a raw HTML string. $()
         // resolves an element or an id; if it resolves to nothing (a raw HTML
-        // string is treated as an id and not found), wrap the string in a
-        // container element instead.
+        // string is treated as an id and not found), parse the string and use
+        // its root element (firstDescendant() avoids an extra wrapper node so
+        // the content is inserted exactly as before).
         if (Object.isString(html)) {
             var resolved = $(html);
-            html = resolved ? resolved : new Element('DIV').update(html);
+            html = resolved ? resolved : new Element('DIV').update(html).firstDescendant();
         }
         html = $(html).show();
         var win = $('RB_window'), child;
