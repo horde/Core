@@ -115,7 +115,10 @@ class Horde_Core_Cache_Session extends Horde_Cache_Storage_Base
             $this->_params['cache']->set($this->_getCid($key, false), $data);
             $this->_stored[$key] = 1;
             $this->_saveStored();
-            $this->_session->removeScoped($this->_params['app'], $key);
+            $this->_session->removeScoped(
+                $this->_params['app'],
+                $this->_getCid($key, true)
+            );
         } else {
             $this->_session->setScoped(
                 $this->_params['app'],
@@ -142,7 +145,10 @@ class Horde_Core_Cache_Session extends Horde_Cache_Storage_Base
      */
     public function expire($key)
     {
-        $this->_session->removeScoped($this->_params['app'], $key);
+        $this->_session->removeScoped(
+            $this->_params['app'],
+            $this->_getCid($key, true)
+        );
         if (isset($this->_stored[$key])) {
             unset($this->_stored[$key]);
             $this->_saveStored();
