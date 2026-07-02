@@ -995,7 +995,7 @@ class Horde_Registry implements Horde_Shutdown_Task
                     continue;
                 }
 
-                if ((is_null($perms) || $this->hasPermission($app, $perms))) {
+                if ((is_null($perms) || $this->hasPermission($app, $perms, ['notransparent' => true]))) {
                     $apps[$app] = $params;
                 }
             }
@@ -1858,10 +1858,15 @@ class Horde_Registry implements Horde_Shutdown_Task
     ) {
         /* Always do isAuthenticated() check first. You can be an admin, but
          * application auth != Horde admin auth. And there can *never* be
-         * non-SHOW access to an application that requires authentication. */
-        if (!$this->isAuthenticated(['app' => $app, 'notransparent' => !empty($params['notransparent'])])
+         * non-SHOW access to an application that requires authentication.
+         *
+         * We check $perms != SHOW FIRST to avoid potentially expensive failed
+         * isAuthenticated() runs. isAuthenticated() in per-app scope fires transparent
+         * authentication against the app's auth backend, i.e. IMAP for IMP.
+         */
+        if (($perms != Horde_Perms::SHOW)
             && $GLOBALS['injector']->getInstance('Horde_Core_Factory_Auth')->create($app)->requireAuth()
-            && ($perms != Horde_Perms::SHOW)) {
+            && !$this->isAuthenticated(['app' => $app, 'notransparent' => !empty($params['notransparent'])])) {
             return false;
         }
 
