@@ -167,6 +167,16 @@ class Horde_Core_Topbar
                 unset($prefs_apps['horde']);
             }
 
+            /* Resolve each app's translated name using its own domain, before
+             * sorting -- gettext's _() uses the currently active default domain,
+             * which may belong to a different app by this point in the request. */
+            foreach ($prefs_apps as $app => &$params) {
+                if (strlen((string) ($params['name'] ?? ''))) {
+                    $params['name'] = dgettext($app, $params['name']);
+                }
+            }
+            unset($params);
+
             uasort($prefs_apps, [$this, '_sortByName']);
             foreach ($prefs_apps as $app => $params) {
                 $menu['prefs_' . $app] = [
@@ -254,7 +264,7 @@ class Horde_Core_Topbar
                          * user's locale may not have been loaded when registry.php was
                          * parsed, and the translations of the application names are
                          * not in the Core package. */
-                        $name = strlen((string) ($params['name'] ?? '')) ? _($params['name']) : '';
+                        $name = strlen((string) ($params['name'] ?? '')) ? dgettext($app, $params['name']) : '';
 
                         /* Headings have no webroot; they're just containers for other
                          * menu items. */
@@ -319,7 +329,7 @@ class Horde_Core_Topbar
      */
     protected function _sortByName($a, $b)
     {
-        return strcoll(_($a['name']), _($b['name']));
+        return strcoll($a['name'], $b['name']);
     }
 
 }
