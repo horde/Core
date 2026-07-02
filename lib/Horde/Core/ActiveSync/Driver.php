@@ -257,10 +257,27 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             )
         );
 
+        // Brute-force throttle. Track credential failures per (username, client
+        // IP) in the cache and short-circuit once the configured threshold is
+        // exceeded within the window, so the ActiveSync endpoint cannot be used
+        // to bypass Horde's interactive-login protection. A successful
+        // credential check clears the counter, so devices that authenticate
+        // normally never accumulate. Automatically disabled when no cache
+        // backend is configured or when explicitly turned off.
+        $throttleKey = $this->_authThrottleKey($username);
+        if ($this->_authThrottleExceeded($throttleKey)) {
+            $injector->getInstance('Horde_Log_Logger')->warn(sprintf(
+                'ActiveSync: too many failed authentication attempts for user %s; temporarily refusing further attempts.',
+                $username
+            ));
+            return Horde_ActiveSync::AUTH_REASON_UNAVAILABLE;
+        }
+
         // First try transparent/X509. Happens for authtype == 'cert' || 'basic_cert'
         if ($conf['activesync']['auth']['type'] != 'basic') {
             if (!$this->_auth->transparent()) {
                 $injector->getInstance('Horde_Log_Logger')->notice(sprintf('Login failed ActiveSync client certificate for user %s.', $username));
+                $this->_recordAuthFailure($throttleKey);
                 return false;
             }
             if ($username != $GLOBALS['registry']->getAuth()) {
@@ -270,6 +287,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     $username
                 ));
                 $GLOBALS['registry']->clearAuth();
+                $this->_recordAuthFailure($throttleKey);
                 return false;
             }
             $this->_logger->info(
@@ -303,9 +321,14 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
 
             if (!$authResult) {
                 $injector->getInstance('Horde_Log_Logger')->notice(sprintf('Login failed from ActiveSync client for user %s.', $username));
+                $this->_recordAuthFailure($throttleKey);
                 return false;
             }
         }
+
+        // Credentials verified successfully; clear any brute-force failure
+        // counter for this (username, client IP) pair.
+        $this->_clearAuthThrottle($throttleKey);
 
         // Get the username from the registry so we capture it after any
         // hooks were run on it. In some setups this can be empty even after
@@ -338,6 +361,109 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     }
 
     /**
+     * Build the cache key used to track failed authentication attempts for
+     * brute-force throttling.
+     *
+     * @param string $username  The client-supplied username.
+     *
+     * @return string|null  The cache key, or null if throttling is not
+     *                      available (no cache backend), disabled by
+     *                      configuration, or no username was provided.
+     */
+    protected function _authThrottleKey($username)
+    {
+        global $conf;
+
+        if (empty($this->_cache) || (string) $username === '') {
+            return null;
+        }
+        if (isset($conf['activesync']['auth']['throttle']['enabled'])
+            && !$conf['activesync']['auth']['throttle']['enabled']) {
+            return null;
+        }
+
+        $ip = '';
+        if (!empty($this->_serverRequest)) {
+            $params = $this->_serverRequest->getServerParams();
+            $ip = isset($params['REMOTE_ADDR']) ? (string) $params['REMOTE_ADDR'] : '';
+        }
+
+        return 'HCASD:authfail:'
+            . hash('sha256', Horde_String::lower((string) $username) . '|' . $ip);
+    }
+
+    /**
+     * Return the configured brute-force throttle limit and window.
+     *
+     * Configurable via $conf['activesync']['auth']['throttle']['max_attempts']
+     * and ['window'] (seconds). Defaults to 15 failures per 300s, which is well
+     * above what a normally-configured device produces but low enough to blunt
+     * online password guessing.
+     *
+     * @return array  [max_attempts, window_seconds]
+     */
+    protected function _authThrottleLimits()
+    {
+        global $conf;
+
+        $throttle = isset($conf['activesync']['auth']['throttle'])
+            && is_array($conf['activesync']['auth']['throttle'])
+            ? $conf['activesync']['auth']['throttle']
+            : [];
+        $max = isset($throttle['max_attempts']) ? (int) $throttle['max_attempts'] : 15;
+        $window = isset($throttle['window']) ? (int) $throttle['window'] : 300;
+
+        return [max($max, 1), max($window, 1)];
+    }
+
+    /**
+     * Determine whether the failure count for the given key has reached the
+     * configured threshold within the throttle window.
+     *
+     * @param string|null $key  The throttle cache key.
+     *
+     * @return boolean  True if further attempts should be refused.
+     */
+    protected function _authThrottleExceeded($key)
+    {
+        if ($key === null || empty($this->_cache)) {
+            return false;
+        }
+        [$max, $window] = $this->_authThrottleLimits();
+
+        return (int) $this->_cache->get($key, $window) >= $max;
+    }
+
+    /**
+     * Record a failed authentication attempt for brute-force throttling.
+     *
+     * @param string|null $key  The throttle cache key (no-op if null).
+     */
+    protected function _recordAuthFailure($key)
+    {
+        if ($key === null || empty($this->_cache)) {
+            return;
+        }
+        [, $window] = $this->_authThrottleLimits();
+        $count = (int) $this->_cache->get($key, $window);
+        $this->_cache->set($key, (string) ($count + 1), $window);
+    }
+
+    /**
+     * Clear the failed authentication counter following a successful credential
+     * check.
+     *
+     * @param string|null $key  The throttle cache key (no-op if null).
+     */
+    protected function _clearAuthThrottle($key)
+    {
+        if ($key === null || empty($this->_cache)) {
+            return;
+        }
+        $this->_cache->expire($key);
+    }
+
+    /**
      * Clean up
      *
      * @see Horde_ActiveSync_Driver_Base#clearAuthentication()
@@ -366,22 +492,36 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      */
     public function getUser()
     {
-        // Priority 1: Authenticated user (from parent::authenticate())
+        // Priority 1: Authenticated user (from parent::authenticate()).
         $user = parent::getUser();
-
-        // Priority 2: GET parameter (Horde-specific ActiveSync extension)
-        // Used in device provisioning scenarios where auth hasn't completed yet
-        if (empty($user)) {
-            $queryParams = $this->_serverRequest->getQueryParams();
-            if (!empty($queryParams['User'])) {
-                $user = $queryParams['User'];
-            }
+        if (!empty($user)) {
+            return $user;
         }
 
-        // Priority 3: Registry auth fallback
-        // For scenarios where request comes from authenticated session
-        if (empty($user)) {
-            $user = $this->_registry->getAuth();
+        // Priority 2: Registry authenticated user. An authenticated identity
+        // MUST take precedence over any client-supplied value, so this is
+        // checked before the ?User= query parameter.
+        $registryUser = $this->_registry->getAuth();
+        if (!empty($registryUser)) {
+            return $registryUser;
+        }
+
+        // Priority 3: ?User= GET parameter (Horde-specific ActiveSync
+        // extension). This is client-controlled and is NOT proof of identity.
+        // It is only consulted here as a last resort so that device/state
+        // resolution has a username to work with during the transparent
+        // (X509 certificate) provisioning flow, before basic auth has run.
+        // The certificate auth path in self::authenticate() verifies that this
+        // value matches the certificate-authenticated identity (and clears the
+        // session on mismatch) before any data is served, so it can never be
+        // used on its own to impersonate another user.
+        $queryParams = $this->_serverRequest->getQueryParams();
+        if (!empty($queryParams['User'])) {
+            $this->_logger->warn(sprintf(
+                'ActiveSync: no authenticated user; falling back to client-supplied ?User=%s for user resolution. This value is verified against the authenticated identity before data is served.',
+                $queryParams['User']
+            ));
+            return $queryParams['User'];
         }
 
         return $user;

@@ -95,7 +95,12 @@ class DriverGetUserTest extends TestCase
     }
 
     /**
-     * Test Priority 2: GET parameter when no authenticated user
+     * Test Priority 3: GET parameter is used only when neither an
+     * authenticated user nor a registry-authenticated user is present.
+     *
+     * The registry (priority 2) is consulted before the client-supplied
+     * ?User= value (priority 3); when it returns empty we fall back to the
+     * GET parameter.
      */
     public function testGetUserFallsBackToGetParameter(): void
     {
@@ -106,15 +111,20 @@ class DriverGetUserTest extends TestCase
         $serverRequest = (new ServerRequest('POST', '/'))
             ->withQueryParams(['User' => 'get_param_user', 'DeviceId' => '123']);
 
+        $registry = $this->getMockSkipConstructor(Horde_Registry::class);
+        $registry->expects($this->once())
+            ->method('getAuth')
+            ->willReturn('');
+
         $driver = new Horde_Core_ActiveSync_Driver([
             'connector' => $this->expectUntouched(Horde_Core_ActiveSync_Connector::class),
             'auth' => $this->expectUntouched(Horde_Core_ActiveSync_Auth::class),
             'serverrequest' => $serverRequest,
-            'registry' => $this->expectUntouched(Horde_Registry::class),
+            'registry' => $registry,
             'state' => $this->createDriverStateMock(),
         ]);
 
-        // No authentication, should use GET parameter
+        // No authenticated user and empty registry auth: use GET parameter.
         $this->assertEquals('get_param_user', $driver->getUser());
     }
 
@@ -171,9 +181,15 @@ class DriverGetUserTest extends TestCase
     }
 
     /**
-     * Test: GET parameter overrides registry
+     * Test: a registry-authenticated user overrides the client-supplied
+     * ?User= GET parameter.
+     *
+     * An authenticated identity MUST take precedence over any client-controlled
+     * value. The ?User= parameter is not proof of identity and is only used as
+     * a last resort when no authenticated user (auth flow or registry) exists,
+     * so a non-empty registry auth wins here.
      */
-    public function testGetParameterOverridesRegistry(): void
+    public function testRegistryOverridesGetParameter(): void
     {
         if (!class_exists('Horde_ActiveSync_State_Sql')) {
             $this->markTestSkipped('horde/activesync not available');
@@ -182,16 +198,20 @@ class DriverGetUserTest extends TestCase
         $serverRequest = (new ServerRequest('POST', '/'))
             ->withQueryParams(['User' => 'get_param_user']);
 
+        $registry = $this->getMockSkipConstructor(Horde_Registry::class);
+        $registry->expects($this->once())
+            ->method('getAuth')
+            ->willReturn('registry_user');
+
         $driver = new Horde_Core_ActiveSync_Driver([
             'connector' => $this->expectUntouched(Horde_Core_ActiveSync_Connector::class),
             'auth' => $this->expectUntouched(Horde_Core_ActiveSync_Auth::class),
             'serverrequest' => $serverRequest,
-            // GET param wins; registry must NOT be consulted.
-            'registry' => $this->expectUntouched(Horde_Registry::class),
+            'registry' => $registry,
             'state' => $this->createDriverStateMock(),
         ]);
 
-        $this->assertEquals('get_param_user', $driver->getUser());
+        $this->assertEquals('registry_user', $driver->getUser());
     }
 
     /**
