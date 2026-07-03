@@ -168,7 +168,15 @@ class TopbarBuilder
                 continue;
             }
 
-            $name = strlen((string) ($params['name'] ?? '')) ? _($params['name']) : '';
+            $name = '';
+            if (strlen((string) ($params['name'] ?? ''))) {
+                /* Application names live in the owning app's gettext domain;
+                 * headings/links have no dedicated app domain, so keep the
+                 * legacy _() behaviour for them. */
+                $name = in_array($status, ['heading', 'link'], true)
+                    ? _($params['name'])
+                    : $this->appName($app, (string) $params['name']);
+            }
             $url = '';
             if (isset($params['url'])) {
                 $url = (string) $params['url'];
@@ -486,8 +494,18 @@ class TopbarBuilder
             unset($prefsApps['horde']);
         }
 
+        /* Resolve each app's name via its own gettext domain before sorting;
+         * the comparator only sees values, not the app key, and _() would
+         * resolve against whatever default domain is active here. */
+        foreach ($prefsApps as $app => &$params) {
+            if (strlen((string) ($params['name'] ?? ''))) {
+                $params['name'] = $this->appName($app, (string) $params['name']);
+            }
+        }
+        unset($params);
+
         uasort($prefsApps, static function ($a, $b) {
-            return strcoll(_($a['name']), _($b['name']));
+            return strcoll((string) ($a['name'] ?? ''), (string) ($b['name'] ?? ''));
         });
 
         foreach ($prefsApps as $app => $params) {
@@ -512,6 +530,33 @@ class TopbarBuilder
                 'parent' => 'prefs',
             ];
         }
+    }
+
+    /**
+     * Translate an application's display name using that application's own
+     * gettext domain.
+     *
+     * The registry stores raw msgids for application names; the translations
+     * live in each app's own catalog, not in Core. Plain _() resolves against
+     * the active default domain, which may belong to a different app by this
+     * point in the request, so non-current apps would fall back to the raw
+     * English name. dgettext() targets an explicit domain, but only resolves
+     * if that domain was bound this request (an app that was never pushed has
+     * no binding), so bind it first. dgettext() does not change the active
+     * domain, so no textdomain() save/restore is needed.
+     */
+    private function appName(string $app, string $name): string
+    {
+        if ($name === '') {
+            return '';
+        }
+
+        bindtextdomain($app, (string) $this->registry->get('fileroot', $app) . '/locale');
+        if (function_exists('bind_textdomain_codeset')) {
+            bind_textdomain_codeset($app, 'UTF-8');
+        }
+
+        return dgettext($app, $name);
     }
 
     private function callTopbarCreate(string $app, array $params, array &$flatNodes): void

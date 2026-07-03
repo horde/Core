@@ -80,6 +80,15 @@ class Horde_Core_Topbar
                   && !($isAdmin && ($params['status'] == 'noadmin'))
                   && !(!$isAdmin && ($params['status'] == 'admin'))
                   && $registry->hasPermission((!empty($params['app']) ? $params['app'] : $app), Horde_Perms::SHOW)))) {
+                /* Resolve the display name now, while the owning app and its
+                 * status are still known. Application names live in the
+                 * owning app's gettext domain; headings/links keep the legacy
+                 * _() behaviour since they have no dedicated app domain. */
+                if (strlen((string) ($params['name'] ?? ''))) {
+                    $params['name'] = in_array($params['status'], ['heading', 'link'])
+                        ? _($params['name'])
+                        : $this->_appName($registry, $app, $params['name']);
+                }
                 $menu[$app] = $params;
             }
         }
@@ -167,12 +176,13 @@ class Horde_Core_Topbar
                 unset($prefs_apps['horde']);
             }
 
-            /* Resolve each app's translated name using its own domain, before
-             * sorting -- gettext's _() uses the currently active default domain,
-             * which may belong to a different app by this point in the request. */
+            /* Resolve each app's name via its own gettext domain before
+             * sorting; the comparator only sees values, not the app key, and
+             * _() would resolve against whatever default domain happens to be
+             * active at this point in the request. */
             foreach ($prefs_apps as $app => &$params) {
                 if (strlen((string) ($params['name'] ?? ''))) {
-                    $params['name'] = dgettext($app, $params['name']);
+                    $params['name'] = $this->_appName($registry, $app, $params['name']);
                 }
             }
             unset($params);
@@ -260,11 +270,11 @@ class Horde_Core_Topbar
 
                 default:
                     try {
-                        /* Need to run the name through Horde's gettext since the
-                         * user's locale may not have been loaded when registry.php was
-                         * parsed, and the translations of the application names are
-                         * not in the Core package. */
-                        $name = strlen((string) ($params['name'] ?? '')) ? dgettext($app, $params['name']) : '';
+                        /* Names were already resolved against their owning
+                         * app's gettext domain when the menu was built (see
+                         * above); Core-owned entries are translated at
+                         * creation time. Use the value as-is. */
+                        $name = (string) ($params['name'] ?? '');
 
                         /* Headings have no webroot; they're just containers for other
                          * menu items. */
@@ -329,7 +339,44 @@ class Horde_Core_Topbar
      */
     protected function _sortByName($a, $b)
     {
-        return strcoll($a['name'], $b['name']);
+        return strcoll((string) ($a['name'] ?? ''), (string) ($b['name'] ?? ''));
+    }
+
+    /**
+     * Translate an application's display name using that application's own
+     * gettext domain.
+     *
+     * The registry stores raw (untranslated) msgids for application names:
+     * the user's locale may not have been loaded when registry.php was
+     * parsed, and the translations live in each app's own catalog, not in
+     * Core. Plain _() resolves against the currently active default domain,
+     * which may belong to a different app by this point in the request, so
+     * non-current apps would fall back to the raw English name.
+     *
+     * dgettext() resolves against an explicit domain, but only if that domain
+     * has been bound this request; an app that was never pushed has no
+     * binding, and dgettext() would then return the raw msgid. Bind it here
+     * before resolving. dgettext() does not change the active domain, so no
+     * save/restore of textdomain() is required.
+     *
+     * @param Horde_Registry $registry  The registry (for the app fileroot).
+     * @param string $app               The app whose domain owns the name.
+     * @param string $name              The raw application name (msgid).
+     *
+     * @return string  The translated name (or $name if no catalog entry).
+     */
+    protected function _appName(Horde_Registry $registry, $app, $name)
+    {
+        if (!strlen((string) $name)) {
+            return '';
+        }
+
+        bindtextdomain($app, $registry->get('fileroot', $app) . '/locale');
+        if (function_exists('bind_textdomain_codeset')) {
+            bind_textdomain_codeset($app, 'UTF-8');
+        }
+
+        return dgettext($app, (string) $name);
     }
 
 }
