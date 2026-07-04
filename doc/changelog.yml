@@ -1,4 +1,14 @@
 ---
+3.1.0:
+  api: 3.1.0
+  state:
+    release: stable
+    api: stable
+  date: 2026-07-04
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: "fix(core): bind owning app gettext domain and cover modern topbar builder\nfix(core): resolve topbar/prefs app names with dgettext against owning app's domain\nfeat(core): throttle ActiveSync auth and harden user resolution\nMerge pull request #188 from horde/fix/hasperm-show-skip-transparent-auth\ntest(registry): add hasPermission and listApps auth unit tests\nperf(registry): skip transparent auth for SHOW checks and menu enumeration\nfix: Some apps didn't show their preferences due to caching order\nUse firstDescendant() to avoid an extra wrapper node\nResolve id strings before wrapping as HTML\nFix RedBox.showHtml() with HTML string content"
 3.0.1:
   api: 3.0.1
   state:
