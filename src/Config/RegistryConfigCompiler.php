@@ -16,6 +16,9 @@ declare(strict_types=1);
 
 namespace Horde\Core\Config;
 
+use Horde\Core\Factory\RegistryConfigCompilerFactory;
+use Horde\Injector\Attribute\Factory;
+
 /**
  * Compile all registry sources into a single array graph.
  *
@@ -81,6 +84,7 @@ namespace Horde\Core\Config;
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
+#[Factory(factory: RegistryConfigCompilerFactory::class, method: 'create')]
 class RegistryConfigCompiler
 {
     /**
