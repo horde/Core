@@ -21,11 +21,11 @@ use Horde\Core\Service\SqlPermissionService;
 use Horde\Core\Service\NullPermissionService;
 use Horde\Core\Service\GroupService;
 use Horde\Core\Config\ConfigLoader;
+use Horde_Cache;
+use Horde_Cache_Storage_Null;
 use Horde_Perms_Sql;
 use Horde_Perms_Null;
 use Horde\Injector\Injector;
-use Horde_Cache;
-use Horde_Log_Logger;
 use RuntimeException;
 
 /**
@@ -85,17 +85,25 @@ class PermissionServiceFactory
         $dbFactory = $injector->getInstance(DbServiceFactory::class);
         $dbService = $dbFactory->create($injector, 'horde:perms');
 
-        // Get dependencies
-        $cache = $injector->getInstance(Horde_Cache::class);
-        $logger = $injector->getInstance(Horde_Log_Logger::class);
         $groupService = $injector->getInstance(GroupService::class);
 
-        // Create legacy Horde_Perms_Sql backend
+        // Create legacy Horde_Perms_Sql backend. Horde_Perms_Sql calls
+        // $this->_cache->get() unconditionally in getPermission() and
+        // then passes the cache into Horde_Perms_Permission_Sql::setObs(),
+        // which strictly type-hints Horde_Cache. A no-op cache that
+        // still satisfies the type is what we want: a real Horde_Cache
+        // wired to Horde_Cache_Storage_Null. Both are standalone —
+        // no $GLOBALS['conf'] dependency, no external service.
+        //
+        // The legacy Horde_Core_Factory_Cache path would also produce
+        // a Horde_Cache, but reads driver and params from $conf, which
+        // the modern rampage stack doesn't populate.
+        $cache = new Horde_Cache(new Horde_Cache_Storage_Null());
+
         $permsParams = [
             'db' => $dbService->getAdapter(),
             'table' => $params['table'] ?? 'horde_perms',
             'cache' => $cache,
-            'logger' => $logger,
         ];
 
         $backend = new Horde_Perms_Sql($permsParams);
