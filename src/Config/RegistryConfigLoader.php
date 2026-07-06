@@ -35,6 +35,21 @@ use Horde\Injector\Attribute\Factory;
  *
  * Registry is global - always loads from 'horde' app only.
  *
+ * ## Compiled-registry short-circuit
+ *
+ * If a compiled-registry file exists at $compiledRegistryPath, the
+ * loader loads it via `require` and returns a merged view without
+ * scanning any of the layer files above. The compiled file is
+ * produced by {@see RegistryConfigCompiler} and holds a
+ * two-level structure: a 'default' key with the merged default
+ * registry, and one key per compiled vhost with that vhost's raw
+ * delta. `load()` merges default + vhost-slot at read time.
+ *
+ * Callers who want to force layer reloading (e.g. after editing a
+ * registry.d snippet) should delete the compiled file. `clearCache()`
+ * only invalidates the in-memory RegistryState cache, not the on-disk
+ * compiled file.
+ *
  * @category  Horde
  * @copyright 2026 The Horde Project
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
@@ -44,13 +59,21 @@ use Horde\Injector\Attribute\Factory;
 class RegistryConfigLoader
 {
     private ?RegistryState $cache = null;
+    private readonly string $compiledRegistryPath;
 
     public function __construct(
         private string $configBase,     // HORDE_CONFIG_BASE constant
         private string $vendorBase,     // Path to vendor/horde/horde directory
-        private Vhost|string $vhost = 'localhost'
+        private Vhost|string $vhost = 'localhost',
+        ?string $compiledRegistryPath = null,
     ) {
         $this->vhost = Vhost::from($this->vhost);
+        // The compiled registry lives outside the admin-authored
+        // var/config/horde/ tree. It's a derived cache, not a config
+        // source. Default: sibling var/cache/compiled/registry.php.
+        // Callers with non-standard layouts pass this explicitly.
+        $this->compiledRegistryPath = $compiledRegistryPath
+            ?? dirname($this->configBase) . '/cache/compiled/registry.php';
     }
 
     /**
@@ -64,7 +87,22 @@ class RegistryConfigLoader
     public function load(string $file = 'registry.php'): RegistryState
     {
         if ($this->cache === null) {
-            $applications = $this->loadFiles($file);
+            // Fast path: if a compiled registry exists, use it and
+            // skip every layer file. The compiler wrote the same
+            // merge result the layer scan would produce, so callers
+            // observe identical output either way.
+            //
+            // Only the default filename is served from the compiled
+            // artifact. Callers passing an explicit non-default $file
+            // want a different registry (e.g. a test fixture) and
+            // must fall through to the layer scan.
+            if ($file === 'registry.php'
+                && file_exists($this->compiledRegistryPath)
+            ) {
+                $applications = $this->loadFromCompiled();
+            } else {
+                $applications = $this->loadFiles($file);
+            }
             $this->cache = new RegistryState($applications);
         }
 
@@ -202,7 +240,53 @@ class RegistryConfigLoader
     }
 
     /**
-     * Include PHP file in isolated scope with $this context
+     * Load the merged registry from a pre-compiled artifact.
+     *
+     * The compiled file is a plain PHP `<?php return [...]` returning
+     * the two-level structure produced by RegistryConfigCompiler:
+     *   [
+     *     'default' => [ merged default registry ],
+     *     '<vhost>' => [ vhost-specific delta ],
+     *   ]
+     *
+     * If the current vhost is present in the compiled artifact, its
+     * delta merges onto the default via array_replace_recursive (same
+     * semantics as the layer scan). Vhosts not present in the compiled
+     * artifact fall back to the default silently. This matches the
+     * layer scan's behavior when no registry-{vhost}.php file exists.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private function loadFromCompiled(): array
+    {
+        $compiled = require $this->compiledRegistryPath;
+
+        // Defensive: if the compiled file is somehow malformed (not an
+        // array, or missing 'default'), fall back to layers rather
+        // than propagate an unusable state. This preserves the "you
+        // can delete the compiled file to force a fresh scan" story
+        // even when the file is corrupt.
+        if (!is_array($compiled) || !isset($compiled['default'])) {
+            return $this->loadFiles('registry.php');
+        }
+
+        $applications = $compiled['default'];
+
+        if ($this->vhost->isAvailable()) {
+            $hostname = $this->vhost->getHostname();
+            if ($hostname !== null && isset($compiled[$hostname])) {
+                $applications = array_replace_recursive(
+                    $applications,
+                    $compiled[$hostname]
+                );
+            }
+        }
+
+        return $applications;
+    }
+
+    /**
+     * Include PHP file in isolated scope with $this context.
      *
      * Registry files expect $this->applications to be available
      *

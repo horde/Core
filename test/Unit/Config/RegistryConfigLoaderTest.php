@@ -523,4 +523,200 @@ class RegistryConfigLoaderTest extends TestCase
         $this->assertArrayHasKey('imp', $localLayer);
         $this->assertArrayNotHasKey('horde', $localLayer);
     }
+
+    // ===================================================================
+    // F. Compiled-registry short-circuit
+    // ===================================================================
+
+    /**
+     * Write a compiled-registry PHP file at the given path.
+     *
+     * Mirrors the format RegistryConfigWriter emits: a plain
+     * `<?php return [...];` file the loader `require`s.
+     */
+    private function writeCompiledFile(string $path, array $compiled): void
+    {
+        if (!is_dir(dirname($path))) {
+            mkdir(dirname($path), 0o755, true);
+        }
+        file_put_contents(
+            $path,
+            "<?php\n\nreturn " . var_export($compiled, true) . ";\n"
+        );
+    }
+
+    public function testCompiledFileShortCircuitsLayerScan(): void
+    {
+        // Write a *conflicting* base file that would produce a
+        // different result if the layers were scanned. A load that
+        // honours the compiled file must ignore it.
+        file_put_contents(
+            $this->configDir . '/horde/registry.php',
+            <<<'PHP'
+                <?php
+                $this->applications['horde'] = ['name' => 'From base file'];
+                PHP
+        );
+
+        $compiledPath = $this->tempDir . '/cache/compiled/registry.php';
+        $this->writeCompiledFile($compiledPath, [
+            'default' => [
+                'horde' => ['name' => 'From compiled file'],
+            ],
+        ]);
+
+        $loader = new RegistryConfigLoader(
+            $this->configDir,
+            $this->vendorDir,
+            compiledRegistryPath: $compiledPath,
+        );
+
+        $state = $loader->load();
+        $apps = $state->toArray();
+
+        // Compiled wins: the base file was not scanned.
+        $this->assertSame('From compiled file', $apps['horde']['name']);
+    }
+
+    public function testCompiledFileMergesVhostDeltaOntoDefault(): void
+    {
+        $compiledPath = $this->tempDir . '/cache/compiled/registry.php';
+        $this->writeCompiledFile($compiledPath, [
+            'default' => [
+                'imp' => [
+                    'name' => 'IMP',
+                    'webroot' => '/imp',
+                    'fileroot' => '/var/www/imp',
+                    'jsuri' => '/imp/js',
+                    'themesuri' => '/imp/themes',
+                    'status' => 'active',
+                ],
+            ],
+            'example.com' => [
+                'imp' => ['webroot' => '/mail'],
+            ],
+        ]);
+
+        $loader = new RegistryConfigLoader(
+            $this->configDir,
+            $this->vendorDir,
+            'example.com',
+            compiledRegistryPath: $compiledPath,
+        );
+
+        $apps = $loader->load()->toArray();
+
+        // Vhost delta overrides webroot. Default preserves the rest.
+        $this->assertSame('/mail', $apps['imp']['webroot']);
+        $this->assertSame('IMP', $apps['imp']['name']);
+        $this->assertSame('active', $apps['imp']['status']);
+    }
+
+    public function testCompiledFileFallsBackToDefaultForUnknownVhost(): void
+    {
+        $compiledPath = $this->tempDir . '/cache/compiled/registry.php';
+        $this->writeCompiledFile($compiledPath, [
+            'default' => [
+                'imp' => ['webroot' => '/imp'],
+            ],
+            'known.example.com' => [
+                'imp' => ['webroot' => '/mail-known'],
+            ],
+        ]);
+
+        // Loader configured for a vhost that has no slot in the
+        // compiled artifact. Should silently fall back to default.
+        $loader = new RegistryConfigLoader(
+            $this->configDir,
+            $this->vendorDir,
+            'unknown.example.com',
+            compiledRegistryPath: $compiledPath,
+        );
+
+        $apps = $loader->load()->toArray();
+        $this->assertSame('/imp', $apps['imp']['webroot']);
+    }
+
+    public function testCompiledFileMissingFallsBackToLayerScan(): void
+    {
+        // Layer files present, compiled-registry path pointed at a
+        // path that doesn't exist. Loader must not raise and must
+        // return the same result the layer scan would produce.
+        file_put_contents(
+            $this->configDir . '/horde/registry.php',
+            <<<'PHP'
+                <?php
+                $this->applications['horde'] = ['name' => 'Layer scan'];
+                PHP
+        );
+
+        $loader = new RegistryConfigLoader(
+            $this->configDir,
+            $this->vendorDir,
+            compiledRegistryPath: $this->tempDir . '/does-not-exist.php',
+        );
+
+        $apps = $loader->load()->toArray();
+        $this->assertSame('Layer scan', $apps['horde']['name']);
+    }
+
+    public function testMalformedCompiledFileFallsBackToLayerScan(): void
+    {
+        // A corrupt or wrong-shape compiled file (not an array, or
+        // missing 'default') should not brick the loader. The layer
+        // scan is the safe fallback.
+        file_put_contents(
+            $this->configDir . '/horde/registry.php',
+            <<<'PHP'
+                <?php
+                $this->applications['horde'] = ['name' => 'Layer scan'];
+                PHP
+        );
+
+        $compiledPath = $this->tempDir . '/cache/compiled/registry.php';
+        if (!is_dir(dirname($compiledPath))) {
+            mkdir(dirname($compiledPath), 0o755, true);
+        }
+        file_put_contents(
+            $compiledPath,
+            "<?php\n\nreturn 'not an array';\n"
+        );
+
+        $loader = new RegistryConfigLoader(
+            $this->configDir,
+            $this->vendorDir,
+            compiledRegistryPath: $compiledPath,
+        );
+
+        $apps = $loader->load()->toArray();
+        $this->assertSame('Layer scan', $apps['horde']['name']);
+    }
+
+    public function testDefaultCompiledPathIsSiblingCacheDir(): void
+    {
+        // When no explicit compiledRegistryPath is passed, the loader
+        // derives dirname($configBase) . '/cache/compiled/registry.php'.
+        // Simulate a bundle-shaped var/{config,cache}/ layout and
+        // check the loader picks up the file at the expected place.
+        $bundleVar = $this->tempDir . '/var';
+        mkdir($bundleVar . '/config/horde', 0o755, true);
+        mkdir($bundleVar . '/cache/compiled', 0o755, true);
+
+        $this->writeCompiledFile(
+            $bundleVar . '/cache/compiled/registry.php',
+            ['default' => ['horde' => ['name' => 'From default path']]]
+        );
+
+        // Layers under var/config/ would produce a different result
+        // Layers under var/config/ would produce a different result
+        // if scanned. Do not seed them. Silence is the assertion
+        // that layer scanning was skipped.
+        $loader = new RegistryConfigLoader(
+            $bundleVar . '/config',
+            $this->vendorDir,
+        );
+
+        $apps = $loader->load()->toArray();
+        $this->assertSame('From default path', $apps['horde']['name']);
+    }
 }
