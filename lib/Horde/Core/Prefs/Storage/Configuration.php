@@ -29,6 +29,17 @@ class Horde_Core_Prefs_Storage_Configuration extends Horde_Prefs_Storage_Base
     {
         global $registry;
 
+        /* Modern PSR-15 request paths (e.g. the admin REST API) never
+         * populate $GLOBALS['registry']. Config-file defaults are a
+         * best-effort layer atop user prefs; when we cannot reach the
+         * registry, return the scope unchanged and let downstream
+         * storage drivers (SQL etc.) supply real values. Same graceful
+         * fallback shape as the try/catch below for missing prefs.php
+         * files. */
+        if (!$registry instanceof Horde_Registry) {
+            return $scope_ob;
+        }
+
         /* Read the configuration file.
          * Values are in the $_prefs array. */
         try {
