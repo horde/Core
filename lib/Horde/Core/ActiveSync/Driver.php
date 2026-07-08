@@ -357,6 +357,50 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             }
         }
 
+        if (!$this->_ensureMailAuthenticated($username, $password)) {
+            return Horde_ActiveSync::AUTH_REASON_UNAVAILABLE;
+        }
+
+        return true;
+    }
+
+    /**
+     * Ensure the mail backend session exists when email sync is enabled.
+     *
+     * ActiveSync authenticates to Horde; mail operations need a separate
+     * login to the mail app (including hordeauth transparent login to the
+     * IMAP backend). Delegated to the registered 'mail' application via the
+     * optional 'mail/ensureImapConnection' API method, so Core stays
+     * agnostic of the concrete mail app.
+     *
+     * @param string $username  The authenticated Horde username.
+     * @param string $password  The ActiveSync password.
+     *
+     * @return boolean  True if mail is not required or the connection is ready.
+     */
+    protected function _ensureMailAuthenticated($username, $password)
+    {
+        global $registry;
+
+        if (empty($this->_imap)
+            || !$registry->hasMethod('mail/ensureImapConnection')) {
+            return true;
+        }
+
+        try {
+            $registry->mail->ensureImapConnection([
+                'userId' => $username,
+                'password' => $password,
+            ]);
+        } catch (Horde_Exception $e) {
+            $this->_logger->warn(sprintf(
+                'ActiveSync: mail server authentication failed for user %s: %s',
+                $username,
+                $e->getMessage()
+            ));
+            return false;
+        }
+
         return true;
     }
 
