@@ -31,7 +31,9 @@ class Horde_Core_Factory_ActiveSyncBackend extends Horde_Core_Factory_Injector
 
         // Backend driver and dependencies
         $params = ['registry' => $registry];
-        $adapter_params = ['factory' => new Horde_Core_ActiveSync_Imap_Factory()];
+        $adapter_params = ['factory' => new Horde_Core_ActiveSync_Imap_Factory([
+            'logger' => $injector->getInstance('Horde_Log_Logger'),
+        ])];
 
         // Determine emailsync setting - force to off if we don't have a mail API.
         // Use local variable instead of mutating global $conf.

@@ -7,8 +7,6 @@
  * @package   Core
  */
 
-use Horde\Core\Horde;
-
 /**
  * Horde_Core_ActiveSync_Imap_Factory implements a factory/builder for
  * providing a Horde_ActiveSync_Imap_Adapter object as well as building a tree
@@ -24,6 +22,30 @@ class Horde_Core_ActiveSync_Imap_Factory implements Horde_ActiveSync_Interface_I
     protected $_adapter;
     protected $_mailboxlist;
     protected $_specialMailboxlist;
+
+    /**
+     * Logger.
+     *
+     * @var Horde_Log_Logger
+     */
+    protected $_logger;
+
+    /**
+     * Constructor.
+     *
+     * @param array $params  Parameters:
+     *   - logger: (Horde_Log_Logger) The logger to use. Optional; a null
+     *             logger is used when none is supplied.
+     *
+     * @author Torben Dannhauer <torben@dannhauer.de>
+     */
+    public function __construct(array $params = [])
+    {
+        $this->_logger = (isset($params['logger'])
+            && $params['logger'] instanceof Horde_Log_Logger)
+            ? $params['logger']
+            : new Horde_Log_Logger(new Horde_Log_Handler_Null());
+    }
 
     /**
      * Return a Horde_Imap_Client
@@ -107,13 +129,13 @@ class Horde_Core_ActiveSync_Imap_Factory implements Horde_ActiveSync_Interface_I
                     // the caller defer the sync instead of treating it as a
                     // hard error (which spams the log at every layer and can
                     // make clients drop their mail folders).
-                    Horde::log(sprintf(
+                    $this->_logger->log(sprintf(
                         'Mail server temporarily unavailable while retrieving mailbox list: %s',
                         $e->getMessage()
                     ), Horde_Log::NOTICE);
                     throw new Horde_ActiveSync_Exception_TemporaryFailure($e);
                 }
-                Horde::log(sprintf(
+                $this->_logger->log(sprintf(
                     'Error retrieving mailbox list: %s',
                     $e->getMessage()
                 ), Horde_Log::ERR);
@@ -146,7 +168,7 @@ class Horde_Core_ActiveSync_Imap_Factory implements Horde_ActiveSync_Interface_I
             try {
                 $this->_specialMailboxlist = $registry->mail->getSpecialMailboxes();
             } catch (Horde_Exception $e) {
-                Horde::log(sprintf(
+                $this->_logger->log(sprintf(
                     'Error retrieving specialmailbox list: %s',
                     $e->getMessage()
                 ), Horde_Log::ERR);
