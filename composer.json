@@ -37,7 +37,7 @@
         "config",
         "errorhandler"
     ],
-    "time": "2026-07-04",
+    "time": "2026-07-08",
     "repositories": [],
     "require": {
         "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || ^3 || ^2",
@@ -72,7 +72,7 @@
         "horde/mime_viewer": "^3 || dev-FRAMEWORK_6_0",
         "horde/notification": "^3 || dev-FRAMEWORK_6_0",
         "horde/pack": "^2 || dev-FRAMEWORK_6_0",
-        "horde/perms": "^3 || dev-FRAMEWORK_6_0",
+        "horde/perms": "^3.1 || dev-FRAMEWORK_6_0",
         "horde/prefs": "^3 || dev-FRAMEWORK_6_0",
         "horde/rpc": "^3 || dev-FRAMEWORK_6_0",
         "horde/secret": "^3 || dev-FRAMEWORK_6_0",

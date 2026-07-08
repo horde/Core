@@ -1,4 +1,14 @@
 ---
+3.2.0:
+  api: 3.2.0
+  state:
+    release: stable
+    api: stable
+  date: 2026-07-08
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: "fix(core): address review - inject logger and stop folder loss on hard IMAP errors\nfix(core): stop ActiveSync log spam and folder loss on IMAP outage\nfeat(core): reconnect IMAP for ActiveSync mail via mail API\nfix(prefs): guard config-file storage against null $registry global\ni18n(perms): update de translations for negative-permissions admin UI\nfeat(perms): add negative-permissions admin UI with tri-state controls\nfix(service): decouple group and permission factories from legacy $conf globals\nfeat(config): expose RegistryConfigCompiler through injector factory\nfeat(config): compile registry to a single artifact with vhost slots and load it via a short-circuit"
 3.1.0:
   api: 3.1.0
   state:
