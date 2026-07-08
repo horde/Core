@@ -77,7 +77,7 @@ dependencies:
       horde/mime_viewer: ^3
       horde/notification: ^3
       horde/pack: ^2
-      horde/perms: ^3
+      horde/perms: ^3.1
       horde/prefs: ^3
       horde/rpc: ^3
       horde/secret: ^3

@@ -78,6 +78,7 @@ use Horde\Core\Factory\PrefsServiceFactory;
 use Horde\Core\Factory\RegistryConfigLoaderFactory;
 use Horde\Core\Factory\RouteUrlWriterFactory;
 use Horde\Core\Factory\RuntimeRoutesProviderFactory;
+use Horde\Core\Factory\ServerRequestFactory;
 use Horde\Core\RuntimeRoutesProvider;
 use Horde\Core\Factory\SecretManagerFactory;
 use Horde\Core\Factory\SessionHandlerFactory;
@@ -156,6 +157,7 @@ use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Http\Client\ClientInterface as PsrHttpClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Psr\SimpleCache\CacheInterface as SimpleCacheInterface;
@@ -289,6 +291,7 @@ class DefaultInjectorBindings implements InjectorBindings
             RouteUrlWriter::class => RouteUrlWriterFactory::class,
             RuntimeRoutesProvider::class => RuntimeRoutesProviderFactory::class,
             RoutesProvider::class => RuntimeRoutesProviderFactory::class,
+            ServerRequestInterface::class => ServerRequestFactory::class,
         ];
 
         $implementations = [
