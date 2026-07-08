@@ -629,13 +629,25 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     /**
      * Return an array of stats for the server's folder list.
      *
-     * @return array  An array of folder stats @see self::statFolder()
+     * @return array|boolean  An array of folder stats
+     *                        (@see self::statFolder()), or false if the mail
+     *                        server is temporarily unavailable and folder
+     *                        change detection should be skipped this round.
      * @todo Horde 6 move to base class
      */
     public function getFolderList()
     {
         $this->_logger->meta('Horde_Core_ActiveSync_Driver::getFolderList()');
-        $folderlist = $this->getFolders();
+        try {
+            $folderlist = $this->getFolders();
+        } catch (Horde_ActiveSync_Exception_TemporaryFailure $e) {
+            // Mail server temporarily unavailable. Returning false tells the
+            // state engine to skip folder-change detection this round instead
+            // of computing a diff against an empty hierarchy (which would
+            // delete the client's mail folders). The device retries on the
+            // next sync. Already logged once by the IMAP factory.
+            return false;
+        }
         $folders = [];
         foreach ($folderlist as $f) {
             $folders[] = $this->statFolder(
@@ -654,6 +666,8 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      * Return an array of the server's folder objects.
      *
      * @return array  An array of Horde_ActiveSync_Message_Folder objects.
+     * @throws Horde_ActiveSync_Exception_TemporaryFailure  If the mail server
+     *         is temporarily unreachable (transient connection failure).
      */
     public function getFolders()
     {
@@ -820,8 +834,16 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             // at least an INBOX, even with email sync turned off.
             try {
                 $folders = array_merge($folders, $this->_getMailFolders());
+            } catch (Horde_ActiveSync_Exception_TemporaryFailure $e) {
+                // Mail server temporarily unreachable. Do not fall through to
+                // returning a partial/empty hierarchy (that can make clients
+                // drop their mail folders); propagate so the caller can defer
+                // the sync and the device retries later. Already logged once
+                // by the IMAP factory.
+                $this->_endBuffer();
+                throw $e;
             } catch (Horde_ActiveSync_Exception $e) {
-                $this->_logger->err($e->getMessage());
+                $this->_logger->meta($e->getMessage());
                 $this->_endBuffer();
                 return [];
             }
@@ -4166,9 +4188,14 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 try {
                     $imap_folders = $this->_imap->getMailboxes(true);
                 } catch (Horde_ActiveSync_Exception $e) {
-                    $this->_logger->err(
+                    // The IMAP factory already logged the root cause once; do
+                    // not re-log the same failure at every layer. Keep a debug
+                    // trace and re-throw the original (which preserves the
+                    // Horde_ActiveSync_Exception_TemporaryFailure type on a
+                    // transient connection failure).
+                    $this->_logger->meta(
                         sprintf(
-                            'Problem loading mail folders from IMAP server: %s',
+                            'Mail folder list unavailable: %s',
                             $e->getMessage()
                         )
                     );

@@ -100,6 +100,19 @@ class Horde_Core_ActiveSync_Imap_Factory implements Horde_ActiveSync_Interface_I
                     }
                 }
             } catch (Horde_Exception $e) {
+                if ($this->_isTransientImapError($e)) {
+                    // The mail server is temporarily unreachable. This is an
+                    // expected, recoverable condition during ActiveSync
+                    // polling, so log it once here at a low severity and let
+                    // the caller defer the sync instead of treating it as a
+                    // hard error (which spams the log at every layer and can
+                    // make clients drop their mail folders).
+                    Horde::log(sprintf(
+                        'Mail server temporarily unavailable while retrieving mailbox list: %s',
+                        $e->getMessage()
+                    ), Horde_Log::NOTICE);
+                    throw new Horde_ActiveSync_Exception_TemporaryFailure($e);
+                }
                 Horde::log(sprintf(
                     'Error retrieving mailbox list: %s',
                     $e->getMessage()
@@ -186,6 +199,39 @@ class Horde_Core_ActiveSync_Imap_Factory implements Horde_ActiveSync_Interface_I
         }
 
         return $msgFlags;
+    }
+
+    /**
+     * Determine whether an exception represents a transient IMAP failure
+     * (mail server unreachable or connection dropped) as opposed to a hard
+     * error such as an authentication or configuration problem.
+     *
+     * The relevant Horde_Imap_Client_Exception is preserved in the previous
+     * exception chain even when wrapped by outer exceptions (e.g. the
+     * injector's "Cannot create IMP_Ftree"), so walk the chain to classify.
+     *
+     * @author Torben Dannhauer <torben@dannhauer.de>
+     *
+     * @param Throwable $e  The caught exception.
+     *
+     * @return boolean  True if the failure looks transient/connection related.
+     */
+    protected function _isTransientImapError($e)
+    {
+        $transient = [
+            Horde_Imap_Client_Exception::DISCONNECT,
+            Horde_Imap_Client_Exception::SERVER_CONNECT,
+            Horde_Imap_Client_Exception::LOGIN_UNAVAILABLE,
+        ];
+
+        for ($current = $e; $current !== null; $current = $current->getPrevious()) {
+            if ($current instanceof Horde_Imap_Client_Exception
+                && in_array($current->getCode(), $transient, true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }
