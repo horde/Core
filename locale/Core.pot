@@ -3,72 +3,205 @@
 # This file is distributed under the same license as the Core package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#: vendor/horde/translation/test/NullHandlerTest.php:24
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Core\n"
 "Report-Msgid-Bugs-To: dev@lists.horde.org\n"
-"POT-Creation-Date: 2025-06-11 17:55+0200\n"
+"POT-Creation-Date: 2026-07-08 06:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: lib/Horde.php:1152
+#: vendor/horde/form/lib/Horde/Form/Type.php:3074
+#: vendor/horde/form/src/V3/DateVariable.php:73
+#, php-format
+msgid " (%s days ago)"
+msgstr ""
+
+#: src/Horde.php:1219 src/View/AccessKeyTracker.php:126
 #, php-format
 msgid " (Accesskey %s)"
 msgstr ""
 
-#: lib/Horde/Registry.php:1361 lib/Horde/Registry.php:2112
+#: vendor/horde/form/lib/Horde/Form/Type.php:3082
+#: vendor/horde/form/src/V3/DateVariable.php:88
+#, php-format
+msgid " (in %s days)"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3078
+#: vendor/horde/form/src/V3/DateVariable.php:81
+msgid " (today)"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3080
+#: vendor/horde/form/src/V3/DateVariable.php:85
+msgid " (tomorrow)"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3076
+#: vendor/horde/form/src/V3/DateVariable.php:77
+msgid " (yesterday)"
+msgstr ""
+
+#: vendor/horde/cli/lib/Horde/Cli.php:407 vendor/horde/cli/src/Cli.php:421
+#, php-format
+msgid " on line %d"
+msgstr ""
+
+#: vendor/horde/cli/lib/Horde/Cli.php:551 vendor/horde/cli/src/Cli.php:575
+#, php-format
+msgid "\"%s\" is not a valid choice."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1794
+#: vendor/horde/form/src/V3/EmailVariable.php:120
+#: vendor/horde/prefs/lib/Horde/Prefs/Identity.php:369
+#, php-format
+msgid "\"%s\" is not a valid email address."
+msgstr ""
+
+#: lib/Horde/Registry.php:1449 lib/Horde/Registry.php:2232
 #, php-format
 msgid "\"%s\" is not configured in the Horde Registry."
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:125
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:128
 #, php-format
 msgid "%d contact was successfully added to your address book."
 msgid_plural "%d contacts were successfully added to your address book."
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/Horde/Core/Auth/Application.php:685
+#: lib/Horde/Core/Auth/Application.php:751
 #, php-format
 msgid "%d day until your password expires."
 msgid_plural "%d days until your password expires."
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/Horde/Registry.php:1562
+#: vendor/horde/translation/test/GettextTest.php:33
+#, php-format
+msgid "%d days"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Utils.php:125
+#, php-format
+msgid "%d days ago"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Utils.php:115
+#, php-format
+msgid "%d hour ago"
+msgid_plural "%d hours ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: test/Unit/Translation/DelegatingTranslationHandlerTest.php:59
+#, php-format
+msgid "%d item"
+msgid_plural "%d items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: vendor/horde/date/lib/Horde/Date/Utils.php:110
+#, php-format
+msgid "%d minute ago"
+msgid_plural "%d minutes ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: vendor/horde/date/lib/Horde/Date/Utils.php:105
+#, php-format
+msgid "%d second ago"
+msgid_plural "%d seconds ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:993
+#, php-format
+msgid "%d times"
+msgstr ""
+
+#: vendor/horde/translation/test/AutodetectTest.php:40
+#: vendor/horde/translation/test/AutodetectTest.php:65
+#: vendor/horde/translation/test/AutodetectTest.php:89
+#: vendor/horde/translation/test/GettextTest.php:39
+#: vendor/horde/translation/test/GettextTest.php:40
+#: vendor/horde/translation/test/IcuHandlerTest.php:40
+#: vendor/horde/translation/test/IcuHandlerTest.php:41
+#: vendor/horde/translation/test/WrapperTest.php:26
+#, php-format
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: vendor/horde/date/lib/Horde/Date/Utils.php:130
+#, php-format
+msgid "%d week ago"
+msgid_plural "%d weeks ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/Horde/Registry.php:1655
 #, php-format
 msgid "%s is not activated."
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:353 lib/Horde/Core/Perms/Ui.php:413
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:934
+#: vendor/horde/form/lib/Horde/Form/Type.php:3043
+#: vendor/horde/form/src/V3/DateVariable.php:42
+#, php-format
+msgid "%s is required"
+msgstr ""
+
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Imap/Message.php:577
+#, php-format
+msgid "%s part"
+msgstr ""
+
+#: lib/Horde/Core/Perms/Ui.php:359 lib/Horde/Core/Perms/Ui.php:419
+#: vendor/horde/form/lib/Horde/Form/Type.php:2626
+#: vendor/horde/form/lib/Horde/Form/Type.php:2698
+#: vendor/horde/form/src/V3/EnumVariable.php:41
+#: vendor/horde/form/src/V3/MlenumVariable.php:40
 msgid "-- select --"
 msgstr ""
 
-#: lib/Horde/Core/Notification/Event/Status.php:74 lib/Horde/PageOutput.php:684
+#: lib/Horde/Core/Notification/Event/Status.php:74 lib/Horde/PageOutput.php:760
 msgid "1 day"
 msgstr ""
 
-#: lib/Horde/Core/Notification/Event/Status.php:72 lib/Horde/PageOutput.php:682
+#: lib/Horde/Core/Notification/Event/Status.php:72 lib/Horde/PageOutput.php:758
 msgid "1 hour"
 msgstr ""
 
-#: lib/Horde/Core/Notification/Event/Status.php:71 lib/Horde/PageOutput.php:681
+#: test/Unit/Translation/DelegatingTranslationHandlerTest.php:81
+#: test/Unit/Translation/DelegatingTranslationHandlerTest.php:82
+#: vendor/horde/translation/test/NullHandlerTest.php:29
+#: vendor/horde/translation/test/NullHandlerTest.php:34
+#: vendor/horde/translation/test/NullHandlerTest.php:35
+msgid "1 item"
+msgid_plural "2 items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/Horde/Core/Notification/Event/Status.php:71 lib/Horde/PageOutput.php:757
 msgid "15 minutes"
 msgstr ""
 
-#: lib/Horde/Core/Notification/Event/Status.php:70 lib/Horde/PageOutput.php:680
+#: lib/Horde/Core/Notification/Event/Status.php:70 lib/Horde/PageOutput.php:756
 msgid "5 minutes"
 msgstr ""
 
-#: lib/Horde/Core/Notification/Event/Status.php:73 lib/Horde/PageOutput.php:683
+#: lib/Horde/Core/Notification/Event/Status.php:73 lib/Horde/PageOutput.php:759
 msgid "6 hours"
 msgstr ""
 
@@ -76,7 +209,11 @@ msgstr ""
 msgid "<Previous"
 msgstr ""
 
-#: lib/Horde/ErrorHandler.php:196
+#: vendor/horde/form/src/V3/FileVariable.php:171
+msgid "A PHP extension stopped the upload."
+msgstr ""
+
+#: lib/Horde/ErrorHandler.php:198
 msgid "A fatal error has occurred"
 msgstr ""
 
@@ -99,28 +236,43 @@ msgid ""
 "A popup window could not be opened. Your browser may be blocking popups."
 msgstr ""
 
+#: vendor/horde/form/lib/Horde/Form/Type.php:1060
+#: vendor/horde/form/lib/Horde/Form/Type.php:1117
+#: vendor/horde/form/src/V3/PgpVariable.php:90
+#: vendor/horde/form/src/V3/SmimeVariable.php:75
+msgid "A temporary directory"
+msgstr ""
+
+#: vendor/horde/idna/lib/Horde/Idna.php:141
+msgid "ACE label does not contain a valid label string"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:11
+msgid "Abkhaz"
+msgstr ""
+
 #: lib/Horde/Core/Auth/Signup/Base.php:114
 #, php-format
 msgid "Account signup request for \"%s\""
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:203 lib/Horde/Core/Ui/VarRenderer/Html.php:709
+#: lib/Horde/Core/Perms/Ui.php:206 lib/Horde/Core/Ui/VarRenderer/Html.php:711
 msgid "Add"
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:136
+#: lib/Horde/Core/Perms/Ui.php:139 src/Perms/Ui.php:255
 msgid "Add Child Permission"
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:103
+#: lib/Horde/Core/Perms/Ui.php:106
 msgid "Add New Permission"
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:80
+#: lib/Horde/Core/Perms/Ui.php:83
 msgid "Add Permission"
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:202
+#: lib/Horde/Core/Perms/Ui.php:205
 #, php-format
 msgid "Add a child permission to \"%s\""
 msgstr ""
@@ -129,50 +281,141 @@ msgstr ""
 msgid "Add source"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:437
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:440
 msgid "Add to address book:"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:453
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:456
 msgid "Add to my address book"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:243
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:307
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:246
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:310
+#: vendor/horde/form/lib/Horde/Form/Type.php:959
+#: vendor/horde/form/src/V3/AddressVariable.php:142
 msgid "Address"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:439
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:442
 msgid "Address Book"
 msgstr ""
 
-#: lib/Horde/Registry.php:360
+#: vendor/horde/form/lib/Horde/Form/Type.php:996
+#: vendor/horde/form/src/V3/AddresslinkVariable.php:39
+msgid "Address Link"
+msgstr ""
+
+#: lib/Horde/Registry.php:464
 msgid ""
 "Admin authentication requested, but no admin users defined in configuration."
 msgstr ""
 
-#: lib/Horde/Core/Topbar.php:126
+#: lib/Horde/Core/Topbar.php:137 src/Sidebar/AdminSidebarPanel.php:95
+#: src/Topbar/TopbarBuilder.php:425
 msgid "Administration"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:10
+msgid "Afar"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:9
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:17
+msgid "Afghanistan"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:13
+msgid "Afrikaans"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:14
+msgid "Akan"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:30
+msgid "Aland Islands"
 msgstr ""
 
 #: lib/Horde/Core/Notification/Event/Status.php:90
 msgid "Alarm"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:158
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:11
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:20
+msgid "Albania"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:158
+msgid "Albanian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:12
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:74
+msgid "Algeria"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:161
 msgid "Alias"
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:268
+#: lib/Horde/Core/Perms/Ui.php:274
 msgid "All Authenticated Users"
 msgstr ""
 
-#: lib/Horde/Core/Perms.php:123 lib/Horde/Core/Perms/Ui.php:108
+#: lib/Horde/Core/Perms.php:123 lib/Horde/Core/Perms/Ui.php:111
+#: src/Perms/Ui.php:152
 msgid "All Permissions"
 msgstr ""
 
-#: lib/Horde/Core/Prefs/Ui.php:325 lib/Horde/Core/Prefs/Ui.php:338
+#: vendor/horde/form/lib/Horde/Form/Type.php:1965
+#: vendor/horde/form/src/V3/EmailVariable.php:727
+msgid "Allow multiple addresses?"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:13
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:26
+msgid "American Samoa"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:15
+msgid "Amharic"
+msgstr ""
+
+#: lib/Horde/Core/Prefs/Ui.php:333 lib/Horde/Core/Prefs/Ui.php:346
 msgid "An illegal value was specified."
+msgstr ""
+
+#: vendor/horde/icalendar/lib/Horde/Icalendar/Vevent.php:138
+msgid "An unknown person"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:14
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:15
+msgid "Andorra"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:15
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:23
+msgid "Angola"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:16
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:19
+msgid "Anguilla"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Geoip.php:327
+msgid "Anonymous Proxy"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:17
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:24
+msgid "Antarctica"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:18
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:18
+msgid "Antigua and Barbuda"
 msgstr ""
 
 #: lib/Horde/Core/Smartmobile/View/Helper.php:55
@@ -184,46 +427,399 @@ msgid "Approve the account:"
 msgstr ""
 
 #: lib/Horde/Core/Ui/JsCalendar.php:132
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:498
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:558
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:501
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:561
 msgid "April"
 msgstr ""
 
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:17
+msgid "Arabic"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:16
+msgid "Aragonese"
+msgstr ""
+
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rar.php:91
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Tgz.php:126
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Zip.php:100
+msgid "Archive File Size"
+msgstr ""
+
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rar.php:86
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Tgz.php:121
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Zip.php:99
+msgid "Archive Name"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:19
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:25
+msgid "Argentina"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:20
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:21
+msgid "Armenia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:72
+msgid "Armenian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:21
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:29
+msgid "Aruba"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:14
+msgid "Ascension Island"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Geoip.php:325
+msgid "Asia/Pacific Region"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:18
+msgid "Assamese"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4300
+#: vendor/horde/form/src/V3/AssignVariable.php:164
+msgid "Assignment columns"
+msgstr ""
+
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rar.php:104
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Tgz.php:139
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Zip.php:105
+msgid "Attributes"
+msgstr ""
+
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Imap/Message.php:556
+msgid "Audio part"
+msgstr ""
+
 #: lib/Horde/Core/Ui/JsCalendar.php:136
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:502
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:562
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:505
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:565
 msgid "August"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:22
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:28
+msgid "Australia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:23
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:27
+msgid "Austria"
+msgstr ""
+
+#: src/Middleware/OAuthConsentMiddleware.php:100
+msgid "Authorize Application"
 msgstr ""
 
 #: lib/Horde/Core/Prefs/Ui/Widgets.php:203
 msgid "Available address books:"
 msgstr ""
 
-#: lib/Horde/Core/Smartmobile/View/Helper.php:47 lib/Horde/PageOutput.php:611
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:19
+msgid "Avaric"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:12
+msgid "Avestan"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:20
+msgid "Aymara"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:24
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:31
+msgid "Azerbaijan"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:21
+msgid "Azerbaijani"
+msgstr ""
+
+#: lib/Horde/Core/Smartmobile/View/Helper.php:47 lib/Horde/PageOutput.php:678
 msgid "Back"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:166
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:25
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:45
+msgid "Bahamas"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:26
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:38
+msgid "Bahrain"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:27
+msgid "Bambara"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:27
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:34
+msgid "Bangladesh"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:28
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:33
+msgid "Barbados"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:22
+msgid "Bashkir"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:51
+msgid "Basque"
+msgstr ""
+
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rfc822.php:71
+msgid "Bcc"
+msgstr ""
+
+#: vendor/horde/translation/test/GettextTest.php:32
+msgid "Beautiful"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:29
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:49
+msgid "Belarus"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:23
+msgid "Belarusian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:30
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:35
+msgid "Belgium"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:31
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:50
+msgid "Belize"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:28
+msgid "Bengali"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:32
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:40
+msgid "Benin"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:33
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:41
+msgid "Bermuda"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:34
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:46
+msgid "Bhutan"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:25
+msgid "Bihari"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:169
 msgid "Birthday"
 msgstr ""
 
-#: lib/Horde/Core/Block/Collection.php:409
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:26
+msgid "Bislama"
+msgstr ""
+
+#: lib/Horde/Core/Block/Collection.php:415
 #, php-format
 msgid "Block \"%s\" of application \"%s\" not found."
 msgstr ""
 
-#: lib/Horde/Core/ActiveSync/Driver.php:157
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:602
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:43
+msgid "Bolivia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:35
+msgid "Bolivia, Plurinational State of"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:36
+msgid "Bonaire, Sint Eustatius and Saba"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:37
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:32
+msgid "Bosnia and Herzegovina"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:31
+msgid "Bosnian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:38
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:48
+msgid "Botswana"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:39
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:47
+msgid "Bouvet Island"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:40
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:44
+msgid "Brazil"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:30
+msgid "Breton"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:41
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:119
+msgid "British Indian Ocean Territory"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:42
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:42
+msgid "Brunei Darussalam"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:43
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:37
+msgid "Bulgaria"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:24
+msgid "Bulgarian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:44
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:36
+msgid "Burkina Faso"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:119
+msgid "Burmese"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:45
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:39
+msgid "Burundi"
+msgstr ""
+
+#: lib/Horde/Core/ActiveSync/Driver.php:196
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:604
 msgid "Calendar"
 msgstr ""
 
-#: lib/Horde/Core/Ajax/Imple/InPlaceEditor.php:57
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:46
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:130
+msgid "Cambodia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:47
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:60
+msgid "Cameroon"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:48
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:51
+msgid "Canada"
+msgstr ""
+
+#: lib/Horde/Core/Ajax/Imple/InPlaceEditor.php:59
 #: lib/Horde/Core/Script/Package/Dialog.php:26
 msgid "Cancel"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:338
+#: vendor/horde/compress/lib/Horde/Compress/Base.php:94
+msgid "Cannot compress data"
+msgstr ""
+
+#: vendor/horde/data/lib/Horde/Data/Csv.php:81
+msgid "Cannot open file."
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:49
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:65
+msgid "Cape Verde"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:32
+msgid "Catalan; Valencian"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4606
+#: vendor/horde/form/src/V3/CategoryVariable.php:54
+msgid "Category"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:50
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:137
+msgid "Cayman Islands"
+msgstr ""
+
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Imap/Message.php:196
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rfc822.php:70
+msgid "Cc"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:341
 msgid "Cell Phone"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:51
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:54
+msgid "Central African Republic"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:52
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:226
+msgid "Chad"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:34
+msgid "Chamorro"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1977
+#: vendor/horde/form/src/V3/EmailVariable.php:743
+msgid "Character to split multiple addresses with"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:33
+msgid "Chechen"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:2956
+#: vendor/horde/form/src/V3/SetVariable.php:75
+msgid "Check all"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:130
+msgid "Chichewa; Chewa; Nyanja"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:53
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:59
+msgid "Chile"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:54
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:61
+msgid "China"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:192
+msgid "Chinese"
 msgstr ""
 
 #: lib/Horde/Core/Auth/Signup/Form.php:48
@@ -240,24 +836,66 @@ msgstr ""
 msgid "Choose the order of address books to search when expanding addresses."
 msgstr ""
 
-#: lib/Horde/PageOutput.php:690
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:55
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:66
+msgid "Christmas Island"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:39
+msgid "Chuvash"
+msgstr ""
+
+#: lib/Horde/PageOutput.php:766
 msgid "Clear All"
 msgstr ""
 
-#: lib/Horde/Core/Ajax/Imple/InPlaceEditor.php:58
+#: lib/Horde/Core/Ajax/Imple/InPlaceEditor.php:60
 msgid "Click to add caption..."
 msgstr ""
 
-#: lib/Horde/PageOutput.php:612
+#: lib/Horde/PageOutput.php:679
 msgid "Close"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:650
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:655
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:56
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:52
+msgid "Cocos (Keeling) Islands"
+msgstr ""
+
+#: src/Perms/Ui.php:218
+msgid "Collapse or expand this branch"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:57
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:62
+msgid "Colombia"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:652
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:657
 msgid "Color Picker"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:395
+#: vendor/horde/form/lib/Horde/Form/Type.php:3942
+#: vendor/horde/form/src/V3/ColorpickerVariable.php:39
+msgid "Colour selection"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:2475
+#: vendor/horde/form/src/V3/MatrixVariable.php:107
+msgid "Column titles"
+msgstr ""
+
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Device.php:355
+msgid "Common Name"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:58
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:132
+msgid "Comoros"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:398
 msgid "Company"
 msgstr ""
 
@@ -265,117 +903,420 @@ msgstr ""
 msgid "Confirm new email address"
 msgstr ""
 
-#: lib/Horde/Core/ActiveSync/Driver.php:158
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:59
+msgid "Congo"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:55
+msgid "Congo, Republic of"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:53
+msgid "Congo, The Democratic Republic of the"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:60
+msgid "Congo, the Democratic Republic of the"
+msgstr ""
+
+#: lib/Horde/Core/Topbar.php:215 src/Topbar/TopbarBuilder.php:311
+msgid "Connected Accounts"
+msgstr ""
+
+#: lib/Horde/Core/ActiveSync/Driver.php:197
 msgid "Contacts"
 msgstr ""
 
-#: lib/Horde/Config.php:319
+#: vendor/horde/idna/lib/Horde/Idna.php:137
+msgid "Contains a dot"
+msgstr ""
+
+#: vendor/horde/idna/lib/Horde/Idna.php:129
+msgid "Contains disallowed characters"
+msgstr ""
+
+#: vendor/horde/idna/lib/Horde/Idna.php:121
+msgid "Contains hyphen in the third and fourth positions"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:61
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:58
+msgid "Cook Islands"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:99
+msgid "Cornish"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:35
+msgid "Corsican"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:62
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:63
+msgid "Costa Rica"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:57
+msgid "Cote d'Ivoire"
+msgstr ""
+
+#: vendor/horde/mail/lib/Horde/Mail/Mbox/Parse.php:65
+msgid "Could not parse mailbox data."
+msgstr ""
+
+#: lib/Horde/Config.php:342
 #, php-format
 msgid "Could not save the backup configuration file %s."
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:299
+#: vendor/horde/form/lib/Horde/Form/Type.php:843
+#: vendor/horde/form/src/V3/CountedtextVariable.php:74
+msgid "Counted text"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1151
+#: vendor/horde/form/src/V3/CountryVariable.php:62
+msgid "Country drop down list"
+msgstr ""
+
+#: lib/Horde/Core/Perms/Ui.php:305
 msgid "Creator Permissions"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:569
+#: vendor/horde/form/lib/Horde/Form/Type.php:4419
+#: vendor/horde/form/src/V3/CreditcardVariable.php:114
+msgid "Credit card number"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:36
+msgid "Cree"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:64
+msgid "Croatia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:111
+msgid "Croatia/Hrvatska"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:69
+msgid "Croatian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:65
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:64
+msgid "Cuba"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:66
+msgid "CuraÃ§ao"
+msgstr ""
+
+#: vendor/horde/form/test/v3/V3BaseVariableTest.php:403
+msgid "Custom error message"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:67
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:67
+msgid "Cyprus"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:37
+msgid "Czech"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:68
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:68
+msgid "Czech Republic"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:63
+msgid "CÃ´te d'Ivoire"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:572
 msgid "DD"
 msgstr ""
 
+#: vendor/horde/form/lib/Horde/Form/Type.php:4485
+#: vendor/horde/form/src/V3/DblookupVariable.php:60
+msgid ""
+"DSN (see http://pear.php.net/manual/en/package.database.db.intro-dsn.php)"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:219
+#: vendor/horde/date/src/Recurrence/Recurrence.php:1272
+#: vendor/horde/logintasks/lib/Horde/LoginTasks.php:309
+#: vendor/horde/logintasks/src/TaskInterval.php:58
+msgid "Daily"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:946
+msgid "Daily: Recurs every"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:41
+msgid "Danish"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4483
+#: vendor/horde/form/src/V3/DblookupVariable.php:57
+msgid "Database lookup"
+msgstr ""
+
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Imap/Message.php:176
+#: vendor/horde/form/lib/Horde/Form/Type.php:3117
+#: vendor/horde/form/src/V3/DateVariable.php:112
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rfc822.php:67
+msgid "Date"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3899
+#: vendor/horde/form/src/V3/DatetimeVariable.php:179
+msgid "Date and time selection"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3704
+#: vendor/horde/form/src/V3/MonthdayyearVariable.php:261
+msgid "Date selection"
+msgstr ""
+
 #: lib/Horde/Core/Ui/JsCalendar.php:140
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:506
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:566
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:509
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:569
 msgid "December"
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:494 lib/Horde/Core/Perms/Ui.php:512
+#: vendor/horde/prefs/lib/Horde/Prefs/Identity.php:130
+msgid "Default Identity"
+msgstr ""
+
+#: lib/Horde/Core/Perms/Ui.php:503 lib/Horde/Core/Perms/Ui.php:521
+#: src/Perms/Ui.php:529 vendor/horde/perms/lib/Horde/Perms.php:69
 msgid "Delete"
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:84 lib/Horde/Core/Perms/Ui.php:144
+#: lib/Horde/Core/Perms/Ui.php:87 lib/Horde/Core/Perms/Ui.php:147
+#: src/Perms/Ui.php:283
 msgid "Delete Permission"
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:493
+#: lib/Horde/Core/Perms/Ui.php:502
 #, php-format
 msgid "Delete permissions for \"%s\""
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:496
+#: lib/Horde/Core/Perms/Ui.php:505
 #, php-format
 msgid "Delete permissions for \"%s\" and any sub-permissions?"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:69
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:71
+msgid "Denmark"
 msgstr ""
 
 #: lib/Horde/Core/Auth/Signup/Base.php:110
 msgid "Deny the account:"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:397
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:400
 msgid "Department"
 msgstr ""
 
+#: vendor/horde/form/lib/Horde/Form/Type.php:206
+#: vendor/horde/form/src/V3/DescriptionVariable.php:31
+msgid "Description"
+msgstr ""
+
 #: lib/Horde/Core/Alarm/Handler/Desktop.php:102
+#: vendor/horde/alarm/lib/Horde/Alarm/Handler/Desktop.php:88
+#: vendor/horde/alarm/src/DesktopHandler.php:118
 msgid "Desktop notification (with certain browsers)"
 msgstr ""
 
-#: lib/Horde/ErrorHandler.php:231
-msgid "Details"
-msgstr ""
-
-#: lib/Horde/ErrorHandler.php:200
+#: lib/Horde/ErrorHandler.php:202
 msgid "Details have been logged for the administrator."
-msgstr ""
-
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1313
-#, php-format
-msgid "Dial %s"
 msgstr ""
 
 #: lib/Horde/Core/Notification/Event/Status.php:69
 msgid "Dismiss"
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:494
+#: vendor/horde/form/lib/Horde/Form/Type.php:3714
+#: vendor/horde/form/lib/Horde/Form/Type.php:3909
+#: vendor/horde/form/src/V3/DatetimeVariable.php:198
+#: vendor/horde/form/src/V3/MonthdayyearVariable.php:280
+msgid "Display format"
+msgstr ""
+
+#: vendor/horde/mime/lib/Horde/Mime/Mdn.php:195
+msgid "Disposition Notification"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:43
+msgid "Divehi; Dhivehi; Maldivian;"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:70
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:70
+msgid "Djibouti"
+msgstr ""
+
+#: lib/Horde/Core/Perms/Ui.php:503
 msgid "Do not delete"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:222
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:286
+#: vendor/horde/idna/lib/Horde/Idna.php:145
+msgid "Does not meet the IDNA BiDi requirements (for right-to-left characters)"
+msgstr ""
+
+#: vendor/horde/idna/lib/Horde/Idna.php:149
+msgid "Does not meet the IDNA CONTEXTJ requirements"
+msgstr ""
+
+#: vendor/horde/idna/lib/Horde/Idna.php:104
+msgid "Domain name is empty"
+msgstr ""
+
+#: vendor/horde/idna/lib/Horde/Idna.php:109
+msgid "Domain name is too long"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:225
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:289
 msgid "Domestic Address"
 msgstr ""
 
-#: lib/Horde/Core/ActiveSync/Driver.php:3499
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:71
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:72
+msgid "Dominica"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:72
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:73
+msgid "Dominican Republic"
+msgstr ""
+
+#: lib/Horde/Core/ActiveSync/Driver.php:4185
 msgid "Drafts"
 msgstr ""
 
+#: vendor/horde/form/lib/Horde/Form/Type.php:2667
+#: vendor/horde/form/src/V3/EnumVariable.php:102
+msgid "Drop down list"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:125
+msgid "Dutch"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:44
+msgid "Dzongkha"
+msgstr ""
+
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Device.php:370
+msgid "EAS Version"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:236
+msgid "East Timor"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:73
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:75
+msgid "Ecuador"
+msgstr ""
+
 #: lib/Horde/Core/Block/Layout.php:115 lib/Horde/Core/Block/Layout.php:117
+#: vendor/horde/perms/lib/Horde/Perms.php:68
 msgid "Edit"
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:83 lib/Horde/Core/Perms/Ui.php:142
+#: lib/Horde/Core/Perms/Ui.php:86 lib/Horde/Core/Perms/Ui.php:145
+#: src/Perms/Ui.php:269
 msgid "Edit Permission"
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:432
+#: lib/Horde/Core/Perms/Ui.php:438
 #, php-format
 msgid "Edit permissions for \"%s\""
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:378
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:74
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:77
+msgid "Egypt"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:75
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:222
+msgid "El Salvador"
+msgstr ""
+
+#: lib/Horde/Core/Alarm/Handler/Mail.php:167
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:381
+#: vendor/horde/alarm/lib/Horde/Alarm/Handler/Mail.php:136
+#: vendor/horde/alarm/src/MailHandler.php:152
+#: vendor/horde/form/lib/Horde/Form/Type.php:1962
+#: vendor/horde/form/src/V3/EmailVariable.php:724
 msgid "Email"
+msgstr ""
+
+#: lib/Horde/Core/Alarm/Handler/Mail.php:180
+#: vendor/horde/alarm/lib/Horde/Alarm/Handler/Mail.php:156
+#: vendor/horde/alarm/src/MailHandler.php:160
+msgid "Email address (optional)"
 msgstr ""
 
 #: lib/Horde/Core/Prefs/Identity.php:110
 msgid "Email address to confirm not found."
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:362
+#: vendor/horde/form/lib/Horde/Form/Type.php:2510
+#: vendor/horde/form/src/V3/EmailconfirmVariable.php:26
+msgid "Email addresses must match."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:2532
+#: vendor/horde/form/src/V3/EmailconfirmVariable.php:49
+msgid "Email with confirmation"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:365
 msgid "Emoticons"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1106
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1119
-msgid "Enter the letters below:"
+#: vendor/horde/form/lib/Horde/Form/Type.php:3344
+#: vendor/horde/form/lib/Horde/Form/Type.php:3708
+#: vendor/horde/form/lib/Horde/Form/Type.php:3903
+#: vendor/horde/form/src/V3/DatetimeVariable.php:186
+#: vendor/horde/form/src/V3/MonthdayyearVariable.php:268
+#: vendor/horde/form/src/V3/MonthyearVariable.php:88
+msgid "End year"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:986
+msgid "Ends after"
+msgstr ""
+
+#: vendor/horde/idna/lib/Horde/Idna.php:117
+msgid "Ends with a hyphen"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:47
+msgid "English"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:76
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:101
+msgid "Equatorial Guinea"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:77
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:79
+msgid "Eritrea"
 msgstr ""
 
 #: lib/Horde/Core/Block/Layout/View.php:123
@@ -383,37 +1324,183 @@ msgstr ""
 msgid "Error"
 msgstr ""
 
-#: lib/Horde/PageOutput.php:674
+#: lib/Horde/PageOutput.php:750
 msgid "Error when communicating with the server."
 msgstr ""
 
-#: lib/Horde/Core/Block/Layout/Manager.php:543
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:48
+msgid "Esperanto"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:78
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:76
+msgid "Estonia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:50
+msgid "Estonian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:79
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:81
+msgid "Ethiopia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Geoip.php:326
+msgid "Europe"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:82
+msgid "European Union"
+msgstr ""
+
+#: vendor/horde/logintasks/lib/Horde/LoginTasks.php:310
+#: vendor/horde/logintasks/src/TaskInterval.php:59
+msgid "Every Login"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:45
+msgid "Ewe"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:996
+msgid "Exceptions on"
+msgstr ""
+
+#: lib/Horde/Core/Block/Layout/Manager.php:562
 msgid "Expand"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:324
+#: vendor/horde/date/lib/Horde/Date.php:602
+#: vendor/horde/date/lib/Horde/Date.php:608
+#, php-format
+msgid "Failed to parse time string (%s)"
+msgstr ""
+
+#: vendor/horde/form/src/V3/FileVariable.php:170
+msgid "Failed to write file to disk."
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:80
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:85
+msgid "Falkland Islands (Malvinas)"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:81
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:87
+msgid "Faroe Islands"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:56
+msgid "Faroese"
+msgstr ""
+
+#: vendor/horde/cli/lib/Horde/Cli.php:415 vendor/horde/cli/src/Cli.php:429
+msgid "Fatal Error:"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:327
 msgid "Fax"
 msgstr ""
 
 #: lib/Horde/Core/Ui/JsCalendar.php:130
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:496
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:556
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:499
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:559
 msgid "February"
 msgstr ""
 
-#: lib/Horde/PageOutput.php:613
+#: vendor/horde/form/lib/Horde/Form/Type.php:2472
+#: vendor/horde/form/src/V3/MatrixVariable.php:104
+msgid "Field matrix"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4546
+#: vendor/horde/form/src/V3/FigletVariable.php:72
+msgid "Figlet CAPTCHA"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4550
+#: vendor/horde/form/src/V3/FigletVariable.php:79
+msgid "Figlet font"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:82
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:84
+msgid "Fiji"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:55
+msgid "Fijian"
+msgstr ""
+
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rar.php:96
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Tgz.php:131
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Zip.php:102
+#, php-format
+msgid "File Count: %d file"
+msgid_plural "File Count: %d files"
+msgstr[0] ""
+msgstr[1] ""
+
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rar.php:103
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Tgz.php:138
+msgid "File Name"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4159
+#: vendor/horde/form/src/V3/SelectfilesVariable.php:99
+msgid "File selection"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1209
+#: vendor/horde/form/src/V3/FileVariable.php:160
+msgid "File upload"
+msgstr ""
+
+#: vendor/horde/browser/lib/Horde/Browser.php:654
+msgid "File uploads not supported."
+msgstr ""
+
+#: lib/Horde/PageOutput.php:680
 msgid "Filter items..."
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:296
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:83
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:83
+msgid "Finland"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:54
+msgid "Finnish"
+msgstr ""
+
+#: vendor/horde/logintasks/src/TaskInterval.php:60
+msgid "First Login"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:299
 msgid "Fix ratio"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:267
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:270
 msgid "Flip"
 msgstr ""
 
-#: lib/Horde/Core/ActiveSync/Mail.php:460
+#: vendor/horde/form/lib/Horde/Form/Type.php:4574
+#: vendor/horde/form/src/V3/CaptchaVariable.php:37
+msgid "Font"
+msgstr ""
+
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Device.php:373
+msgid "Forced Multiplexed Bitmask"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3120
+#: vendor/horde/form/src/V3/DateVariable.php:115
+msgid "Format"
+msgstr ""
+
+#: lib/Horde/Core/ActiveSync/Mail.php:466
 msgid "Forwarded Message"
 msgstr ""
 
@@ -421,185 +1508,1190 @@ msgstr ""
 msgid "Fr"
 msgstr ""
 
+#: vendor/horde/form/lib/Horde/Form/Type.php:324
+#: vendor/horde/form/src/V3/NumberVariable.php:132
+msgid "Fraction"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:84
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:88
+msgid "France"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:57
+msgid "French"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:85
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:93
+msgid "French Guiana"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:86
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:187
+msgid "French Polynesia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:87
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:227
+msgid "French Southern Territories"
+msgstr ""
+
 #: lib/Horde/Core/Ui/JsCalendar.php:116
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:962
 msgid "Friday"
 msgstr ""
 
-#: lib/Horde/Core/Prefs/Ui.php:683 lib/Horde/Core/Topbar.php:161
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Imap/Message.php:180
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rfc822.php:68
+msgid "From"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:53
+msgid "Fula; Fulah; Pulaar; Pular"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:88
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:89
+msgid "Gabon"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:61
+msgid "Galician"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:89
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:98
+msgid "Gambia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:90
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:92
+msgid "Georgia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:86
+msgid "Georgian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:42
+msgid "German"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:91
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:69
+msgid "Germany"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:92
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:95
+msgid "Ghana"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:93
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:96
+msgid "Gibraltar"
+msgstr ""
+
+#: lib/Horde/Core/Prefs/Ui.php:691 lib/Horde/Core/Topbar.php:172
+#: src/Topbar/TopbarBuilder.php:484
 msgid "Global Preferences"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1434
-msgid "Google Maps"
+#: test/Unit/Translation/DelegatingTranslationHandlerTest.php:47
+msgid "Goodbye"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:273
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:276
 msgid "Grayscale"
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:373
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:94
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:102
+msgid "Greece"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:46
+msgid "Greek, Modern"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:95
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:97
+msgid "Greenland"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:96
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:91
+msgid "Grenada"
+msgstr ""
+
+#: lib/Horde/Core/Perms/Ui.php:379
 msgid "Groups"
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:286
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:97
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:100
+msgid "Guadeloupe"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:98
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:105
+msgid "Guam"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:62
+msgid "Guarani"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:99
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:104
+msgid "Guatemala"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:100
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:94
+msgid "Guernsey"
+msgstr ""
+
+#: lib/Horde/Core/Perms/Ui.php:292
 msgid "Guest Permissions"
 msgstr ""
 
-#: lib/Horde/Core/Topbar.php:207 lib/Horde/Help.php:254 lib/Horde/Help.php:255
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:101
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:99
+msgid "Guinea"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:102
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:106
+msgid "Guinea-Bissau"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:63
+msgid "Gujarati"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:103
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:107
+msgid "Guyana"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:231
+#: vendor/horde/form/src/V3/HtmlVariable.php:31
+msgid "HTML"
+msgstr ""
+
+#: vendor/horde/mime/lib/Horde/Mime/Mail.php:446
+msgid "HTML Version of Message"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:104
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:112
+msgid "Haiti"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:70
+msgid "Haitian; Haitian Creole"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:65
+msgid "Hausa"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:184
+#: vendor/horde/form/lib/Horde/Form/Type.php:4082
+#: vendor/horde/form/src/V3/HeaderVariable.php:31
+#: vendor/horde/form/src/V3/SorterVariable.php:126
+msgid "Header"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type/tableset.php:76
+#: vendor/horde/form/src/V3/TablesetVariable.php:77
+msgid "Headers"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:105
+msgid "Heard Island and McDonald Islands"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:109
+msgid "Heard and McDonald Islands"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:66
+msgid "Hebrew (modern)"
+msgstr ""
+
+#: test/Unit/Translation/DelegatingTranslationHandlerTest.php:35
+#: test/Unit/Translation/DelegatingTranslationHandlerTest.php:79
+#: test/Unit/Translation/DelegatingTranslationHandlerTest.php:80
+#: vendor/horde/translation/test/NullHandlerTest.php:23
+msgid "Hello"
+msgstr ""
+
+#: lib/Horde/Core/Topbar.php:239 lib/Horde/Help.php:256 lib/Horde/Help.php:257
+#: src/Topbar/TopbarBuilder.php:360
 msgid "Help"
 msgstr ""
 
-#: lib/Horde/Help.php:59
+#: lib/Horde/Help.php:61
 msgid "Help file not found."
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:214
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:278
+#: vendor/horde/form/lib/Horde/Form/Type.php:786
+#: vendor/horde/form/lib/Horde/Form/Type.php:970
+#: vendor/horde/form/src/V3/AddressVariable.php:153
+#: vendor/horde/form/src/V3/LongtextVariable.php:101
+msgid "Helpers"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:73
+msgid "Herero"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:67
+msgid "Hindi"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:68
+msgid "Hiri Motu"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:106
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:249
+msgid "Holy See (Vatican City State)"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:217
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:281
 msgid "Home Address"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:328
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:331
 msgid "Home Phone"
 msgstr ""
 
-#: lib/Horde/Core/ActiveSync/Driver.php:3494
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:107
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:110
+msgid "Honduras"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:108
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:108
+msgid "Hong Kong"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:71
+msgid "Hungarian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:109
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:113
+msgid "Hungary"
+msgstr ""
+
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Device.php:352
+msgid "IMEI"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:680
+#: vendor/horde/form/src/V3/IpaddressVariable.php:56
+msgid "IP address"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:711
+#: vendor/horde/form/src/V3/Ip6addressVariable.php:44
+msgid "IPv6 address"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:110
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:122
+msgid "Iceland"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:81
+msgid "Icelandic"
+msgstr ""
+
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Device.php:343
+#: vendor/horde/form/lib/Horde/Form/Type.php:4161
+#: vendor/horde/form/src/V3/SelectfilesVariable.php:102
+msgid "Id"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:80
+msgid "Ido"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:77
+msgid "Igbo"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4570
+#: vendor/horde/form/src/V3/CaptchaVariable.php:30
+msgid "Image CAPTCHA"
+msgstr ""
+
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Imap/Message.php:559
+msgid "Image part"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1584
+#: vendor/horde/form/src/V3/ImageVariable.php:475
+msgid "Image upload"
+msgstr ""
+
+#: vendor/horde/mail/lib/Horde/Mail/Mbox/Parse.php:102
+#, php-format
+msgid "Imported mailbox contains more than enforced limit of %u messages."
+msgstr ""
+
+#: vendor/horde/cli/lib/Horde/Cli.php:404 vendor/horde/cli/src/Cli.php:418
+#, php-format
+msgid "In %s"
+msgstr ""
+
+#: lib/Horde/Core/ActiveSync/Driver.php:4180
 msgid "Inbox"
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:312
+#: vendor/horde/data/lib/Horde/Data/Csv.php:242
+msgid "Incorrect charset given for the data."
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:111
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:118
+msgid "India"
+msgstr ""
+
+#: lib/Horde/Core/Perms/Ui.php:318
 msgid "Individual Users"
 msgstr ""
 
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:112
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:114
+msgid "Indonesia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:75
+msgid "Indonesian"
+msgstr ""
+
 #: lib/Horde/Core/Alarm/Handler/Notify.php:72
+#: vendor/horde/alarm/lib/Horde/Alarm/Handler/Notify.php:86
+#: vendor/horde/alarm/src/NotifyHandler.php:122
 msgid "Inline"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:226
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:290
+#: vendor/horde/form/lib/Horde/Form/Type.php:358
+#: vendor/horde/form/src/V3/IntVariable.php:62
+msgid "Integer"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:418
+#: vendor/horde/form/src/V3/IntlistVariable.php:39
+msgid "Integer list"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:74
+msgid "Interlingua"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:76
+msgid "Interlingue"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:229
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:293
 msgid "International Address"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:852
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:83
+msgid "Inuktitut"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:79
+msgid "Inupiaq"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4648
+#: vendor/horde/form/src/V3/InvalidVariable.php:47
+msgid "Invalid"
+msgstr ""
+
+#: vendor/horde/compress/lib/Horde/Compress/Rar.php:67
+#: vendor/horde/compress/lib/Horde/Compress/Rar.php:76
+#: vendor/horde/compress/lib/Horde/Compress/Rar.php:133
+#: vendor/horde/compress/src/Driver/Rar.php:53
+#: vendor/horde/compress/src/Driver/Rar.php:62
+#: vendor/horde/compress/src/Driver/Rar.php:116
+msgid "Invalid RAR data."
+msgstr ""
+
+#: vendor/horde/compress/lib/Horde/Compress/Zip.php:230
+#: vendor/horde/compress/lib/Horde/Compress/Zip.php:240
+#: vendor/horde/compress/lib/Horde/Compress/Zip.php:271
+#: vendor/horde/compress/lib/Horde/Compress/Zip.php:298
+#: vendor/horde/compress/src/Driver/Zip.php:165
+#: vendor/horde/compress/src/Driver/Zip.php:173
+#: vendor/horde/compress/src/Driver/Zip.php:201
+#: vendor/horde/compress/src/Driver/Zip.php:222
+msgid "Invalid ZIP data"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:2643
+#: vendor/horde/form/lib/Horde/Form/Type.php:2730
+#: vendor/horde/form/lib/Horde/Form/Type.php:2821
+#: vendor/horde/form/lib/Horde/Form/Type.php:2931
+#: vendor/horde/form/lib/Horde/Form/Type/tableset.php:53
+#: vendor/horde/form/src/V3/EnumVariable.php:56
+#: vendor/horde/form/src/V3/MlenumVariable.php:68
+#: vendor/horde/form/src/V3/MultienumVariable.php:82
+#: vendor/horde/form/src/V3/SetVariable.php:48
+#: vendor/horde/form/src/V3/TablesetVariable.php:49
+msgid "Invalid data submitted."
+msgstr ""
+
+#: vendor/horde/form/src/V3/Renderer/HtmlControlRenderer.php:1979
+msgid "Invalid field"
+msgstr ""
+
+#: vendor/horde/compress/lib/Horde/Compress/Dbx.php:140
+#: vendor/horde/compress/lib/Horde/Compress/Dbx.php:169
+#: vendor/horde/compress/lib/Horde/Compress/Dbx.php:250
+#: vendor/horde/compress/src/Driver/Dbx.php:104
+#: vendor/horde/compress/src/Driver/Dbx.php:124
+#: vendor/horde/compress/src/Driver/Dbx.php:195
+msgid "Invalid file format"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:854
 #: lib/Horde/Core/Ui/VarRenderer/TablesetHtml.php:27
 msgid "Invert selection"
 msgstr ""
 
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:113
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:121
+msgid "Iran, Islamic Republic of"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:114
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:120
+msgid "Iraq"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:115
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:115
+msgid "Ireland"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:59
+msgid "Irish"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:116
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:117
+msgid "Isle of Man"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:117
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:116
+msgid "Israel"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:82
+msgid "Italian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:118
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:123
+msgid "Italy"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:119
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:125
+msgid "Jamaica"
+msgstr ""
+
 #: lib/Horde/Core/Ui/JsCalendar.php:129
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:495
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:555
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:498
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:558
 msgid "January"
 msgstr ""
 
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:120
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:127
+msgid "Japan"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:84
+msgid "Japanese"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:85
+msgid "Javanese"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:121
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:124
+msgid "Jersey"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:122
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:126
+msgid "Jordan"
+msgstr ""
+
 #: lib/Horde/Core/Ui/JsCalendar.php:135
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:501
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:561
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:504
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:564
 msgid "July"
 msgstr ""
 
 #: lib/Horde/Core/Ui/JsCalendar.php:134
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:500
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:560
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:503
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:563
 msgid "June"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:305
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:91
+msgid "Kalaallisut, Greenlandic"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:93
+msgid "Kannada"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:95
+msgid "Kanuri"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:96
+msgid "Kashmiri"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:90
+msgid "Kazakh"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:123
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:138
+msgid "Kazakhstan"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:308
 msgid "Keep original?"
 msgstr ""
 
-#: lib/Horde/Core/Smartmobile/View/Helper.php:68
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:124
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:128
+msgid "Kenya"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:92
+msgid "Khmer"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:88
+msgid "Kikuyu, Gikuyu"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:146
+msgid "Kinyarwanda"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:100
+msgid "Kirghiz, Kyrgyz"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:125
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:131
+msgid "Kiribati"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:143
+msgid "Kirundi"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:98
+msgid "Komi"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:87
+msgid "Kongo"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:126
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:134
+msgid "Korea, Democratic People's Republic of"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:127
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:135
+msgid "Korea, Republic of"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:94
+msgid "Korean"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:97
+msgid "Kurdish"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:128
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:136
+msgid "Kuwait"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:89
+msgid "Kwanyama, Kuanyama"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:129
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:129
+msgid "Kyrgyzstan"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:106
+msgid "Lao"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:130
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:139
+msgid "Lao People's Democratic Republic"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:101
+msgid "Latin"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:131
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:148
+msgid "Latvia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:109
+msgid "Latvian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:132
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:140
+msgid "Lebanon"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4306
+#: vendor/horde/form/src/V3/AssignVariable.php:175
+msgid "Left header"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4302
+#: vendor/horde/form/src/V3/AssignVariable.php:167
+msgid "Left values"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:133
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:145
+msgid "Lesotho"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:134
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:144
+msgid "Liberia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:135
+msgid "Libya"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:149
+msgid "Libyan Arab Jamahiriya"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:136
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:142
+msgid "Liechtenstein"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:104
+msgid "Limburgish, Limburgan, Limburger"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:105
+msgid "Lingala"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1660
+#: vendor/horde/form/src/V3/LinkVariable.php:55
+msgid "Link"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4165
+#: vendor/horde/form/src/V3/SelectfilesVariable.php:110
+msgid "Link style"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4163
+#: vendor/horde/form/src/V3/SelectfilesVariable.php:106
+msgid "Link text"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1971
+#: vendor/horde/form/src/V3/EmailVariable.php:735
+msgid "Link the email address to the compose page when displaying?"
+msgstr ""
+
+#: vendor/horde/text_filter/lib/Horde/Text/Filter/Html2text.php:146
+#: vendor/horde/text_filter/lib/Horde/Text/Filter/Html2text.php:147
+#: vendor/horde/text_filter/src/Filter/Html2text.php:141
+#: vendor/horde/text_filter/src/Filter/Html2text.php:142
+msgid "Links"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:137
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:146
+msgid "Lithuania"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:107
+msgid "Lithuanian"
+msgstr ""
+
+#: lib/Horde/Core/Smartmobile/View/Helper.php:69
 msgid "Log out"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:494
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:554
+#: vendor/horde/form/lib/Horde/Form/Type.php:780
+#: vendor/horde/form/src/V3/LongtextVariable.php:90
+msgid "Long text"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:108
+msgid "Luba-Katanga"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:103
+msgid "Luganda"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:138
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:147
+msgid "Luxembourg"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:102
+msgid "Luxembourgish, Letzeburgesch"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:497
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:557
 msgid "MM"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1382
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1409
-msgid "MapQuest map"
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:139
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:160
+msgid "Macao"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:156
+msgid "Macedonia, The Former Yugoslav Republic of"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:140
+msgid "Macedonia, the Former Yugoslav Republic of"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:113
+msgid "Macedonian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:141
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:154
+msgid "Madagascar"
+msgstr ""
+
+#: test/Unit/Topbar/TopbarBuilderTest.php:374
+msgid "Mail"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:110
+msgid "Malagasy"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:142
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:168
+msgid "Malawi"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:117
+msgid "Malay"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:114
+msgid "Malayalam"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:143
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:170
+msgid "Malaysia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:144
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:167
+msgid "Maldives"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:145
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:157
+msgid "Mali"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:146
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:165
+msgid "Malta"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:118
+msgid "Maltese"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:64
+msgid "Manx"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:112
+msgid "Maori"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:116
+msgid "Marathi"
 msgstr ""
 
 #: lib/Horde/Core/Ui/JsCalendar.php:131
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:497
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:557
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:500
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:560
 msgid "March"
 msgstr ""
 
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:147
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:155
+msgid "Marshall Islands"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:111
+msgid "Marshallese"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:148
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:162
+msgid "Martinique"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:149
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:163
+msgid "Mauritania"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:150
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:166
+msgid "Mauritius"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1590
+#: vendor/horde/form/src/V3/ImageVariable.php:486
+msgid "Maximum file size in bytes"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:505
+#: vendor/horde/form/lib/Horde/Form/Type.php:530
+#: vendor/horde/form/lib/Horde/Form/Type.php:562
+#: vendor/horde/form/src/V3/TextVariable.php:92
+msgid "Maximum length"
+msgstr ""
+
 #: lib/Horde/Core/Ui/JsCalendar.php:133
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:499
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:559
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:502
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:562
 msgid "May"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:151
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:259
+msgid "Mayotte"
 msgstr ""
 
 #: lib/Horde/Core/Notification/Event/Status.php:100
 msgid "Message"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:270
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Imap/Message.php:563
+msgid "Message part"
+msgstr ""
+
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rar.php:107
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Zip.php:108
+msgid "Method"
+msgstr ""
+
+#: vendor/horde/rpc/lib/Horde/Rpc/Phpgw.php:81
+#: vendor/horde/rpc/lib/Horde/Rpc/Phpgw.php:82
+#: vendor/horde/rpc/lib/Horde/Rpc/Soap.php:177
+#: vendor/horde/rpc/lib/Horde/Rpc/Soap.php:185
+#, php-format
+msgid "Method \"%s\" is not defined"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:152
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:169
+msgid "Mexico"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:153
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:86
+msgid "Micronesia, Federated States of"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:273
 msgid "Mirror"
+msgstr ""
+
+#: vendor/horde/form/src/V3/BaseForm.php:1003
+msgid "Missing form token â possible cross-site request."
 msgstr ""
 
 #: lib/Horde/Core/Ui/JsCalendar.php:94
 msgid "Mo"
 msgstr ""
 
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Device.php:358
+msgid "Mobile Operator"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:637
+#: vendor/horde/form/src/V3/CellphoneVariable.php:29
+msgid "Mobile phone number"
+msgstr ""
+
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Device.php:349
+msgid "Model"
+msgstr ""
+
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rar.php:106
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Tgz.php:141
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Zip.php:107
+msgid "Modified Date"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:154
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:152
+msgid "Moldova, Republic of"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:155
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:151
+msgid "Monaco"
+msgstr ""
+
 #: lib/Horde/Core/Ui/JsCalendar.php:112
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:950
 msgid "Monday"
 msgstr ""
 
-#: lib/Horde/Core/Block/Layout/Manager.php:577
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:156
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:159
+msgid "Mongolia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:115
+msgid "Mongolian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:157
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:153
+msgid "Montenegro"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3340
+#: vendor/horde/form/src/V3/MonthyearVariable.php:81
+msgid "Month and year"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:225
+#: vendor/horde/date/src/Recurrence/Recurrence.php:1276
+#: vendor/horde/logintasks/lib/Horde/LoginTasks.php:307
+#: vendor/horde/logintasks/src/TaskInterval.php:56
+msgid "Monthly"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:972
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:974
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:976
+msgid "Monthly: Recurs every"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:158
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:164
+msgid "Montserrat"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:159
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:150
+msgid "Morocco"
+msgstr ""
+
+#: lib/Horde/Core/Block/Layout/Manager.php:596
 msgid "Move Down"
 msgstr ""
 
-#: lib/Horde/Core/Block/Layout/Manager.php:581
+#: lib/Horde/Core/Block/Layout/Manager.php:600
 msgid "Move Left"
 msgstr ""
 
-#: lib/Horde/Core/Block/Layout/Manager.php:585
+#: lib/Horde/Core/Block/Layout/Manager.php:604
 msgid "Move Right"
 msgstr ""
 
-#: lib/Horde/Core/Block/Layout/Manager.php:573
+#: lib/Horde/Core/Block/Layout/Manager.php:592
 msgid "Move Up"
 msgstr ""
 
 #: lib/Horde/Core/Prefs/Ui/Widgets.php:102
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:683
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:685
 msgid "Move down"
 msgstr ""
 
 #: lib/Horde/Core/Prefs/Ui/Widgets.php:101
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:682
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:683
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:684
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:685
 msgid "Move up"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1351
-msgid "Multimap UK map"
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:160
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:171
+msgid "Mozambique"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:154
+#: vendor/horde/form/lib/Horde/Form/Type.php:2755
+#: vendor/horde/form/src/V3/MlenumVariable.php:96
+msgid "Multi-level drop down lists"
+msgstr ""
+
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Imap/Message.php:566
+msgid "Multipart part"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:2830
+#: vendor/horde/form/src/V3/MultienumVariable.php:93
+msgid "Multiple selection"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:2864
+#: vendor/horde/form/src/V3/KeyvalMultienumVariable.php:42
+msgid "Multiple selection, preserving keys"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:161
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:158
+msgid "Myanmar"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:157
 msgid "Name"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:162
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:172
+msgid "Namibia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:163
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:120
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:181
+msgid "Nauru"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:129
+msgid "Navajo, Navaho"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:124
+msgid "Ndonga"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:164
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:180
+msgid "Nepal"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:123
+msgid "Nepali"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:165
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:178
+msgid "Netherlands"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:22
+msgid "Netherlands Antilles"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:166
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:173
+msgid "New Caledonia"
+msgstr ""
+
+#: vendor/horde/prefs/lib/Horde/Prefs/CategoryManager.php:61
+msgid "New Category"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:2487
+#: vendor/horde/form/src/V3/MatrixVariable.php:119
+msgid "New Input"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:167
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:183
+msgid "New Zealand"
 msgstr ""
 
 #: lib/Horde/Core/Ui/Pager.php:117
 msgid "Next>"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1201
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:168
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:177
+msgid "Nicaragua"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:169
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:174
+msgid "Niger"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:170
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:176
+msgid "Nigeria"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:171
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:182
+msgid "Niue"
+msgstr ""
+
+#: vendor/horde/form/src/V3/Renderer/HtmlControlRenderer.php:1826
 msgid "No"
 msgstr ""
 
-#: lib/Horde/PageOutput.php:692
+#: lib/Horde/PageOutput.php:768
 msgid "No Alerts"
 msgstr ""
 
-#: lib/Horde/Core/Factory/Twitter.php:18
+#: lib/Horde/Core/Factory/Twitter.php:24
 msgid "No OAuth Key or Secret found for the Twitter API"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:619
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:621
 msgid "No Sound"
 msgstr ""
 
@@ -607,138 +2699,515 @@ msgstr ""
 msgid "No address book selected."
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:211
+#: lib/Horde/Core/Perms/Ui.php:214
 msgid "No children can be added to this permission."
 msgstr ""
 
-#: lib/Horde.php:498
+#: src/Horde.php:655
 #, php-format
 msgid "No configuration information specified for %s."
 msgstr ""
 
-#: lib/Horde/Core/ActiveSync/Mail.php:675
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:994
+msgid "No end date"
+msgstr ""
+
+#: vendor/horde/browser/lib/Horde/Browser.php:675
+#: vendor/horde/browser/lib/Horde/Browser.php:690
+msgid "No file uploaded"
+msgstr ""
+
+#: vendor/horde/form/src/V3/FileVariable.php:168
+msgid "No file was uploaded."
+msgstr ""
+
+#: lib/Horde/Core/ActiveSync/Mail.php:681
 msgid "No message body text"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:217
+#: vendor/horde/date/src/Recurrence/Recurrence.php:1271
+msgid "No recurrence"
+msgstr ""
+
+#: vendor/horde/vfs/lib/Horde/Vfs/Smb.php:643
+msgid "No such file"
+msgstr ""
+
+#: vendor/horde/rpc/lib/Horde/Rpc/Phpgw.php:137
+msgid "No valid XML data returned:"
 msgstr ""
 
 #: lib/Horde/Core/Ajax/Application/Handler/Email.php:41
 msgid "No valid email address found"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1209
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1219
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1230
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1247
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1264
-msgid "No values"
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:172
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:175
+msgid "Norfolk Island"
 msgstr ""
 
-#: lib/Horde/Registry.php:303
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:122
+msgid "North Ndebele"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:173
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:161
+msgid "Northern Mariana Islands"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:150
+msgid "Northern Sami"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:174
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:179
+msgid "Norway"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:127
+msgid "Norwegian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:121
+msgid "Norwegian BokmÃ¥l"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:126
+msgid "Norwegian Nynorsk"
+msgstr ""
+
+#: vendor/horde/exception/lib/Horde/Exception/NotFound.php:42
+#: vendor/horde/exception/src/NotFound.php:46
+msgid "Not Found"
+msgstr ""
+
+#: lib/Horde/Registry.php:407
 msgid "Not an admin"
 msgstr ""
 
-#: lib/Horde/Core/ActiveSync/Driver.php:160
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:404
+#: lib/Horde/Core/ActiveSync/Driver.php:199
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:407
 msgid "Notes"
 msgstr ""
 
 #: lib/Horde/Core/Ui/JsCalendar.php:139
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:505
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:565
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:508
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:568
 msgid "November"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:322
+#: vendor/horde/form/src/V3/NumberVariable.php:129
+msgid "Number"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:849
+#: vendor/horde/form/src/V3/CountedtextVariable.php:85
+msgid "Number of characters"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:784
+#: vendor/horde/form/lib/Horde/Form/Type.php:847
+#: vendor/horde/form/lib/Horde/Form/Type.php:966
+#: vendor/horde/form/lib/Horde/Form/Type.php:1064
+#: vendor/horde/form/lib/Horde/Form/Type.php:1121
+#: vendor/horde/form/src/V3/AddressVariable.php:149
+#: vendor/horde/form/src/V3/CountedtextVariable.php:81
+#: vendor/horde/form/src/V3/LongtextVariable.php:97
+#: vendor/horde/form/src/V3/PgpVariable.php:98
+#: vendor/horde/form/src/V3/SmimeVariable.php:83
+msgid "Number of columns"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:782
+#: vendor/horde/form/lib/Horde/Form/Type.php:845
+#: vendor/horde/form/lib/Horde/Form/Type.php:962
+#: vendor/horde/form/lib/Horde/Form/Type.php:1062
+#: vendor/horde/form/lib/Horde/Form/Type.php:1119
+#: vendor/horde/form/src/V3/AddressVariable.php:145
+#: vendor/horde/form/src/V3/CountedtextVariable.php:77
+#: vendor/horde/form/src/V3/LongtextVariable.php:93
+#: vendor/horde/form/src/V3/PgpVariable.php:94
+#: vendor/horde/form/src/V3/SmimeVariable.php:79
+msgid "Number of rows"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:78
+msgid "Nuosu"
 msgstr ""
 
 #: lib/Horde/Core/Script/Package/Dialog.php:27
 msgid "OK"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1086
-msgid "Object"
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Device.php:361
+msgid "OS"
+msgstr ""
+
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Device.php:364
+msgid "OS Language"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:131
+msgid "Occitan"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:388
+#: vendor/horde/form/src/V3/OctalVariable.php:39
+msgid "Octal"
 msgstr ""
 
 #: lib/Horde/Core/Ui/JsCalendar.php:138
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:504
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:564
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:507
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:567
 msgid "October"
 msgstr ""
 
-#: lib/Horde/Core/Ajax/Imple/InPlaceEditor.php:59
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:132
+msgid "Ojibwe, Ojibwa"
+msgstr ""
+
+#: lib/Horde/Core/Ajax/Imple/InPlaceEditor.php:61
 msgid "Ok"
 msgstr ""
 
-#: lib/Horde/Core/ActiveSync/Connector.php:986
-#: lib/Horde/Core/ActiveSync/Connector.php:993
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:38
+msgid ""
+"Old Church Slavonic, Church Slavic, Church Slavonic, Old Bulgarian, Old "
+"Slavonic"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:175
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:184
+msgid "Oman"
+msgstr ""
+
+#: vendor/horde/logintasks/src/TaskInterval.php:61
+msgid "Once"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:2523
+#: vendor/horde/form/src/V3/EmailconfirmVariable.php:38
+msgid "Only one email address allowed."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1784
+#: vendor/horde/form/src/V3/EmailVariable.php:110
+msgid "Only one email address is allowed."
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:134
+msgid "Oriya"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:133
+msgid "Oromo"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:135
+msgid "Ossetian, Ossetic"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Geoip.php:329
+msgid "Other"
+msgstr ""
+
+#: lib/Horde/Core/ActiveSync/Connector.php:1007
+#: lib/Horde/Core/ActiveSync/Connector.php:1014
 msgid "Out Of Office"
 msgstr ""
 
-#: lib/Horde/Core/ActiveSync/Driver.php:3504
+#: lib/Horde/Core/ActiveSync/Driver.php:4190
 msgid "Outbox"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:234
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:298
+#: vendor/horde/form/lib/Horde/Form/Type.php:1056
+#: vendor/horde/form/src/V3/PgpVariable.php:83
+msgid "PGP Key"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:176
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:190
+msgid "Pakistan"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:177
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:197
+msgid "Palau"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:178
+msgid "Palestine, State of"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:195
+msgid "Palestinian Territory, Occupied"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:137
+msgid "Pali"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:179
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:185
+msgid "Panama"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:136
+msgid "Panjabi, Punjabi"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:180
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:188
+msgid "Papua New Guinea"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:181
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:198
+msgid "Paraguay"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:237
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:301
 msgid "Parcel Address"
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:211
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:139
+msgid "Pashto, Pushto"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:2558
+#: vendor/horde/form/src/V3/PasswordVariable.php:35
+msgid "Password"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:2595
+#: vendor/horde/form/src/V3/PasswordconfirmVariable.php:46
+msgid "Password with confirmation"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:2577
+#: vendor/horde/form/src/V3/PasswordconfirmVariable.php:26
+msgid "Passwords must match."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1058
+#: vendor/horde/form/src/V3/PgpVariable.php:86
+msgid "Path to the GnuPG binary"
+msgstr ""
+
+#: lib/Horde/Core/Perms/Ui.php:214
 msgid "Permission"
 msgstr ""
 
-#: lib/Horde/Registry.php:375
+#: vendor/horde/exception/lib/Horde/Exception/PermissionDenied.php:42
+#: vendor/horde/exception/src/PermissionDenied.php:51
+#: vendor/horde/vfs/lib/Horde/Vfs/Smb.php:646
+msgid "Permission Denied"
+msgstr ""
+
+#: lib/Horde/Registry.php:479
 msgid "Permission denied."
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:216 lib/Horde/Core/Perms/Ui.php:226
+#: lib/Horde/Core/Perms/Ui.php:219 lib/Horde/Core/Perms/Ui.php:229
 msgid "Permissions"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:343
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:52
+msgid "Persian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:182
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:186
+msgid "Peru"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:183
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:189
+msgid "Philippines"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:346
 msgid "Phone"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:177
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:187
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:193
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Device.php:367
+msgid "Phone Number"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:615
+#: vendor/horde/form/src/V3/PhoneVariable.php:67
+msgid "Phone number"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:180
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:190
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:196
 msgid "Photo"
 msgstr ""
 
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:184
+msgid "Pitcairn"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:193
+msgid "Pitcairn Island"
+msgstr ""
+
+#: vendor/horde/mime/lib/Horde/Mime/Mail.php:444
+msgid "Plaintext Version of Message"
+msgstr ""
+
 #: lib/Horde/Core/Alarm/Handler/Notify.php:92
+#: vendor/horde/alarm/lib/Horde/Alarm/Handler/Notify.php:106
+#: vendor/horde/alarm/src/NotifyHandler.php:130
 msgid "Play a sound?"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:230
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:294
+#: vendor/horde/form/lib/Horde/Form/Type.php:3976
+#: vendor/horde/form/src/V3/SoundVariable.php:51
+msgid "Please choose a sound."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3319
+#: vendor/horde/form/src/V3/MonthyearVariable.php:57
+msgid "Please enter a month and a year."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:666
+#: vendor/horde/form/lib/Horde/Form/Type.php:697
+#: vendor/horde/form/src/V3/Ip6addressVariable.php:28
+#: vendor/horde/form/src/V3/IpaddressVariable.php:40
+msgid "Please enter a valid IP address."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3471
+#: vendor/horde/form/src/V3/MonthdayyearVariable.php:86
+msgid "Please enter a valid date, check the number of days in the month."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3186
+#: vendor/horde/form/src/V3/HourminutesecondVariable.php:41
+#: vendor/horde/form/src/V3/HourminutesecondVariable.php:51
+msgid "Please enter a valid time."
+msgstr ""
+
+#: vendor/horde/prefs/lib/Horde/Prefs/CategoryManager.php:89
+msgid "Please type the new category name:"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:185
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:191
+msgid "Poland"
+msgstr ""
+
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Device.php:344
+msgid "Policy Key"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:138
+msgid "Polish"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:186
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:196
+msgid "Portugal"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:140
+msgid "Portuguese"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:233
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:297
 msgid "Postal Address"
 msgstr ""
 
-#: lib/Horde/Core/Topbar.php:145
+#: lib/Horde/Core/Topbar.php:156 src/Topbar/TopbarBuilder.php:459
 msgid "Preferences"
 msgstr ""
 
-#: lib/Horde/Core/Prefs/Ui.php:686
+#: lib/Horde/Core/Prefs/Ui.php:694
 #, php-format
 msgid "Preferences for %s"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:238
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:302
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:241
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:305
 msgid "Preferred Address"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1666
-msgid "Preview"
+#: lib/Horde/Core/Topbar.php:227 src/Topbar/TopbarBuilder.php:340
+msgid "Problem"
 msgstr ""
 
-#: lib/Horde/Core/Topbar.php:195
-msgid "Problem"
+#: vendor/horde/form/lib/Horde/Form/Type.php:1153
+#: vendor/horde/form/lib/Horde/Form/Type.php:2671
+#: vendor/horde/form/lib/Horde/Form/Type.php:2759
+#: vendor/horde/form/lib/Horde/Form/Type.php:2893
+#: vendor/horde/form/lib/Horde/Form/Type.php:4489
+#: vendor/horde/form/src/V3/CountryVariable.php:65
+#: vendor/horde/form/src/V3/DblookupVariable.php:68
+#: vendor/horde/form/src/V3/EnumVariable.php:109
+#: vendor/horde/form/src/V3/MlenumVariable.php:103
+#: vendor/horde/form/src/V3/RadioVariable.php:40
+msgid "Prompt text"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1968
+#: vendor/horde/form/src/V3/EmailVariable.php:731
+msgid "Protect address from spammers?"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:187
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:194
+msgid "Puerto Rico"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:188
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:199
+msgid "Qatar"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:141
+msgid "Quechua"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:2887
+#: vendor/horde/form/src/V3/RadioVariable.php:33
+msgid "Radio selection"
+msgstr ""
+
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rar.php:108
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Zip.php:109
+msgid "Ratio"
+msgstr ""
+
+#: vendor/horde/perms/lib/Horde/Perms.php:67
+msgid "Read"
 msgstr ""
 
 #: lib/Horde/Core/Block/Layout.php:128
 msgid "Really delete this block?"
 msgstr ""
 
+#: vendor/horde/form/lib/Horde/Form/Type.php:501
+#: vendor/horde/form/lib/Horde/Form/Type.php:526
+#: vendor/horde/form/lib/Horde/Form/Type.php:558
+#: vendor/horde/form/src/V3/TextVariable.php:84
+msgid "Regex"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4441
+#: vendor/horde/form/src/V3/ObrowserVariable.php:31
+msgid "Relationship browser"
+msgstr ""
+
 #: lib/Horde/Core/Block/Layout.php:124 lib/Horde/Core/Block/Layout.php:130
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:235
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:712
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:238
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:714
 msgid "Remove"
 msgstr ""
 
@@ -746,66 +3215,232 @@ msgstr ""
 msgid "Remove source"
 msgstr ""
 
-#: lib/Horde.php:510
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Imap/Message.php:184
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rfc822.php:72
+msgid "Reply-To"
+msgstr ""
+
+#: vendor/horde/rpc/lib/Horde/Rpc/Phpgw.php:135
+msgid "Request couldn't be answered. Returned errorcode: "
+msgstr ""
+
+#: src/Horde.php:667
 #, php-format
 msgid "Required \"%s\" not specified in %s configuration."
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:255
-msgid "Reset"
+#: vendor/horde/form/lib/Horde/Form/Renderer.php:400
+msgid "Required Field"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:389
-msgid "Role"
-msgstr ""
-
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:261
-msgid "Rotate 180"
+#: vendor/horde/form/lib/Horde/Form.php:821
+msgid "Required secret is invalid - potentially malicious request."
 msgstr ""
 
 #: lib/Horde/Core/Ui/VarRenderer/Html.php:258
-msgid "Rotate Left"
+#: vendor/horde/form/lib/Horde/Form.php:544
+#: vendor/horde/form/lib/Horde/Form/Renderer.php:385
+msgid "Reset"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:200
+msgid "Reunion Island"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4308
+#: vendor/horde/form/src/V3/AssignVariable.php:179
+msgid "Right header"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4304
+#: vendor/horde/form/src/V3/AssignVariable.php:171
+msgid "Right values"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:392
+msgid "Role"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:190
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:201
+msgid "Romania"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:144
+msgid "Romanian, Moldavian, Moldovan"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:142
+msgid "Romansh"
 msgstr ""
 
 #: lib/Horde/Core/Ui/VarRenderer/Html.php:264
+msgid "Rotate 180"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:261
+msgid "Rotate Left"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:267
 msgid "Rotate Right"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:2479
+#: vendor/horde/form/src/V3/MatrixVariable.php:111
+msgid "Row titles"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:145
+msgid "Russian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:191
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:203
+msgid "Russian Federation"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:192
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:204
+msgid "Rwanda"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:189
+msgid "RÃ©union"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1115
+#: vendor/horde/form/src/V3/SmimeVariable.php:72
+msgid "S/MIME Key"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4487
+#: vendor/horde/form/src/V3/DblookupVariable.php:64
+msgid "SQL statement for value lookups"
 msgstr ""
 
 #: lib/Horde/Core/Ui/JsCalendar.php:99
 msgid "Sa"
 msgstr ""
 
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:193
+msgid "Saint BarthÃ©lemy"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:211
+msgid "Saint Helena"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:194
+msgid "Saint Helena, Ascension and Tristan da Cunha"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:195
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:133
+msgid "Saint Kitts and Nevis"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:196
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:141
+msgid "Saint Lucia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:197
+msgid "Saint Martin (French part)"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:198
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:192
+msgid "Saint Pierre and Miquelon"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:199
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:250
+msgid "Saint Vincent and the Grenadines"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:200
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:257
+msgid "Samoa"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:155
+msgid "Samoan"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:201
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:216
+msgid "San Marino"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:151
+msgid "Sango"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:147
+msgid "Sanskrit"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:202
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:220
+msgid "Sao Tome and Principe"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:148
+msgid "Sardinian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Geoip.php:328
+msgid "Satellite Provider"
+msgstr ""
+
 #: lib/Horde/Core/Ui/JsCalendar.php:117
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:965
 msgid "Saturday"
 msgstr ""
 
-#: lib/Horde/Registry.php:246
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:203
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:205
+msgid "Saudi Arabia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:60
+msgid "Scottish Gaelic; Gaelic"
+msgstr ""
+
+#: lib/Horde/Registry.php:350
 msgid "Script must be run from the command line"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:602
+#: vendor/horde/form/lib/Horde/Form/Type.php:4137
+#: vendor/horde/form/src/V3/SelectfilesVariable.php:71
+msgid "Select Files"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:604
 msgid "Select a date"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:850
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:852
 #: lib/Horde/Core/Ui/VarRenderer/TablesetHtml.php:25
 msgid "Select all"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1086
-msgid "Select an object"
+#: vendor/horde/form/lib/Horde/Form/Type.php:3475
+#: vendor/horde/form/src/V3/MonthdayyearVariable.php:90
+msgid "Select all date components."
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:851
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:853
 #: lib/Horde/Core/Ui/VarRenderer/TablesetHtml.php:26
 msgid "Select none"
 msgstr ""
 
-#: lib/Horde/Core/Prefs/Ui.php:866
+#: lib/Horde/Core/Prefs/Ui.php:876
 msgid "Select the identity you want to change:"
 msgstr ""
 
-#: lib/Horde/PageOutput.php:679
+#: lib/Horde/PageOutput.php:755
 msgid "Select..."
 msgstr ""
 
@@ -813,22 +3448,116 @@ msgstr ""
 msgid "Selected address books:"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1329
-msgid "Send SMS"
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:204
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:217
+msgid "Senegal"
 msgstr ""
 
-#: lib/Horde/Core/ActiveSync/Driver.php:3489
+#: lib/Horde/Core/ActiveSync/Driver.php:4175
 msgid "Sent"
 msgstr ""
 
 #: lib/Horde/Core/Ui/JsCalendar.php:137
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:503
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:563
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:506
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:566
 msgid "September"
 msgstr ""
 
-#: lib/Horde/Core/Block/Layout/Manager.php:548
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:205
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:202
+msgid "Serbia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:159
+msgid "Serbian"
+msgstr ""
+
+#: vendor/horde/alarm/lib/Horde/Alarm/Sql.php:95
+#: vendor/horde/alarm/lib/Horde/Alarm/Sql.php:119
+#: vendor/horde/alarm/lib/Horde/Alarm/Sql.php:197
+#: vendor/horde/alarm/lib/Horde/Alarm/Sql.php:234
+#: vendor/horde/alarm/lib/Horde/Alarm/Sql.php:277
+#: vendor/horde/alarm/lib/Horde/Alarm/Sql.php:305
+#: vendor/horde/alarm/lib/Horde/Alarm/Sql.php:337
+#: vendor/horde/alarm/lib/Horde/Alarm/Sql.php:364
+#: vendor/horde/alarm/lib/Horde/Alarm/Sql.php:391
+#: vendor/horde/alarm/lib/Horde/Alarm/Sql.php:417
+#: vendor/horde/alarm/lib/Horde/Alarm/Sql.php:445
+#: vendor/horde/alarm/lib/Horde/Alarm/Sql.php:519
+#: vendor/horde/alarm/src/SqlStorage.php:79
+#: vendor/horde/alarm/src/SqlStorage.php:101
+#: vendor/horde/alarm/src/SqlStorage.php:119
+#: vendor/horde/alarm/src/SqlStorage.php:159
+#: vendor/horde/alarm/src/SqlStorage.php:182
+#: vendor/horde/alarm/src/SqlStorage.php:201
+#: vendor/horde/alarm/src/SqlStorage.php:222
+#: vendor/horde/alarm/src/SqlStorage.php:241
+#: vendor/horde/alarm/src/SqlStorage.php:264
+#: vendor/horde/alarm/src/SqlStorage.php:282
+#: vendor/horde/alarm/src/SqlStorage.php:331
+#: vendor/horde/alarm/src/SqlStorage.php:369
+#: vendor/horde/alarm/src/SqlStorage.php:491
+msgid "Server error when querying database."
+msgstr ""
+
+#: vendor/horde/form/src/V3/FileVariable.php:169
+msgid "Server temporary directory missing."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:2949
+#: vendor/horde/form/src/V3/SetVariable.php:68
+msgid "Set"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:206
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:207
+msgid "Seychelles"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:156
+msgid "Shona"
+msgstr ""
+
+#: vendor/horde/perms/lib/Horde/Perms.php:66
+msgid "Show"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4167
+#: vendor/horde/form/src/V3/SelectfilesVariable.php:114
+msgid "Show icon?"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1588
+#: vendor/horde/form/src/V3/ImageVariable.php:482
+msgid "Show option to keep original?"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3710
+#: vendor/horde/form/lib/Horde/Form/Type.php:3905
+#: vendor/horde/form/src/V3/DatetimeVariable.php:190
+#: vendor/horde/form/src/V3/MonthdayyearVariable.php:272
+msgid "Show picker?"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3274
+#: vendor/horde/form/lib/Horde/Form/Type.php:3911
+#: vendor/horde/form/src/V3/DatetimeVariable.php:202
+#: vendor/horde/form/src/V3/HourminutesecondVariable.php:175
+msgid "Show seconds?"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1586
+#: vendor/horde/form/src/V3/ImageVariable.php:478
+msgid "Show upload?"
+msgstr ""
+
+#: lib/Horde/Core/Block/Layout/Manager.php:567
 msgid "Shrink"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:207
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:215
+msgid "Sierra Leone"
 msgstr ""
 
 #: lib/Horde/Core/Auth/Signup/Form.php:32
@@ -839,49 +3568,351 @@ msgstr ""
 msgid "Sign up for an account"
 msgstr ""
 
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:149
+msgid "Sindhi"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:208
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:210
+msgid "Singapore"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:152
+msgid "Sinhala, Sinhalese"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:209
+msgid "Sint Maarten (Dutch part)"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:503
+#: vendor/horde/form/lib/Horde/Form/Type.php:528
+#: vendor/horde/form/lib/Horde/Form/Type.php:560
+#: vendor/horde/form/lib/Horde/Form/Type.php:617
+#: vendor/horde/form/lib/Horde/Form/Type.php:1980
+#: vendor/horde/form/lib/Horde/Form/Type.php:2834
+#: vendor/horde/form/lib/Horde/Form/Type.php:4080
+#: vendor/horde/form/lib/Horde/Form/Type.php:4310
+#: vendor/horde/form/src/V3/AssignVariable.php:183
+#: vendor/horde/form/src/V3/EmailVariable.php:747
+#: vendor/horde/form/src/V3/MultienumVariable.php:100
+#: vendor/horde/form/src/V3/PhoneVariable.php:70
+#: vendor/horde/form/src/V3/SorterVariable.php:122
+#: vendor/horde/form/src/V3/TextVariable.php:88
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rar.php:105
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Tgz.php:140
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Zip.php:106
+msgid "Size"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:153
+msgid "Slovak"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:210
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:214
+msgid "Slovakia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:154
+msgid "Slovene"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:211
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:212
+msgid "Slovenia"
+msgstr ""
+
 #: lib/Horde/Core/Notification/Event/Status.php:77
 msgid "Snooze..."
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:212
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:206
+msgid "Solomon Islands"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:157
+msgid "Somali"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:213
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:218
+msgid "Somalia"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4076
+#: vendor/horde/form/src/V3/SorterVariable.php:115
+msgid "Sort order selection"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3984
+#: vendor/horde/form/src/V3/SoundVariable.php:61
+msgid "Sound selection"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:214
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:261
+msgid "South Africa"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:215
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:103
+msgid "South Georgia and the South Sandwich Islands"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:128
+msgid "South Ndebele"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:216
+msgid "South Sudan"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:161
+msgid "Southern Sotho"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:221
+msgid "Soviet Union"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:162
+#: vendor/horde/form/src/V3/SpacerVariable.php:32
+msgid "Spacer"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:217
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:80
+msgid "Spain"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:49
+msgid "Spanish; Castilian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:218
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:143
+msgid "Sri Lanka"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3342
+#: vendor/horde/form/lib/Horde/Form/Type.php:3706
+#: vendor/horde/form/lib/Horde/Form/Type.php:3901
+#: vendor/horde/form/src/V3/DatetimeVariable.php:182
+#: vendor/horde/form/src/V3/MonthdayyearVariable.php:264
+#: vendor/horde/form/src/V3/MonthyearVariable.php:84
+msgid "Start year"
+msgstr ""
+
+#: vendor/horde/idna/lib/Horde/Idna.php:133
+msgid "Starts with \"xn--\" but does not contain valid Punycode"
+msgstr ""
+
+#: vendor/horde/idna/lib/Horde/Idna.php:125
+msgid "Starts with a combining mark"
+msgstr ""
+
+#: vendor/horde/idna/lib/Horde/Idna.php:113
+msgid "Starts with a hyphen"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3712
+#: vendor/horde/form/lib/Horde/Form/Type.php:3907
+#: vendor/horde/form/src/V3/DatetimeVariable.php:194
+#: vendor/horde/form/src/V3/MonthdayyearVariable.php:276
+msgid "Storage format"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:524
+#: vendor/horde/form/src/V3/StringlistVariable.php:31
+msgid "String list"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:556
+#: vendor/horde/form/src/V3/StringarrayVariable.php:37
+msgid "String list returning an array"
 msgstr ""
 
 #: lib/Horde/Core/Ui/JsCalendar.php:93
 msgid "Su"
 msgstr ""
 
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Imap/Message.php:188
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rfc822.php:73
+msgid "Subject"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form.php:537
+#: vendor/horde/form/lib/Horde/Form/Renderer.php:382
+msgid "Submit"
+msgstr ""
+
 #: lib/Horde/Core/Notification/Event/Status.php:105
 msgid "Success"
 msgstr ""
 
-#: lib/Horde/Config.php:317
+#: lib/Horde/Config.php:340
 #, php-format
 msgid "Successfully saved the backup configuration file %s."
 msgstr ""
 
-#: lib/Horde/Config.php:327
+#: lib/Horde/Config.php:350
 #, php-format
 msgid "Successfully wrote %s"
 msgstr ""
 
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:219
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:208
+msgid "Sudan"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:162
+msgid "Sundanese"
+msgstr ""
+
 #: lib/Horde/Core/Ui/JsCalendar.php:111
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:968
 msgid "Sunday"
 msgstr ""
 
-#: lib/Horde/Core/ActiveSync/Driver.php:159
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:220
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:219
+msgid "Suriname"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:221
+msgid "Svalbard and Jan Mayen"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:213
+msgid "Svalbard and Jan Mayen Islands"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:164
+msgid "Swahili"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:160
+msgid "Swati"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:222
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:224
+msgid "Swaziland"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:223
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:209
+msgid "Sweden"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:163
+msgid "Swedish"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:224
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:56
+msgid "Switzerland"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:225
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:223
+msgid "Syrian Arab Republic"
+msgstr ""
+
+#: vendor/horde/data/lib/Horde/Data/Tsv.php:227
+msgid "TSV file"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type/tableset.php:72
+#: vendor/horde/form/src/V3/TablesetVariable.php:70
+msgid "Table Set"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:171
+msgid "Tagalog"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:178
+msgid "Tahitian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:240
+msgid "Taiwan"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:226
+msgid "Taiwan, Province of China"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:167
+msgid "Tajik"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:227
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:230
+msgid "Tajikistan"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:165
+msgid "Tamil"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:228
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:241
+msgid "Tanzania, United Republic of"
+msgstr ""
+
+#: lib/Horde/Core/ActiveSync/Driver.php:198
 msgid "Tasks"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:176
+msgid "Tatar"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:166
+msgid "Telugu"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:499
+#: vendor/horde/form/lib/Horde/Form/Type.php:4548
+#: vendor/horde/form/lib/Horde/Form/Type.php:4572
+#: vendor/horde/form/lib/Horde/Form/Type.php:4651
+#: vendor/horde/form/src/V3/CaptchaVariable.php:33
+#: vendor/horde/form/src/V3/FigletVariable.php:75
+#: vendor/horde/form/src/V3/InvalidVariable.php:50
+#: vendor/horde/form/src/V3/TextVariable.php:81
+msgid "Text"
+msgstr ""
+
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Imap/Message.php:569
+msgid "Text part"
 msgstr ""
 
 #: lib/Horde/Core/Ui/JsCalendar.php:97
 msgid "Th"
 msgstr ""
 
-#: lib/Horde/PageOutput.php:686
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:168
+msgid "Thai"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:229
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:229
+msgid "Thailand"
+msgstr ""
+
+#: lib/Horde/PageOutput.php:762
 msgid "The alarm was dismissed."
 msgstr ""
 
-#: lib/Horde/PageOutput.php:675
+#: lib/Horde/PageOutput.php:751
 msgid "The connection to the server has been restored."
 msgstr ""
 
-#: lib/Horde/Core/Prefs/Ui.php:1001
+#: lib/Horde/Core/Prefs/Ui.php:1011
 msgid "The e-mail field cannot be empty."
 msgstr ""
 
@@ -892,112 +3923,518 @@ msgid ""
 "window now."
 msgstr ""
 
-#: lib/Horde.php:399
+#: src/Horde.php:582
 msgid "The encryption features require a secure web connection."
 msgstr ""
 
-#: lib/Horde.php:512
+#: src/Horde.php:669
 #, php-format
 msgid "The file %s should contain a %s setting."
 msgstr ""
 
-#: lib/Horde.php:500
+#: src/Horde.php:657
 #, php-format
 msgid "The file %s should contain some %s settings."
 msgstr ""
 
-#: lib/Horde/Registry.php:2802
+#: vendor/horde/data/lib/Horde/Data/Base.php:326
+msgid "The file contained no data."
+msgstr ""
+
+#: vendor/horde/form/src/V3/FileVariable.php:166
+msgid "The file was larger than the maximum allowed size."
+msgstr ""
+
+#: vendor/horde/form/src/V3/FileVariable.php:167
+msgid "The file was only partially uploaded."
+msgstr ""
+
+#: lib/Horde/Registry.php:2976
 #, php-format
 msgid "The following applications encountered errors removing user data: %s"
 msgstr ""
 
-#: lib/Horde/ErrorHandler.php:232
-msgid ""
-"The full error message is logged in Horde's log file, and is shown below "
-"only to administrators. Non-administrative users will not see error details."
-msgstr ""
-
-#: lib/Horde/Core/Prefs/Ui.php:956
+#: lib/Horde/Core/Prefs/Ui.php:966
 #, php-format
 msgid "The identity \"%s\" has been deleted."
 msgstr ""
 
-#: lib/Horde/Core/Prefs/Ui.php:1008
+#: vendor/horde/form/lib/Horde/Form/Type.php:1347
+#: vendor/horde/form/src/V3/ImageVariable.php:191
+msgid ""
+"The image file size could not be determined or it was 0 bytes. The upload "
+"may have been interrupted."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1350
+#: vendor/horde/form/src/V3/ImageVariable.php:195
+#, php-format
+msgid "The image file was larger than the maximum allowed size (%d bytes)."
+msgstr ""
+
+#: vendor/horde/mime/lib/Horde/Mime/Mdn.php:208
+#, php-format
+msgid ""
+"The message sent on %s to %s with subject \"%s\" has been displayed.\n"
+"\n"
+"This is no guarantee that the message has been read or understood."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1974
+#: vendor/horde/form/src/V3/EmailVariable.php:739
+msgid "The name to use when linking to the compose page"
+msgstr ""
+
+#: lib/Horde/Core/Prefs/Ui.php:1018
 msgid "The new from address can't be verified, try again later: "
 msgstr ""
 
-#: lib/Horde/Core/Factory/Prefs.php:280
+#: vendor/horde/auth/lib/Horde/Auth.php:416
+#, php-format
+msgid ""
+"The password is too long; passwords may not be more than %d characters long!"
+msgstr ""
+
+#: vendor/horde/auth/lib/Horde/Auth.php:501
+#: vendor/horde/auth/lib/Horde/Auth.php:511
+msgid "The password is too simple to guess."
+msgstr ""
+
+#: vendor/horde/auth/lib/Horde/Auth.php:412
+#, php-format
+msgid "The password must be at least %d characters long!"
+msgstr ""
+
+#: vendor/horde/auth/lib/Horde/Auth.php:460
+#, php-format
+msgid "The password must contain at least %d alphabetic character."
+msgid_plural "The password must contain at least %d alphabetic characters."
+msgstr[0] ""
+msgstr[1] ""
+
+#: vendor/horde/auth/lib/Horde/Auth.php:463
+#, php-format
+msgid "The password must contain at least %d alphanumeric character."
+msgid_plural "The password must contain at least %d alphanumeric characters."
+msgstr[0] ""
+msgstr[1] ""
+
+#: vendor/horde/auth/lib/Horde/Auth.php:469
+#, php-format
+msgid ""
+"The password must contain at least %d different types of characters. The "
+"types are: lower, upper, numeric, and symbols."
+msgstr ""
+
+#: vendor/horde/auth/lib/Horde/Auth.php:454
+#, php-format
+msgid "The password must contain at least %d lowercase character."
+msgid_plural "The password must contain at least %d lowercase characters."
+msgstr[0] ""
+msgstr[1] ""
+
+#: vendor/horde/auth/lib/Horde/Auth.php:457
+#, php-format
+msgid "The password must contain at least %d numeric character."
+msgid_plural "The password must contain at least %d numeric characters."
+msgstr[0] ""
+msgstr[1] ""
+
+#: vendor/horde/auth/lib/Horde/Auth.php:466
+#, php-format
+msgid "The password must contain at least %d numeric or special character."
+msgid_plural ""
+"The password must contain at least %d numeric or special characters."
+msgstr[0] ""
+msgstr[1] ""
+
+#: vendor/horde/auth/lib/Horde/Auth.php:478
+#, php-format
+msgid "The password must contain at least %d symbol character."
+msgid_plural "The password must contain at least %d symbol characters."
+msgstr[0] ""
+msgstr[1] ""
+
+#: vendor/horde/auth/lib/Horde/Auth.php:451
+#, php-format
+msgid "The password must contain at least %d uppercase character."
+msgid_plural "The password must contain at least %d uppercase characters."
+msgstr[0] ""
+msgstr[1] ""
+
+#: vendor/horde/auth/lib/Horde/Auth.php:473
+#, php-format
+msgid "The password must contain less than %d whitespace characters."
+msgstr ""
+
+#: vendor/horde/auth/lib/Horde/Auth.php:475
+msgid "The password must not contain whitespace characters."
+msgstr ""
+
+#: lib/Horde/Core/Factory/Prefs.php:275
 #, php-format
 msgid ""
 "The preference \"%s\" could not be saved because its data exceeds the "
 "maximum allowable size"
 msgstr ""
 
-#: lib/Horde/Core/Factory/Prefs.php:210
+#: lib/Horde/Core/Factory/Prefs.php:205
 msgid ""
 "The preferences backend is currently unavailable and your preferences have "
 "not been loaded. You may continue to use the system with default preferences."
 msgstr ""
 
-#: lib/Horde/Core/Prefs/Ui.php:473
+#: vendor/horde/form/lib/Horde/Form/Type.php:4524
+#: vendor/horde/form/src/V3/FigletVariable.php:48
+msgid "The text you entered did not match the text on the screen."
+msgstr ""
+
+#: vendor/horde/data/lib/Horde/Data/Base.php:387
+msgid "The uploaded data was lost since the previous step."
+msgstr ""
+
+#: vendor/horde/browser/lib/Horde/Browser.php:716
+msgid ""
+"The uploaded file appears to be empty. It may not exist on your computer."
+msgstr ""
+
+#: vendor/horde/data/lib/Horde/Data/Csv.php:222
+#: vendor/horde/data/lib/Horde/Data/Tsv.php:234
+msgid "The uploaded file could not be saved."
+msgstr ""
+
+#: lib/Horde/Core/Prefs/Ui.php:481
 msgid "There are no preferences available for this application."
 msgstr ""
 
-#: lib/Horde/PageOutput.php:676
+#: vendor/horde/form/lib/Horde/Form/Type.php:824
+#: vendor/horde/form/src/V3/CountedtextVariable.php:58
+#, php-format
+msgid ""
+"There are too many characters in this field. You have entered %d character; "
+msgid_plural ""
+"There are too many characters in this field. You have entered %d characters; "
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/Horde/PageOutput.php:752
 msgid ""
 "There has been no contact with the server for several minutes. The server "
 "may be temporarily unavailable or network problems may be interrupting your "
 "session. You will not see any updates until the connection is restored."
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:118
+#: vendor/horde/browser/lib/Horde/Browser.php:746
+msgid ""
+"There was a problem with the file upload: Can't write the uploaded data to "
+"the server."
+msgstr ""
+
+#: vendor/horde/browser/lib/Horde/Browser.php:709
+#, php-format
+msgid "There was a problem with the file upload: No %s was uploaded."
+msgstr ""
+
+#: vendor/horde/browser/lib/Horde/Browser.php:727
+#, php-format
+msgid ""
+"There was a problem with the file upload: The %s was larger than the maximum "
+"allowed size (%d bytes)."
+msgstr ""
+
+#: vendor/horde/browser/lib/Horde/Browser.php:733
+#, php-format
+msgid ""
+"There was a problem with the file upload: The %s was only partially uploaded."
+msgstr ""
+
+#: vendor/horde/browser/lib/Horde/Browser.php:739
+msgid ""
+"There was a problem with the file upload: The temporary folder used to store "
+"the upload data is missing."
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:121
 msgid "There was an error importing the contact data:"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:104
+#: vendor/horde/data/lib/Horde/Data/Imc.php:43
+msgid "There was an error importing the iCalendar data."
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:107
 msgid "There was an error reading the contact data."
 msgstr ""
 
-#: lib/Horde/Core/Prefs/Ui.php:387
+#: lib/Horde/Core/Prefs/Ui.php:395
 msgid "There were errors encountered while updating your preferences."
 msgstr ""
 
-#: lib/Horde/PageOutput.php:691
+#: vendor/horde/form/lib/Horde/Form/Type.php:4335
+#: vendor/horde/form/src/V3/CreditcardVariable.php:29
+msgid "This does not seem to be a valid card number."
+msgstr ""
+
+#: vendor/horde/compress/src/Base.php:54 vendor/horde/compress/src/Base.php:59
+#: vendor/horde/compress/src/Base.php:65
+msgid "This driver does not support compression."
+msgstr ""
+
+#: vendor/horde/compress/src/Base.php:96
+msgid "This driver does not support decompression."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:253
+#: vendor/horde/form/lib/Horde/Form/Type.php:343
+#: vendor/horde/form/lib/Horde/Form/Type.php:373
+#: vendor/horde/form/lib/Horde/Form/Type.php:403
+#: vendor/horde/form/lib/Horde/Form/Type.php:474
+#: vendor/horde/form/lib/Horde/Form/Type.php:595
+#: vendor/horde/form/lib/Horde/Form/Type.php:669
+#: vendor/horde/form/lib/Horde/Form/Type.php:700
+#: vendor/horde/form/lib/Horde/Form/Type.php:820
+#: vendor/horde/form/lib/Horde/Form/Type.php:1329
+#: vendor/horde/form/lib/Horde/Form/Type.php:2506
+#: vendor/horde/form/lib/Horde/Form/Type.php:2547
+#: vendor/horde/form/lib/Horde/Form/Type.php:2573
+#: vendor/horde/form/lib/Horde/Form/Type.php:2635
+#: vendor/horde/form/lib/Horde/Form/Type.php:2722
+#: vendor/horde/form/lib/Horde/Form/Type.php:2812
+#: vendor/horde/form/lib/Horde/Form/Type.php:3139
+#: vendor/horde/form/lib/Horde/Form/Type.php:3190
+#: vendor/horde/form/lib/Horde/Form/Type.php:3463
+#: vendor/horde/form/lib/Horde/Form/Type.php:3927
+#: vendor/horde/form/lib/Horde/Form/Type.php:3969
+#: vendor/horde/form/lib/Horde/Form/Type.php:4328
+#: vendor/horde/form/lib/Horde/Form/Type.php:4520
+#: vendor/horde/form/lib/Horde/Form/Type.php:4612
+#: vendor/horde/form/lib/Horde/Form/Variable.php:531
+#: vendor/horde/form/lib/Horde/Form/Variable.php:539
+#: vendor/horde/form/src/V3/BaseVariable.php:601
+#: vendor/horde/form/src/V3/BaseVariable.php:608
+#: vendor/horde/form/src/V3/BaseVariable.php:613
+#: vendor/horde/form/src/V3/CategoryVariable.php:41
+#: vendor/horde/form/src/V3/ColorpickerVariable.php:22
+#: vendor/horde/form/src/V3/CountedtextVariable.php:54
+#: vendor/horde/form/src/V3/CreditcardVariable.php:22
+#: vendor/horde/form/src/V3/EmailconfirmVariable.php:22
+#: vendor/horde/form/src/V3/EnumVariable.php:50
+#: vendor/horde/form/src/V3/FigletVariable.php:44
+#: vendor/horde/form/src/V3/FileVariable.php:84
+#: vendor/horde/form/src/V3/HourminutesecondVariable.php:55
+#: vendor/horde/form/src/V3/ImageVariable.php:173
+#: vendor/horde/form/src/V3/IntVariable.php:35
+#: vendor/horde/form/src/V3/IntlistVariable.php:22
+#: vendor/horde/form/src/V3/Ip6addressVariable.php:31
+#: vendor/horde/form/src/V3/IpaddressVariable.php:43
+#: vendor/horde/form/src/V3/MlenumVariable.php:60
+#: vendor/horde/form/src/V3/MonthdayyearVariable.php:71
+#: vendor/horde/form/src/V3/MonthdayyearVariable.php:78
+#: vendor/horde/form/src/V3/MultienumVariable.php:73
+#: vendor/horde/form/src/V3/NumberVariable.php:56
+#: vendor/horde/form/src/V3/OctalVariable.php:22
+#: vendor/horde/form/src/V3/PasswordVariable.php:22
+#: vendor/horde/form/src/V3/PasswordconfirmVariable.php:22
+#: vendor/horde/form/src/V3/PhoneVariable.php:45
+#: vendor/horde/form/src/V3/SoundVariable.php:44
+#: vendor/horde/form/src/V3/TextVariable.php:54
+#: vendor/horde/form/src/V3/TimeVariable.php:22
+msgid "This field is required."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:350
+#: vendor/horde/form/src/V3/IntVariable.php:42
+msgid "This field may only contain integers."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3146
+#: vendor/horde/form/src/V3/TimeVariable.php:27
+msgid "This field may only contain numbers and the colon."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:380
+#: vendor/horde/form/src/V3/OctalVariable.php:29
+msgid "This field may only contain octal values."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:410
+#: vendor/horde/form/src/V3/IntlistVariable.php:29
+msgid "This field must be a comma or space separated list of integers"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:265
+#: vendor/horde/form/src/V3/NumberVariable.php:68
+msgid "This field must be a valid number."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3934
+#: vendor/horde/form/src/V3/ColorpickerVariable.php:29
+msgid ""
+"This field must contain a color code in the RGB Hex format, for example "
+"'#1234af'."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form.php:816
+#: vendor/horde/form/src/V3/BaseForm.php:1008
+msgid "This form has already been processed."
+msgstr ""
+
+#: lib/Horde/PageOutput.php:767
 msgid "This is the notification log."
 msgstr ""
 
-#: lib/Horde/Registry.php:555
+#: vendor/horde/token/lib/Horde/Token/Base.php:262
+#, php-format
+msgid ""
+"This request cannot be completed because the link you followed or the form "
+"you submitted was only valid for %s minutes. Please try again now."
+msgstr ""
+
+#: vendor/horde/compress/lib/Horde/Compress/Zip.php:129
+#: vendor/horde/compress/src/Driver/Zip.php:81
+msgid "This server can't compress zip files."
+msgstr ""
+
+#: vendor/horde/compress/lib/Horde/Compress/Gzip.php:55
+#: vendor/horde/compress/src/Driver/Gzip.php:48
+msgid "This server can't uncompress gzip files."
+msgstr ""
+
+#: lib/Horde/Registry.php:640
 msgid "This system is currently deactivated."
 msgstr ""
 
-#: lib/Horde/Core/Prefs/Ui.php:350
+#: vendor/horde/token/lib/Horde/Token/Base.php:291
+msgid "This token has been used before!"
+msgstr ""
+
+#: vendor/horde/token/lib/Horde/Token/Base.php:285
+msgid "This token is invalid!"
+msgstr ""
+
+#: lib/Horde/Core/Prefs/Ui.php:358
 msgid "This value must be a number."
 msgstr ""
 
-#: lib/Horde/Core/Prefs/Ui.php:352
+#: lib/Horde/Core/Prefs/Ui.php:360
 msgid "This value must be non-zero."
 msgstr ""
 
 #: lib/Horde/Core/Ui/JsCalendar.php:115
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:959
 msgid "Thursday"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:383
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:29
+msgid "Tibetan Standard, Tibetan, Central"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:169
+msgid "Tigrinya"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3154
+#: vendor/horde/form/src/V3/TimeVariable.php:37
+msgid "Time"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3272
+#: vendor/horde/form/src/V3/HourminutesecondVariable.php:172
+msgid "Time selection"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:230
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:232
+msgid "Timor-Leste"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:386
 msgid "Title"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:819
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Imap/Message.php:192
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rfc822.php:69
+msgid "To"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:821
 msgid ""
 "To select multiple items, hold down the Control (PC) or Command (Mac) key "
 "while clicking."
 msgstr ""
 
-#: lib/Horde/Core/Topbar.php:184
+#: vendor/horde/translation/test/AutodetectTest.php:30
+#: vendor/horde/translation/test/AutodetectTest.php:34
+#: vendor/horde/translation/test/AutodetectTest.php:55
+#: vendor/horde/translation/test/AutodetectTest.php:59
+#: vendor/horde/translation/test/AutodetectTest.php:79
+#: vendor/horde/translation/test/AutodetectTest.php:83
+#: vendor/horde/translation/test/GettextTest.php:31
+#: vendor/horde/translation/test/IcuHandlerTest.php:35
+#: vendor/horde/translation/test/WrapperTest.php:24
+#: vendor/horde/translation/test/WrapperTest.php:25
+msgid "Today"
+msgstr ""
+
+#: lib/Horde/Core/Topbar.php:206 src/Topbar/TopbarBuilder.php:324
 msgid "Toggle Alerts Log"
 msgstr ""
 
-#: lib/Horde/Core/ActiveSync/Driver.php:3484
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:231
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:228
+msgid "Togo"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:232
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:231
+msgid "Tokelau"
+msgstr ""
+
+#: vendor/horde/translation/test/GettextTest.php:34
+#: vendor/horde/translation/test/WrapperTest.php:28
+#: vendor/horde/translation/test/WrapperTest.php:29
+msgid "Tomorrow"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:233
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:235
+msgid "Tonga"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:173
+msgid "Tonga (Tonga Islands)"
+msgstr ""
+
+#: lib/Horde/Core/ActiveSync/Driver.php:4170
 msgid "Trash"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:234
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:238
+msgid "Trinidad and Tobago"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1619
+#: vendor/horde/form/src/V3/BooleanVariable.php:51
+msgid "True or false"
+msgstr ""
+
+#: vendor/horde/rpc/lib/Horde/Rpc/ActiveSync.php:103
+msgid "Trying to access the ActiveSync endpoint from a browser. Not Supported."
+msgstr ""
+
+#: vendor/horde/perms/lib/Horde/Perms/Sql.php:206
+msgid ""
+"Trying to create sub permission of non-existent parent permission. Create "
+"parent permission(s) first."
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:175
+msgid "Tsonga"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:172
+msgid "Tswana"
 msgstr ""
 
 #: lib/Horde/Core/Ui/JsCalendar.php:95
@@ -1005,7 +4442,49 @@ msgid "Tu"
 msgstr ""
 
 #: lib/Horde/Core/Ui/JsCalendar.php:113
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:953
 msgid "Tuesday"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:235
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:234
+msgid "Tunisia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:236
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:237
+msgid "Turkey"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:174
+msgid "Turkish"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:170
+msgid "Turkmen"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:237
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:233
+msgid "Turkmenistan"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:238
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:225
+msgid "Turks and Caicos Islands"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:239
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:239
+msgid "Tuvalu"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:177
+msgid "Twi"
+msgstr ""
+
+#: vendor/horde/cli/lib/Horde/Cli.php:534 vendor/horde/cli/src/Cli.php:553
+msgid "Type your choice"
 msgstr ""
 
 #: lib/Horde/Core/Auth/Signup/Form.php:48
@@ -1013,16 +4492,115 @@ msgstr ""
 msgid "Type your password twice to confirm"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:411
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:414
 msgid "URL"
 msgstr ""
 
-#: lib/Horde/Core/Perms/Ui.php:258
+#: vendor/horde/data/lib/Horde/Data/Base.php:146
+#, php-format
+msgid "URL %s not found"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:240
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:243
+msgid "Uganda"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:179
+msgid "Uighur, Uyghur"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:241
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:242
+msgid "Ukraine"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:180
+msgid "Ukrainian"
+msgstr ""
+
+#: vendor/horde/compress/lib/Horde/Compress/Gzip.php:62
+#: vendor/horde/compress/lib/Horde/Compress/Gzip.php:94
+#: vendor/horde/compress/lib/Horde/Compress/Tar.php:240
+#: vendor/horde/compress/src/Driver/Gzip.php:54
+#: vendor/horde/compress/src/Driver/Gzip.php:79
+#: vendor/horde/compress/src/Driver/Tar.php:171
+msgid "Unable to decompress data."
+msgstr ""
+
+#: vendor/horde/vfs/lib/Horde/Vfs/SqlFile.php:279
+msgid "Unable to rename VFS file."
+msgstr ""
+
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rtf.php:76
+msgid "Unable to translate this RTF document"
+msgstr ""
+
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Msword.php:83
+msgid "Unable to translate this Word document"
+msgstr ""
+
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Wordperfect.php:76
+msgid "Unable to translate this WordPerfect document"
+msgstr ""
+
+#: vendor/horde/prefs/lib/Horde/Prefs/CategoryManager.php:70
+msgid "Unfiled"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:242
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:16
+msgid "United Arab Emirates"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:243
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:90
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:244
+msgid "United Kingdom"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:244
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:246
+msgid "United States"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:245
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:245
+msgid "United States Minor Outlying Islands"
+msgstr ""
+
+#: vendor/horde/idna/lib/Horde/Idna.php:153
+msgid "Unknown error"
+msgstr ""
+
+#: vendor/horde/form/src/V3/FileVariable.php:172
+msgid "Unknown upload error."
+msgstr ""
+
+#: vendor/horde/prefs/lib/Horde/Prefs/Identity.php:346
+msgid "Unnamed"
+msgstr ""
+
+#: lib/Horde/Core/Perms/Ui.php:264
 msgid "Update"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:225
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:228
 msgid "Upload"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:181
+msgid "Urdu"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:246
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:247
+msgid "Uruguay"
+msgstr ""
+
+#: vendor/horde/prefs/lib/Horde/Prefs/CategoryManager.php:55
+#, php-format
+msgid "Use Current: %s"
 msgstr ""
 
 #: lib/Horde/Core/Auth/Signup/Sql.php:101
@@ -1030,13 +4608,112 @@ msgstr ""
 msgid "User \"%s\" does not exist."
 msgstr ""
 
-#: lib/Horde/Core/Prefs/Ui.php:658
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Device.php:345
+msgid "User Agent"
+msgstr ""
+
+#: lib/Horde/Core/Prefs/Ui.php:666
 msgid "User Preferences"
 msgstr ""
 
 #: lib/Horde/Core/Auth/Signup/Base.php:147
 #, php-format
 msgid "Username \"%s\" already exists."
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:182
+msgid "Uzbek"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:247
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:248
+msgid "Uzbekistan"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:468
+#: vendor/horde/form/src/V3/TextVariable.php:48
+#, php-format
+msgid "Value is over the maximum length of %d."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1663
+#: vendor/horde/form/lib/Horde/Form/Type.php:2483
+#: vendor/horde/form/lib/Horde/Form/Type.php:2832
+#: vendor/horde/form/lib/Horde/Form/Type.php:2890
+#: vendor/horde/form/lib/Horde/Form/Type.php:2952
+#: vendor/horde/form/lib/Horde/Form/Type.php:4078
+#: vendor/horde/form/lib/Horde/Form/Type/tableset.php:74
+#: vendor/horde/form/src/V3/LinkVariable.php:58
+#: vendor/horde/form/src/V3/MatrixVariable.php:115
+#: vendor/horde/form/src/V3/MultienumVariable.php:96
+#: vendor/horde/form/src/V3/RadioVariable.php:36
+#: vendor/horde/form/src/V3/SetVariable.php:71
+#: vendor/horde/form/src/V3/SorterVariable.php:118
+#: vendor/horde/form/src/V3/TablesetVariable.php:73
+msgid "Values"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:2669
+#: vendor/horde/form/lib/Horde/Form/Type.php:2757
+#: vendor/horde/form/src/V3/EnumVariable.php:105
+#: vendor/horde/form/src/V3/MlenumVariable.php:99
+msgid "Values to select from"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:248
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:255
+msgid "Vanuatu"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:183
+msgid "Venda"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:251
+msgid "Venezuela"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:249
+msgid "Venezuela, Bolivarian Republic of"
+msgstr ""
+
+#: vendor/horde/activesync/lib/Horde/ActiveSync/Imap/Message.php:572
+msgid "Video part"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:250
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:254
+msgid "Viet Nam"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:184
+msgid "Vietnamese"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:251
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:252
+msgid "Virgin Islands, British"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:252
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:253
+msgid "Virgin Islands, U.S."
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:185
+msgid "VolapÃ¼k"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:253
+msgid "Wallis and Futuna"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:256
+msgid "Wallis and Futuna Islands"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:186
+msgid "Walloon"
 msgstr ""
 
 #: lib/Horde/Core/Notification/Event/Status.php:110
@@ -1047,60 +4724,144 @@ msgstr ""
 msgid "We"
 msgstr ""
 
-#: lib/Horde/Core/Factory/Weather.php:17
+#: vendor/horde/token/lib/Horde/Token/Base.php:226
+#: vendor/horde/token/lib/Horde/Token/Base.php:232
+#: vendor/horde/token/lib/Horde/Token/Base.php:268
+msgid ""
+"We cannot verify that this request was really sent by you. It could be a "
+"malicious request. If you intended to perform this action, you can retry it "
+"now."
+msgstr ""
+
+#: lib/Horde/Core/Factory/Weather.php:19
 msgid "Weather support not configured."
 msgstr ""
 
 #: lib/Horde/Core/Ui/JsCalendar.php:114
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:956
 msgid "Wednesday"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1358
-msgid "Whereis Australia map"
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:221
+#: vendor/horde/date/src/Recurrence/Recurrence.php:1273
+#: vendor/horde/logintasks/lib/Horde/LoginTasks.php:308
+#: vendor/horde/logintasks/src/TaskInterval.php:57
+msgid "Weekly"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:218
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:282
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:970
+msgid "Weekly: Recurs every"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:40
+msgid "Welsh"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:58
+msgid "Western Frisian"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:254
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:78
+msgid "Western Sahara"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:4312
+#: vendor/horde/form/src/V3/AssignVariable.php:187
+msgid "Width in CSS units"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:187
+msgid "Wolof"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:221
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:285
 msgid "Work Address"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:333
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:336
 msgid "Work Phone"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:507
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:573
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:188
+msgid "Xhosa"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:510
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:576
 msgid "YYYY"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:1201
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:229
+#: vendor/horde/date/src/Recurrence/Recurrence.php:1279
+#: vendor/horde/logintasks/lib/Horde/LoginTasks.php:306
+#: vendor/horde/logintasks/src/TaskInterval.php:55
+msgid "Yearly"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:978
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:980
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:982
+msgid "Yearly: Recurs every"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:255
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:258
+msgid "Yemen"
+msgstr ""
+
+#: vendor/horde/form/src/V3/Renderer/HtmlControlRenderer.php:1826
 msgid "Yes"
 msgstr ""
 
-#: lib/Horde/Core/Block/Layout/Manager.php:229
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:189
+msgid "Yiddish"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:190
+msgid "Yoruba"
+msgstr ""
+
+#: lib/Horde/Core/Block/Layout/Manager.php:248
 #, php-format
 msgid "You are not allowed to create more than %d block."
 msgid_plural "You are not allowed to create more than %d blocks."
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/Horde/Registry.php:2755
+#: lib/Horde/Registry.php:2929
 msgid "You are not allowed to remove user data."
 msgstr ""
 
-#: lib/Horde/Core/Auth/Application.php:770
+#: lib/Horde/Core/Auth/Application.php:836
 msgid ""
 "You are using an old, unsupported version of Internet Explorer. You need at "
 "least Internet Explorer 8. If you already run IE8 or higher, disable the "
 "Compatibility View. Minimal view will be used until you upgrade your browser."
 msgstr ""
 
-#: lib/Horde/PageOutput.php:677
+#: lib/Horde/PageOutput.php:753
 #, php-format
 msgid "You can snooze it for %s or %s dismiss %s it entirely"
 msgstr ""
 
-#: lib/Horde/Core/ActiveSync/Driver.php:3086
+#: vendor/horde/rpc/lib/Horde/Rpc/Phpgw.php:100
+msgid "You did not authenticate."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:2517
+#: vendor/horde/form/src/V3/EmailconfirmVariable.php:32
+msgid "You did not enter a valid email address."
+msgstr ""
+
+#: vendor/horde/data/lib/Horde/Data/Base.php:333
+msgid ""
+"You didn\\'t map any fields from the imported file to the corresponding "
+"fields."
+msgstr ""
+
+#: lib/Horde/Core/ActiveSync/Driver.php:3609
 msgid ""
 "You do not have an email address configured in your Personal Information "
 "Preferences."
@@ -1118,8 +4879,40 @@ msgid ""
 "If you don't know what this message means, you can delete it."
 msgstr ""
 
+#: vendor/horde/form/lib/Horde/Form/Type.php:3792
+#: vendor/horde/form/src/V3/DatetimeVariable.php:65
+msgid "You must choose a date."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:3796
+#: vendor/horde/form/src/V3/DatetimeVariable.php:68
+msgid "You must choose a time."
+msgstr ""
+
 #: lib/Horde/Core/Factory/Vfs.php:75
 msgid "You must configure a VFS backend."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:598
+#: vendor/horde/form/src/V3/PhoneVariable.php:48
+msgid ""
+"You must enter a valid phone number, digits only with an optional '+' for "
+"the international dialing prefix."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:477
+#: vendor/horde/form/src/V3/TextVariable.php:57
+msgid "You must enter a valid value."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1804
+#: vendor/horde/form/src/V3/EmailVariable.php:130
+msgid "You must enter an email address."
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:1802
+#: vendor/horde/form/src/V3/EmailVariable.php:128
+msgid "You must enter at least one email address."
 msgstr ""
 
 #: lib/Horde/Core/Prefs/Ui/Widgets.php:401
@@ -1127,42 +4920,83 @@ msgstr ""
 msgid "You must provide a setting for \"%s\"."
 msgstr ""
 
-#: lib/Horde/Core/Auth/Application.php:737
+#: vendor/horde/prefs/lib/Horde/Prefs/CategoryManager.php:90
+msgid "You must type a new category name."
+msgstr ""
+
+#: vendor/horde/auth/lib/Horde/Auth/Base.php:158
+#, php-format
+msgid "Your account has been locked for %d minutes"
+msgstr ""
+
+#: vendor/horde/auth/lib/Horde/Auth/Base.php:156
+msgid "Your account has been permanently locked"
+msgstr ""
+
+#: lib/Horde/Core/Auth/Application.php:803
 msgid "Your browser does not support javascript. Using minimal view instead."
 msgstr ""
 
-#: lib/Horde/Core/Auth/Application.php:745
+#: lib/Horde/Core/Auth/Application.php:811
 msgid ""
 "Your browser does not support the dynamic view. Using basic view instead."
 msgstr ""
 
-#: lib/Horde/Core/Auth/Application.php:748
-#: lib/Horde/Core/Auth/Application.php:756
+#: lib/Horde/Core/Auth/Application.php:814
+#: lib/Horde/Core/Auth/Application.php:822
 msgid ""
 "Your browser does not support the dynamic view. Using minimal view instead."
 msgstr ""
 
-#: lib/Horde/Core/Prefs/Ui.php:972
+#: lib/Horde/Core/Prefs/Ui.php:982
 msgid "Your default identity has been changed."
 msgstr ""
 
-#: lib/Horde/Core/Prefs/Ui.php:865
+#: lib/Horde/Core/Prefs/Ui.php:875
 msgid "Your default identity:"
 msgstr ""
 
-#: lib/Horde/Core/Prefs/Ui.php:397
+#: lib/Horde/Core/Prefs/Ui.php:405
 msgid "Your preferences have been updated for the duration of this session."
 msgstr ""
 
-#: lib/Horde/Core/Prefs/Ui.php:399
+#: lib/Horde/Core/Prefs/Ui.php:407
 msgid "Your preferences have been updated."
+msgstr ""
+
+#: src/Perms/Ui.php:654
+msgid ""
+"Your submission could not be verified. The form security token was missing "
+"or has expired. Please reload the page and try again."
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:260
+msgid "Yugoslavia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:256
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:262
+msgid "Zambia"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:191
+msgid "Zhuang, Chuang"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:257
+#: vendor/horde/nls/lib/Horde/Nls/Tld.php:263
+msgid "Zimbabwe"
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Languages.php:193
+msgid "Zulu"
 msgstr ""
 
 #: lib/Horde/Core/Text/Filter/Highlightquotes.php:53
 msgid "[Hide Quoted Text]"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:148
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:151
 msgid "[No Label]"
 msgstr ""
 
@@ -1171,35 +5005,97 @@ msgstr ""
 msgid "[Show Quoted Text - %d lines]"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:288
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:946
+msgid "day(s)"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:291
 msgid "h:"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:445
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:448
 msgid "hh"
 msgstr ""
 
-#: lib/Horde/ErrorHandler.php:249
-#, php-format
-msgid "in %s:%d"
-msgstr ""
-
-#: lib/Horde/PageOutput.php:614
+#: lib/Horde/PageOutput.php:681
 msgid "loading"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:458
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:461
 msgid "mm"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:477
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:972
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:974
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:976
+msgid "month(s)"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:972
+msgid "on the same date"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:976
+msgid "on the same last weekday"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:974
+msgid "on the same weekday"
+msgstr ""
+
+#: vendor/horde/form/src/V3/Renderer/HtmlControlRenderer.php:128
+msgid "optional"
+msgstr ""
+
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:480
 msgid "ss"
 msgstr ""
 
-#: lib/Horde/Core/Mime/Viewer/Vcard.php:100
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Rar.php:79
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Tgz.php:114
+#: vendor/horde/mime_viewer/lib/Horde/Mime/Viewer/Zip.php:91
+msgid "unnamed"
+msgstr ""
+
+#: test/Unit/Translation/TranslationManagerTest.php:83
+msgid "untranslated"
+msgstr ""
+
+#: lib/Horde/Core/Mime/Viewer/Vcard.php:103
 msgid "vCard"
 msgstr ""
 
-#: lib/Horde/Core/Ui/VarRenderer/Html.php:278
+#: lib/Horde/Core/Ui/VarRenderer/Html.php:281
 msgid "w:"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:970
+msgid "week(s) on:"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:978
+msgid "year(s) on the same date"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:980
+msgid "year(s) on the same day of the year"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Recurrence.php:982
+msgid "year(s) on the same weekday and month of the year"
+msgstr ""
+
+#: vendor/horde/date/lib/Horde/Date/Utils.php:120
+#, php-format
+msgid "yesterday at %s"
+msgstr ""
+
+#: vendor/horde/form/lib/Horde/Form/Type.php:825
+#: vendor/horde/form/src/V3/CountedtextVariable.php:59
+#, php-format
+msgid "you must enter less than %d."
+msgstr ""
+
+#: vendor/horde/nls/lib/Horde/Nls/Countries.php:10
+msgid "Ãland Islands"
 msgstr ""
