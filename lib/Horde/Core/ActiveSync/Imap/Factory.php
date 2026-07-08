@@ -39,6 +39,20 @@ class Horde_Core_ActiveSync_Imap_Factory implements Horde_ActiveSync_Interface_I
             } catch (Horde_Exception $e) {
                 throw new Horde_ActiveSync_Exception($e);
             }
+
+            if (empty($this->_adapter)
+                && $GLOBALS['registry']->hasMethod('mail/ensureImapConnection')) {
+                try {
+                    $GLOBALS['registry']->mail->ensureImapConnection();
+                    $this->_adapter = $GLOBALS['registry']->mail->imapOb();
+                } catch (Horde_Exception $e) {
+                    throw new Horde_ActiveSync_Exception($e);
+                }
+            }
+        }
+
+        if (empty($this->_adapter)) {
+            throw new Horde_ActiveSync_Exception('IMAP client is not available.');
         }
 
         return $this->_adapter;
