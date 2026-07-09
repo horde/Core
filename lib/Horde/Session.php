@@ -60,7 +60,7 @@ use Horde\Token\Token as ModernToken;
  * @package  Core
  *
  * @property-read integer $begin             The timestamp when this session
- *                                           began (0 if session is not active).
+ *                                           began (0 if unknown).
  * @property-read boolean $regenerate_due    True if session ID is due for
  *                                           regeneration (since 2.5.0).
  * @property-read integer $regenerate_interval  The regeneration interval
@@ -222,9 +222,15 @@ class Horde_Session implements Horde_Shutdown_Task
     {
         switch ($name) {
             case 'begin':
-                if (!$this->_active) {
-                    return 0;
-                }
+                // Read through to the modern session regardless of
+                // `_active`. close() (used by read-only service scripts
+                // such as download/view) flips `_active` to false but
+                // never clears the underlying data, so the previous
+                // "!$this->_active -> 0" short-circuit made `begin` (and
+                // thus Registry::checkExistingAuth()'s max_time check)
+                // report an unauthenticated session in every closed,
+                // read-only request once `session.max_time` was
+                // configured. See horde/imp#88.
                 $begin = $this->modern->getSessionBegin();
                 if ($begin !== null) {
                     return $begin->getTimestamp();
