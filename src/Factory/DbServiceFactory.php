@@ -201,7 +201,7 @@ class DbServiceFactory
      */
     private function buildConnectionConfig(array $sqlConfig): array
     {
-        return [
+        $config = [
             'username' => $sqlConfig['username'] ?? '',
             'password' => $sqlConfig['password'] ?? '',
             'database' => $sqlConfig['database'] ?? $sqlConfig['dbname'] ?? '',
@@ -209,5 +209,17 @@ class DbServiceFactory
             'port' => $sqlConfig['port'] ?? 3306,
             'charset' => $sqlConfig['charset'] ?? 'UTF-8',
         ];
+
+        // Preserve Unix-socket connection settings when the config asks
+        // for them; without this the adapter falls back to the TCP
+        // host/port defaults above and breaks socket deployments.
+        if (isset($sqlConfig['protocol'])) {
+            $config['protocol'] = $sqlConfig['protocol'];
+        }
+        if (isset($sqlConfig['socket'])) {
+            $config['socket'] = $sqlConfig['socket'];
+        }
+
+        return $config;
     }
 }
