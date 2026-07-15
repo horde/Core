@@ -71,13 +71,7 @@ class ApiRegistry implements ApiProvider, MethodInvoker
             return null;
         }
 
-        return new MethodDescriptor(
-            name: $interface . '.' . $descriptor->name,
-            description: $descriptor->description,
-            parameters: $descriptor->parameters,
-            returnType: $descriptor->returnType,
-            permissions: $descriptor->permissions,
-        );
+        return $this->prefixDescriptor($interface, $descriptor);
     }
 
     /**
@@ -88,13 +82,7 @@ class ApiRegistry implements ApiProvider, MethodInvoker
         $all = [];
         foreach ($this->providers as $interface => $provider) {
             foreach ($provider->listMethods($context) as $descriptor) {
-                $all[] = new MethodDescriptor(
-                    name: $interface . '.' . $descriptor->name,
-                    description: $descriptor->description,
-                    parameters: $descriptor->parameters,
-                    returnType: $descriptor->returnType,
-                    permissions: $descriptor->permissions,
-                );
+                $all[] = $this->prefixDescriptor($interface, $descriptor);
             }
         }
 
@@ -151,6 +139,24 @@ class ApiRegistry implements ApiProvider, MethodInvoker
     public function getProviderForInterface(string $interface): ApiProvider|MethodInvoker|null
     {
         return $this->providers[$interface] ?? null;
+    }
+
+    /**
+     * Re-wrap a provider-local descriptor with the interface-prefixed name,
+     * preserving all other metadata (including the JSON schemas needed by
+     * MCP tool listings).
+     */
+    private function prefixDescriptor(string $interface, MethodDescriptor $descriptor): MethodDescriptor
+    {
+        return new MethodDescriptor(
+            name: $interface . '.' . $descriptor->name,
+            description: $descriptor->description,
+            parameters: $descriptor->parameters,
+            returnType: $descriptor->returnType,
+            inputSchema: $descriptor->inputSchema,
+            outputSchema: $descriptor->outputSchema,
+            permissions: $descriptor->permissions,
+        );
     }
 
     /**
