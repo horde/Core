@@ -85,6 +85,42 @@ class ApiRegistryTest extends TestCase
         $this->assertSame('List items', $desc->description);
     }
 
+    public function testDescriptorSchemasPreserved(): void
+    {
+        $inputSchema = [
+            'type' => 'object',
+            'properties' => [
+                'pagename' => ['type' => 'string', 'description' => 'Page to edit'],
+            ],
+            'required' => ['pagename'],
+        ];
+        $outputSchema = ['type' => 'object'];
+        $provider = $this->makeProvider(
+            ['edit' => fn() => null],
+            ['edit' => new MethodDescriptor(
+                'edit',
+                description: 'Edit a page',
+                inputSchema: $inputSchema,
+                outputSchema: $outputSchema,
+            )],
+        );
+        $registry = new ApiRegistry();
+        $registry->registerProvider('wiki', $provider);
+
+        $desc = $registry->getMethodDescriptor('wiki.edit');
+
+        $this->assertNotNull($desc);
+        $this->assertSame($inputSchema, $desc->inputSchema);
+        $this->assertSame($outputSchema, $desc->outputSchema);
+
+        $listed = $registry->listMethods();
+
+        $this->assertCount(1, $listed);
+        $this->assertSame('wiki.edit', $listed[0]->name);
+        $this->assertSame($inputSchema, $listed[0]->inputSchema);
+        $this->assertSame($outputSchema, $listed[0]->outputSchema);
+    }
+
     public function testUnknownInterfaceHasMethodReturnsFalse(): void
     {
         $registry = new ApiRegistry();
