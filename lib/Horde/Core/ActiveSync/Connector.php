@@ -514,7 +514,11 @@ class Horde_Core_ActiveSync_Connector
             try {
                 return [$query => $this->_registry->calendar->lookupFreeBusy($query, true)];
             } catch (Horde_Exception $e) {
-                return false; // ?
+                // Optional for many recipients (esp. external addresses without
+                // a free/busy URL); avoid flooding normal log levels.
+                $this->_logger->debug($e->getMessage());
+                // Keep the keyed array shape so callers can index by $query.
+                return [$query => false];
             }
         }
 

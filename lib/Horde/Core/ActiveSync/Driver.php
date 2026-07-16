@@ -3362,7 +3362,8 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             if (!empty($entry)) {
                 $fb = $this->_connector->resolveRecipient($search, $opts);
                 if ($availability_request) {
-                    $entry['availability'] = self::buildFbString($fb[$search], $opts['starttime'], $opts['endtime']);
+                    $fbData = (is_array($fb) && isset($fb[$search])) ? $fb[$search] : null;
+                    $entry['availability'] = self::buildFbString($fbData, $opts['starttime'], $opts['endtime']);
                 }
                 $return[] = $entry;
             }
