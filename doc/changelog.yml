@@ -1,4 +1,14 @@
 ---
+3.2.1:
+  api: 3.2.1
+  state:
+    release: stable
+    api: stable
+  date: 2026-07-17
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: "fix(activesync): refuse Draft Modify append-as-new for missing/stale IMAP UIDs (ActiveSync #85)"
 3.2.0:
   api: 3.2.0
   state:

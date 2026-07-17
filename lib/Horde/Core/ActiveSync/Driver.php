@@ -2565,8 +2565,10 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                                 $this->_user,
                                 $this->_version
                             );
-                            $draft->setDraftMessage($message);
 
+                            // Load the existing draft before setDraftMessage so
+                            // attachment carry-over works, and so a missing/
+                            // stale Modify ServerId fails before MIME build.
                             if ($id) {
                                 try {
                                     $draft->getExistingDraftMessage(
@@ -2574,9 +2576,25 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                                         $id
                                     );
                                 } catch (Horde_ActiveSync_Exception $e) {
-                                    // Stale UID from client; treat as new.
+                                    // Modify with a missing/stale UID must not
+                                    // append a new draft (retries after a lost
+                                    // Sync response would otherwise duplicate
+                                    // unbounded). Importer short-circuits when
+                                    // the prior apply was recorded; this is
+                                    // defense in depth when that record is absent.
+                                    $this->_logger->notice(
+                                        sprintf(
+                                            'Draft Modify for missing UID %s in %s; refusing append-as-new.',
+                                            $id,
+                                            $draft_folder
+                                        )
+                                    );
+                                    $this->_endBuffer();
+                                    return false;
                                 }
                             }
+
+                            $draft->setDraftMessage($message);
 
                             // Append the message and return results.
                             $results = $draft->append($draft_folder);
@@ -2585,6 +2603,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                             $stat['conversationid'] = bin2hex($message->subject);
                             $stat['conversationindex'] = time();
 
+                            $this->_endBuffer();
                             return $stat;
                         }
                     }
