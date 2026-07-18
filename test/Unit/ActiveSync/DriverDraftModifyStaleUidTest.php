@@ -21,6 +21,7 @@ namespace Horde\Core\Test\Unit\ActiveSync;
 use Horde\Http\ServerRequest;
 use Horde_ActiveSync;
 use Horde_ActiveSync_Device;
+use Horde_ActiveSync_Driver_Base;
 use Horde_ActiveSync_Imap_Adapter;
 use Horde_ActiveSync_Message_AirSyncBaseBody;
 use Horde_ActiveSync_Message_Mail;
@@ -32,6 +33,7 @@ use Horde_Log_Logger;
 use Horde_Registry;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 /**
  * Defense-in-depth for Issue #85: Draft Modify must not append-as-new when
@@ -90,8 +92,8 @@ class DriverDraftModifyStaleUidTest extends TestCase
         $driver->setLogger(new Horde_Log_Logger(new Horde_Log_Handler_Null()));
         $driver->setProtocolVersion(Horde_ActiveSync::VERSION_SIXTEEN);
 
-        $userProp = new \ReflectionProperty(
-            \Horde_ActiveSync_Driver_Base::class,
+        $userProp = new ReflectionProperty(
+            Horde_ActiveSync_Driver_Base::class,
             '_user'
         );
         $userProp->setAccessible(true);
