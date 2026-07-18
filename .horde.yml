@@ -35,7 +35,7 @@ authors:
     active: false
     role: developer
 version:
-  release: 3.2.0
+  release: 3.2.1
   api: 3.0.0alpha1
 state:
   release: stable
@@ -146,7 +146,7 @@ ci-platform:
     - ext-spl
     - ext-xml
   '8.1':
-    - php: '>=8.1'
+    - php: ^8.1
     - composer-plugin-api: ^2.2.0
     - ext-bcmath
     - ext-ctype
@@ -163,7 +163,7 @@ ci-platform:
     - ext-spl
     - ext-xml
   '8.2':
-    - php: '>=8.1'
+    - php: ^8.2
     - composer-plugin-api: ^2.2.0
     - ext-bcmath
     - ext-ctype
@@ -180,7 +180,7 @@ ci-platform:
     - ext-spl
     - ext-xml
   '8.3':
-    - php: '>=8.1'
+    - php: ^8.3
     - composer-plugin-api: ^2.2.0
     - ext-bcmath
     - ext-ctype
@@ -197,7 +197,7 @@ ci-platform:
     - ext-spl
     - ext-xml
   '8.4':
-    - php: '>=8.1'
+    - php: ^8.4
     - composer-plugin-api: ^2.2.0
     - ext-bcmath
     - ext-ctype
@@ -214,7 +214,7 @@ ci-platform:
     - ext-spl
     - ext-xml
   '8.5':
-    - php: '>=8.1'
+    - php: ^8.5
     - composer-plugin-api: ^2.2.0
     - ext-bcmath
     - ext-ctype
@@ -231,7 +231,7 @@ ci-platform:
     - ext-spl
     - ext-xml
   '8.6':
-    - php: '>=8.1'
+    - php: ^8.6
     - composer-plugin-api: ^2.2.0
     - ext-bcmath
     - ext-ctype

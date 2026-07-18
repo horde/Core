@@ -1,4 +1,14 @@
 ---
+3.2.1:
+  api: 3.2.1
+  state:
+    release: stable
+    api: stable
+  date: 2026-07-18
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: "fix(core): preserve descriptor schemas in ApiRegistry re-wrapping\nMerge pull request #200 from horde/fix/activesync-resolve-recipient-freebusy\nfix(activesync): guard ResolveRecipients free/busy lookup failures\nfix(core): preserve Unix socket SQL config in DbServiceFactory\nfix(core): keep Horde_Session::$begin readable after close() (imp#88)"
 3.2.0:
   api: 3.2.0
   state:
