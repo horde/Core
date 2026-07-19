@@ -456,6 +456,12 @@ class Horde_Core_ActiveSync_Connector
      */
     public function contacts_search($query, array $options = [])
     {
+        // IMP can advertise contacts/favouriteRecipients without a full contacts
+        // provider (Turba). hasInterface('contacts') is false in that case.
+        if (!$this->_registry->hasInterface('contacts')) {
+            return [];
+        }
+
         if ((!$gal = $this->contacts_getGal()) && empty($options['recipient_cache_search'])) {
             return [];
         }
@@ -522,6 +528,10 @@ class Horde_Core_ActiveSync_Connector
             }
         }
 
+        if (!$this->_registry->hasInterface('contacts')) {
+            return [$query => []];
+        }
+
         $gal = $this->contacts_getGal();
         $sources = array_keys($this->_registry->contacts->sources(false, true));
         if (!in_array($gal, $sources)) {
@@ -556,8 +566,14 @@ class Horde_Core_ActiveSync_Connector
      */
     public function contacts_getGal()
     {
-        if (empty($this->_gal)) {
-            $this->_gal = $this->_registry->contacts->getGalUid();
+        if (!isset($this->_gal)) {
+            // Avoid $registry->contacts->getGalUid() when no contacts provider
+            // is registered. listAPIs() may still list "contacts" because IMP
+            // provides contacts/favouriteRecipients, which makes __get('contacts')
+            // succeed and then call() throw for getGalUid.
+            $this->_gal = $this->_registry->hasMethod('contacts/getGalUid')
+                ? $this->_registry->contacts->getGalUid()
+                : false;
         }
         return $this->_gal;
     }
