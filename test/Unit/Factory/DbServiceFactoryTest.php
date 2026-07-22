@@ -39,6 +39,41 @@ final class DbServiceFactoryTest extends TestCase
         self::assertSame('unix', $config['protocol']);
         self::assertSame('/var/run/postgresql/.s.PGSQL.5432', $config['socket']);
         self::assertSame('horde', $config['database']);
+        // Must not invent TCP defaults — PDO would dial localhost:3306.
+        self::assertArrayNotHasKey('host', $config);
+        self::assertArrayNotHasKey('port', $config);
+    }
+
+    public function testBuildConnectionConfigUnixWithoutSocketOmitsTcpDefaults(): void
+    {
+        $config = $this->buildConnectionConfig([
+            'username' => 'horde',
+            'password' => 'secret',
+            'protocol' => 'unix',
+            'database' => 'horde',
+            'phptype' => 'pgsql',
+        ]);
+
+        self::assertSame('unix', $config['protocol']);
+        self::assertArrayNotHasKey('host', $config);
+        self::assertArrayNotHasKey('port', $config);
+        self::assertArrayNotHasKey('socket', $config);
+    }
+
+    public function testBuildConnectionConfigUnixKeepsExplicitHostAndPort(): void
+    {
+        $config = $this->buildConnectionConfig([
+            'username' => 'horde',
+            'password' => 'secret',
+            'protocol' => 'unix',
+            'hostspec' => '/var/run/postgresql',
+            'port' => 5432,
+            'database' => 'horde',
+            'phptype' => 'pgsql',
+        ]);
+
+        self::assertSame('/var/run/postgresql', $config['host']);
+        self::assertSame(5432, $config['port']);
     }
 
     public function testBuildConnectionConfigRenamesHostspecToHost(): void
@@ -57,6 +92,20 @@ final class DbServiceFactoryTest extends TestCase
         self::assertSame(5433, $config['port']);
     }
 
+    public function testBuildConnectionConfigDefaultsPgsqlTcpPort(): void
+    {
+        $config = $this->buildConnectionConfig([
+            'username' => 'horde',
+            'password' => 'secret',
+            'protocol' => 'tcp',
+            'database' => 'horde',
+            'phptype' => 'pgsql',
+        ]);
+
+        self::assertSame('localhost', $config['host']);
+        self::assertSame(5432, $config['port']);
+    }
+
     public function testBuildConnectionConfigDefaultsCharset(): void
     {
         $config = $this->buildConnectionConfig([
@@ -67,6 +116,8 @@ final class DbServiceFactoryTest extends TestCase
         ]);
 
         self::assertSame('UTF-8', $config['charset']);
+        self::assertSame('localhost', $config['host']);
+        self::assertSame(3306, $config['port']);
     }
 
     /**

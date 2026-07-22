@@ -38,6 +38,7 @@ use InvalidArgumentException;
  * @category Horde
  * @package  Core
  * @author   Ralf Lang <ralf.lang@ralf-lang.de>
+ * @author   Torben Dannhauer <torben@dannhauer.de>
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  */
 class DbServiceFactory
@@ -196,6 +197,11 @@ class DbServiceFactory
      *
      * Normalizes config keys across different naming conventions.
      *
+     * For protocol=unix, do not inject TCP host/port defaults. The PDO
+     * adapters strip `protocol` when building the DSN; if host=localhost
+     * and port=3306 remain, PostgreSQL tries TCP to MySQL's port and
+     * fails on socket-only deployments (see Horde Core#198 follow-up).
+     *
      * @param array $sqlConfig Raw SQL configuration
      * @return array Normalized adapter configuration
      */
@@ -205,20 +211,37 @@ class DbServiceFactory
             'username' => $sqlConfig['username'] ?? '',
             'password' => $sqlConfig['password'] ?? '',
             'database' => $sqlConfig['database'] ?? $sqlConfig['dbname'] ?? '',
-            'host' => $sqlConfig['hostspec'] ?? $sqlConfig['host'] ?? 'localhost',
-            'port' => $sqlConfig['port'] ?? 3306,
             'charset' => $sqlConfig['charset'] ?? 'UTF-8',
         ];
 
-        // Preserve Unix-socket connection settings when the config asks
-        // for them; without this the adapter falls back to the TCP
-        // host/port defaults above and breaks socket deployments.
         if (isset($sqlConfig['protocol'])) {
             $config['protocol'] = $sqlConfig['protocol'];
         }
         if (isset($sqlConfig['socket'])) {
             $config['socket'] = $sqlConfig['socket'];
         }
+
+        $protocol = $sqlConfig['protocol'] ?? null;
+        $hasExplicitHost = isset($sqlConfig['hostspec']) || isset($sqlConfig['host']);
+
+        // Unix socket: only pass host/port when the config sets them.
+        // Omitting them lets PDO_pgsql use the default server socket.
+        if ($protocol === 'unix') {
+            if ($hasExplicitHost) {
+                $config['host'] = $sqlConfig['hostspec'] ?? $sqlConfig['host'];
+            }
+            if (isset($sqlConfig['port'])) {
+                $config['port'] = $sqlConfig['port'];
+            }
+
+            return $config;
+        }
+
+        $phptype = $sqlConfig['phptype'] ?? 'mysqli';
+        $defaultPort = ($phptype === 'pgsql') ? 5432 : 3306;
+
+        $config['host'] = $sqlConfig['hostspec'] ?? $sqlConfig['host'] ?? 'localhost';
+        $config['port'] = $sqlConfig['port'] ?? $defaultPort;
 
         return $config;
     }
