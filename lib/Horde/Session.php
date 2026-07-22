@@ -17,6 +17,7 @@ use Horde\Core\Factory\TokenServiceFactory;
 use Horde\Core\Horde;
 use Horde\Core\Session\HordeSession;
 use Horde\Core\Session\HordeSessionFactory;
+use Horde\Core\Session\PublishesModernSessionToAccessorTrait;
 use Horde\Core\Session\SessionAccess;
 use Horde\Core\Session\SessionLifecycle;
 use Horde\SessionHandler\SessionHandler as ModernSessionHandler;
@@ -71,6 +72,8 @@ use Horde\Token\Token as ModernToken;
  */
 class Horde_Session implements Horde_Shutdown_Task
 {
+    use PublishesModernSessionToAccessorTrait;
+
     /* Class constants. */
     public const BEGIN = '_b';
     public const ENCRYPTED = '_e'; /* @since 2.7.0 */
@@ -1005,6 +1008,12 @@ class Horde_Session implements Horde_Shutdown_Task
      * legacy fixtures) opted out of accessor-based resolution and
      * expect their pinned instance to stay authoritative regardless of
      * `$_SESSION` churn.
+     *
+     * The standard injector-plus-accessor publish is delegated to
+     * {@see PublishesModernSessionToAccessorTrait::publishModernSessionToAccessor()}
+     * so {@see Horde_Session_Null} can reuse the exact same behaviour
+     * without inheriting the two special branches this method wraps
+     * around it.
      */
     private function _rebuildModern(): void
     {
@@ -1021,21 +1030,7 @@ class Horde_Session implements Horde_Shutdown_Task
         }
 
         if (isset($GLOBALS['injector'])) {
-            $fresh = $GLOBALS['injector']->createInstance(HordeSession::class);
-            $GLOBALS['injector']->setInstance(HordeSession::class, $fresh);
-            // Also publish to the accessor if one is bound, so
-            // consumers reading through SessionAccess pick up the
-            // freshly-built instance.
-            try {
-                $access = $GLOBALS['injector']->getInstance(SessionAccess::class);
-                if ($access instanceof \Horde\Core\Session\SessionAccessor) {
-                    $access->replaceWith($fresh);
-                }
-            } catch (\Throwable) {
-                // No SessionAccess binding. Consumers still reach the
-                // fresh instance via getInstance(HordeSession::class)
-                // — the setInstance above.
-            }
+            $this->publishModernSessionToAccessor();
             return;
         }
 
