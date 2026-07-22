@@ -227,8 +227,25 @@ class SessionLifecycle implements Horde_Shutdown_Task
             }
 
             if (!$this->shutdownRegistered) {
-                Horde_Shutdown::add($this);
-                $this->shutdownRegistered = true;
+                /* The shutdown task mirrors HordeSession's payload back
+                 * into `$_SESSION` at request end so legacy code that
+                 * reads the superglobal directly picks up modern
+                 * writes. Only meaningful for legacy consumers.
+                 *
+                 * Horde_Shutdown::add() reaches into $GLOBALS['injector'];
+                 * that global is populated by Horde_Registry::appInit()
+                 * which the legacy web-script bootstrap runs but modern
+                 * PSR-15 routes may skip entirely. Skip the mirror
+                 * registration in the modern case — the accessor is
+                 * what consumers on that path read through, no
+                 * $_SESSION mirror needed. Shutdown tasks are not the
+                 * way to handle sessions in route-based code; kept
+                 * only for legacy interoperability.
+                 */
+                if (isset($GLOBALS['injector'])) {
+                    Horde_Shutdown::add($this);
+                    $this->shutdownRegistered = true;
+                }
             }
 
             $this->setupApplied = true;
