@@ -12,7 +12,7 @@
  * @package   Core
  */
 
-use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 
 /**
  * Hashtable implementation that ensures persistency of data within a given
@@ -46,19 +46,20 @@ class Horde_Core_HashTable_PersistentSession extends Horde_Core_HashTable_Vfs im
     public const VFS_PATH = '.horde/core/psession_data';
 
     /**
-     * The modern session.
+     * The request-scoped session access slot.
      */
-    protected HordeSession $_session;
+    protected SessionAccess $_session;
 
     /**
      * @param array $params  Configuration parameters:
-     *   - session: (HordeSession) Modern session for the key list. If
-     *              omitted, resolved from the global injector for BC.
+     *   - session: (SessionAccess) Modern session-access slot for the
+     *              key list. If omitted, resolved from the global
+     *              injector for BC.
      */
     public function __construct(array $params = [])
     {
         $this->_session = $params['session']
-            ?? $GLOBALS['injector']->getInstance(HordeSession::class);
+            ?? $GLOBALS['injector']->getInstance(SessionAccess::class);
 
         /* Stable per-session VFS prefix. Derived from session_id() rather
          * than a CSRF token because such tokens are not stable across calls.

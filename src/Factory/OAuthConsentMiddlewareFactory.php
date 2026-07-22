@@ -17,7 +17,7 @@ declare(strict_types=1);
 namespace Horde\Core\Factory;
 
 use Horde\Core\Middleware\OAuthConsentMiddleware;
-use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 use Horde\OAuth\Server\Handler\AuthorizationEndpoint;
 use Horde\OAuth\Server\Repository\ConsentRepository;
 use Horde\Injector\Injector;
@@ -33,7 +33,7 @@ class OAuthConsentMiddlewareFactory
         return new OAuthConsentMiddleware(
             $injector->getInstance(AuthorizationEndpoint::class),
             $injector->getInstance(ConsentRepository::class),
-            $injector->getInstance(HordeSession::class),
+            $injector->getInstance(SessionAccess::class),
             $injector->getInstance(Horde_PageOutput::class),
             $injector->getInstance(Horde_Notification_Handler::class),
             $injector->getInstance(ResponseFactoryInterface::class),

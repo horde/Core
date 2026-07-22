@@ -17,6 +17,7 @@ use Horde\Core\Factory\TokenServiceFactory;
 use Horde\Core\Horde;
 use Horde\Core\Session\HordeSession;
 use Horde\Core\Session\HordeSessionFactory;
+use Horde\Core\Session\SessionAccess;
 use Horde\Core\Session\SessionLifecycle;
 use Horde\SessionHandler\SessionHandler as ModernSessionHandler;
 use Horde\SessionHandler\SessionId;
@@ -112,9 +113,24 @@ class Horde_Session implements Horde_Shutdown_Task
     public object $sessionHandler;
 
     /**
-     * The modern session object holding the actual data.
+     * The modern session-access slot. Resolved at construction time,
+     * used by {@see modern()} to fetch the currently-canonical
+     * {@see HordeSession} value on every read.
+     *
+     * Nullable to accommodate the legacy fallback path: constructors
+     * that explicitly pass a HordeSession (Horde_Test_Factory_Session,
+     * unit tests) bypass the accessor entirely and pin that instance
+     * via {@see $explicitModern}.
      */
-    private HordeSession $modern;
+    private ?SessionAccess $modernAccess = null;
+
+    /**
+     * An explicitly-passed HordeSession, used only by the legacy
+     * constructor form. When set, {@see modern()} returns this value
+     * unconditionally instead of consulting the accessor. Preserved
+     * for test/fixture compatibility.
+     */
+    private ?HordeSession $explicitModern = null;
 
     /**
      * The token service used for getToken()/checkToken(). Resolved lazily to
@@ -163,7 +179,18 @@ class Horde_Session implements Horde_Shutdown_Task
         ?HordeSession $modern = null,
         ?ModernToken $tokenService = null
     ) {
-        $this->modern = $modern ?? $this->_resolveModern();
+        if ($modern !== null) {
+            // Legacy path: caller passed an explicit HordeSession
+            // (Horde_Test_Factory_Session, unit tests). Pin it — the
+            // accessor is not consulted.
+            $this->explicitModern = $modern;
+        } else {
+            // Modern path: resolve the request-scoped SessionAccess.
+            // Every subsequent read via modern() consults the accessor
+            // fresh, so post-regeneration values reach us automatically.
+            // See horde/Core#190.
+            $this->modernAccess = $this->_resolveAccess();
+        }
         $this->explicitTokenService = $tokenService;
 
         /* Make sure the global session variable is initialised and points to
@@ -181,13 +208,63 @@ class Horde_Session implements Horde_Shutdown_Task
     }
 
     /**
-     * Resolve the modern session at construction time. Prefers the global
-     * injector (so encryptor/decryptor closures wired by HordeSessionFactory
-     * are present); falls back to a minimal direct construction for legacy
-     * test contexts that build a Horde_Session without setting up an
-     * injector.
+     * Read the currently-canonical {@see HordeSession} value.
+     *
+     * When constructed with an explicit HordeSession (legacy path),
+     * always returns that instance. Otherwise consults the
+     * {@see SessionAccess} slot fresh on every call — so a
+     * {@see SessionLifecycle::regenerate()} that mints a successor
+     * value reaches all the shim's subsequent reads without any
+     * explicit "refresh $this->modern" step.
+     *
+     * When the accessor has no current session yet (before
+     * {@see SessionLifecycle::start()}, after
+     * {@see SessionLifecycle::destroy()}), falls back to a direct
+     * container lookup and finally to constructing a minimal instance
+     * — matching the pre-accessor _resolveModern behavior.
      */
-    private function _resolveModern(): HordeSession
+    private function modern(): HordeSession
+    {
+        if ($this->explicitModern !== null) {
+            return $this->explicitModern;
+        }
+        if ($this->modernAccess !== null && $this->modernAccess->hasCurrent()) {
+            return $this->modernAccess->current();
+        }
+        return $this->_resolveModernFallback();
+    }
+
+    /**
+     * Resolve the {@see SessionAccess} slot for this shim instance.
+     *
+     * Prefers the global injector — the same container that
+     * {@see SessionLifecycle} writes fresh HordeSession values into on
+     * every lifecycle transition. Legacy test contexts without an
+     * injector fall through to null and the shim's fallback resolution
+     * kicks in inside {@see modern()}.
+     */
+    private function _resolveAccess(): ?SessionAccess
+    {
+        if (!isset($GLOBALS['injector'])) {
+            return null;
+        }
+        try {
+            $access = $GLOBALS['injector']->getInstance(SessionAccess::class);
+            return $access instanceof SessionAccess ? $access : null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Pre-accessor fallback: resolve a HordeSession directly.
+     *
+     * Preserves the shape of the old _resolveModern() so that legacy
+     * test contexts and pre-setup bootstrap moments still get a usable
+     * instance. Called only from {@see modern()} when the accessor
+     * cannot provide a value.
+     */
+    private function _resolveModernFallback(): HordeSession
     {
         if (isset($GLOBALS['injector'])) {
             return $GLOBALS['injector']->getInstance(HordeSession::class);
@@ -231,7 +308,7 @@ class Horde_Session implements Horde_Shutdown_Task
                 // report an unauthenticated session in every closed,
                 // read-only request once `session.max_time` was
                 // configured. See horde/imp#88.
-                $begin = $this->modern->getSessionBegin();
+                $begin = $this->modern()->getSessionBegin();
                 if ($begin !== null) {
                     return $begin->getTimestamp();
                 }
@@ -398,7 +475,7 @@ class Horde_Session implements Horde_Shutdown_Task
         $curr_time = time();
 
         /* Create internal data arrays. */
-        if ($this->modern->getSessionBegin() === null
+        if ($this->modern()->getSessionBegin() === null
             && !isset($this->_data[self::BEGIN])) {
             $this->_data[self::BEGIN] = $curr_time;
             $this->_data[self::REGENERATE] = $curr_time
@@ -410,8 +487,8 @@ class Horde_Session implements Horde_Shutdown_Task
             // and $data['_r'][''] instead of $data['_b'] / $data['_r'])
             // and broke modern readers. The typed setters keep all
             // writers aligned.
-            $this->modern->setSessionBegin($curr_time);
-            $this->modern->setRegenerationDeadline(
+            $this->modern()->setSessionBegin($curr_time);
+            $this->modern()->setRegenerationDeadline(
                 $curr_time + $this->regenerate_interval
             );
         }
@@ -432,7 +509,7 @@ class Horde_Session implements Horde_Shutdown_Task
             // markers.
             $lifecycle->regenerate();
             $this->_data = &$_SESSION;
-            $deadline = $this->modern->getRegenerationDeadline();
+            $deadline = $this->modern()->getRegenerationDeadline();
             if ($deadline !== null) {
                 $this->_data[self::REGENERATE] = $deadline;
             }
@@ -445,7 +522,7 @@ class Horde_Session implements Horde_Shutdown_Task
         session_regenerate_id(true);
         $regenAt = time() + $this->regenerate_interval;
         $this->_data[self::REGENERATE] = $regenAt;
-        $this->modern->setRegenerationDeadline($regenAt);
+        $this->modern()->setRegenerationDeadline($regenAt);
     }
 
     /**
@@ -471,11 +548,14 @@ class Horde_Session implements Horde_Shutdown_Task
 
             // Refresh the shim's bookkeeping to match the now-cleaned
             // PHP session. _data must rebind to $_SESSION because
-            // session_unset() detached the previous binding; modern must
-            // be re-resolved because rebuildHordeSession() created a fresh
-            // singleton.
+            // session_unset() detached the previous binding.
+            //
+            // The modern session pointer refreshes automatically:
+            // modern() reads through the SessionAccess accessor, and
+            // SessionLifecycle::clean() has already published a fresh
+            // instance there via publishSession(). No shim-side
+            // resolve step needed.
             $this->_data = &$_SESSION;
-            $this->modern = $this->_resolveModern();
             $this->_cleansession = true;
             return true;
         }
@@ -554,8 +634,10 @@ class Horde_Session implements Horde_Shutdown_Task
             // HordeSession + Horde_Secret_Cbc::clearKey + clears lifecycle
             // markers. It also flips its own active flag and cleaned flag.
             $lifecycle->destroy();
+            // modern() reads through the accessor; SessionLifecycle::
+            // destroy() has already updated it. No shim-side re-resolve
+            // needed.
             $this->_data = &$_SESSION;
-            $this->modern = $this->_resolveModern();
             $this->_cleansession = true;
             return;
         }
@@ -592,7 +674,7 @@ class Horde_Session implements Horde_Shutdown_Task
      */
     public function exists($app, $name)
     {
-        return $this->modern->hasScoped($app, $name);
+        return $this->modern()->hasScoped($app, $name);
     }
 
     /**
@@ -614,11 +696,11 @@ class Horde_Session implements Horde_Shutdown_Task
      */
     public function get($app, $name, $mask = 0)
     {
-        if ($this->modern->hasScoped($app, $name)) {
-            if ($this->modern->isEncrypted($app, $name)) {
-                return $this->modern->getEncrypted($app, $name);
+        if ($this->modern()->hasScoped($app, $name)) {
+            if ($this->modern()->isEncrypted($app, $name)) {
+                return $this->modern()->getEncrypted($app, $name);
             }
-            return $this->modern->getScoped($app, $name);
+            return $this->modern()->getScoped($app, $name);
         }
 
         if ($subkeys = $this->_subkeys($app, $name)) {
@@ -669,12 +751,12 @@ class Horde_Session implements Horde_Shutdown_Task
     public function set($app, $name, $value, $mask = 0)
     {
         if ($mask & self::ENCRYPT) {
-            $this->modern->setEncrypted($app, $name, $value);
+            $this->modern()->setEncrypted($app, $name, $value);
             $this->sessionHandler->changed = true;
             return;
         }
 
-        $this->modern->setScoped($app, $name, $value);
+        $this->modern()->setScoped($app, $name, $value);
         $this->sessionHandler->changed = true;
     }
 
@@ -687,12 +769,12 @@ class Horde_Session implements Horde_Shutdown_Task
     public function remove($app, $name = null)
     {
         if (is_null($name)) {
-            foreach ($this->modern->keysForApp($app) as $key) {
-                $this->modern->removeScoped($app, $key);
+            foreach ($this->modern()->keysForApp($app) as $key) {
+                $this->modern()->removeScoped($app, $key);
             }
             $this->sessionHandler->changed = true;
-        } elseif ($this->modern->hasScoped($app, $name)) {
-            $this->modern->removeScoped($app, $name);
+        } elseif ($this->modern()->hasScoped($app, $name)) {
+            $this->modern()->removeScoped($app, $name);
             $this->sessionHandler->changed = true;
         } else {
             foreach ($this->_subkeys($app, $name) as $val) {
@@ -720,7 +802,7 @@ class Horde_Session implements Horde_Shutdown_Task
             return $ret;
         }
 
-        foreach ($this->modern->keysForApp($app) as $k) {
+        foreach ($this->modern()->keysForApp($app) as $k) {
             if (strpos($k, $name) === 0) {
                 $ret[substr($k, strlen($name))] = $k;
             }
@@ -787,7 +869,7 @@ class Horde_Session implements Horde_Shutdown_Task
             $factory = $GLOBALS['injector']->getInstance(
                 TokenServiceFactory::class
             );
-            $this->tokenService = $factory->createForSession($this->modern);
+            $this->tokenService = $factory->createForSession($this->modern());
             return $this->tokenService;
         }
 
@@ -813,7 +895,7 @@ class Horde_Session implements Horde_Shutdown_Task
 
         $nonces = $this->_nonces();
         $nonces[] = $id;
-        $this->modern->setScoped('horde', self::NONCE_ID, array_values($nonces));
+        $this->modern()->setScoped('horde', self::NONCE_ID, array_values($nonces));
         $this->sessionHandler->changed = true;
 
         return $id;
@@ -835,7 +917,7 @@ class Horde_Session implements Horde_Shutdown_Task
             throw new Horde_Exception('Invalid token!');
         }
         unset($nonces[$pos]);
-        $this->modern->setScoped('horde', self::NONCE_ID, array_values($nonces));
+        $this->modern()->setScoped('horde', self::NONCE_ID, array_values($nonces));
         $this->sessionHandler->changed = true;
     }
 
@@ -844,7 +926,7 @@ class Horde_Session implements Horde_Shutdown_Task
      */
     private function _nonces(): array
     {
-        $nonces = $this->modern->getScoped('horde', self::NONCE_ID);
+        $nonces = $this->modern()->getScoped('horde', self::NONCE_ID);
 
         return is_array($nonces) ? array_values($nonces) : [];
     }
@@ -901,41 +983,71 @@ class Horde_Session implements Horde_Shutdown_Task
      */
     private function _mirrorToSession(): void
     {
-        $_SESSION = $this->modern->toPayload();
+        $_SESSION = $this->modern()->toPayload();
         $this->_data = &$_SESSION;
     }
 
     /**
-     * Rebuild the modern session from the current $_SESSION via the injector
-     * so encryptor/decryptor closures wired by HordeSessionFactory are
-     * preserved. Used by start() (after session_start populates $_SESSION),
-     * clean() and destroy() (after $_SESSION is cleared), and by
-     * __set('session_data') (after a foreign payload is swapped in).
+    /**
+     * Rebuild the modern session and publish it to whatever access
+     * layer is available.
      *
-     * The freshly-built instance is also registered as the injector singleton
-     * so callers that resolve HordeSession via getInstance (e.g. modern
-     * AuthCredentialStore) see the same object the shim mirrors back to
-     * $_SESSION on close(). Without this, two HordeSession instances coexist:
-     * the shim's authoritative one and a stale singleton that silently swallows
-     * writes from modern callers.
+     * With an injector present, {@see SessionLifecycle::rebuildHordeSession()}
+     * is the canonical path — but this helper is called from the shim's
+     * *fallback* branches (when no lifecycle is wired) plus from the
+     * `session_data` write path (line 342). In those cases we build a
+     * fresh HordeSession ourselves and publish it to the accessor if we
+     * have one; consumers reading through {@see modern()} pick up the
+     * new value automatically.
+     *
+     * The `explicitModern` path is intentionally untouched: callers who
+     * pinned a HordeSession at construction time (test factories,
+     * legacy fixtures) opted out of accessor-based resolution and
+     * expect their pinned instance to stay authoritative regardless of
+     * `$_SESSION` churn.
      */
     private function _rebuildModern(): void
     {
+        if ($this->explicitModern !== null) {
+            // Legacy: instance was pinned at construction. Rebuild
+            // means construct a fresh instance over the current
+            // $_SESSION shape and swap it into the pin.
+            $sid = (string) (session_id() ?: 'none');
+            $this->explicitModern = new HordeSession(
+                new SessionId($sid !== '' ? $sid : 'none'),
+                $_SESSION ?? [],
+            );
+            return;
+        }
+
         if (isset($GLOBALS['injector'])) {
-            $this->modern = $GLOBALS['injector']->createInstance(
-                HordeSession::class
-            );
-            $GLOBALS['injector']->setInstance(
-                HordeSession::class,
-                $this->modern
-            );
+            $fresh = $GLOBALS['injector']->createInstance(HordeSession::class);
+            $GLOBALS['injector']->setInstance(HordeSession::class, $fresh);
+            // Also publish to the accessor if one is bound, so
+            // consumers reading through SessionAccess pick up the
+            // freshly-built instance.
+            try {
+                $access = $GLOBALS['injector']->getInstance(SessionAccess::class);
+                if ($access instanceof \Horde\Core\Session\SessionAccessor) {
+                    $access->replaceWith($fresh);
+                }
+            } catch (\Throwable) {
+                // No SessionAccess binding. Consumers still reach the
+                // fresh instance via getInstance(HordeSession::class)
+                // — the setInstance above.
+            }
             return;
         }
 
         /* Fallback for bootstrapping/test contexts without an injector. No
          * encryption closures available; encrypted reads will return raw bytes
-         * and encrypted writes will fail loudly via setEncrypted(). */
+         * and encrypted writes will fail loudly via setEncrypted(). Pin the
+         * new instance via explicitModern so subsequent modern() reads
+         * hit it. */
         $sid = (string) (session_id() ?: 'none');
-        $this->modern = new HordeSession($sid !== '' ? new SessionId($sid) : new SessionId('none'), $_SESSION ?? []);
+        $this->explicitModern = new HordeSession(
+            $sid !== '' ? new SessionId($sid) : new SessionId('none'),
+            $_SESSION ?? [],
+        );
     }
 }

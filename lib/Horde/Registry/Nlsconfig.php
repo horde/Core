@@ -13,7 +13,7 @@
  * @package  Core
  */
 
-use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 
 /**
  * Interface to NLS configuration.
@@ -158,10 +158,13 @@ class Horde_Registry_Nlsconfig
     }
 
     /**
-     * Resolve the modern session lazily from the global injector.
+     * Resolve the modern session-access slot lazily from the global
+     * injector. Every call resolves fresh through the accessor's
+     * passthrough, so post-regenerate values are visible without any
+     * cache-invalidation dance.
      */
-    private function _session(): HordeSession
+    private function _session(): SessionAccess
     {
-        return $GLOBALS['injector']->getInstance(HordeSession::class);
+        return $GLOBALS['injector']->getInstance(SessionAccess::class);
     }
 }

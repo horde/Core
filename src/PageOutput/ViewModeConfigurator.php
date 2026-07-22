@@ -19,6 +19,7 @@ namespace Horde\Core\PageOutput;
 use Horde\Core\Assets\JsDiscoverer;
 use Horde\Core\Service\PrefsService;
 use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 use Horde\Injector\Attribute\Factory;
 use Horde\Token\Token;
 use Horde_Registry;
@@ -41,7 +42,7 @@ class ViewModeConfigurator
     public function __construct(
         private readonly Horde_Registry $registry,
         private readonly PrefsService $prefs,
-        private readonly HordeSession $session,
+        private readonly SessionAccess $session,
         private readonly JsDiscoverer $jsDiscoverer,
         private readonly Token $tokenService,
     ) {}

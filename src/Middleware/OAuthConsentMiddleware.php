@@ -17,7 +17,7 @@ declare(strict_types=1);
 namespace Horde\Core\Middleware;
 
 use DateTimeImmutable;
-use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 use Horde\OAuth\ErrorResponse;
 use Horde\OAuth\Exception\OAuthException;
 use Horde\OAuth\Server\AuthorizationRequest;
@@ -41,7 +41,7 @@ class OAuthConsentMiddleware implements MiddlewareInterface
     public function __construct(
         private readonly AuthorizationEndpoint $authorizationEndpoint,
         private readonly ConsentRepository $consentRepository,
-        private readonly HordeSession $session,
+        private readonly SessionAccess $session,
         private readonly Horde_PageOutput $pageOutput,
         private readonly Horde_Notification_Handler $notification,
         private readonly ResponseFactoryInterface $responseFactory,

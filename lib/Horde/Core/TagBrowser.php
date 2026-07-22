@@ -16,6 +16,7 @@
  */
 
 use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 
 abstract class Horde_Core_TagBrowser
 {
@@ -75,7 +76,7 @@ abstract class Horde_Core_TagBrowser
      * legacy `Horde_Pack` blobs, but this slot is a transient browse cache
      * that gets rebuilt on the next page request.
      */
-    protected HordeSession $_session;
+    protected SessionAccess $_session;
 
     /**
      * Const'r
@@ -90,7 +91,7 @@ abstract class Horde_Core_TagBrowser
         $owner = null
     ) {
         $this->_tagger = $tagger;
-        $this->_session = $GLOBALS['injector']->getInstance(HordeSession::class);
+        $this->_session = $GLOBALS['injector']->getInstance(SessionAccess::class);
 
         if (!empty($tags)) {
             $this->_tags = $this->_tagger->getTagIds($tags);

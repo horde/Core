@@ -21,7 +21,7 @@ use Horde\Core\PageOutput\AssetCollector;
 use Horde\Core\PageOutput\ViewMode;
 use Horde\Core\PageOutput\ViewModeConfigurator;
 use Horde\Core\Service\PrefsService;
-use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 use Horde\Token\GeneratedToken;
 use Horde\Token\Token;
 use Horde\Url\Url;
@@ -71,7 +71,7 @@ class ViewModeConfiguratorTest extends TestCase
         $registry = $this->createMock(Horde_Registry::class);
         $registry->expects($this->never())->method('getApp');
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects($this->once())->method('getAuthId')->willReturn(null);
         // Anonymous user: prefs lookup never fires.
         $prefs = $this->createMock(PrefsService::class);
@@ -106,7 +106,7 @@ class ViewModeConfiguratorTest extends TestCase
             ->with('testuser', 'horde', 'widget_accesskey')
             ->willReturn(true);
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects($this->once())->method('getAuthId')->willReturn('testuser');
 
         $configurator = new ViewModeConfigurator(
@@ -134,7 +134,7 @@ class ViewModeConfiguratorTest extends TestCase
             ->with('testuser', 'horde', 'widget_accesskey')
             ->willReturn(false);
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects($this->once())->method('getAuthId')->willReturn('testuser');
 
         $configurator = new ViewModeConfigurator(
@@ -159,7 +159,7 @@ class ViewModeConfiguratorTest extends TestCase
             ->method('getServiceLink')
             ->willReturn(new Url('/horde/services/ajax.php'));
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         // getAuthId fires for BASIC's accesskey check AND for DYNAMIC's uid lookup.
         $session->expects($this->exactly(2))->method('getAuthId')->willReturn('testuser');
 
@@ -195,7 +195,7 @@ class ViewModeConfiguratorTest extends TestCase
             ->method('getServiceLink')
             ->willReturn(new Url('/horde/services/ajax.php'));
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects($this->exactly(2))->method('getAuthId')->willReturn('testuser');
 
         $prefs = $this->createMock(PrefsService::class);

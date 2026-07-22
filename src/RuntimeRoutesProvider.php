@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Horde\Core;
 
 use Horde\Core\Config\RegistryState;
+use Horde\Core\Controller\NoopController;
 use Horde\Core\Middleware\DefaultStack;
 use Horde\Core\Uri\RoutesProvider;
 use Horde\Http\Uri;
@@ -201,7 +202,12 @@ class RuntimeRoutesProvider extends GroupMapper implements RoutesProvider
 
         foreach ($services as $name => $path) {
             if (!isset($existingNames[$name])) {
-                $this->buildRoute(uri: $hordeWebroot . $path, name: $name)->add();
+                // Wire NoopController to suppress the legacy horde/Routes
+                // "controller = 'content'" default for when no explicit controller is set.
+                // These routes so far should be serviced by real endpoint files and not by the router.
+                $this->buildRoute(uri: $hordeWebroot . $path, name: $name)
+                    ->withController(NoopController::class)
+                    ->add();
             }
         }
     }

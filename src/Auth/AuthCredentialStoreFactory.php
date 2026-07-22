@@ -16,13 +16,13 @@ declare(strict_types=1);
 
 namespace Horde\Core\Auth;
 
-use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 use Horde\Injector\Injector;
 
 /**
  * DI factory for {@see AuthCredentialStore}.
  *
- * Resolves the modern {@see HordeSession} from the injector and hands it to
+ * Resolves the modern {@see SessionAccess} from the injector and hands it to
  * the store. Kept as a separate factory file (rather than an anonymous
  * `#[Factory]` closure) so legacy `Horde_Injector` lookups against the FQCN
  * resolve via the same code path as the modern `#[Factory]` attribute.
@@ -32,7 +32,7 @@ class AuthCredentialStoreFactory
     public function create(Injector $injector): AuthCredentialStore
     {
         return new AuthCredentialStore(
-            $injector->getInstance(HordeSession::class),
+            $injector->getInstance(SessionAccess::class),
         );
     }
 }

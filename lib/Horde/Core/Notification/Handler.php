@@ -13,6 +13,7 @@
  */
 
 use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 
 /**
  * Core Horde notification handler.
@@ -22,6 +23,9 @@ use Horde\Core\Session\HordeSession;
  * diverges from values previously written through the legacy
  * `Horde_Session::set()` path. Stale entries from the prior format are
  * treated as missing on the first read after deploy.
+ *
+ * Reads and writes go through {@see SessionAccess} so post-regenerate
+ * values reach us on the next call — see horde/Core#190.
  *
  * @author    Michael Slusarz <slusarz@horde.org>
  * @author    Ralf Lang <ralf.lang@ralf-lang.de>
@@ -36,9 +40,9 @@ class Horde_Core_Notification_Handler extends Horde_Notification_Handler
     public const SESS_KEY = 'core_notification_handler';
 
     /**
-     * The modern session.
+     * The request-scoped session access slot.
      */
-    protected HordeSession $_session;
+    protected SessionAccess $_session;
 
     /**
      * List of applications that contain notification handlers. Array with
@@ -49,8 +53,8 @@ class Horde_Core_Notification_Handler extends Horde_Notification_Handler
 
     /**
      * @param Horde_Notification_Storage_Interface $storage  Notification storage.
-     * @param HordeSession|null                    $session  Modern session for
-     *                                                       the per-session
+     * @param SessionAccess|null                   $session  Modern session-access
+     *                                                       slot for the per-session
      *                                                       app-handler cache.
      *                                                       If omitted, resolved
      *                                                       from the global
@@ -58,11 +62,11 @@ class Horde_Core_Notification_Handler extends Horde_Notification_Handler
      */
     public function __construct(
         Horde_Notification_Storage_Interface $storage,
-        ?HordeSession $session = null
+        ?SessionAccess $session = null
     ) {
         parent::__construct($storage);
         $this->_session = $session
-            ?? $GLOBALS['injector']->getInstance(HordeSession::class);
+            ?? $GLOBALS['injector']->getInstance(SessionAccess::class);
     }
 
     /**

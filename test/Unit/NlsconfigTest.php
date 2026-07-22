@@ -16,6 +16,8 @@ declare(strict_types=1);
 namespace Horde\Core\Test\Unit;
 
 use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
+use Horde\Core\Session\SessionAccessor;
 use Horde\Core\Test\Stub\Loadconfig;
 use Horde\Core\Test\Stub\Registry as StubRegistry;
 use Horde\SessionHandler\SessionId;
@@ -43,12 +45,16 @@ class NlsconfigTest extends TestCase
         $GLOBALS['session'] = new Horde_Session();
         $GLOBALS['session']->sessionHandler = new Horde_Support_Stub();
 
-        // Nlsconfig now resolves HordeSession from $GLOBALS['injector'].
-        // Provide a real one over an empty in-memory data array so the
-        // session-cache slots used by validLang() round-trip correctly.
+        // Nlsconfig now resolves SessionAccess from $GLOBALS['injector'].
+        // Provide a real accessor over an empty in-memory HordeSession so
+        // the session-cache slots used by validLang() round-trip
+        // correctly.
         $hordeSession = new HordeSession(new SessionId('test-session'));
+        $accessor = new SessionAccessor();
+        $accessor->replaceWith($hordeSession);
         $GLOBALS['injector'] = new Horde_Injector(new Horde_Injector_TopLevel());
         $GLOBALS['injector']->setInstance(HordeSession::class, $hordeSession);
+        $GLOBALS['injector']->setInstance(SessionAccess::class, $accessor);
 
         $GLOBALS['registry'] = new StubRegistry('john', 'horde');
         $config = new Loadconfig('horde', 'nls.php', 'horde_nls_config');

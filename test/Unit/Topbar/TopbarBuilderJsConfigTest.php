@@ -6,7 +6,7 @@ namespace Horde\Core\Test\Unit\Topbar;
 
 use Horde\Core\Service\PermissionService;
 use Horde\Core\Service\PrefsService;
-use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 use Horde\Core\Topbar\TopbarBuilder;
 use Horde\Url\Url;
 use Horde_Exception;
@@ -46,7 +46,7 @@ class TopbarBuilderJsConfigTest extends TestCase
 
     private function authedSession(string $uid = 'testuser'): MockObject
     {
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects($this->atLeastOnce())->method('getAuthId')->willReturn($uid);
 
         return $session;
@@ -157,7 +157,7 @@ class TopbarBuilderJsConfigTest extends TestCase
         $registry->expects($this->atLeastOnce())->method('callByPackage')->willReturn([]);
         $registry->method('getServiceLink')->willThrowException(new Horde_Exception('No service'));
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects($this->atLeastOnce())->method('getAuthId')->willReturn(null);
 
         $builder = new TopbarBuilder(

@@ -18,6 +18,7 @@ namespace Horde\Core\Auth;
 
 use DateTimeImmutable;
 use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 use Horde\Injector\Attribute\Factory;
 use Horde\Injector\Injector;
 
@@ -69,7 +70,7 @@ class AuthCredentialStore
     private const BASE_APP_KEY = 'auth/credentials';
 
     public function __construct(
-        private readonly HordeSession $session,
+        private readonly SessionAccess $session,
     ) {}
 
     /**
