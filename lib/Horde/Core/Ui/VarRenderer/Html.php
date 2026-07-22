@@ -1424,16 +1424,26 @@ function obrowserCallback(name, oid)
         }
 
         $html = $text ? nl2br(htmlspecialchars((string) $address)) : '';
+        /* The three map-icon <img> tags below all carry a shared
+         * "horde-map-icon" class so apps can constrain their size
+         * via app-level CSS. The default theme's map.png ships at
+         * 48x48, which reads as oversized in list-view rows where
+         * surrounding sprites are 16x16; theme-material ships a
+         * 20x20 variant. Rather than pick a canonical size here or
+         * touch theme assets, we tag the elements so each consumer
+         * (turba browse list, kronolith attendee panel, imp contact
+         * details, ...) sizes them to fit its own layout. See
+         * turba#64. */
         if (!empty($mapurl)) {
-            $html .= '&nbsp;&nbsp;' . Horde::link(Horde::externalUrl($mapurl), $desc, null, '_blank') . Horde_Themes_Image::tag($icon, ['alt' => $desc]) . '</a>';
+            $html .= '&nbsp;&nbsp;' . Horde::link(Horde::externalUrl($mapurl), $desc, null, '_blank') . Horde_Themes_Image::tag($icon, ['alt' => $desc, 'attr' => ['class' => 'horde-map-icon']]) . '</a>';
         }
         if (!empty($mapurl2)) {
-            $html .= '&nbsp;' . Horde::link(Horde::externalUrl($mapurl2), $desc2, null, '_blank') . Horde_Themes_Image::tag($icon2, ['alt' => $desc2]) . '</a>';
+            $html .= '&nbsp;' . Horde::link(Horde::externalUrl($mapurl2), $desc2, null, '_blank') . Horde_Themes_Image::tag($icon2, ['alt' => $desc2, 'attr' => ['class' => 'horde-map-icon']]) . '</a>';
         }
 
         /* Google generated map. */
         if ($address) {
-            $html .= '&nbsp;' . Horde::link(Horde::externalUrl('http://maps.google.com/maps?q=' . urlencode(preg_replace('/\r?\n/', ',', $address)) . '&hl=en'), Horde_Core_Translation::t('Google Maps'), null, '_blank') . Horde_Themes_Image::tag($google_icon, ['alt' => Horde_Core_Translation::t('Google Maps')]) . '</a>';
+            $html .= '&nbsp;' . Horde::link(Horde::externalUrl('http://maps.google.com/maps?q=' . urlencode(preg_replace('/\r?\n/', ',', $address)) . '&hl=en'), Horde_Core_Translation::t('Google Maps'), null, '_blank') . Horde_Themes_Image::tag($google_icon, ['alt' => Horde_Core_Translation::t('Google Maps'), 'attr' => ['class' => 'horde-map-icon']]) . '</a>';
         }
 
         return $html;
