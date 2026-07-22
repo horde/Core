@@ -26,6 +26,8 @@
  */
 class Horde_Session_Null extends Horde_Session implements Horde_Shutdown_Task
 {
+    use \Horde\Core\Session\PublishesModernSessionToAccessorTrait;
+
     /**
      * Constructor.
      */
@@ -97,6 +99,21 @@ class Horde_Session_Null extends Horde_Session implements Horde_Shutdown_Task
     {
         $this->_active = true;
         $this->_data[Horde_Session::BEGIN] = time();
+
+        /* Publish an in-memory HordeSession to the modern SessionAccessor
+         * so consumers reading through SessionAccess (Nlsconfig, prefs
+         * cache, notification handler, ...) see a current session value
+         * for the duration of this request. Nothing here calls
+         * session_start(); this is purely the in-memory
+         * publish-to-accessor step that Horde_Session performs from its
+         * _rebuildModern() path. Without it, every request that boots
+         * with session_control='none' (rpc.php → ActiveSync, WebDAV,
+         * SyncML, EAS Autodiscover; and CLI tools via appInit()) hits
+         * SessionAccessor::current() during Registry::__construct()'s
+         * setLanguageEnvironment() call and fatals.
+         *
+         * See horde/Core#207. */
+        $this->publishModernSessionToAccessor();
     }
 
     /**

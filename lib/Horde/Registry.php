@@ -356,6 +356,26 @@ class Horde_Registry implements Horde_Shutdown_Task
 
             $args['nocompress'] = true;
             $args['authentication'] = 'none';
+
+            /* CLI tools have never wanted a persisted PHP session — they
+             * are one-shot processes, cannot receive a session cookie,
+             * and their state (alarms, cache warmers, admin scripts)
+             * lives in the DB or hashtable, not $_SESSION. Historically
+             * the CLI branch below built a real Horde_Session but called
+             * setup(false) to skip session_start(); that left the modern
+             * SessionAccessor empty and every consumer that reached it
+             * during Registry::__construct() (Nlsconfig, notification
+             * handler, ...) fataled. Route CLI through session_control
+             * 'none' (Horde_Session_Null) instead: same "no persisted
+             * session" semantics, but Horde_Session_Null publishes an
+             * in-memory HordeSession to the accessor so consumers see a
+             * live session for the duration of the process.
+             *
+             * Only default; explicit callers may override. See
+             * horde/Core#207. */
+            if ($args['session_control'] === null) {
+                $args['session_control'] = 'none';
+            }
         }
 
         // For 'fallback' authentication, try authentication first.
