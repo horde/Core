@@ -1,4 +1,14 @@
 ---
+3.2.2:
+  api: 3.2.2
+  state:
+    release: stable
+    api: stable
+  date: 2026-07-22
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: "fix: Emit css class for maps\nfix/auth session establishes session 190 (#205)\nrefactor: Don't inject and hold the session itself but a SessionAccess locator (#203)\nfix(activesync): refuse Draft Modify append-as-new for stale UIDs (#201)\nfix(activesync): skip GAL contacts calls when Turba is absent"
 3.2.1:
   api: 3.2.1
   state:
