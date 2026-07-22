@@ -85,6 +85,35 @@ class SessionLifecycleFactory
             }
         }
 
-        return new SessionLifecycle($injector, $handler, $config, $secret, $coordinator);
+        // Resolve the request-scoped SessionAccess slot as a
+        // SessionAccessor. The lifecycle publishes fresh HordeSession
+        // values to this accessor on start/clean/destroy/regenerate;
+        // consumer services reading through SessionAccess pick up the
+        // current value on their next call. See horde/Core#190.
+        //
+        // Wrapped in a try/catch so bootstrap-time or legacy-test
+        // contexts that don't bind SessionAccess still work — the
+        // lifecycle falls back to lazy resolution via the injector,
+        // and if that also fails it constructs a private accessor
+        // (correctness-degraded but non-crashing).
+        $accessor = null;
+        try {
+            $resolvedAccess = $injector->getInstance(SessionAccess::class);
+            if ($resolvedAccess instanceof SessionAccessor) {
+                $accessor = $resolvedAccess;
+            }
+        } catch (Throwable) {
+            // No SessionAccess binding. Lifecycle will fall back to
+            // its accessor() helper.
+        }
+
+        return new SessionLifecycle(
+            $injector,
+            $handler,
+            $config,
+            $secret,
+            $coordinator,
+            $accessor,
+        );
     }
 }

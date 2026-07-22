@@ -18,7 +18,7 @@ namespace Horde\Core\PageOutput;
 
 use Horde\Core\Assets\JsDiscoverer;
 use Horde\Core\Service\PrefsService;
-use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 use Horde_Injector;
 use Horde\Injector\Injector;
 use Horde\Token\Token;
@@ -39,7 +39,7 @@ class ViewModeConfiguratorFactory
         return new ViewModeConfigurator(
             $injector->getInstance(Horde_Registry::class),
             $injector->getInstance(PrefsService::class),
-            $injector->getInstance(HordeSession::class),
+            $injector->getInstance(SessionAccess::class),
             $injector->getInstance(JsDiscoverer::class),
             $injector->getInstance(Token::class),
         );

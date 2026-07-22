@@ -9,7 +9,7 @@ use Horde\Core\PageOutput\AssetCollector;
 use Horde\Core\PageOutput\ViewMode;
 use Horde\Core\PageOutput\ViewModeConfigurator;
 use Horde\Core\Service\PrefsService;
-use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 use Horde\Token\GeneratedToken;
 use Horde\Token\Token;
 use Horde\Url\Url;
@@ -71,7 +71,7 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
         $prefs = $this->createMock(PrefsService::class);
         $prefs->expects(self::never())->method(self::anything());
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects(self::once())->method('getAuthId')->willReturn(null);
         $session->expects(self::never())->method('getScoped');
 
@@ -103,7 +103,7 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
         $prefs = $this->createMock(PrefsService::class);
         $prefs->expects(self::never())->method(self::anything());
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects(self::once())->method('getAuthId')->willReturn(null);
         $session->expects(self::never())->method('getScoped');
 
@@ -145,7 +145,7 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
         $prefs = $this->createMock(PrefsService::class);
         $prefs->expects(self::never())->method(self::anything());
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects(self::exactly(2))->method('getAuthId')->willReturn(null);
 
         $configurator = new ViewModeConfigurator(
@@ -189,7 +189,7 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
                 return null;
             });
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects(self::once())->method('getAuthId')->willReturn('testuser');
         $session->expects(self::never())->method('getScoped');
 
@@ -234,7 +234,7 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
         $prefs = $this->createMock(PrefsService::class);
         $prefs->expects(self::never())->method(self::anything());
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects(self::once())->method('getAuthId')->willReturn(null);
         $session->expects(self::never())->method('getScoped');
 

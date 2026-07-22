@@ -74,6 +74,7 @@ final class HordeSessionMiddleware implements MiddlewareInterface
         private readonly SessionConfig $config,
         private readonly LoggerInterface $logger = new NullLogger(),
         private readonly ?SessionEncryptionCoordinator $coordinator = null,
+        private readonly ?\Horde\Core\Session\SessionAccess $access = null,
     ) {}
 
     public function process(
@@ -91,6 +92,22 @@ final class HordeSessionMiddleware implements MiddlewareInterface
         } else {
             [$session, $hadCookie] = $this->loadOrMint($request);
             $request = $request->withAttribute(self::ATTRIBUTE_SESSION, $session);
+        }
+
+        // Publish the resolved session to the request-scoped
+        // SessionAccess so services that inject SessionAccess (a slot
+        // pointer, not a value) resolve to the current session via
+        // their SessionAccess->current() reads. The modern middleware
+        // path builds HordeSession here without going through
+        // SessionLifecycle, so we're the one that has to seed the
+        // accessor. See horde/Core#190.
+        //
+        // Narrow to the concrete SessionAccessor for the write side —
+        // replaceWith() is not on the interface. Interface-swappers
+        // that bind a different implementation opt out of the
+        // publishing path; the write here becomes a no-op.
+        if ($this->access instanceof \Horde\Core\Session\SessionAccessor) {
+            $this->access->replaceWith($session);
         }
 
         $response = $handler->handle($request);

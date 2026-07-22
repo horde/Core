@@ -19,7 +19,7 @@ namespace Horde\Core\Topbar;
 use Horde\Core\Horde;
 use Horde\Core\Service\PermissionService;
 use Horde\Core\Service\PrefsService;
-use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 use Horde\Injector\Attribute\Factory;
 use Horde_Registry;
 use DateTimeImmutable;
@@ -48,7 +48,7 @@ class TopbarBuilder
         private readonly Horde_Registry $registry,
         private readonly PrefsService $prefs,
         private readonly PermissionService $permissions,
-        private readonly HordeSession $session,
+        private readonly SessionAccess $session,
     ) {}
 
     public function build(string $currentApp = 'horde'): TopbarData

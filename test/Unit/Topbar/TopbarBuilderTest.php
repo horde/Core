@@ -18,7 +18,7 @@ namespace Horde\Core\Test\Unit\Topbar;
 
 use Horde\Core\Service\PermissionService;
 use Horde\Core\Service\PrefsService;
-use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 use Horde\Core\Topbar\TopbarBuilder;
 use Horde\Core\Topbar\TopbarData;
 use Horde\Url\Url;
@@ -69,7 +69,7 @@ class TopbarBuilderTest extends TestCase
         $registry->method('isAdmin')->willReturn(false);
         $this->pinCommonRegistryReads($registry);
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects($this->atLeastOnce())
             ->method('getAuthId')->willReturn(null);
 
@@ -104,7 +104,7 @@ class TopbarBuilderTest extends TestCase
         $permissions->expects($this->atLeastOnce())
             ->method('exists')->willReturn(false);
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects($this->atLeastOnce())
             ->method('getAuthId')->willReturn('testuser');
 
@@ -128,7 +128,7 @@ class TopbarBuilderTest extends TestCase
         $registry->method('isAdmin')->willReturn(false);
         $this->pinCommonRegistryReads($registry);
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects($this->atLeastOnce())
             ->method('getAuthId')->willReturn('testuser');
 
@@ -161,7 +161,7 @@ class TopbarBuilderTest extends TestCase
         $registry->method('isAdmin')->willReturn(false);
         $this->pinCommonRegistryReads($registry);
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects($this->atLeastOnce())
             ->method('getAuthId')->willReturn(null);
 
@@ -192,7 +192,7 @@ class TopbarBuilderTest extends TestCase
                 throw new Horde_Exception('No service');
             });
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects($this->atLeastOnce())
             ->method('getAuthId')->willReturn('admin');
 
@@ -224,7 +224,7 @@ class TopbarBuilderTest extends TestCase
                 throw new Horde_Exception('No service');
             });
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects($this->atLeastOnce())
             ->method('getAuthId')->willReturn(null);
 
@@ -253,7 +253,7 @@ class TopbarBuilderTest extends TestCase
         $registry->method('isAdmin')->willReturn(false);
         $this->pinCommonRegistryReads($registry);
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects($this->atLeastOnce())
             ->method('getAuthId')->willReturn(null);
 
@@ -309,7 +309,7 @@ class TopbarBuilderTest extends TestCase
         $permissions = $this->createMock(PermissionService::class);
         $permissions->method('exists')->willReturn(false);
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->method('getAuthId')->willReturn(null);
 
         $builder = new TopbarBuilder(
@@ -391,7 +391,7 @@ class TopbarBuilderTest extends TestCase
         $permissions = $this->createMock(PermissionService::class);
         $permissions->method('exists')->willReturn(false);
 
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->method('getAuthId')->willReturn(null);
 
         $builder = new TopbarBuilder(

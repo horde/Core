@@ -14,6 +14,8 @@ namespace Horde\Core\Test\Unit\Session;
 use Horde\Core\Config\State;
 use Horde\Core\Secret\SessionSecret;
 use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
+use Horde\Core\Session\SessionAccessor;
 use Horde\Core\Session\SessionConfigFactory;
 use Horde\Core\Session\SessionLifecycle;
 use Horde\Injector\Injector;
@@ -544,6 +546,424 @@ class SessionLifecycleTest extends TestCase
         $lifecycle->regenerate();
 
         self::assertFalse($session->shouldRegenerate());
+    }
+
+    // ---------------------------------------------------------------
+    // SessionAccess-mediated regeneration invariants (horde/Core#190).
+    //
+    // Before the SessionAccess split, consumers that captured a
+    // HordeSession via constructor injection (private readonly
+    // HordeSession $session) held a stale reference across a
+    // regenerate() call: rebuildHordeSession() published a fresh
+    // instance to the injector, but the already-handed-out reference
+    // was frozen. LoginService, whups controllers, and every other
+    // Category-A/B holder in the fleet had this shape.
+    //
+    // The fix moves consumers to `private readonly SessionAccess $session`.
+    // SessionAccess is a request-scoped slot pointer; every read
+    // consults SessionLifecycle's canonical HordeSession at call time.
+    // These tests pin the invariant end-to-end: a SessionAccess
+    // captured *before* regenerate() sees the post-regenerate value
+    // on its next read.
+    // ---------------------------------------------------------------
+
+    /**
+     * Build a SessionLifecycle with a pinned {@see SessionAccessor} so
+     * tests can pre-capture the accessor (mimicking a consumer's
+     * constructor-injected `SessionAccess`) and prove it points at the
+     * canonical instance after regenerate().
+     *
+     * @param array<string,mixed> $conf
+     */
+    private function buildWithAccess(
+        SessionAccessor $accessor,
+        array $conf = [],
+        ?HordeSession $session = null,
+        ?SessionSecret $secret = null,
+    ): SessionLifecycle {
+        $injector = new Injector(new TopLevel());
+        $session ??= new HordeSession(new SessionId('access-test'), []);
+        $injector->setInstance(HordeSession::class, $session);
+        $injector->setInstance(SessionAccess::class, $accessor);
+        $accessor->replaceWith($session);
+
+        $handler = new SessionHandler(new BuiltinBackend());
+        $config = (new SessionConfigFactory())->fromState(new State($conf));
+
+        return new SessionLifecycle(
+            $injector,
+            $handler,
+            $config,
+            $secret,
+            null,
+            $accessor,
+        );
+    }
+
+    #[Test]
+    public function testCapturedSessionAccessReferenceSeesRegeneratedInstance(): void
+    {
+        // Mirror of the LoginService pattern: a consumer captures the
+        // SessionAccess at construction and holds it across a
+        // regenerate() call. The captured reference must resolve to
+        // the canonical (post-regenerate) HordeSession on its next
+        // read.
+        //
+        // Uses the reEncryptAll fallback path (no coordinator wired)
+        // because a coordinator-driven regenerate needs session_id()
+        // to return the id PHP has post-rotation, which we can't
+        // reliably produce in CLI without booting a real session.
+        // Under the fallback, regenerate() mutates the same
+        // HordeSession in place and calls publishSession() to refresh
+        // the accessor pointer. The captured reference is the
+        // accessor; the pointer swap is invisible to the caller
+        // because they always read via current().
+
+        $accessor = new SessionAccessor();
+        $session = new CapturingHordeSession(new SessionId('access-regen'), []);
+        $lifecycle = $this->buildWithAccess(
+            $accessor,
+            [],
+            $session,
+        );
+
+        // Simulate a consumer capturing SessionAccess at construction.
+        $capturedRef = $accessor;
+
+        $lifecycle->regenerate();
+
+        // The captured reference resolves to the canonical HordeSession
+        // — the one SessionLifecycle just finished mutating. Before the
+        // SessionAccess fix, a consumer that captured HordeSession
+        // directly would see a divergent instance here.
+        self::assertTrue(
+            $capturedRef->hasCurrent(),
+            'captured SessionAccess must resolve after regenerate',
+        );
+        self::assertSame(
+            $session,
+            $capturedRef->current(),
+            'captured SessionAccess resolves to the lifecycle-managed HordeSession',
+        );
+    }
+
+    #[Test]
+    public function testSessionAccessPassthroughReadReflectsPostRegenerateState(): void
+    {
+        // A consumer that stores something in a scoped slot before
+        // regenerate() and reads it back via SessionAccess after
+        // regenerate() must see the value. Under the reEncryptAll
+        // fallback path this is trivially true (same object, in-place
+        // mutation), but the test pins the invariant end-to-end
+        // through the passthrough facade.
+
+        $accessor = new SessionAccessor();
+        $session = new CapturingHordeSession(new SessionId('access-scoped'), []);
+        $lifecycle = $this->buildWithAccess($accessor, [], $session);
+
+        // Simulate a consumer writing a scoped value before regen.
+        $accessor->setScoped('imp', 'user_pref', 'value-before-regen');
+
+        $lifecycle->regenerate();
+
+        // Consumer's next read via the captured accessor sees the
+        // value. This is what jcdelepine's log showed failing: post-
+        // regen reads via the shim's captured $this->modern saw
+        // stale/wrong state.
+        self::assertSame(
+            'value-before-regen',
+            $accessor->getScoped('imp', 'user_pref'),
+            'post-regenerate read via SessionAccess sees the pre-regen write',
+        );
+    }
+
+    #[Test]
+    public function testTwoAccessReadsInSameRequestReturnSameInstance(): void
+    {
+        // Correctness invariant: within one request, SessionAccess::current()
+        // returns the same HordeSession value across successive calls
+        // as long as no lifecycle transition has run in between. If a
+        // second call returned a different object silently, encrypted
+        // slot semantics would break (each object gets its own
+        // ciphertext view). Guards against a regression where the
+        // accessor might re-resolve from the injector on every call.
+
+        $accessor = new SessionAccessor();
+        $session = new CapturingHordeSession(new SessionId('access-stable'), []);
+        $this->buildWithAccess($accessor, [], $session);
+
+        $first = $accessor->current();
+        $second = $accessor->current();
+
+        self::assertSame(
+            $first,
+            $second,
+            'accessor returns the same HordeSession object across calls '
+            . 'until a lifecycle transition replaces it',
+        );
+    }
+
+    #[Test]
+    public function testLifecycleWorksWithoutSessionAccessBinding(): void
+    {
+        // BC guarantee: legacy test/bootstrap contexts that build a
+        // SessionLifecycle without wiring SessionAccess still work.
+        // The lifecycle falls back to a private, non-shared accessor;
+        // consumers reading SessionAccess in those contexts get an
+        // independent instance (which is the sensible behavior for
+        // partial DI setups — they don't have consumers to keep in
+        // sync in the first place).
+
+        $session = new CapturingHordeSession(new SessionId('bc-no-access'), []);
+        $lifecycle = $this->build([], $session);
+
+        try {
+            $lifecycle->regenerate();
+        } catch (Throwable $e) {
+            self::fail(
+                'regenerate() must not throw when SessionAccess is not '
+                . 'bound: ' . $e->getMessage(),
+            );
+        }
+
+        self::assertTrue($session->reEncryptAllCalled);
+    }
+
+    // ---------------------------------------------------------------
+    // Coordinator-path invariants: this is where the horde/Core#190
+    // fix actually differs from the pre-fix behavior. Pre-fix, the
+    // coordinator's refill() mutated the pre-regen HordeSession in
+    // place — captured references saw the id-and-salt drift but the
+    // *object identity* was preserved, and reads through those
+    // captured refs got the (mutated) post-regen state anyway.
+    //
+    // Under the fix, regenerate() mints a *fresh* HordeSession value
+    // (immutable SessionId semantics: a rotated session is a
+    // different session), and only the SessionAccess slot's pointer
+    // update reaches consumers. A captured HordeSession reference
+    // stays frozen on the pre-regen instance; a captured SessionAccess
+    // reference resolves to the fresh one on every read.
+    //
+    // These tests pin that observable difference.
+    // ---------------------------------------------------------------
+
+    /**
+     * Build a lifecycle with a real {@see SessionEncryptionCoordinator}
+     * (backed by a recording SessionSecret) and a real
+     * {@see HordeSessionFactory}. This drives the coordinator branch
+     * of `regenerate()` — mint a successor via `mintSuccessor()`, rekey
+     * and refill into it, publish it via the accessor.
+     *
+     * `session_regenerate_id(true)` inside regenerate() emits a
+     * warning in CLI (no live PHP session). We suppress it for the
+     * duration of the regenerate() call so failOnWarning doesn't
+     * trip; the observable invariants (accessor points at fresh
+     * instance, old ref unchanged) are independent of whether the
+     * id-rotation call itself succeeded.
+     */
+    private function runCoordinatorRegenerate(
+        SessionLifecycle $lifecycle,
+    ): void {
+        set_error_handler(static fn() => true, E_WARNING);
+        try {
+            $lifecycle->regenerate();
+        } finally {
+            restore_error_handler();
+        }
+    }
+
+    #[Test]
+    public function testCoordinatorRegenerateMintsFreshHordeSessionAndPublishesIt(): void
+    {
+        // Core invariant of the fix: the coordinator path produces a
+        // NEW HordeSession value under regenerate() and publishes it
+        // to the accessor. A captured SessionAccess reference reads
+        // through to the new instance on its next call.
+        //
+        // This is the test that distinguishes fixed-vs-broken code
+        // for horde/Core#190. Before the fix, coordinator->refill()
+        // mutated the pre-regen instance in place; after the fix,
+        // mintSuccessor() constructs a new one. If publishSession()
+        // stops updating the accessor, this test fails.
+
+        $accessor = new SessionAccessor();
+        $secret = new RecordingSessionSecret();
+        $coordinator = new \Horde\Core\Session\SessionEncryptionCoordinator($secret);
+
+        $pre = new HordeSession(new SessionId('coord-pre'), []);
+
+        $injector = new Injector(new TopLevel());
+        $injector->setInstance(HordeSession::class, $pre);
+        $injector->setInstance(SessionAccess::class, $accessor);
+        $injector->setInstance(
+            \Horde\Core\Session\HordeSessionFactory::class,
+            new \Horde\Core\Session\HordeSessionFactory(),
+        );
+        $accessor->replaceWith($pre);
+
+        $handler = new SessionHandler(new BuiltinBackend());
+        $config = (new SessionConfigFactory())->fromState(new State([]));
+
+        $lifecycle = new SessionLifecycle(
+            $injector,
+            $handler,
+            $config,
+            $secret,
+            $coordinator,
+            $accessor,
+        );
+
+        // Capture the accessor as if we were LoginService.
+        $capturedAccess = $accessor;
+
+        $this->runCoordinatorRegenerate($lifecycle);
+
+        // The successor must be a distinct HordeSession instance.
+        // This is the observable difference between the pre-fix
+        // (in-place mutation) and post-fix (mint successor) shapes.
+        $post = $capturedAccess->current();
+        self::assertNotSame(
+            $pre,
+            $post,
+            'coordinator regenerate must mint a fresh HordeSession value',
+        );
+        self::assertInstanceOf(HordeSession::class, $post);
+    }
+
+    #[Test]
+    public function testCoordinatorRegenerateBindsSecretToSuccessorSession(): void
+    {
+        // The rekey() step must point the SessionSecret at the fresh
+        // successor before setKey() writes the new salt. Otherwise
+        // the salt lands on the pre-regen session (whose ciphertext
+        // slots we're not going to refill) and the successor reads
+        // its salt from an empty slot.
+        //
+        // Verifies the rekey() half of the drain/rekey/refillInto
+        // primitives split from the old refill().
+
+        $accessor = new SessionAccessor();
+        $secret = new RecordingSessionSecret();
+        $coordinator = new \Horde\Core\Session\SessionEncryptionCoordinator($secret);
+
+        $pre = new HordeSession(new SessionId('coord-secret-bind'), []);
+
+        $injector = new Injector(new TopLevel());
+        $injector->setInstance(HordeSession::class, $pre);
+        $injector->setInstance(SessionAccess::class, $accessor);
+        $injector->setInstance(
+            \Horde\Core\Session\HordeSessionFactory::class,
+            new \Horde\Core\Session\HordeSessionFactory(),
+        );
+        $accessor->replaceWith($pre);
+
+        $lifecycle = new SessionLifecycle(
+            $injector,
+            new SessionHandler(new BuiltinBackend()),
+            (new SessionConfigFactory())->fromState(new State([])),
+            $secret,
+            $coordinator,
+            $accessor,
+        );
+
+        $this->runCoordinatorRegenerate($lifecycle);
+
+        // The secret's setSession() must have been called with the
+        // successor, not the predecessor. RecordingSessionSecret
+        // remembers the last one.
+        self::assertNotNull(
+            $secret->wiredSession,
+            'coordinator regenerate must wire the secret to a session',
+        );
+        self::assertNotSame(
+            $pre,
+            $secret->wiredSession,
+            'secret must be bound to the successor, not the pre-regen session',
+        );
+    }
+
+    #[Test]
+    public function testCoordinatorRegenerateCallsSecretSetKeyOnce(): void
+    {
+        // The refill()'s "setKey once per rotation" contract survives
+        // the split into rekey() + refillInto().
+
+        $accessor = new SessionAccessor();
+        $secret = new RecordingSessionSecret();
+        $coordinator = new \Horde\Core\Session\SessionEncryptionCoordinator($secret);
+
+        $pre = new HordeSession(new SessionId('coord-setkey'), []);
+
+        $injector = new Injector(new TopLevel());
+        $injector->setInstance(HordeSession::class, $pre);
+        $injector->setInstance(SessionAccess::class, $accessor);
+        $injector->setInstance(
+            \Horde\Core\Session\HordeSessionFactory::class,
+            new \Horde\Core\Session\HordeSessionFactory(),
+        );
+        $accessor->replaceWith($pre);
+
+        $lifecycle = new SessionLifecycle(
+            $injector,
+            new SessionHandler(new BuiltinBackend()),
+            (new SessionConfigFactory())->fromState(new State([])),
+            $secret,
+            $coordinator,
+            $accessor,
+        );
+
+        $this->runCoordinatorRegenerate($lifecycle);
+
+        self::assertTrue(
+            $secret->setKeyCalled,
+            'rekey must call secret->setKey() once per regenerate',
+        );
+    }
+
+    #[Test]
+    public function testCoordinatorRegenerateCarriesPlaintextDataForward(): void
+    {
+        // A scoped value written before regenerate() must be readable
+        // via the accessor after regenerate(). mintSuccessor() feeds
+        // the old session's toPayload() into HordeSessionFactory::restore(),
+        // so scoped-slot data survives the transition. The failure
+        // mode this guards against: mintSuccessor() constructing an
+        // empty-payload successor and silently dropping every user
+        // preference and cache slot.
+
+        $accessor = new SessionAccessor();
+        $secret = new RecordingSessionSecret();
+        $coordinator = new \Horde\Core\Session\SessionEncryptionCoordinator($secret);
+
+        $pre = new HordeSession(new SessionId('coord-plain-forward'), []);
+        $pre->setScoped('imp', 'ui_layout', ['sidebar' => 'left']);
+
+        $injector = new Injector(new TopLevel());
+        $injector->setInstance(HordeSession::class, $pre);
+        $injector->setInstance(SessionAccess::class, $accessor);
+        $injector->setInstance(
+            \Horde\Core\Session\HordeSessionFactory::class,
+            new \Horde\Core\Session\HordeSessionFactory(),
+        );
+        $accessor->replaceWith($pre);
+
+        $lifecycle = new SessionLifecycle(
+            $injector,
+            new SessionHandler(new BuiltinBackend()),
+            (new SessionConfigFactory())->fromState(new State([])),
+            $secret,
+            $coordinator,
+            $accessor,
+        );
+
+        $this->runCoordinatorRegenerate($lifecycle);
+
+        self::assertSame(
+            ['sidebar' => 'left'],
+            $accessor->getScoped('imp', 'ui_layout'),
+            'scoped values written pre-regenerate must be readable '
+            . 'via the accessor after regenerate',
+        );
     }
 }
 

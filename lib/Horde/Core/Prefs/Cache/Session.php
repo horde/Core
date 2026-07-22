@@ -13,13 +13,17 @@
  */
 
 use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 
 /**
- * Cache storage implementation using HordeSession.
+ * Cache storage implementation using {@see HordeSession} through a
+ * request-scoped {@see SessionAccess} slot.
  *
- * Reads go through the modern PSR-4 {@see HordeSession}. Writes invalidate
- * the cached scope instead of replacing it, so the next request reloads the
- * scope from storage. This avoids a write-ordering race against
+ * Reads go through the modern PSR-4 {@see HordeSession} via
+ * {@see SessionAccess} so post-regenerate values reach us on the next
+ * call (horde/Core#190). Writes invalidate the cached scope instead of
+ * replacing it, so the next request reloads the scope from storage.
+ * This avoids a write-ordering race against
  * {@see Horde\Core\Session\SessionLifecycle::shutdown()}, which mirrors
  * {@see HordeSession} back into `$_SESSION` at request shutdown: a
  * `store()` that ran after the mirror would never reach the persisted
@@ -84,11 +88,13 @@ class Horde_Core_Prefs_Cache_Session extends Horde_Prefs_Cache_Base
     }
 
     /**
-     * Resolve the modern session lazily from the global injector. The cache
-     * driver has no constructor of its own, so DI happens at call time.
+     * Resolve the modern session-access slot lazily from the global
+     * injector. The cache driver has no constructor of its own, so DI
+     * happens at call time. Each call resolves fresh through the
+     * accessor's passthrough, so post-regenerate values are visible.
      */
-    private function _session(): HordeSession
+    private function _session(): SessionAccess
     {
-        return $GLOBALS['injector']->getInstance(HordeSession::class);
+        return $GLOBALS['injector']->getInstance(SessionAccess::class);
     }
 }

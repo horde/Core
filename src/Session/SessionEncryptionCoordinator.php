@@ -82,22 +82,67 @@ final class SessionEncryptionCoordinator
     }
 
     /**
-     * Rotate the secret service's key material and re-encrypt the
-     * plaintexts returned by a prior {@see drain()} call.
+     * Rotate the secret service's key material AND re-encrypt the
+     * plaintexts returned by a prior {@see drain()} call — combined
+     * form, mutates `$session` in place.
      *
-     * The call to {@see SessionSecret::setKey()} updates the secret
-     * service's key state. Under HKDF this means writing a fresh
-     * salt to the session payload; under the legacy pre-HKDF code
-     * this minted a new random key. Either way the secret service
-     * is now configured to derive/return a key different from the
-     * one drain() used.
+     * @deprecated since 3.2.2 — the combined form mutates the same
+     *             HordeSession that drain() read from, which cannot
+     *             carry an id rotation (SessionId is immutable). Split
+     *             the call: {@see rekey()} on the successor HordeSession,
+     *             then {@see refillInto()} on the successor. See
+     *             horde/Core#190 and the SessionAccess design note.
+     *             The body of this method is now just a composition of
+     *             the two new primitives; existing callers see no
+     *             functional change.
      *
      * @param list<array{0: string, 1: string, 2: string}> $plainValues
      *     The list returned by drain().
      */
     public function refill(HordeSession $session, array $plainValues): void
     {
+        $this->rekey($session);
+        $this->refillInto($session, $plainValues);
+    }
+
+    /**
+     * Point the secret service at `$target` and rotate its key material.
+     *
+     * The call to {@see SessionSecret::setSession()} tells the secret
+     * service to read and write its per-session key from the target's
+     * payload instead of any other HordeSession it may have been bound
+     * to previously. Under HKDF this is where the derivation gets
+     * rebound to the new session id; the derived-key cache is
+     * invalidated as a side effect.
+     *
+     * The subsequent {@see SessionSecret::setKey()} call rotates the
+     * key state — under HKDF that means writing a fresh salt to
+     * `$target`'s `_secret/salt` slot; under legacy pre-HKDF it minted
+     * a new random key. Either way the secret service is now
+     * configured to derive/return a key different from the one
+     * {@see drain()} used.
+     *
+     * The encryptor/decryptor closures on `$target` were captured
+     * with `$secret` by reference at HordeSession construction time
+     * and resolve `getKey()` on every call, so they automatically
+     * pick up the new derivation without needing to be replaced.
+     */
+    public function rekey(HordeSession $target): void
+    {
+        $this->secret->setSession($target);
         $this->secret->setKey();
-        $session->refillEncrypted($plainValues);
+    }
+
+    /**
+     * Re-encrypt the plaintexts from a prior {@see drain()} call and
+     * store them as encrypted slots on `$target`, using the current
+     * (post-{@see rekey()}) key.
+     *
+     * @param list<array{0: string, 1: string, 2: string}> $plainValues
+     *     The list returned by drain().
+     */
+    public function refillInto(HordeSession $target, array $plainValues): void
+    {
+        $target->refillEncrypted($plainValues);
     }
 }

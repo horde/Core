@@ -17,6 +17,7 @@ use Horde\Core\Auth\CredentialStateMetadata;
 use Horde\Core\Auth\HasCredentialsState;
 use Horde\Core\Auth\InvalidationReason;
 use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccessor;
 use Horde\SessionHandler\SessionId;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -50,6 +51,20 @@ class AuthCredentialStoreTest extends TestCase
         return $session;
     }
 
+    /**
+     * Build an AuthCredentialStore against `$session` by wrapping it in
+     * a fresh {@see SessionAccessor}. Production wires the accessor as
+     * a shared request-scoped singleton; here every store gets its own
+     * accessor holding just this session, which matches what the tests
+     * actually exercise.
+     */
+    private function store(HordeSession $session): AuthCredentialStore
+    {
+        $accessor = new SessionAccessor();
+        $accessor->replaceWith($session);
+        return new AuthCredentialStore($accessor);
+    }
+
     #[Test]
     public function getReturnsFalseWhenNoBaseAppSet(): void
     {
@@ -61,7 +76,7 @@ class AuthCredentialStoreTest extends TestCase
             $encryptor,
             $decryptor,
         );
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         self::assertFalse($store->get(null));
         self::assertFalse($store->get('imp'));
@@ -71,7 +86,7 @@ class AuthCredentialStoreTest extends TestCase
     public function setAndGetForBaseApp(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $store->set(null, ['password' => 's3cret']);
 
@@ -83,7 +98,7 @@ class AuthCredentialStoreTest extends TestCase
     public function setMarksAppInitialized(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         self::assertFalse($store->isInitialized('horde'));
 
@@ -96,7 +111,7 @@ class AuthCredentialStoreTest extends TestCase
     public function setOneAppendsToExistingCredentials(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $store->set(null, ['password' => 's3cret']);
 
@@ -119,7 +134,7 @@ class AuthCredentialStoreTest extends TestCase
             $encryptor,
             $decryptor,
         );
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         self::assertFalse($store->setOne(null, 'password', 's3cret'));
     }
@@ -128,7 +143,7 @@ class AuthCredentialStoreTest extends TestCase
     public function dedupAgainstBaseAppStoresTrueForMatchingEntry(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $credentials = ['password' => 's3cret'];
         $store->set(null, $credentials);
@@ -151,7 +166,7 @@ class AuthCredentialStoreTest extends TestCase
     public function dedupAgainstBaseAppStoresEntryForDifferentValues(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $store->set(null, ['password' => 'horde-pw']);
 
@@ -172,7 +187,7 @@ class AuthCredentialStoreTest extends TestCase
     public function getFallsBackToBaseAppWhenAppSlotMissing(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $store->set(null, ['password' => 'horde-pw']);
 
@@ -185,7 +200,7 @@ class AuthCredentialStoreTest extends TestCase
     {
         // Base app set but the slot was never written for it.
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         self::assertFalse($store->get('horde'));
         self::assertFalse($store->get('imp'));
@@ -195,7 +210,7 @@ class AuthCredentialStoreTest extends TestCase
     public function clearRemovesCredentialsAndInitFlag(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $store->set(null, ['password' => 's3cret']);
         self::assertTrue($store->isInitialized('horde'));
@@ -211,7 +226,7 @@ class AuthCredentialStoreTest extends TestCase
     public function setUsesEncryptedStorageForCredentialsArray(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $store->set(null, ['password' => 'plain-text-secret']);
 
@@ -230,7 +245,7 @@ class AuthCredentialStoreTest extends TestCase
     public function initFlagWiredToScopedNotEncryptedSlot(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $store->set(null, ['password' => 's3cret']);
 
@@ -247,7 +262,7 @@ class AuthCredentialStoreTest extends TestCase
         // corrupted bytes). The declared array|false return type would be
         // violated if the store passed the string through.
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         // Poke a raw string into the credentials slot, bypassing set()'s
         // encryption path. Mirrors a corrupt-decryption outcome at read
@@ -264,7 +279,7 @@ class AuthCredentialStoreTest extends TestCase
         // base-app slot itself. Resolving it would mean recursing into the
         // same slot. Treat as missing rather than loop or surface `true`.
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $session->setScoped('horde', 'auth_app/horde', true);
 
@@ -279,7 +294,7 @@ class AuthCredentialStoreTest extends TestCase
     public function getStateDefaultsToNeverHadWhenNoSlot(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         // No state slot has been written; the implicit default is NeverHad.
         self::assertSame(HasCredentialsState::NeverHad, $store->getState('imp'));
@@ -289,7 +304,7 @@ class AuthCredentialStoreTest extends TestCase
     public function setMarksStateAsPresent(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $store->set('horde', ['password' => 'secret']);
 
@@ -300,7 +315,7 @@ class AuthCredentialStoreTest extends TestCase
     public function setCredentialsAliasMarksStateAsPresent(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $store->setCredentials('horde', ['password' => 'secret']);
 
@@ -312,7 +327,7 @@ class AuthCredentialStoreTest extends TestCase
     public function markInvalidatedFlipsStateAndDropsCredentials(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $store->set('imp', ['password' => 'secret']);
         $store->markInvalidated('imp', InvalidationReason::BackendRejected);
@@ -326,7 +341,7 @@ class AuthCredentialStoreTest extends TestCase
     public function markInvalidatedRecordsReasonAndDetail(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $store->set('imp', ['password' => 'secret']);
         $store->markInvalidated('imp', InvalidationReason::PasswordChanged, 'changed via passwd/');
@@ -343,7 +358,7 @@ class AuthCredentialStoreTest extends TestCase
     public function markInvalidatedIsIdempotent(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $store->set('imp', ['password' => 'secret']);
         $store->markInvalidated('imp', InvalidationReason::BackendRejected);
@@ -359,7 +374,7 @@ class AuthCredentialStoreTest extends TestCase
     public function markNeverHadFlipsStateWithoutReason(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $store->markNeverHad('imp');
 
@@ -374,7 +389,7 @@ class AuthCredentialStoreTest extends TestCase
     public function clearRemovesStateSlots(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $store->set('imp', ['password' => 'secret']);
         $store->markInvalidated('imp', InvalidationReason::BackendRejected, 'rejected');
@@ -390,7 +405,7 @@ class AuthCredentialStoreTest extends TestCase
     public function getStateMetadataReturnsNullWhenNoSlot(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         // No state has been recorded for this app; metadata is null even
         // though getState() returns NeverHad as the safe default.
@@ -402,7 +417,7 @@ class AuthCredentialStoreTest extends TestCase
     public function getOrExplainReturnsCredentialsWhenPresent(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $store->set('horde', ['password' => 'secret']);
         $result = $store->getOrExplain('horde');
@@ -417,7 +432,7 @@ class AuthCredentialStoreTest extends TestCase
     public function getOrExplainReturnsInvalidatedReasonWhenInvalidated(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $store->set('imp', ['password' => 'secret']);
         $store->markInvalidated('imp', InvalidationReason::BackendRejected, 'imap rejected');
@@ -434,7 +449,7 @@ class AuthCredentialStoreTest extends TestCase
     public function getOrExplainReturnsNeverHadByDefault(): void
     {
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $result = $store->getOrExplain('kronolith');
 
@@ -449,7 +464,7 @@ class AuthCredentialStoreTest extends TestCase
         // After a backend rejects credentials and the user re-enters them,
         // a fresh set() should clear the Invalidated state and reason.
         $session = $this->sessionWithBaseApp('horde');
-        $store = new AuthCredentialStore($session);
+        $store = $this->store($session);
 
         $store->set('imp', ['password' => 'old']);
         $store->markInvalidated('imp', InvalidationReason::BackendRejected, 'wrong password');

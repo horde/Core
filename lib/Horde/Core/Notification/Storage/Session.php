@@ -13,13 +13,16 @@
  */
 
 use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 
 /**
  * A class that stores notifications in the session.
  *
- * Reads and writes go through the modern PSR-4 {@see HordeSession}. The wire
- * format diverges from values written through legacy `Horde_Session::set()`
- * with TYPE_ARRAY/TYPE_OBJECT masks, but notifications are display-only
+ * Reads and writes go through the modern PSR-4 {@see HordeSession} via
+ * a request-scoped {@see SessionAccess} slot, so post-regenerate values
+ * are visible on the next call (horde/Core#190). The wire format diverges
+ * from values written through legacy `Horde_Session::set()` with
+ * TYPE_ARRAY/TYPE_OBJECT masks, but notifications are display-only
  * transient state: stale entries from the prior shim format are simply
  * treated as missing on the first read after deploy.
  *
@@ -38,9 +41,9 @@ use Horde\Core\Session\HordeSession;
 class Horde_Core_Notification_Storage_Session implements Horde_Notification_Storage_Interface
 {
     /**
-     * The modern session.
+     * The request-scoped session access slot.
      */
-    protected HordeSession $_session;
+    protected SessionAccess $_session;
 
     /**
      * Cached notifications if session is not active.
@@ -50,14 +53,15 @@ class Horde_Core_Notification_Storage_Session implements Horde_Notification_Stor
     protected $_cached = [];
 
     /**
-     * @param HordeSession|null $session  Modern session to read/write through.
-     *                                    If omitted, resolved from the global
-     *                                    injector for BC.
+     * @param SessionAccess|null $session  Modern session-access slot to
+     *                                     read/write through. If omitted,
+     *                                     resolved from the global injector
+     *                                     for BC.
      */
-    public function __construct(?HordeSession $session = null)
+    public function __construct(?SessionAccess $session = null)
     {
         $this->_session = $session
-            ?? $GLOBALS['injector']->getInstance(HordeSession::class);
+            ?? $GLOBALS['injector']->getInstance(SessionAccess::class);
     }
 
     /**

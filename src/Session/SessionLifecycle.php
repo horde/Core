@@ -135,6 +135,16 @@ class SessionLifecycle implements Horde_Shutdown_Task
      *                                        lifecycle falls back to the
      *                                        inline reEncryptAll +
      *                                        secret->setKey path.
+     * @param SessionAccessor|null  $accessor Optional. Request-scoped slot
+     *                                        holding the currently-canonical
+     *                                        HordeSession value. When null
+     *                                        (legacy / test contexts), the
+     *                                        lifecycle resolves it through
+     *                                        the injector lazily on first
+     *                                        use. Consumer services inject
+     *                                        {@see SessionAccess} to reach
+     *                                        this same slot. See
+     *                                        horde/Core#190.
      */
     public function __construct(
         private readonly Injector $injector,
@@ -142,6 +152,7 @@ class SessionLifecycle implements Horde_Shutdown_Task
         private readonly SessionConfig $config,
         private readonly ?SessionSecret $secret = null,
         private readonly ?SessionEncryptionCoordinator $coordinator = null,
+        private ?SessionAccessor $accessor = null,
     ) {}
 
     /**
@@ -344,44 +355,51 @@ class SessionLifecycle implements Horde_Shutdown_Task
      *
      * Used by paths that detect {@see regenerationDue()} and want to
      * proactively rotate without going through clean()/destroy().
+     *
+     * Value-object semantics: the id-rotated session is a distinct
+     * HordeSession value (SessionId is immutable). regenerate() drains
+     * encrypted plaintext from the pre-rotation session, rotates the
+     * PHP session id, mints a successor HordeSession with the new id
+     * and old plaintext data carried forward, points the encryption
+     * layer at the successor, and refills the encrypted slots on the
+     * successor under the new key. The freshly-minted value is then
+     * published via {@see publishSession()} so consumers reading
+     * through {@see SessionAccess} pick it up on their next call.
      */
     public function regenerate(): void
     {
-        $session = $this->getSession();
+        $old = $this->getSession();
 
         if ($this->coordinator !== null) {
             // Modern path: drain under the OLD key (the encryption
             // closures captured by HordeSession resolve getKey()
             // against the current salt + session_id), rotate the
-            // session id, then refill (which calls secret->setKey()
-            // — writes a fresh salt — and re-encrypts each slot
-            // under the new derivation).
-            //
-            // The drain-rotate-refill split (rather than the inline
-            // reEncryptAll closure used in the fallback below) is
-            // necessary because the modern PSR-15 middleware path
-            // uses the same coordinator and rotates the row via
-            // SessionHandler::regenerate() rather than
-            // session_regenerate_id(true). Both stacks converge on
-            // identical encryption ceremony.
-            $plain = $this->coordinator->drain($session);
+            // session id, then mint a successor value and refill
+            // encrypted slots on it under the new derivation.
+            $plain = $this->coordinator->drain($old);
             session_regenerate_id(true);
-            $this->coordinator->refill($session, $plain);
+            $new = $this->mintSuccessor($old);
+            $this->coordinator->rekey($new);
+            $this->coordinator->refillInto($new, $plain);
+            $this->publishSession($new);
         } else {
             // Fallback for test / legacy contexts without a wired
-            // coordinator. Uses HordeSession::reEncryptAll's inline
-            // closure shape; semantically equivalent to the
-            // coordinator path, just less decoupled.
-            $session->reEncryptAll(function (): void {
+            // coordinator. reEncryptAll mutates the same object in
+            // place — matches the pre-value-object behavior. Publish
+            // the (mutated-in-place) instance so callers holding a
+            // stale reference via the accessor pick up its state.
+            $old->reEncryptAll(function (): void {
                 session_regenerate_id(true);
                 $this->secret?->setKey();
             });
+            $this->publishSession($old);
+            $new = $old;
         }
 
         // The deadline is canonical on HordeSession at the top level.
         // The shim's addFinal() shutdown task mirrors HordeSession to
         // $_SESSION for legacy code that reads the superglobal directly.
-        $session->setRegenerationDeadline(
+        $new->setRegenerationDeadline(
             $this->config->nextRegenerationDeadline(),
         );
 
@@ -391,7 +409,51 @@ class SessionLifecycle implements Horde_Shutdown_Task
 
         // Synchronous executor: clear pending intent so a downstream
         // processFlags() call sees a coherent no-op.
-        $session->clearLifecycleFlags();
+        $new->clearLifecycleFlags();
+    }
+
+    /**
+     * Build the successor {@see HordeSession} for a regenerate().
+     *
+     * Composes:
+     * - A fresh {@see SessionId} read from PHP's `session_id()` after
+     *   `session_regenerate_id(true)` has rotated it.
+     * - The old session's toPayload() — carries scoped values,
+     *   timestamps, encrypted-slot map, and the ciphertexts of the
+     *   encrypted slots (which are stale under the new key but will
+     *   be overwritten by {@see SessionEncryptionCoordinator::refillInto()}).
+     *
+     * Uses the same encryptor/decryptor closures as the predecessor.
+     * Both are captured on HordeSessionFactory at container-build time
+     * and reference the same `$secret` service by reference; that means
+     * a {@see SessionEncryptionCoordinator::rekey()} call afterwards
+     * takes effect on the successor's next encrypt/decrypt invocation
+     * without needing to hand new closures around.
+     *
+     * Delegates to {@see HordeSessionFactory::restore()} because that
+     * path constructs a HordeSession from an explicit payload rather
+     * than reading `$_SESSION`, which is stale relative to the drained
+     * payload we want to pass in.
+     */
+    private function mintSuccessor(HordeSession $old): HordeSession
+    {
+        $factory = $this->injector->getInstance(HordeSessionFactory::class);
+        $successor = $factory->restore(
+            new SessionId((string) (session_id() ?: 'none')),
+            $old->toPayload(),
+        );
+        // HordeSessionFactory::restore() returns Session (parent type).
+        // In this codepath the factory is always the Horde-app
+        // HordeSessionFactory whose restore() actually returns a
+        // HordeSession, but assert the type for the type checker.
+        if (!$successor instanceof HordeSession) {
+            throw new \RuntimeException(
+                'HordeSessionFactory::restore() returned '
+                . get_debug_type($successor)
+                . '; expected HordeSession.',
+            );
+        }
+        return $successor;
     }
 
     /**
@@ -492,14 +554,72 @@ class SessionLifecycle implements Horde_Shutdown_Task
     }
 
     /**
-     * Resolve the current {@see HordeSession} from the injector.
+     * Resolve the {@see SessionAccessor} for this lifecycle.
      *
-     * Lazily looked up on every call because {@see clean()} and
-     * {@see destroy()} replace the injector singleton with a fresh
-     * instance.
+     * If a {@see SessionAccessor} was passed to the constructor, use it;
+     * otherwise resolve one through the injector on first use. The
+     * accessor is the request-scoped slot the lifecycle publishes fresh
+     * HordeSession values to on start/clean/destroy/regenerate;
+     * consumers reading through {@see SessionAccess} see whichever value
+     * lives in that slot at call time.
+     *
+     * Lazily resolved so tests and bootstrap-time contexts that build
+     * a SessionLifecycle without wiring the accessor still work — the
+     * legacy-shape 5-argument constructor call in
+     * {@see SessionLifecycleFactory::create()} continues to work
+     * unchanged.
+     */
+    private function accessor(): SessionAccessor
+    {
+        if ($this->accessor === null) {
+            $resolved = null;
+            try {
+                $resolved = $this->injector->getInstance(SessionAccess::class);
+            } catch (\Throwable) {
+                // No SessionAccess binding — legacy test contexts and
+                // partial DI setups build a SessionLifecycle without
+                // wiring the accessor. Fall through to the private
+                // instance below; consumers going through SessionAccess
+                // in those contexts get an independent accessor and
+                // won't stay in sync with the lifecycle, which is fine
+                // for the narrow test cases where nobody is reading
+                // SessionAccess in the first place.
+            }
+            if (!$resolved instanceof SessionAccessor) {
+                // Interface binding may resolve to a different
+                // implementation, or resolution failed entirely.
+                // Publish-based lifecycle management is only possible
+                // against the concrete SessionAccessor. Fall back to
+                // constructing one; it will not be shared with anyone
+                // else. In test contexts that don't wire SessionAccess
+                // this is exactly right; in production this signals a
+                // broken bootstrap but the fallback keeps the request
+                // running.
+                $resolved = new SessionAccessor();
+            }
+            $this->accessor = $resolved;
+        }
+        return $this->accessor;
+    }
+
+    /**
+     * Resolve the current {@see HordeSession} through the accessor.
+     *
+     * Retained as a private helper for the sake of readability inside
+     * this class; a small enough number of internal call sites that
+     * inlining would just add clutter.
+     *
+     * If the accessor holds no session yet (before start() or after
+     * destroy()), falls back to resolving through the injector. This
+     * matches the pre-accessor behavior for the narrow set of call
+     * paths that read the session outside of an established lifecycle
+     * — the shutdown task's isDestroyed() check being the notable one.
      */
     private function getSession(): HordeSession
     {
+        if ($this->accessor()->hasCurrent()) {
+            return $this->accessor()->current();
+        }
         return $this->injector->getInstance(HordeSession::class);
     }
 
@@ -512,9 +632,14 @@ class SessionLifecycle implements Horde_Shutdown_Task
      * instance no longer reflects the data the rest of the request will
      * see.
      *
-     * Sets the freshly-built instance as the injector singleton so callers
-     * resolving HordeSession via getInstance see the same object the
-     * lifecycle synchronises with.
+     * Publishes the freshly-built instance to two places:
+     * 1. The {@see SessionAccessor}, so consumers reading through
+     *    {@see SessionAccess} pick up the new value on their next call
+     *    (see horde/Core#190).
+     * 2. The `HordeSession::class` injector binding — retained in
+     *    parallel because dozens of transient callers still do
+     *    `$injector->getInstance(HordeSession::class)->…` inline and
+     *    expect the current value there too.
      *
      * The instance is also published on `$GLOBALS['injector']` when that
      * is a different scope. `SessionLifecycle` is resolved through a
@@ -530,6 +655,22 @@ class SessionLifecycle implements Horde_Shutdown_Task
     private function rebuildHordeSession(): void
     {
         $fresh = $this->injector->createInstance(HordeSession::class);
+        $this->publishSession($fresh);
+    }
+
+    /**
+     * Publish `$fresh` as the current session across every place that
+     * cares: the accessor (canonical for SessionAccess consumers), the
+     * local injector's HordeSession binding, and — if we're inside a
+     * child injector — the global injector's binding too.
+     *
+     * The three publications are kept together so start(), clean(),
+     * destroy(), and regenerate() cannot drift on which places they
+     * update.
+     */
+    private function publishSession(HordeSession $fresh): void
+    {
+        $this->accessor()->replaceWith($fresh);
         $this->injector->setInstance(HordeSession::class, $fresh);
         if (isset($GLOBALS['injector'])
             && $GLOBALS['injector'] !== $this->injector) {

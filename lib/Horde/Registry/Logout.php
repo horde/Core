@@ -12,7 +12,7 @@
  * @package   Core
  */
 
-use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 
 /**
  * Manage the logout tasks registered with Horde_Registry.
@@ -99,10 +99,12 @@ class Horde_Registry_Logout
     }
 
     /**
-     * Resolve the modern session lazily from the global injector.
+     * Resolve the modern session-access slot lazily from the global
+     * injector. Every call resolves fresh, so post-regenerate values
+     * are visible on the next read.
      */
-    private function _session(): HordeSession
+    private function _session(): SessionAccess
     {
-        return $GLOBALS['injector']->getInstance(HordeSession::class);
+        return $GLOBALS['injector']->getInstance(SessionAccess::class);
     }
 }

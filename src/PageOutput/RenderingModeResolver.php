@@ -17,14 +17,14 @@ declare(strict_types=1);
 namespace Horde\Core\PageOutput;
 
 use Horde\Browser\Browser;
-use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 use Horde\Injector\Attribute\Factory;
 
 #[Factory(factory: RenderingModeResolverFactory::class, method: 'create')]
 class RenderingModeResolver
 {
     public function __construct(
-        private readonly HordeSession $session,
+        private readonly SessionAccess $session,
         private readonly Browser $browser,
     ) {}
 

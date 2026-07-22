@@ -7,7 +7,7 @@ namespace Horde\Core\Test\Unit\PageOutput;
 use Horde\Browser\Browser;
 use Horde\Core\PageOutput\RenderingMode;
 use Horde\Core\PageOutput\RenderingModeResolver;
-use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -20,9 +20,9 @@ class RenderingModeResolverTest extends TestCase
      * for the unused dependency. The resolver never reads it on the path
      * under test, so a pure type-hint stub is the right shape.
      */
-    private function unusedSessionStub(): HordeSession
+    private function unusedSessionStub(): SessionAccess
     {
-        return $this->createStub(HordeSession::class);
+        return $this->createStub(SessionAccess::class);
     }
 
     private function unusedBrowserStub(): Browser
@@ -33,7 +33,7 @@ class RenderingModeResolverTest extends TestCase
     #[Test]
     public function authenticatedUserWithStoredModeUsesSessionValue(): void
     {
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects(self::once())->method('getAuthId')->willReturn('testuser');
         $session->expects(self::once())->method('hasScoped')
             ->with('horde', 'rendering_mode')->willReturn(true);
@@ -47,7 +47,7 @@ class RenderingModeResolverTest extends TestCase
     #[Test]
     public function authenticatedUserWithDynamicModeStored(): void
     {
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects(self::once())->method('getAuthId')->willReturn('testuser');
         $session->expects(self::once())->method('hasScoped')
             ->with('horde', 'rendering_mode')->willReturn(true);
@@ -61,7 +61,7 @@ class RenderingModeResolverTest extends TestCase
     #[Test]
     public function authenticatedUserWithInvalidStoredModeFallsToBrowserDetection(): void
     {
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects(self::once())->method('getAuthId')->willReturn('testuser');
         $session->expects(self::once())->method('hasScoped')
             ->with('horde', 'rendering_mode')->willReturn(true);
@@ -81,7 +81,7 @@ class RenderingModeResolverTest extends TestCase
     #[Test]
     public function authenticatedUserWithNoStoredModeFallsToBrowserDetection(): void
     {
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects(self::once())->method('getAuthId')->willReturn('testuser');
         $session->expects(self::once())->method('hasScoped')
             ->with('horde', 'rendering_mode')->willReturn(false);
@@ -100,7 +100,7 @@ class RenderingModeResolverTest extends TestCase
     #[Test]
     public function anonymousUserOnMobileBrowserGetsResponsive(): void
     {
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects(self::once())->method('getAuthId')->willReturn(null);
         $session->expects(self::never())->method('hasScoped');
 
@@ -115,7 +115,7 @@ class RenderingModeResolverTest extends TestCase
     #[Test]
     public function anonymousUserOnTabletGetsResponsive(): void
     {
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects(self::once())->method('getAuthId')->willReturn(null);
 
         $browser = $this->createMock(Browser::class);
@@ -130,7 +130,7 @@ class RenderingModeResolverTest extends TestCase
     #[Test]
     public function anonymousUserOnDesktopWithAjaxGetsDynamic(): void
     {
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects(self::once())->method('getAuthId')->willReturn(null);
 
         $browser = $this->createMock(Browser::class);
@@ -146,7 +146,7 @@ class RenderingModeResolverTest extends TestCase
     #[Test]
     public function anonymousUserOnDesktopWithoutAjaxGetsBasic(): void
     {
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects(self::once())->method('getAuthId')->willReturn(null);
 
         $browser = $this->createMock(Browser::class);
@@ -162,7 +162,7 @@ class RenderingModeResolverTest extends TestCase
     #[Test]
     public function storeModeWritesToSession(): void
     {
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects(self::once())
             ->method('setScoped')
             ->with('horde', 'rendering_mode', 'responsive');
@@ -175,7 +175,7 @@ class RenderingModeResolverTest extends TestCase
     #[Test]
     public function storeModeNullRemovesFromSession(): void
     {
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects(self::once())->method('hasScoped')
             ->with('horde', 'rendering_mode')->willReturn(true);
         $session->expects(self::once())
@@ -190,7 +190,7 @@ class RenderingModeResolverTest extends TestCase
     #[Test]
     public function storeModeNullWithNoExistingValueDoesNothing(): void
     {
-        $session = $this->createMock(HordeSession::class);
+        $session = $this->createMock(SessionAccess::class);
         $session->expects(self::once())->method('hasScoped')
             ->with('horde', 'rendering_mode')->willReturn(false);
         $session->expects(self::never())->method('removeScoped');

@@ -300,6 +300,7 @@ class DefaultInjectorBindings implements InjectorBindings
             ResponseFactoryInterface::class => ResponseFactory::class,
             StreamFactoryInterface::class => StreamFactory::class,
             RouteMapperProvider::class => RegistryRouteMapperProvider::class,
+            Session\SessionAccess::class => Session\SessionAccessor::class,
         ];
 
         foreach ($factories as $key => $val) {

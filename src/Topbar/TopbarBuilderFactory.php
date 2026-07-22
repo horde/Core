@@ -18,7 +18,7 @@ namespace Horde\Core\Topbar;
 
 use Horde\Core\Service\PermissionService;
 use Horde\Core\Service\PrefsService;
-use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 use Horde_Injector;
 use Horde\Injector\Injector;
 use Horde_Registry;
@@ -39,7 +39,7 @@ class TopbarBuilderFactory
             $injector->getInstance(Horde_Registry::class),
             $injector->getInstance(PrefsService::class),
             $injector->getInstance(PermissionService::class),
-            $injector->getInstance(HordeSession::class),
+            $injector->getInstance(SessionAccess::class),
         );
     }
 }

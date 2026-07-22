@@ -13,6 +13,7 @@
  */
 
 use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 
 /**
  * Cache data in session, offloading the data to the cache storage backend
@@ -23,6 +24,9 @@ use Horde\Core\Session\HordeSession;
  * through the legacy `Horde_Session::set()` mask system, but this is a
  * cache: stale entries are simply treated as misses on the first read after
  * deploy and refilled from the cache backend.
+ *
+ * Reads and writes go through {@see SessionAccess} so post-regenerate
+ * values are visible on the next call — see horde/Core#190.
  *
  * @author    Michael Slusarz <slusarz@horde.org>
  * @author    Ralf Lang <ralf.lang@ralf-lang.de>
@@ -45,9 +49,12 @@ class Horde_Core_Cache_Session extends Horde_Cache_Storage_Base
     protected $_stored = [];
 
     /**
-     * The modern session.
+     * The request-scoped session access slot. All reads and writes
+     * resolve the current HordeSession through this on every call, so
+     * post-regenerate values are visible without the cache holding a
+     * stale value reference.
      */
-    protected HordeSession $_session;
+    protected SessionAccess $_session;
 
     /**
      * @param array $params  Configuration parameters:
@@ -56,8 +63,9 @@ class Horde_Core_Cache_Session extends Horde_Cache_Storage_Base
      *            store large entries.
      *   - maxsize: (integer) The maximum size of the data to store in the
      *              session (0 to always store in session).
-     *   - session: (HordeSession) Modern session to read/write through. If
-     *              omitted, resolved from the global injector for BC.
+     *   - session: (SessionAccess) Modern session-access slot to read/write
+     *              through. If omitted, resolved from the global injector
+     *              for BC.
      *   - storage_key: (string) The storage key to save the session data
      *                  under.
      */
@@ -68,7 +76,7 @@ class Horde_Core_Cache_Session extends Horde_Cache_Storage_Base
         }
 
         $this->_session = $params['session']
-            ?? $GLOBALS['injector']->getInstance(HordeSession::class);
+            ?? $GLOBALS['injector']->getInstance(SessionAccess::class);
         unset($params['session']);
 
         parent::__construct(array_merge(

@@ -17,7 +17,7 @@ declare(strict_types=1);
 namespace Horde\Core\PageOutput;
 
 use Horde\Browser\Browser;
-use Horde\Core\Session\HordeSession;
+use Horde\Core\Session\SessionAccess;
 use Horde\Injector\Injector;
 
 class RenderingModeResolverFactory
@@ -25,7 +25,7 @@ class RenderingModeResolverFactory
     public function create(Injector $injector): RenderingModeResolver
     {
         return new RenderingModeResolver(
-            $injector->getInstance(HordeSession::class),
+            $injector->getInstance(SessionAccess::class),
             $injector->getInstance(Browser::class),
         );
     }
