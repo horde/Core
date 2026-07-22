@@ -35,7 +35,7 @@ authors:
     active: false
     role: developer
 version:
-  release: 3.2.2
+  release: 3.2.3
   api: 3.0.0alpha1
 state:
   release: stable

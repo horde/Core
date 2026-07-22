@@ -1,4 +1,14 @@
 ---
+3.2.3:
+  api: 3.2.3
+  state:
+    release: stable
+    api: stable
+  date: 2026-07-22
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: 'fix(core): Wire HordeSession / SessionAccess into legacy Horde_Session_Null'
 3.2.2:
   api: 3.2.2
   state:
