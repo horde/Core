@@ -92,6 +92,14 @@
         this._onPointerMove = this._onPointerMove.bind(this);
         this._onPointerEnd = this._onPointerEnd.bind(this);
         this._autoScrollTick = this._autoScrollTick.bind(this);
+        this._onExternalScroll = this._onExternalScroll.bind(this);
+
+        /* touch-action: none on the source. Without this, touch
+         * browsers claim the pointer for pan/zoom after ~10 px of
+         * movement and fire pointercancel on us. Remember the
+         * caller's original value so destroy() can restore it. */
+        this._srcTouchActionSaved = this.element.style.touchAction;
+        this.element.style.touchAction = 'none';
 
         this.element.addEventListener('pointerdown', this._onPointerDown);
     }
@@ -103,6 +111,7 @@
                 this._cleanup(true);
             }
             this.element.removeEventListener('pointerdown', this._onPointerDown);
+            this.element.style.touchAction = this._srcTouchActionSaved;
         },
 
         _onPointerDown: function (e) {
@@ -219,8 +228,26 @@
             if (this.opts.scroll) {
                 this._scrollContainer = resolveElement(this.opts.scroll);
             }
+            /* Replay Drag:move whenever an external scroll (mouse
+             * wheel, trackpad, kinetic touch, JS-driven) changes
+             * either the drag's scroll container or the window.
+             * The primitive already replays after its own auto-scroll
+             * nudges; this handles the same class of state change
+             * from any other source uniformly. Consumers that read
+             * container.scrollTop or getBoundingClientRect() in
+             * their move handler stay coherent. */
+            if (this._scrollContainer) {
+                this._scrollContainer.addEventListener('scroll', this._onExternalScroll);
+            }
+            window.addEventListener('scroll', this._onExternalScroll, true);
 
             this._dispatch('Drag:start', this.element, this._detail(e));
+        },
+
+        _onExternalScroll: function () {
+            if (this._active && this._lastMoveEvent) {
+                this._onPointerMove(this._lastMoveEvent);
+            }
         },
 
         _createGhost: function (srcRect) {
@@ -325,6 +352,11 @@
                 window.cancelAnimationFrame(this._rafId);
                 this._rafId = null;
             }
+            /* pointerup and pointercancel implicitly release capture
+             * per the Pointer Events spec, so releasePointerCapture()
+             * is only needed on paths that do not go through those
+             * events. destroy() is the only such path — the caller
+             * asked us to tear down mid-drag. */
             if (forceReleaseCapture && this._pointerId !== null) {
                 try {
                     this.element.releasePointerCapture(this._pointerId);
@@ -333,6 +365,10 @@
             this.element.removeEventListener('pointermove', this._onPointerMove);
             this.element.removeEventListener('pointerup', this._onPointerEnd);
             this.element.removeEventListener('pointercancel', this._onPointerEnd);
+            if (this._scrollContainer) {
+                this._scrollContainer.removeEventListener('scroll', this._onExternalScroll);
+            }
+            window.removeEventListener('scroll', this._onExternalScroll, true);
 
             document.body.style.userSelect = '';
 
