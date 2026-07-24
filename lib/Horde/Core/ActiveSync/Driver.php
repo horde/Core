@@ -15,6 +15,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * Provides the communication between horde data and ActiveSync server.
  *
  * @author  Michael J. Rubinsky <mrubinsk@horde.org>
+ * @author  Torben Dannhauer <torben@dannhauer.de>
  * @package Core
  */
 class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
@@ -1263,6 +1264,37 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     }
 
     /**
+     * Prefetch the IMAP status of the given mail folders in a single server
+     * round trip where possible (LIST-STATUS), for consumption by the
+     * subsequent per-collection change polling.
+     *
+     * Failures are non-fatal: the poll falls back to per-mailbox STATUS.
+     *
+     * @author Torben Dannhauer <torben@dannhauer.de>
+     *
+     * @param array $folders  An array of email backend folder ids.
+     */
+    public function prefetchFolderStatus(array $folders)
+    {
+        if (empty($this->_imap)) {
+            return;
+        }
+        $folders = array_values(array_diff(array_unique($folders), ['OUTBOX']));
+        if (count($folders) < 2) {
+            return;
+        }
+        try {
+            $this->_imap->prefetchStatus($folders);
+        } catch (Horde_Exception $e) {
+            // Non-fatal: ping() falls back to per-mailbox STATUS.
+            $this->_logger->notice(sprintf(
+                'Status prefetch failed, continuing with per-mailbox STATUS: %s',
+                $e->getMessage()
+            ));
+        }
+    }
+
+    /**
      * Get a list of server changes that occured during the specified time
      * period.
      *
@@ -1912,67 +1944,8 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     throw new Horde_Exception_NotFound();
                 }
                 $msg = array_pop($messages);
-
-                // Check for verb status from the Maillog.
-                if ($this->_version >= Horde_ActiveSync::VERSION_FOURTEEN) {
-                    $last = null;
-                    if (!empty($msg->messageid)) {
-                        $last = $this->_getLastVerb($msg->messageid);
-                    }
-                    if (!empty($last)) {
-                        switch ($last['action']) {
-                            case 'reply':
-                            case 'reply_list':
-                                $msg->lastverbexecuted = Horde_ActiveSync_Message_Mail::VERB_REPLY_SENDER;
-                                break;
-                            case 'reply_all':
-                                $msg->lastverbexecuted = Horde_ActiveSync_Message_Mail::VERB_REPLY_ALL;
-                                break;
-                            case 'forward':
-                                $msg->lastverbexecuted = Horde_ActiveSync_Message_Mail::VERB_FORWARD;
-                        }
-                        $msg->lastverbexecutiontime = new Horde_Date($last['ts']);
-                    } else {
-                        // No maillog found, double check the IMAP flags.
-                        // We favor the Maillog since EAS allows for a complete log
-                        // of actions - and it requires a timestamp.
-                        if ($msg->answered) {
-                            $msg->lastverbexecuted = Horde_ActiveSync_Message_Mail::VERB_REPLY_SENDER;
-                            $msg->lastverbexecutiontime = new Horde_Date(time());
-                        } elseif ($msg->forwarded) {
-                            $msg->lastverbexecuted = Horde_ActiveSync_Message_Mail::VERB_FORWARD;
-                            $msg->lastverbexecutiontime = new Horde_Date(time());
-                        }
-                    }
-                }
-
-                // Is this from the draft folder?
-                if ($this->_version >= Horde_ActiveSync::VERSION_SIXTEEN
-                    && !empty($collection['type'])
-                    && $collection['type'] == Horde_ActiveSync::FOLDER_TYPE_DRAFTS) {
-                    $msg->isdraft = true;
-                }
-
+                $this->_postProcessMailMessage($msg, $folderid, $collection);
                 $this->_endBuffer();
-
-                // Should we import an iTip response if we have one and we are in
-                // the INBOX?
-                if ($folderid == 'INBOX'
-                    && $this->_version >= Horde_ActiveSync::VERSION_TWELVE
-                    && $msg->contentclass == 'urn:content-classes:calendarmessage') {
-
-                    switch ($msg->messageclass) {
-                        case 'IPM.Schedule.Meeting.Resp.Pos':
-                        case 'IPM.Schedule.Meeting.Resp.Neg':
-                        case 'IPM.Schedule.Meeting.Resp.Tent':
-                            $addr = new Horde_Mail_Rfc822_Address($msg->from);
-                            $rq = $msg->meetingrequest;
-                            $this->_connector->calendar_import_attendee(
-                                $rq->getvEvent(),
-                                $addr->bare_address
-                            );
-                    }
-                }
                 return $msg;
 
             default:
@@ -1986,6 +1959,145 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         $this->_endBuffer();
 
         return $message;
+    }
+
+    /**
+     * Obtain multiple email messages in a single IMAP fetch operation.
+     *
+     * Optimization used by the SYNC exporter: the returned array is keyed
+     * by message uid and may omit ids that could not be fetched (e.g.
+     * expunged messages); callers fall back to getMessage() for those,
+     * preserving the per-message error semantics. Non-email folders are
+     * not supported and return an empty array.
+     *
+     * @author Torben Dannhauer <torben@dannhauer.de>
+     *
+     * @param string $folderid   The server's folder id the messages are in.
+     * @param array $ids         The IMAP message uids.
+     * @param array $collection  The collection data.
+     *
+     * @return array  Horde_ActiveSync_Message_Mail objects keyed by uid.
+     */
+    public function getMessagesBulk($folderid, array $ids, array $collection)
+    {
+        $folder_split = $this->_parseFolderId($folderid);
+        $folder_class = is_array($folder_split)
+            ? $folder_split[self::FOLDER_PART_CLASS]
+            : $folder_split;
+        if ($folder_class != Horde_ActiveSync::CLASS_EMAIL || empty($this->_imap)) {
+            return [];
+        }
+
+        $this->_logger->meta(
+            sprintf(
+                'Horde_Core_ActiveSync_Driver::getMessagesBulk(%s, [%d ids])',
+                $folderid,
+                count($ids)
+            )
+        );
+
+        ob_start();
+        try {
+            $messages = $this->_imap->getMessages(
+                $folderid,
+                $ids,
+                [
+                    'protocolversion' => $this->_version,
+                    'truncation' => $collection['truncation'] ?? $collection['mimetruncation'] ?? false,
+                    'bodyprefs'  => $collection['bodyprefs'] ?? [],
+                    'bodypartprefs' => $collection['bodypartprefs'] ?? false,
+                    'mimesupport' => $collection['mimesupport'] ?? 0,
+                    'uid_keys' => true,
+                ]
+            );
+            foreach ($messages as $msg) {
+                $this->_postProcessMailMessage($msg, $folderid, $collection);
+            }
+        } catch (Horde_Exception $e) {
+            // Bulk fetch is an optimization only; the caller retries each
+            // id individually via getMessage().
+            $this->_logger->notice(
+                sprintf(
+                    'Bulk message fetch for %s failed: %s',
+                    $folderid,
+                    $e->getMessage()
+                )
+            );
+            $messages = [];
+        }
+        $this->_endBuffer();
+
+        return $messages;
+    }
+
+    /**
+     * Apply post-fetch processing to an email message: last-verb lookup
+     * from the maillog, draft flagging, and iTip response import.
+     *
+     * @param Horde_ActiveSync_Message_Mail $msg  The message object.
+     * @param string $folderid                    The backend folder id.
+     * @param array $collection                   The collection data.
+     */
+    protected function _postProcessMailMessage($msg, $folderid, array $collection)
+    {
+        // Check for verb status from the Maillog.
+        if ($this->_version >= Horde_ActiveSync::VERSION_FOURTEEN) {
+            $last = null;
+            if (!empty($msg->messageid)) {
+                $last = $this->_getLastVerb($msg->messageid);
+            }
+            if (!empty($last)) {
+                switch ($last['action']) {
+                    case 'reply':
+                    case 'reply_list':
+                        $msg->lastverbexecuted = Horde_ActiveSync_Message_Mail::VERB_REPLY_SENDER;
+                        break;
+                    case 'reply_all':
+                        $msg->lastverbexecuted = Horde_ActiveSync_Message_Mail::VERB_REPLY_ALL;
+                        break;
+                    case 'forward':
+                        $msg->lastverbexecuted = Horde_ActiveSync_Message_Mail::VERB_FORWARD;
+                }
+                $msg->lastverbexecutiontime = new Horde_Date($last['ts']);
+            } else {
+                // No maillog found, double check the IMAP flags.
+                // We favor the Maillog since EAS allows for a complete log
+                // of actions - and it requires a timestamp.
+                if ($msg->answered) {
+                    $msg->lastverbexecuted = Horde_ActiveSync_Message_Mail::VERB_REPLY_SENDER;
+                    $msg->lastverbexecutiontime = new Horde_Date(time());
+                } elseif ($msg->forwarded) {
+                    $msg->lastverbexecuted = Horde_ActiveSync_Message_Mail::VERB_FORWARD;
+                    $msg->lastverbexecutiontime = new Horde_Date(time());
+                }
+            }
+        }
+
+        // Is this from the draft folder?
+        if ($this->_version >= Horde_ActiveSync::VERSION_SIXTEEN
+            && !empty($collection['type'])
+            && $collection['type'] == Horde_ActiveSync::FOLDER_TYPE_DRAFTS) {
+            $msg->isdraft = true;
+        }
+
+        // Should we import an iTip response if we have one and we are in
+        // the INBOX?
+        if ($folderid == 'INBOX'
+            && $this->_version >= Horde_ActiveSync::VERSION_TWELVE
+            && $msg->contentclass == 'urn:content-classes:calendarmessage') {
+
+            switch ($msg->messageclass) {
+                case 'IPM.Schedule.Meeting.Resp.Pos':
+                case 'IPM.Schedule.Meeting.Resp.Neg':
+                case 'IPM.Schedule.Meeting.Resp.Tent':
+                    $addr = new Horde_Mail_Rfc822_Address($msg->from);
+                    $rq = $msg->meetingrequest;
+                    $this->_connector->calendar_import_attendee(
+                        $rq->getvEvent(),
+                        $addr->bare_address
+                    );
+            }
+        }
     }
 
     /**
