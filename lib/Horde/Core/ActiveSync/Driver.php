@@ -2248,7 +2248,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      * @param string $folderid      The folder id
      * @param array $ids            The message ids to delete
      * @param boolean $instanceids  If true, $ids is a hash of
-     *                              instanceids => uids. @since 2.23.0
+     *                              uids => instanceids. @since 2.23.0
      *
      * @return array  An array of succesfully deleted messages (currently
      *                only guarenteed for email messages).
@@ -2277,22 +2277,26 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
 
         switch ($class) {
             case Horde_ActiveSync::CLASS_CALENDAR:
+                // Keep $ids as an array for the catch-path foreach below.
+                // Callers pass [uid => instanceid] when $instanceids is true
+                // (see Horde_ActiveSync_Connector_Importer).
                 if ($instanceids) {
                     $instanceid = reset($ids);
-                    $ids = key($ids);
+                    $deleteIds = key($ids);
                 } else {
                     $instanceid = false;
+                    $deleteIds = $ids;
                 }
                 try {
                     $this->_logger->meta(
                         sprintf(
                             'calendar_delete: %s %s %s',
-                            print_r($ids, true),
+                            print_r($deleteIds, true),
                             $folder_id,
                             $instanceid
                         )
                     );
-                    $this->_connector->calendar_delete($ids, $folder_id, $instanceid);
+                    $this->_connector->calendar_delete($deleteIds, $folder_id, $instanceid);
                 } catch (Horde_Exception $e) {
                     // Since we don't get back successfully deleted ids and we can
                     // can pass an array of ids to delete, we need to see what ids
@@ -2301,7 +2305,8 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     // deleted ids.
                     $this->_logger->err($e->getMessage());
                     $success = [];
-                    foreach ($ids as $uid) {
+                    $checkIds = is_array($deleteIds) ? $deleteIds : [$deleteIds];
+                    foreach ($checkIds as $uid) {
                         if ($mod_time = $this->_connector->calendar_getActionTimestamp($uid, 'delete', $folder_id)) {
                             $success[] = $uid;
                         }
