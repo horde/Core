@@ -1,4 +1,14 @@
 ---
+3.3.0:
+  api: 3.3.0
+  state:
+    release: stable
+    api: stable
+  date: 2026-07-24
+  license:
+    identifier: LGPL-2.1-only
+    uri: https://spdx.org/licenses/LGPL-2.1-only.html
+  notes: "feat(core): implement ActiveSync status prefetch and bulk message fetch\nfix(core): omit TCP defaults for Unix-socket SQL config\nfix(js): touch-action:none, external-scroll replay, capture-release comment\nfeat(core): pointerdrag.js pointer-events based drag toolkit"
 3.2.3:
   api: 3.2.3
   state:

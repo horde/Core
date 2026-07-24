@@ -37,7 +37,7 @@
         "config",
         "errorhandler"
     ],
-    "time": "2026-07-22",
+    "time": "2026-07-24",
     "repositories": [],
     "require": {
         "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || ^3 || ^2",
@@ -94,7 +94,7 @@
         "ext-session": "*"
     },
     "require-dev": {
-        "horde/activesync": "^3 || dev-FRAMEWORK_6_0",
+        "horde/activesync": "^3.2 || dev-FRAMEWORK_6_0",
         "horde/form": "^3 || dev-FRAMEWORK_6_0",
         "horde/ldap": "^3 || dev-FRAMEWORK_6_0",
         "horde/mongo": "^2 || dev-FRAMEWORK_6_0",
@@ -103,6 +103,7 @@
         "horde/vfs": "^3 || dev-FRAMEWORK_6_0"
     },
     "suggest": {
+        "horde/activesync": "^3.2 || dev-FRAMEWORK_6_0",
         "pear/text_captcha": "*",
         "pear/text_figlet": "*",
         "ext-dom": "*",

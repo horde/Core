@@ -35,7 +35,7 @@ authors:
     active: false
     role: developer
 version:
-  release: 3.2.3
+  release: 3.3.0
   api: 3.0.0alpha1
 state:
   release: stable
@@ -100,6 +100,7 @@ dependencies:
       session: '*'
   optional:
     composer:
+      horde/activesync: ^3.2
       pear/text_captcha: '*'
       pear/text_figlet: '*'
     ext:
@@ -109,7 +110,7 @@ dependencies:
       sockets: '*'
   dev:
     composer:
-      horde/activesync: ^3
+      horde/activesync: ^3.2
       horde/form: ^3
       horde/ldap: ^3
       horde/mongo: ^2
