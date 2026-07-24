@@ -2291,7 +2291,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     $this->_logger->meta(
                         sprintf(
                             'calendar_delete: %s %s %s',
-                            print_r($deleteIds, true),
+                            is_array($deleteIds) ? implode(',', $deleteIds) : $deleteIds,
                             $folder_id,
                             $instanceid
                         )
