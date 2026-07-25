@@ -2,7 +2,7 @@
 # Copyright 2010-2017 Horde LLC (http://www.horde.org/)
 # This file is distributed under the same license as the Horde_Core module.
 # Martin Matuška <martin@matuska.org>, 2011
-# Jozef Sudolský <jozef.sudolsky@elbia.sk>, 2013
+# Jozef Sudolský <jozef.sudolsky@elbia.sk>, 2013-2026
 #
 msgid ""
 msgstr ""
@@ -255,7 +255,7 @@ msgstr ""
 
 #: lib/Horde/PageOutput.php:690
 msgid "Clear All"
-msgstr ""
+msgstr "Vymazať Všetko"
 
 #: lib/Horde/Core/Ajax/Imple/InPlaceEditor.php:58
 msgid "Click to add caption..."
@@ -329,7 +329,7 @@ msgstr "Oddelenie"
 
 #: lib/Horde/Core/Alarm/Handler/Desktop.php:102
 msgid "Desktop notification (with certain browsers)"
-msgstr ""
+msgstr "Upozornenia na pracovnej ploche (v podporovaných prehliadačoch)"
 
 #: lib/Horde/ErrorHandler.php:231
 msgid "Details"
@@ -359,7 +359,7 @@ msgstr "Domáca adresa"
 
 #: lib/Horde/Core/ActiveSync/Driver.php:3499
 msgid "Drafts"
-msgstr ""
+msgstr "Koncepty"
 
 #: lib/Horde/Core/Block/Layout.php:115 lib/Horde/Core/Block/Layout.php:117
 msgid "Edit"
@@ -417,7 +417,7 @@ msgstr "Február"
 
 #: lib/Horde/PageOutput.php:613
 msgid "Filter items..."
-msgstr ""
+msgstr "Filtrovať položky..."
 
 #: lib/Horde/Core/Ui/VarRenderer/Html.php:296
 msgid "Fix ratio"
@@ -687,7 +687,7 @@ msgstr "Mimo pracovisko"
 
 #: lib/Horde/Core/ActiveSync/Driver.php:3504
 msgid "Outbox"
-msgstr ""
+msgstr "Na odoslanie"
 
 #: lib/Horde/Core/Mime/Viewer/Vcard.php:234
 #: lib/Horde/Core/Mime/Viewer/Vcard.php:298
@@ -890,7 +890,7 @@ msgstr "Št"
 
 #: lib/Horde/PageOutput.php:686
 msgid "The alarm was dismissed."
-msgstr ""
+msgstr "Alarm bol zrušený."
 
 #: lib/Horde/PageOutput.php:675
 msgid "The connection to the server has been restored."
@@ -898,7 +898,7 @@ msgstr "Spojenie so serverom bolo opätovne nadviazané."
 
 #: lib/Horde/Core/Prefs/Ui.php:1001
 msgid "The e-mail field cannot be empty."
-msgstr ""
+msgstr "Pole e-mail nemôže byť prázdne.“"
 
 #: lib/Horde/Core/Prefs/Identity.php:146
 #, php-format
@@ -1138,7 +1138,7 @@ msgstr "Možete odložiť o %s alebo viac %s nepripomínať %s"
 msgid ""
 "You do not have an email address configured in your Personal Information "
 "Preferences."
-msgstr ""
+msgstr "V nastaveniach osobných údajov nemáte nakonfigurovanú žiadnu e-mailovú adresu."
 
 #: lib/Horde/Core/Prefs/Identity.php:64
 #, php-format
@@ -1228,7 +1228,7 @@ msgstr "hh"
 #: lib/Horde/ErrorHandler.php:249
 #, php-format
 msgid "in %s:%d"
-msgstr ""
+msgstr "v %s:%d"
 
 #: lib/Horde/PageOutput.php:614
 msgid "loading"
