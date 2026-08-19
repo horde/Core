@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Horde\Core\Test\Unit\Uri;
 
 use Horde\Core\Config\RegistryState;
+use Horde\Core\Config\State;
 use Horde\Core\Uri\RouteMapperProvider;
 use Horde\Core\Uri\UriBuilder;
 use Horde\Core\Uri\UriBuilderInterface;
@@ -577,5 +578,167 @@ class UriBuilderTest extends TestCase
             (string) $result
         );
         self::assertInstanceOf(UriBuilder::class, $result);
+    }
+
+    // --- Config-driven authority for path-only registry values (base#150) ---
+
+    private function requestFor(string $scheme, string $authority): ServerRequestInterface
+    {
+        $requestUri = $this->createMock(UriInterface::class);
+        $requestUri->expects($this->atLeastOnce())->method('getScheme')->willReturn($scheme);
+        $requestUri->expects($this->atLeastOnce())->method('getAuthority')->willReturn($authority);
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->expects($this->atLeastOnce())->method('getUri')->willReturn($requestUri);
+
+        return $request;
+    }
+
+    #[Test]
+    public function sslAlwaysForcesHttpsAndStripsStandardPortBehindProxy(): void
+    {
+        // Proxy terminates SSL; backend request arrives as http on port 80.
+        $request = $this->requestFor('http', 'mailhost.example.com:80');
+        $config = new State([
+            'use_ssl' => 1,
+            'server' => ['name' => 'mailhost.example.com', 'port' => 443],
+        ]);
+
+        $builder = new UriBuilder($this->registry, $this->routeProvider, $request, '', $config);
+        $result = $builder->withAppWebroot('horde')->withPart('admin/config/config.php');
+
+        self::assertSame(
+            'https://mailhost.example.com/horde/admin/config/config.php',
+            (string) $result
+        );
+        self::assertNull($result->getPort());
+    }
+
+    #[Test]
+    public function sslNeverForcesHttpAndStripsStandardPort(): void
+    {
+        $request = $this->requestFor('https', 'mailhost.example.com:443');
+        $config = new State([
+            'use_ssl' => 0,
+            'server' => ['name' => 'mailhost.example.com', 'port' => 80],
+        ]);
+
+        $builder = new UriBuilder($this->registry, $this->routeProvider, $request, '', $config);
+        $result = $builder->withAppWebroot('horde');
+
+        self::assertSame('http', $result->getScheme());
+        self::assertNull($result->getPort());
+        self::assertSame('http://mailhost.example.com/horde', (string) $result);
+    }
+
+    #[Test]
+    public function sslAutoLetsRequestDecideScheme(): void
+    {
+        $request = $this->requestFor('https', 'front.example.com');
+        $config = new State([
+            'use_ssl' => 2,
+            'server' => ['name' => 'front.example.com', 'port' => 443],
+        ]);
+
+        $builder = new UriBuilder($this->registry, $this->routeProvider, $request, '', $config);
+        $result = $builder->withAppWebroot('horde');
+
+        self::assertSame('https', $result->getScheme());
+        self::assertSame('https://front.example.com/horde', (string) $result);
+    }
+
+    #[Test]
+    public function sslAutoKeepsPlainRequestScheme(): void
+    {
+        $request = $this->requestFor('http', 'front.example.com');
+        $config = new State([
+            'use_ssl' => 2,
+            'server' => ['name' => 'front.example.com'],
+        ]);
+
+        $builder = new UriBuilder($this->registry, $this->routeProvider, $request, '', $config);
+        $result = $builder->withAppWebroot('horde');
+
+        self::assertSame('http', $result->getScheme());
+        self::assertSame('http://front.example.com/horde', (string) $result);
+    }
+
+    #[Test]
+    public function nonStandardConfiguredPortIsRetained(): void
+    {
+        $request = $this->requestFor('http', 'mailhost.example.com:80');
+        $config = new State([
+            'use_ssl' => 1,
+            'server' => ['name' => 'mailhost.example.com', 'port' => 8443],
+        ]);
+
+        $builder = new UriBuilder($this->registry, $this->routeProvider, $request, '', $config);
+        $result = $builder->withAppWebroot('horde');
+
+        self::assertSame(8443, $result->getPort());
+        self::assertSame('https://mailhost.example.com:8443/horde', (string) $result);
+    }
+
+    #[Test]
+    public function configuredServerNameOverridesRequestHost(): void
+    {
+        $request = $this->requestFor('https', 'internal-node1:443');
+        $config = new State([
+            'use_ssl' => 1,
+            'server' => ['name' => 'mail.example.com', 'port' => 443],
+        ]);
+
+        $builder = new UriBuilder($this->registry, $this->routeProvider, $request, '', $config);
+        $result = $builder->withAppWebroot('horde');
+
+        self::assertSame('mail.example.com', $result->getHost());
+    }
+
+    #[Test]
+    public function absoluteRegistryUrlWinsOverConfig(): void
+    {
+        $registry = new RegistryState([
+            'horde' => ['webroot' => 'https://assets.example.com:8443/horde'],
+        ]);
+        $request = $this->requestFor('http', 'mailhost.example.com:80');
+        $config = new State([
+            'use_ssl' => 0,
+            'server' => ['name' => 'mailhost.example.com', 'port' => 80],
+        ]);
+
+        $builder = new UriBuilder($registry, $this->routeProvider, $request, '', $config);
+        $result = $builder->withAppWebroot('horde');
+
+        self::assertSame('https', $result->getScheme());
+        self::assertSame('assets.example.com', $result->getHost());
+        self::assertSame(8443, $result->getPort());
+        self::assertSame('https://assets.example.com:8443/horde', (string) $result);
+    }
+
+    #[Test]
+    public function withoutConfigStateBehaviourIsUnchanged(): void
+    {
+        // No config state: reflect the request verbatim, including :80.
+        $request = $this->requestFor('http', 'mailhost.example.com:80');
+
+        $builder = new UriBuilder($this->registry, $this->routeProvider, $request);
+        $result = $builder->withAppWebroot('horde');
+
+        self::assertSame('http', $result->getScheme());
+        self::assertSame(80, $result->getPort());
+        self::assertSame('http://mailhost.example.com:80/horde', (string) $result);
+    }
+
+    #[Test]
+    public function configWithoutServerNameKeepsRequestHost(): void
+    {
+        $request = $this->requestFor('http', 'mailhost.example.com:80');
+        $config = new State(['use_ssl' => 1]);
+
+        $builder = new UriBuilder($this->registry, $this->routeProvider, $request, '', $config);
+        $result = $builder->withAppWebroot('horde');
+
+        self::assertSame('https', $result->getScheme());
+        self::assertSame('mailhost.example.com', $result->getHost());
+        self::assertNull($result->getPort());
     }
 }

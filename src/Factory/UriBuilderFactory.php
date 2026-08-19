@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Factory;
 
+use Horde\Core\Config\ConfigLoader;
 use Horde\Core\Config\RegistryConfigLoader;
 use Horde\Core\Uri\RouteMapperProvider;
 use Horde\Core\Uri\UriBuilder;
@@ -39,6 +40,17 @@ class UriBuilderFactory
         } catch (Throwable) {
         }
 
-        return new UriBuilder($registryState, $routeProvider, $request);
+        $configState = null;
+        try {
+            $configState = $injector->getInstance(ConfigLoader::class)->load('horde');
+        } catch (Throwable) {
+        }
+
+        return new UriBuilder(
+            $registryState,
+            $routeProvider,
+            request: $request,
+            configState: $configState,
+        );
     }
 }

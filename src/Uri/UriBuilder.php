@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Uri;
 
+use Horde\Core\Config\State;
 use Horde\Core\Config\RegistryState;
 use Horde\Http\Uri;
 use Horde\Url\Psr7Bridge;
@@ -25,14 +26,25 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class UriBuilder extends Uri implements UriBuilderInterface
 {
+    /**
+     * $conf['use_ssl'] modes, mirroring Horde\Core\Horde::SSL_*.
+     */
+    private const SSL_NEVER = 0;
+    private const SSL_ALWAYS = 1;
+    private const SSL_AUTO = 2;
+
+    private const STANDARD_PORTS = ['http' => 80, 'https' => 443];
+
     private RegistryState $registryState;
     private RouteMapperProvider $routeProvider;
+    private ?State $configState;
 
     public function __construct(
         RegistryState $registryState,
         RouteMapperProvider $routeProvider,
         ?ServerRequestInterface $request = null,
         string $uri = '',
+        ?State $configState = null,
     ) {
         if ($request !== null && $uri === '') {
             $requestUri = $request->getUri();
@@ -50,6 +62,7 @@ class UriBuilder extends Uri implements UriBuilderInterface
         parent::__construct($uri);
         $this->registryState = $registryState;
         $this->routeProvider = $routeProvider;
+        $this->configState = $configState;
     }
 
     // PSR-7 with* overrides — narrow return type from self to static
@@ -210,7 +223,7 @@ class UriBuilder extends Uri implements UriBuilderInterface
     private function applyBase(string $base): static
     {
         if (preg_match('#^[a-z][a-z0-9+.\-]*://#i', $base) !== 1) {
-            return $this->withPath($base);
+            return $this->applyConfiguredAuthority()->withPath($base);
         }
 
         $parsed = new Uri($base);
@@ -227,6 +240,75 @@ class UriBuilder extends Uri implements UriBuilderInterface
         }
 
         return $clone->withPath($parsed->getPath());
+    }
+
+    /**
+     * Reconcile scheme/host/port against conf.php for a path-only base.
+     *
+     * When a registry value is path-only (no fully qualified base URL), the
+     * absolute components come from conf.php, mirroring legacy Horde::url():
+     *
+     *   - `use_ssl = SSL_ALWAYS` forces https; `SSL_NEVER` forces http;
+     *     `SSL_AUTO` (and any other value) leaves the request-derived scheme
+     *     alone so the request has the last word.
+     *   - `server.name` supplies the host in every mode when set.
+     *   - `server.port` supplies the port, but a port that is standard for the
+     *     resolved scheme (80/443) is dropped so it never renders.
+     *
+     * Without an injected config state the builder keeps its prior behaviour
+     * and reflects only the incoming request.
+     */
+    private function applyConfiguredAuthority(): static
+    {
+        if ($this->configState === null) {
+            return $this;
+        }
+
+        $clone = $this;
+
+        $useSsl = (int) ($this->configState->get('use_ssl', self::SSL_NEVER) ?? self::SSL_NEVER);
+        $schemeForced = false;
+        if ($useSsl === self::SSL_ALWAYS) {
+            $clone = $clone->withScheme('https');
+            $schemeForced = true;
+        } elseif ($useSsl === self::SSL_NEVER) {
+            $clone = $clone->withScheme('http');
+            $schemeForced = true;
+        }
+
+        $serverName = (string) ($this->configState->get('server.name', '') ?? '');
+        if ($serverName !== '') {
+            $clone = $clone->withHost($serverName);
+        }
+
+        $serverPort = $this->configState->get('server.port');
+        if ($serverPort !== null && $serverPort !== '') {
+            $clone = $clone->withPort((int) $serverPort);
+        } elseif ($schemeForced) {
+            // The request-inherited port belonged to the request scheme, which
+            // config has just overridden; without a configured port it is
+            // meaningless for the forced scheme, so drop it.
+            $clone = $clone->withPort(null);
+        }
+
+        return $clone->stripStandardPort();
+    }
+
+    /**
+     * Drop the port when it is the standard port for the current scheme.
+     */
+    private function stripStandardPort(): static
+    {
+        $port = $this->getPort();
+        if ($port === null) {
+            return $this;
+        }
+        $scheme = $this->getScheme();
+        if (isset(self::STANDARD_PORTS[$scheme]) && self::STANDARD_PORTS[$scheme] === $port) {
+            return $this->withPort(null);
+        }
+
+        return $this;
     }
 
     private static function normalizePath(string $path): string
