@@ -714,6 +714,8 @@ class Horde_PageOutput
 
         $view->stylesheetOpts['sub'] = Horde_Themes::viewDir($this->_view);
 
+        $this->_addThemeScripts();
+
         if ($this->ajax || $this->growler) {
             $this->addScriptFile(new Horde_Script_File_JsFramework('hordecore.js', 'horde'));
 
@@ -830,6 +832,39 @@ class Horde_PageOutput
         if (Horde::contentSent()) {
             echo Horde::endBuffer();
             flush();
+        }
+    }
+
+    /**
+     * Adds the scripts shipped by the current theme, if any.
+     *
+     * A theme declares them in its info.php:
+     *
+     *   $theme_scripts = array('theme.js');
+     *
+     * Themes already ship CSS, images and sounds; this lets them ship the
+     * behaviour that goes with their markup as well, without the installer
+     * having to wire anything up. Only plain file names inside the theme
+     * directory are accepted (see Horde_Themes_Cache::themeScripts()).
+     */
+    protected function _addThemeScripts()
+    {
+        global $injector, $prefs, $registry;
+
+        $theme = $prefs->getValue('theme');
+        if (!strlen((string) $theme)) {
+            return;
+        }
+
+        /* The cache instance may come back unserialized; themeScripts() is
+         * derived on demand (not serialized), like the covered-apps list. */
+        $cache = $injector->getInstance('Horde_Core_Factory_ThemesCache')
+            ->create($registry->getApp(), $theme);
+
+        foreach ($cache->themeScripts() as $script) {
+            $this->addScriptFile(
+                new Horde_Script_File_ThemeDir($script, $theme, 'horde')
+            );
         }
     }
 
