@@ -82,6 +82,21 @@ class Horde_Themes_Cache implements Serializable
     protected $_covers;
 
     /**
+     * Cached list of script files the theme ships. Read from the theme's
+     * info.php.
+     *
+     * @var string[]
+     */
+    protected $_scripts;
+
+    /**
+     * Cached declarations read from the theme's info.php.
+     *
+     * @var array
+     */
+    protected $_info;
+
+    /**
      * Constructor.
      *
      * @param string $app    The application name.
@@ -249,23 +264,89 @@ class Horde_Themes_Cache implements Serializable
     protected function _coveredApps()
     {
         if (!isset($this->_covers)) {
-            $theme_covers = [];
-
-            /* Theme names originate from user prefs/options, so guard against
-             * path traversal: only include info.php for a plain directory name
-             * (no separators, no '..'). Anything else inherits everything. */
-            if (preg_match('/^[A-Za-z0-9_-]+$/', (string) $this->_theme)) {
-                global $registry;
-                $info = $registry->get('themesfs', 'horde') . '/' . $this->_theme . '/info.php';
-                if (is_readable($info)) {
-                    include $info;
-                }
-            }
-
-            $this->_covers = array_map('strtolower', (array) $theme_covers);
+            $info = $this->_themeInfo();
+            $this->_covers = array_map(
+                'strtolower',
+                (array) ($info['theme_covers'] ?? [])
+            );
         }
 
         return $this->_covers;
+    }
+
+    /**
+     * Returns the declarations made by the current theme's info.php.
+     *
+     * @return array  The variables the theme declares, keyed by name. Empty if
+     *                the theme has no info.php (or an unsafe name).
+     */
+    protected function _themeInfo()
+    {
+        if (isset($this->_info)) {
+            return $this->_info;
+        }
+
+        $theme_covers = [];
+        $theme_scripts = [];
+
+        /* Theme names originate from user prefs/options, so guard against
+         * path traversal: only include info.php for a plain directory name
+         * (no separators, no '..'). Anything else declares nothing. */
+        if (preg_match('/^[A-Za-z0-9_-]+$/', (string) $this->_theme)) {
+            global $registry;
+            $info = $registry->get('themesfs', 'horde') . '/' . $this->_theme . '/info.php';
+            if (is_readable($info)) {
+                include $info;
+            }
+        }
+
+        $this->_info = [
+            'theme_covers' => $theme_covers,
+            'theme_scripts' => $theme_scripts,
+        ];
+
+        return $this->_info;
+    }
+
+    /**
+     * Returns the javascript files the current theme ships.
+     *
+     * Themes may ship scripts alongside their CSS, images and sounds, by
+     * listing them in info.php:
+     *
+     *   $theme_scripts = array('theme.js');
+     *
+     * Only plain file names are accepted, and they are resolved inside the
+     * theme directory: a theme cannot pull in a script from an arbitrary path
+     * or an external host. Files that do not exist are skipped.
+     *
+     * Themes without the declaration ship no script, exactly as before.
+     *
+     * @return string[]  Script file names, relative to the theme directory.
+     */
+    public function themeScripts()
+    {
+        if (!isset($this->_scripts)) {
+            $info = $this->_themeInfo();
+            $base = $GLOBALS['registry']->get('themesfs', 'horde') .
+                '/' . $this->_theme . '/';
+            $this->_scripts = [];
+
+            foreach ((array) ($info['theme_scripts'] ?? []) as $script) {
+                /* Plain file names only: no directory separators, no '..'.
+                 * The theme directory is the only place a script may come
+                 * from. */
+                if (!preg_match('/^[A-Za-z0-9_.-]+\.js$/', (string) $script) ||
+                    strpos($script, '..') !== false) {
+                    continue;
+                }
+                if (is_readable($base . $script)) {
+                    $this->_scripts[] = $script;
+                }
+            }
+        }
+
+        return $this->_scripts;
     }
 
     /**
