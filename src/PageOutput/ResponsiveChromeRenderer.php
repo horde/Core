@@ -20,6 +20,7 @@ use Closure;
 use Horde\Core\Assets\CssDiscoverer;
 use Horde\Core\Assets\CssDiscoveryRequest;
 use Horde\Core\Assets\JsDiscoverer;
+use Horde\Core\Assets\JsDiscoveryRequest;
 use Horde\Injector\Attribute\Factory;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -36,6 +37,7 @@ class ResponsiveChromeRenderer implements ChromeRenderer
         private readonly CssDiscoverer $cssDiscoverer,
         private readonly JsDiscoverer $jsDiscoverer,
         Closure $topbarFactory,
+        private readonly string $theme = 'default',
     ) {
         $this->topbarFactory = $topbarFactory;
     }
@@ -94,6 +96,14 @@ class ResponsiveChromeRenderer implements ChromeRenderer
         $uri = $this->jsDiscoverer->resolve('responsive.js', $app);
         if ($uri !== null) {
             $jsUrls[] = $uri;
+        }
+
+        /* Scripts the active theme ships for itself (info.php $theme_scripts). */
+        $themeScripts = $this->jsDiscoverer->discoverTheme(
+            new JsDiscoveryRequest(app: $app, theme: $this->theme),
+        );
+        foreach ($themeScripts as $entry) {
+            $jsUrls[] = $entry->uri;
         }
 
         return $jsUrls;

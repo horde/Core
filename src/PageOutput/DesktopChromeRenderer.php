@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Horde\Core\PageOutput;
 
 use Horde\Core\Assets\JsDiscoverer;
+use Horde\Core\Assets\JsDiscoveryRequest;
 use Horde\Core\Sidebar\SidebarRenderer;
 use Horde\Core\Topbar\TopbarBuilder;
 use Horde\Core\Topbar\TopbarRenderer;
@@ -34,6 +35,7 @@ class DesktopChromeRenderer implements ChromeRenderer
         private readonly TopbarRenderer $topbarRenderer,
         private readonly SidebarRenderer $sidebarRenderer,
         private readonly JsDiscoverer $jsDiscoverer,
+        private readonly string $theme = 'default',
     ) {}
 
     public function renderPage(PageContent $content, ServerRequestInterface $request): string
@@ -51,6 +53,14 @@ class DesktopChromeRenderer implements ChromeRenderer
             if ($uri !== null) {
                 $this->assetCollector->addScript($uri);
             }
+        }
+
+        /* Scripts the active theme ships for itself (info.php $theme_scripts). */
+        $themeScripts = $this->jsDiscoverer->discoverTheme(
+            new JsDiscoveryRequest(app: $content->app, theme: $this->theme),
+        );
+        foreach ($themeScripts as $entry) {
+            $this->assetCollector->addScript($entry->uri);
         }
 
         $meta = new PageMeta(title: $content->title);

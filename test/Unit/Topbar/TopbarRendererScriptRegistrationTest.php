@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Horde\Core\Test\Unit\Topbar;
 
 use Horde\Core\Assets\JsDiscoverer;
+use Horde\Core\Assets\JsDiscoveryRequest;
+use Horde\Core\Assets\JsDiscoveryResult;
 use Horde\Core\PageOutput\AssetCollector;
 use Horde\Core\Topbar\TopbarData;
 use Horde\Core\Topbar\TopbarRenderer;
@@ -40,6 +42,11 @@ class TopbarRendererScriptRegistrationTest extends TestCase
                     $result[$f] = $this->map[$f] ?? null;
                 }
                 return $result;
+            }
+
+            public function discoverTheme(JsDiscoveryRequest $request): JsDiscoveryResult
+            {
+                return new JsDiscoveryResult([], $request->theme, $request->app);
             }
         };
     }

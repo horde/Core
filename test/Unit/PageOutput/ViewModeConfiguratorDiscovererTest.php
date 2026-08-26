@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Horde\Core\Test\Unit\PageOutput;
 
 use Horde\Core\Assets\JsDiscoverer;
+use Horde\Core\Assets\JsDiscoveryRequest;
+use Horde\Core\Assets\JsDiscoveryResult;
 use Horde\Core\PageOutput\AssetCollector;
 use Horde\Core\PageOutput\ViewMode;
 use Horde\Core\PageOutput\ViewModeConfigurator;
@@ -42,6 +44,11 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
                     $result[$f] = $this->map[$f] ?? null;
                 }
                 return $result;
+            }
+
+            public function discoverTheme(JsDiscoveryRequest $request): JsDiscoveryResult
+            {
+                return new JsDiscoveryResult([], $request->theme, $request->app);
             }
         };
     }
@@ -224,6 +231,11 @@ class ViewModeConfiguratorDiscovererTest extends TestCase
             {
                 $this->apps[] = $app;
                 return array_combine($files, array_map(fn($f) => '/js/' . $f, $files));
+            }
+
+            public function discoverTheme(JsDiscoveryRequest $request): JsDiscoveryResult
+            {
+                return new JsDiscoveryResult([], $request->theme, $request->app);
             }
         };
 

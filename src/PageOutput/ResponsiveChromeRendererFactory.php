@@ -48,6 +48,7 @@ class ResponsiveChromeRendererFactory
             $injector->get(CssDiscoverer::class),
             $injector->get(JsDiscoverer::class),
             $topbarFactory,
+            $theme,
         );
     }
 }
