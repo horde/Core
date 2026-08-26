@@ -17,6 +17,8 @@ declare(strict_types=1);
 namespace Horde\Core\PageOutput;
 
 use Horde\Core\Assets\JsDiscoverer;
+use Horde\Core\Assets\ThemeResolver;
+use Horde\Core\Session\SessionAccess;
 use Horde\Core\Sidebar\SidebarRenderer;
 use Horde\Core\Topbar\TopbarBuilder;
 use Horde\Core\Topbar\TopbarRenderer;
@@ -26,6 +28,12 @@ class DesktopChromeRendererFactory
 {
     public function create(Injector $injector): DesktopChromeRenderer
     {
+        $session = $injector->getInstance(SessionAccess::class);
+        $themeResolver = $injector->get(ThemeResolver::class);
+
+        $authUid = $session->getAuthId();
+        $theme = $authUid !== null ? $themeResolver->resolve($authUid) : 'default';
+
         return new DesktopChromeRenderer(
             $injector->getInstance(AssetCollector::class),
             $injector->getInstance(PageComposer::class),
@@ -34,6 +42,7 @@ class DesktopChromeRendererFactory
             $injector->getInstance(TopbarRenderer::class),
             $injector->getInstance(SidebarRenderer::class),
             $injector->getInstance(JsDiscoverer::class),
+            $theme,
         );
     }
 }

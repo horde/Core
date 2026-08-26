@@ -51,4 +51,11 @@ class PathBasedJsDiscoverer implements JsDiscoverer
 
         return $result;
     }
+
+    public function discoverTheme(JsDiscoveryRequest $request): JsDiscoveryResult
+    {
+        /* This discoverer has no theme knowledge; theme scripts are handled
+         * by ThemeJsDiscoverer. */
+        return new JsDiscoveryResult([], $request->theme, $request->app);
+    }
 }

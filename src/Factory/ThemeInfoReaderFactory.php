@@ -17,22 +17,18 @@ declare(strict_types=1);
 namespace Horde\Core\Factory;
 
 use Horde\Core\Assets\AssetFilesystem;
-use Horde\Core\Assets\JsDiscoverer;
+use Horde\Core\Assets\PhpThemeInfoReader;
 use Horde\Core\Assets\ThemeInfoReader;
-use Horde\Core\Assets\ThemeJsDiscoverer;
 use Horde\Core\Path\PathBuilderInterface;
-use Horde\Core\Uri\UriBuilderInterface;
 use Horde\Injector\Injector;
 
-class JsDiscovererFactory
+class ThemeInfoReaderFactory
 {
-    public function create(Injector $injector): JsDiscoverer
+    public function create(Injector $injector): ThemeInfoReader
     {
-        $pathBuilder = $injector->getInstance(PathBuilderInterface::class);
-        $uriBuilder = $injector->getInstance(UriBuilderInterface::class);
-        $filesystem = $injector->getInstance(AssetFilesystem::class);
-        $themeInfo = $injector->getInstance(ThemeInfoReader::class);
-
-        return new ThemeJsDiscoverer($pathBuilder, $uriBuilder, $filesystem, $themeInfo);
+        return new PhpThemeInfoReader(
+            $injector->getInstance(PathBuilderInterface::class),
+            $injector->getInstance(AssetFilesystem::class),
+        );
     }
 }
