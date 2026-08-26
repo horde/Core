@@ -26,4 +26,11 @@ interface JsDiscoverer
 
     /** @return array<string, ?string> Map of file => uri (null if not found) */
     public function resolveMany(array $files, string $app = 'horde'): array;
+
+    /**
+     * Resolve theme-shipped JavaScript for a request.
+     *
+     * Implementations without theme knowledge return an empty result.
+     */
+    public function discoverTheme(JsDiscoveryRequest $request): JsDiscoveryResult;
 }

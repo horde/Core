@@ -6,6 +6,7 @@ namespace Horde\Core\Test\Unit\Assets;
 
 use Horde\Core\Assets\AssetFilesystem;
 use Horde\Core\Assets\JsDiscoverer;
+use Horde\Core\Assets\JsDiscoveryRequest;
 use Horde\Core\Assets\PathBasedJsDiscoverer;
 use Horde\Core\Path\PathBuilderInterface;
 use Horde\Core\Uri\UriBuilderInterface;
@@ -110,6 +111,18 @@ class PathBasedJsDiscovererTest extends TestCase
         $result = $discoverer->resolveMany([]);
 
         self::assertSame([], $result);
+    }
+
+    #[Test]
+    public function discoverThemeIsAlwaysEmpty(): void
+    {
+        $discoverer = new PathBasedJsDiscoverer($this->pathBuilder, $this->uriBuilder, $this->filesystem);
+        $result = $discoverer->discoverTheme(new JsDiscoveryRequest(app: 'turba', theme: 'silver'));
+
+        self::assertTrue($result->isEmpty());
+        self::assertCount(0, $result);
+        self::assertSame('silver', $result->getTheme());
+        self::assertSame('turba', $result->getApp());
     }
 
     /** @param array<string, string> $appJsDirs */
