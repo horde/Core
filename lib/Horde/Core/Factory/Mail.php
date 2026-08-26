@@ -97,9 +97,21 @@ class Horde_Core_Factory_Mail extends Horde_Core_Factory_Base
 
         /* Add username/password options now, regardless of current value of
          * 'auth'. Will remove in create() if final config doesn't require
-         * authentication. Need isAuthenticated() check since we may be
-         * running from CLI with 'user_admin' registry flag, which sets
-         * the authentication name but not the credentials. */
+         * authentication. Need the isAuthenticated() check since we may be
+         * running from CLI with the 'user_admin' registry flag. That flag
+         * sets the authentication name but not the credentials.
+         *
+         * password_auth means "use the logged-in user's password for SMTP".
+         * CLI tools like horde-alarms authenticate by name only. They have
+         * no session password. So getAuthCredential('password') comes back
+         * empty. When password_auth wants that missing password, we derive
+         * neither the username nor the password and keep both master values.
+         * Pairing the auth username with the master password would mismatch
+         * the SMTP account. This keeps the fix in the mail factory. It does
+         * not fabricate a session. See the review on horde/Core#219.
+         *
+         * Problem originally reported and fixed by Torben Dannhauer
+         * <torben@dannhauer.de> in horde/Core#219. */
         if (strcasecmp($transport, 'smtp') === 0) {
             if ($registry->isAuthenticated()
                 && strlen((string) ($auth = $registry->getAuth()))) {
@@ -116,26 +128,41 @@ class Horde_Core_Factory_Mail extends Horde_Core_Factory_Base
                         }
                         // Don't set password when using XOAUTH2
                     } else {
-                        // Hook returned regular credentials
+                        // Hook returned regular credentials. Resolve the
+                        // session password once. When password_auth wants
+                        // it but the session has none, derive neither field
+                        // and keep both master values. Pairing the auth
+                        // username with the master password would mismatch
+                        // the SMTP account.
+                        $cred = $registry->getAuthCredential('password');
+                        $hasCred = strlen((string) $cred) > 0;
+
                         if (isset($smtp_creds['username'])) {
                             $params['username'] = $smtp_creds['username'];
-                        } elseif (!empty($params['username_auth'])) {
+                        } elseif (!empty($params['username_auth'])
+                            && (empty($params['password_auth']) || $hasCred)) {
                             $params['username'] = $auth;
                         }
 
                         if (isset($smtp_creds['password'])) {
                             $params['password'] = $smtp_creds['password'];
-                        } elseif (!empty($params['password_auth'])) {
-                            $params['password'] = $registry->getAuthCredential('password');
+                        } elseif (!empty($params['password_auth']) && $hasCred) {
+                            $params['password'] = $cred;
                         }
                     }
                 } catch (Horde_Exception_HookNotSet $e) {
-                    // No hook defined, use default username/password
-                    if (!empty($params['username_auth'])) {
+                    // No hook defined, use default username/password. Same
+                    // pairing rule as above: skip the auth username when
+                    // password_auth wants a session password we don't have.
+                    $cred = $registry->getAuthCredential('password');
+                    $hasCred = strlen((string) $cred) > 0;
+
+                    if (!empty($params['username_auth'])
+                        && (empty($params['password_auth']) || $hasCred)) {
                         $params['username'] = $auth;
                     }
-                    if (!empty($params['password_auth'])) {
-                        $params['password'] = $registry->getAuthCredential('password');
+                    if (!empty($params['password_auth']) && $hasCred) {
+                        $params['password'] = $cred;
                     }
                 }
             }
