@@ -43,7 +43,10 @@ class LdapGroupService implements GroupService
      * @param string $basedn Base DN for group searches
      * @param string $gidAttr Attribute for group ID (default: 'cn')
      * @param string $memberAttr Attribute for member list (default: 'memberUid')
-     * @param array $objectClass Object classes for searching (default: ['posixGroup'])
+     * @param array $search Search filter config, same shape as legacy
+     *                       Horde_Group_Ldap's 'search' param: either
+     *                       ['objectclass' => 'name'|['name',...]] or
+     *                       ['filter' => '(raw ldap filter)']
      * @param array $newGroupObjectClass Object classes for new groups (default: ['posixGroup'])
      */
     public function __construct(
@@ -51,7 +54,7 @@ class LdapGroupService implements GroupService
         private string $basedn,
         private string $gidAttr = 'cn',
         private string $memberAttr = 'memberUid',
-        private array $objectClass = ['posixGroup'],
+        private array $search = ['objectclass' => ['posixGroup']],
         private array $newGroupObjectClass = ['posixGroup']
     ) {}
 
@@ -125,12 +128,17 @@ class LdapGroupService implements GroupService
             $ldap = $this->ldapService->getAdapter();
             $dn = $this->buildDN($id);
 
-            $entry = $ldap->getEntry($dn, [
-                'attributes' => [$this->gidAttr, $this->memberAttr, 'mail', 'description'],
-            ]);
+            $entry = $ldap->getEntry($dn, [$this->gidAttr, $this->memberAttr, 'mail', 'description']);
 
-            $members = $entry->getValue($this->memberAttr);
-            $mail = $entry->getValue('mail', 'single');
+            // Horde_Ldap_Entry::getValue() throws when an attribute is
+            // genuinely absent from the entry (not just empty) - mail and
+            // group membership are both optional on a given LDAP entry.
+            // Legacy Horde_Group_Ldap guards every read with exists() for
+            // the same reason.
+            $members = $entry->exists($this->memberAttr)
+                ? $entry->getValue($this->memberAttr, 'all')
+                : [];
+            $mail = $entry->exists('mail') ? $entry->getValue('mail', 'single') : null;
 
             $extra = [];
             if ($mail) {
@@ -377,16 +385,7 @@ class LdapGroupService implements GroupService
      */
     private function buildFilter(): Horde_Ldap_Filter
     {
-        if (count($this->objectClass) === 1) {
-            return Horde_Ldap_Filter::create('objectClass', 'equals', $this->objectClass[0]);
-        }
-
-        $filters = [];
-        foreach ($this->objectClass as $oc) {
-            $filters[] = Horde_Ldap_Filter::create('objectClass', 'equals', $oc);
-        }
-
-        return Horde_Ldap_Filter::combine('or', $filters);
+        return Horde_Ldap_Filter::build($this->search);
     }
 
     /**
@@ -409,7 +408,7 @@ class LdapGroupService implements GroupService
     {
         try {
             $ldap = $this->ldapService->getAdapter();
-            $filter = Horde_Ldap_Filter::create('objectClass', 'equals', 'posixGroup');
+            $filter = $this->buildFilter();
 
             $search = $ldap->search($this->basedn, $filter, [
                 'attributes' => ['gidNumber'],

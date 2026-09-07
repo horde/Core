@@ -17,7 +17,6 @@ declare(strict_types=1);
 namespace Horde\Core\Factory;
 
 use Horde\Core\Service\LdapGroupService;
-use Horde\Core\Service\HordeLdapService;
 use Horde\Core\Config\ConfigLoader;
 use Horde\Injector\Injector;
 use RuntimeException;
@@ -44,11 +43,14 @@ class LdapGroupServiceFactory
         $loader = $injector->getInstance(ConfigLoader::class);
         $config = $loader->load('horde');
 
-        // Get LDAP service (may use service-specific connection)
-        $ldapService = $injector->getInstance(HordeLdapService::class);
+        // Resolve the LDAP connection for the 'groups' service specifically:
+        // falls back to the default 'ldap' config if 'ldap.service.groups'
+        // isn't set (see HordeLdapServiceFactory::resolveConfig()).
+        $ldapFactory = $injector->getInstance(HordeLdapServiceFactory::class);
+        $ldapService = $ldapFactory->create($injector, 'horde:groups');
 
-        // Get group configuration
-        $params = $config->get('groups.params', []);
+        // Get group configuration (legacy conf.php key is singular: 'group', not 'groups')
+        $params = $config->get('group.params', []);
 
         if (empty($params['basedn'])) {
             throw new RuntimeException('LDAP groups require basedn configuration');
@@ -59,7 +61,7 @@ class LdapGroupServiceFactory
             basedn: $params['basedn'],
             gidAttr: $params['gid'] ?? 'cn',
             memberAttr: $params['memberuid'] ?? 'memberUid',
-            objectClass: $params['objectclass'] ?? ['posixGroup'],
+            search: $params['search'] ?? ['objectclass' => ['posixGroup']],
             newGroupObjectClass: $params['newgroup_objectclass'] ?? ['posixGroup']
         );
     }
