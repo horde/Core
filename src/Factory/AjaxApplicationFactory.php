@@ -84,11 +84,21 @@ class AjaxApplicationFactory
             return $psr4;
         }
 
-        $legacy = $app . '_Ajax_Application';
+        $legacy = ucfirst($app) . '_Ajax_Application';
         if (class_exists($legacy)) {
             return $legacy;
+        }
+
+        // Fallback for apps whose legacy (PSR-0) class prefix is all-uppercase
+        // (e.g. IMP -> IMP_Ajax_Application) rather than the Ucfirst form. The
+        // composer classmap lookup is case-sensitive, so the variant above
+        // misses these; try the ALLCAPS prefix before giving up.
+        $legacyUpper = mb_strtoupper($app) . '_Ajax_Application';
+        if (class_exists($legacyUpper)) {
+            return $legacyUpper;
         }
 
         return null;
     }
 }
+

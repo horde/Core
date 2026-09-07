@@ -46,7 +46,17 @@ class Horde_Core_Factory_Ajax extends Horde_Core_Factory_Base
         if (class_exists($class)) {
             return new $class($app, $vars, $action, $token);
         }
-        $class = $app . '_Ajax_Application';
+        $class = ucfirst($app) . '_Ajax_Application';
+
+        if (class_exists($class)) {
+            return new $class($app, $vars, $action, $token);
+        }
+
+        // Fallback for apps whose legacy class prefix is all-uppercase
+        // (e.g. IMP -> IMP_Ajax_Application) rather than the Ucfirst form.
+        // The composer classmap lookup is case-sensitive, so the variants
+        // above miss these; try the ALLCAPS prefix before giving up.
+        $class = mb_strtoupper($app) . '_Ajax_Application';
 
         if (class_exists($class)) {
             return new $class($app, $vars, $action, $token);
