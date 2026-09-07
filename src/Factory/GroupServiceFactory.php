@@ -63,10 +63,11 @@ class GroupServiceFactory
 
         return match ($driver) {
             'sql' => $this->createSqlBackend($injector, $params),
+            'ldap' => $injector->getInstance(LdapGroupServiceFactory::class)->create($injector),
             default => throw new RuntimeException(
                 "Unsupported group driver: {$driver}. "
-                . "Modern GroupService currently supports 'sql' only. "
-                . "LDAP, File, and other legacy drivers are not yet ported."
+                . "Modern GroupService currently supports 'sql' and 'ldap'. "
+                . "File and other legacy drivers are not yet ported."
             ),
         };
     }
