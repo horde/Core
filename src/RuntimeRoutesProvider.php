@@ -152,27 +152,35 @@ class RuntimeRoutesProvider extends GroupMapper implements RoutesProvider
 
             $webrootName = $appPascal . 'Home';
             if (!isset($existingNames[$webrootName])) {
-                $this->buildRoute(uri: $webrootPath, name: $webrootName)->add();
+                $this->buildRoute(uri: $webrootPath, name: $webrootName)
+                    ->withDefaults(['app' => $app])
+                    ->add();
             }
 
             if (isset($config['jsuri'])) {
                 $jsName = $appPascal . 'Js';
                 if (!isset($existingNames[$jsName])) {
-                    $this->buildRoute(uri: $config['jsuri'], name: $jsName)->add();
+                    $this->buildRoute(uri: $config['jsuri'], name: $jsName)
+                        ->withDefaults(['app' => $app])
+                        ->add();
                 }
             }
 
             if (isset($config['themesuri'])) {
                 $themesName = $appPascal . 'Themes';
                 if (!isset($existingNames[$themesName])) {
-                    $this->buildRoute(uri: $config['themesuri'], name: $themesName)->add();
+                    $this->buildRoute(uri: $config['themesuri'], name: $themesName)
+                        ->withDefaults(['app' => $app])
+                        ->add();
                 }
             }
         }
 
         $hordeConfig = $this->registryState->getApplication('horde');
         if ($hordeConfig && isset($hordeConfig['staticuri']) && !isset($existingNames['HordeStatic'])) {
-            $this->buildRoute(uri: $hordeConfig['staticuri'], name: 'HordeStatic')->add();
+            $this->buildRoute(uri: $hordeConfig['staticuri'], name: 'HordeStatic')
+                ->withDefaults(['app' => 'horde'])
+                ->add();
         }
 
         if ($hordeConfig && isset($hordeConfig['webroot'])) {
@@ -207,6 +215,7 @@ class RuntimeRoutesProvider extends GroupMapper implements RoutesProvider
                 // These routes so far should be serviced by real endpoint files and not by the router.
                 $this->buildRoute(uri: $hordeWebroot . $path, name: $name)
                     ->withController(NoopController::class)
+                    ->withDefaults(['app' => 'horde'])
                     ->add();
             }
         }
