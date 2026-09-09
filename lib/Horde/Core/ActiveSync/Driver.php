@@ -2789,9 +2789,12 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     {
         $type = Horde_String::lower($params->type);
         $rows = null;
+        $progress = $params->options['progress'] ?? null;
+        $cacheOptions = $params->options;
+        unset($cacheOptions['progress']);
 
         if ($this->_cache) {
-            $cache_key = 'HCASD:' . $type . ':' . $GLOBALS['registry']->getAuth() . ':' . hash('md5', serialize([$params->query, $params->deepTraversal, $params->options]));
+            $cache_key = 'HCASD:' . $type . ':' . $GLOBALS['registry']->getAuth() . ':' . hash('md5', serialize([$params->query, $params->deepTraversal, $cacheOptions]));
             if ($this->_cache->exists($cache_key, 0)) {
                 if ($params->rebuildResults) {
                     $this->_cache->expire($cache_key);
@@ -2802,7 +2805,12 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         }
 
         if ($rows === null) {
-            ob_start();
+            // A progress callback writes WBXML keep-alives to the client;
+            // capturing stdout would swallow them.
+            $captureOutput = !is_callable($progress);
+            if ($captureOutput) {
+                ob_start();
+            }
             try {
                 switch ($type) {
                     case 'gal':
@@ -2824,7 +2832,9 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 $rows = null;
             }
 
-            $this->_endBuffer();
+            if ($captureOutput) {
+                $this->_endBuffer();
+            }
 
             if ($rows !== null && $this->_cache) {
                 $this->_cache->set($cache_key, json_encode($rows));
