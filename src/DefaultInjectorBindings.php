@@ -20,6 +20,7 @@ use Horde\Core\Api\ApiRegistry;
 use Horde\Core\Auth\AuthService;
 use Horde\Core\Config\ConfigLoader;
 use Horde\Core\Config\ConfigMetadataProvider;
+use Horde\Core\Config\BackendConfigLoader;
 use Horde\Core\Config\Driver\DriverRepository;
 use Horde\Core\Config\RegistryConfigLoader;
 use Horde\Core\Config\State;
@@ -269,6 +270,7 @@ class DefaultInjectorBindings implements InjectorBindings
             PsrLoggerInterface::class => LoggerFactory::class,
             AuthenticationService::class => AuthenticationServiceFactory::class,
             ConfigLoader::class => ConfigLoaderFactory::class,
+            BackendConfigLoader::class => Factory\BackendConfigLoaderFactory::class,
             State::class => StateFactory::class,
             DriverRepository::class => DriverRepositoryFactory::class,
             ConfigMetadataProvider::class => ConfigMetadataProviderFactory::class,

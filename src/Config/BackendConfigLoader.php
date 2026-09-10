@@ -52,14 +52,17 @@ class BackendConfigLoader
      *
      * @param string $app App name ('passwd', 'imp', 'ingo', etc.)
      * @param string $file Config filename (default: 'backends.php')
+     * @param string $variable Name of the array variable the config file
+     *                         populates, without the '$' (default: 'backends').
+     *                         IMP's backends.php uses 'servers'.
      * @return BackendState Immutable backend state
      */
-    public function load(string $app, string $file = 'backends.php'): BackendState
+    public function load(string $app, string $file = 'backends.php', string $variable = 'backends'): BackendState
     {
-        $cacheKey = $app . ':' . $file;
+        $cacheKey = $app . ':' . $file . ':' . $variable;
 
         if (!isset($this->cache[$cacheKey])) {
-            $backends = $this->loadFiles($app, $file);
+            $backends = $this->loadFiles($app, $file, $variable);
             $this->cache[$cacheKey] = new BackendState($backends);
         }
 
@@ -72,9 +75,11 @@ class BackendConfigLoader
      * @param string $app App name
      * @param string $layer Layer name ('vendor', 'base', 'snippets', 'local', 'vhost')
      * @param string $file Config filename
+     * @param string $variable Name of the array variable the config file
+     *                         populates, without the '$' (default: 'backends').
      * @return array Raw config from that layer only
      */
-    public function loadLayer(string $app, string $layer, string $file = 'backends.php'): array
+    public function loadLayer(string $app, string $layer, string $file = 'backends.php', string $variable = 'backends'): array
     {
         $pathInfo = pathinfo($file);
         $confDir = $this->configBase . '/' . $app . '/';
@@ -83,11 +88,11 @@ class BackendConfigLoader
         switch ($layer) {
             case 'vendor':
                 $filePath = $vendorDir . $file;
-                return file_exists($filePath) ? $this->includeFile($filePath) : [];
+                return file_exists($filePath) ? $this->includeFile($filePath, $variable) : [];
 
             case 'base':
                 $filePath = $confDir . $file;
-                return file_exists($filePath) ? $this->includeFile($filePath) : [];
+                return file_exists($filePath) ? $this->includeFile($filePath, $variable) : [];
 
             case 'snippets':
                 $snippetsDir = $confDir . $pathInfo['filename'] . '.d';
@@ -101,14 +106,14 @@ class BackendConfigLoader
                 sort($snippets);
                 $merged = [];
                 foreach ($snippets as $snippetFile) {
-                    $loaded = $this->includeFile($snippetFile);
+                    $loaded = $this->includeFile($snippetFile, $variable);
                     $merged = array_replace_recursive($merged, $loaded);
                 }
                 return $merged;
 
             case 'local':
                 $filePath = $confDir . $pathInfo['filename'] . '.local.' . $pathInfo['extension'];
-                return file_exists($filePath) ? $this->includeFile($filePath) : [];
+                return file_exists($filePath) ? $this->includeFile($filePath, $variable) : [];
 
             case 'vhost':
                 // Need to check if vhosts enabled - requires loading base config first
@@ -119,7 +124,7 @@ class BackendConfigLoader
                     return [];
                 }
                 // Return first vhost file found (for introspection purposes)
-                return $this->includeFile($vhostFiles[0]);
+                return $this->includeFile($vhostFiles[0], $variable);
 
             default:
                 throw new RuntimeException("Unknown layer: $layer");
@@ -139,9 +144,11 @@ class BackendConfigLoader
      *
      * @param string $app App name
      * @param string $file Config filename
+     * @param string $variable Name of the array variable the config file
+     *                         populates, without the '$'.
      * @return array Merged backends array
      */
-    private function loadFiles(string $app, string $file): array
+    private function loadFiles(string $app, string $file, string $variable = 'backends'): array
     {
         $pathInfo = pathinfo($file);
         $confDir = $this->configBase . '/' . $app . '/';
@@ -176,7 +183,7 @@ class BackendConfigLoader
         foreach ($files as $filePath) {
             if (file_exists($filePath)) {
                 // Include file in isolated scope
-                $loadedBackends = $this->includeFile($filePath);
+                $loadedBackends = $this->includeFile($filePath, $variable);
 
                 // Merge backends array
                 $backends = array_replace_recursive($backends, $loadedBackends);
@@ -189,7 +196,7 @@ class BackendConfigLoader
             if ($vhostFilename) {
                 $vhostFile = $confDir . $vhostFilename;
                 if (file_exists($vhostFile)) {
-                    $loadedBackends = $this->includeFile($vhostFile);
+                    $loadedBackends = $this->includeFile($vhostFile, $variable);
                     $backends = array_replace_recursive($backends, $loadedBackends);
                 }
             }
@@ -199,20 +206,37 @@ class BackendConfigLoader
     }
 
     /**
-     * Include PHP file in isolated scope and extract $backends variable
+     * Include a PHP config file in an isolated scope and extract the named
+     * array variable.
      *
-     * @param string $file File path
-     * @return array Extracted backends array
+     * The variable name is a parameter because different apps use different
+     * conventions in their backends.php: most use $backends, but IMP uses
+     * $servers. The named variable is predefined as an empty array so a file
+     * that does not set it yields [] rather than a warning.
+     *
+     * @param string $file     File path
+     * @param string $variable Variable name to extract, without the '$'
+     *                         (default: 'backends').
+     * @return array Extracted config array
      */
-    private function includeFile(string $file): array
+    private function includeFile(string $file, string $variable = 'backends'): array
     {
-        // Define variables that config files expect
-        $backends = [];
+        // Guard the variable-variable against clobbering this method's own
+        // locals ($file / $variable), which would break the include.
+        if ($variable === 'file' || $variable === 'variable') {
+            throw new RuntimeException(sprintf(
+                'Config variable name "%s" is reserved.',
+                $variable
+            ));
+        }
+
+        // Predefine the expected variable so an unset file yields [].
+        $$variable = [];
 
         // Include file
         include $file;
 
-        // Return $backends variable
-        return $backends;
+        // Return the named variable.
+        return $$variable;
     }
 }
