@@ -2791,7 +2791,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         $rows = null;
         $progress = $params->options['progress'] ?? null;
         $cacheOptions = $params->options;
-        unset($cacheOptions['progress']);
+        unset($cacheOptions['progress'], $cacheOptions['deadline'], $cacheOptions['stats']);
 
         if ($this->_cache) {
             $cache_key = 'HCASD:' . $type . ':' . $GLOBALS['registry']->getAuth() . ':' . hash('md5', serialize([$params->query, $params->deepTraversal, $cacheOptions]));
@@ -2837,7 +2837,11 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             }
 
             if ($rows !== null && $this->_cache) {
-                $this->_cache->set($cache_key, json_encode($rows));
+                $truncated = is_object($params->options['stats'] ?? null)
+                    && !empty($params->options['stats']->truncated);
+                if (!$truncated) {
+                    $this->_cache->set($cache_key, json_encode($rows));
+                }
             }
         }
 
