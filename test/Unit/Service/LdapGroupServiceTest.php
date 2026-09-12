@@ -107,6 +107,7 @@ class LdapGroupServiceTest extends TestCase
         $entry = $this->getMockBuilder(Horde_Ldap_Entry::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $entry->method('exists')->willReturn(true);
         $entry->expects($this->exactly(2))->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
             if ($attr === 'memberUid') {
                 return ['alice', 'bob'];
@@ -130,6 +131,36 @@ class LdapGroupServiceTest extends TestCase
         $this->assertEquals('developers', $group->id);
         $this->assertEquals(['alice', 'bob'], $group->members);
         $this->assertEquals('dev@example.com', $group->extra['email'] ?? '');
+    }
+
+    public function testGetGroupWithNoMailAttributeReturnsGroupWithoutEmail(): void
+    {
+        // Reproduces a real case: a group entry with actual members but no
+        // 'mail' attribute at all (not empty - genuinely absent).
+        $ldapAdapter = $this->createStub(Horde_Ldap::class);
+        $entry = $this->createStub(Horde_Ldap_Entry::class);
+        $entry->method('exists')->willReturnCallback(fn($attr) => $attr !== 'mail');
+        $entry->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
+            if ($attr === 'memberUid') {
+                // Guards against the real bug this test reproduces: without
+                // explicit 'all', getValue() defaults to 'single' and
+                // collapses a multi-valued attribute to just its first
+                // value as a string.
+                $this->assertEquals('all', $mode, "memberAttr must be read with mode='all'");
+                return ['delepine', 'sdu-zac', 'ld-zac'];
+            }
+            return null;
+        });
+
+        $ldapAdapter->method('getEntry')->willReturn($entry);
+
+        $this->ldapService->method('getAdapter')->willReturn($ldapAdapter);
+        $service = new LdapGroupService($this->ldapService, 'ou=siham,ou=groups,dc=u-picardie,dc=fr');
+
+        $group = $service->get('DISI SSR CSYS');
+
+        $this->assertEquals(['delepine', 'sdu-zac', 'ld-zac'], $group->members);
+        $this->assertArrayNotHasKey('email', $group->extra);
     }
 
     public function testCreateGroup(): void
@@ -196,6 +227,7 @@ class LdapGroupServiceTest extends TestCase
         $entry = $this->getMockBuilder(Horde_Ldap_Entry::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $entry->method('exists')->willReturn(true);
         $entry->expects($this->exactly(2))->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
             if ($attr === 'memberUid') {
                 return [];
@@ -285,6 +317,7 @@ class LdapGroupServiceTest extends TestCase
         $entry = $this->getMockBuilder(Horde_Ldap_Entry::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $entry->method('exists')->willReturn(true);
         $entry->expects($this->exactly(2))->method('getValue')->willReturnCallback(function ($attr, $mode = null) {
             if ($attr === 'memberUid') {
                 return ['alice', 'bob'];
