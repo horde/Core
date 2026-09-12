@@ -2895,6 +2895,7 @@ class Horde_Registry implements Horde_Shutdown_Task
 
             if (!empty($conf['session']['max_time'])
                 && (($conf['session']['max_time'] + $session->begin) < time())) {
+		error_log('[SessionMax] max_time=' . $conf['session']['max_time'] . ' begin=' . $session->begin . ' now=' . time() . ' diff=' . ($conf['session']['max_time'] + $session->begin - time()));
                 $injector->getInstance('Horde_Core_Factory_Auth')->create()
                     ->setError(Horde_Core_Auth_Application::REASON_SESSIONMAXTIME);
                 return false;
