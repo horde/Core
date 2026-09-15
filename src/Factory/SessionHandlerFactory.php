@@ -18,6 +18,7 @@ namespace Horde\Core\Factory;
 use Horde\Core\Config\ConfigLoader;
 use Horde\Core\Config\State;
 use Horde\Core\Service\HordeDbService;
+use Horde\Core\Secret\SessionSecret;
 use Horde\Core\Session\HordeSessionFactory;
 use Horde\HashTable\LockableHashTable;
 use Horde\SessionHandler\DefaultSessionSerializer;
@@ -32,7 +33,6 @@ use Horde\SessionHandler\Storage\StackBackend;
 use Horde_HashTable_Base;
 use Horde_HashTable_Lock;
 use Horde\Injector\Injector;
-use Horde_Secret;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use RuntimeException;
 use Throwable;
@@ -91,7 +91,7 @@ class SessionHandlerFactory
         return new SessionHandler(
             backend: $backend,
             serializer: new DefaultSessionSerializer(),
-            sessionFactory: $this->createSessionFactory($injector),
+            sessionFactory: $injector->getInstance(HordeSessionFactory::class),
             events: $this->getEventDispatcher($injector),
         );
     }
@@ -192,14 +192,14 @@ class SessionHandlerFactory
             || (bool) $state->get('sessionhandler.memcache', false);
     }
 
-    private function createSessionFactory(Injector $injector): HordeSessionFactory
+    public function createSessionFactory(Injector $injector): HordeSessionFactory
     {
         $encryptor = null;
         $decryptor = null;
 
         try {
-            $secret = $injector->getInstance('Horde_Secret');
-            if ($secret instanceof Horde_Secret) {
+            $secret = $injector->getInstance('Horde_Secret_Cbc');
+            if ($secret instanceof SessionSecret) {
                 $encryptor = static fn(string $plaintext): string => $secret->write($secret->getKey(), $plaintext);
                 $decryptor = static fn(string $ciphertext): string => $secret->read($secret->getKey(), $ciphertext);
             }
