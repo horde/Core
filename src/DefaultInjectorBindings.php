@@ -214,6 +214,7 @@ class DefaultInjectorBindings implements InjectorBindings
             'Horde_Secret_Cbc' => 'Horde_Core_Factory_Secret_Cbc',
             Secret\SessionSecret::class => Factory\SessionSecretFactory::class,
             Session\SessionEncryptionCoordinator::class => Factory\SessionEncryptionCoordinatorFactory::class,
+            Session\HordeSessionFactory::class => [SessionHandlerFactory::class, 'createSessionFactory'],
             SecretManager::class => SecretManagerFactory::class,
             DbAdapter::class => DbAdapterFactory::class,
             OAuthProviderConfigRepository::class => OAuthProviderConfigRepositoryFactory::class,
