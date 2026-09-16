@@ -522,7 +522,7 @@ class Horde_Registry implements Horde_Shutdown_Task
         $this->_args = $args;
 
         /* Setup injector. */
-        $GLOBALS['injector'] = $injector = new Horde_Injector(new Horde_Injector_TopLevel());
+        $injector = $GLOBALS['injector'] ??= new Horde_Injector(new Horde_Injector_TopLevel());
 
         (new \Horde\Core\DefaultInjectorBindings())->register($injector);
 
