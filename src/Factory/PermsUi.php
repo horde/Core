@@ -28,6 +28,8 @@ use Horde_Group;
 use Horde_Perms_Base;
 use Horde_Registry;
 use Psr\Http\Message\ServerRequestInterface;
+use Horde_Notification_Handler;
+use Throwable;
 
 /**
  * Factory selecting the administrative permission UI implementation.
@@ -105,12 +107,12 @@ class PermsUi
      * injector can't supply one so the modern UI degrades to silent
      * rejection rather than failing to construct.
      */
-    private function resolveNotification(Injector $injector): ?\Horde_Notification_Handler
+    private function resolveNotification(Injector $injector): ?Horde_Notification_Handler
     {
         try {
             $handler = $injector->getInstance('Horde_Notification');
-            return $handler instanceof \Horde_Notification_Handler ? $handler : null;
-        } catch (\Throwable $e) {
+            return $handler instanceof Horde_Notification_Handler ? $handler : null;
+        } catch (Throwable $e) {
             return null;
         }
     }
@@ -136,7 +138,7 @@ class PermsUi
         try {
             $groups = $injector->getInstance(Horde_Group::class);
             return $groups instanceof Horde_Group ? $groups : null;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return null;
         }
     }
@@ -152,7 +154,7 @@ class PermsUi
             $factory = $injector->getInstance('Horde_Core_Factory_Auth');
             $auth = $factory->create();
             return $auth instanceof Horde_Auth_Base ? $auth : null;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return null;
         }
     }
@@ -179,7 +181,7 @@ class PermsUi
             if ($modern !== null) {
                 return (string) $modern === 'on';
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // ConfigLoader unavailable. Fall through to the legacy
             // globals lookup below.
         }

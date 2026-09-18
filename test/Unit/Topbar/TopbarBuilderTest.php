@@ -347,7 +347,7 @@ class TopbarBuilderTest extends TestCase
          * another test that bound the same domain to a different directory. */
         $domain = 'fixtureapp' . substr(md5($dir), 0, 8);
         $moDir = $dir . '/locale/' . $lang . '/LC_MESSAGES';
-        mkdir($moDir, 0777, true);
+        mkdir($moDir, 0o777, true);
         self::writeMo($moDir . '/' . $domain . '.mo', [
             '' => "Content-Type: text/plain; charset=UTF-8\n",
             'Mail' => 'FIXTURE-MAIL',

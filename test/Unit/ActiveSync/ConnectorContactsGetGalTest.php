@@ -52,7 +52,7 @@ class ConnectorContactsGetGalTest extends TestCase
 
     public function testContactsGetGalReturnsUidWhenAvailable(): void
     {
-        $contacts = new class () {
+        $contacts = new class {
             public function getGalUid()
             {
                 return 'gal-source';
