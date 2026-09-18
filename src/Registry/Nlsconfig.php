@@ -20,32 +20,35 @@ use Horde\Core\Config\BackendConfigLoader;
 use Horde\Core\LanguageContext;
 use Horde\Core\Session\SessionAccess;
 use Horde_Prefs;
-use Horde_String;
 
 /**
- * DI-friendly, PSR-4 replacement for the legacy `Horde_Registry_Nlsconfig`.
+ * DI-friendly successor to the legacy `Horde_Registry_Nlsconfig`.
  *
  * Owns the language cascade (session -> preference -> explicit $lang ->
  * Accept-Language -> site default) and the resolved $language value
- * itself. Unlike its legacy predecessor, it does not read/write
- * $GLOBALS and does not require a bootstrapped `Horde_Registry` — it
- * only needs a session accessor, the merged `nls.php` config, and
- * (optionally) preferences, all constructor-injected.
+ * itself.
  *
- * `Horde_Registry` is a *consumer* of this service, not the other way
- * around: it asks this class to resolve/persist the language, then
- * layers its own legacy side effects (setlocale()/putenv(), gettext
- * domain reload, `$GLOBALS['language']` mirroring, per-app
- * `changeLanguage()` callbacks) on top. See {@see LanguageContext} for
- * the accepted gap when this service is used without going through
- * `Horde_Registry`.
+ * Unlike Horde_Registry_Nlsconfig it does not read/write
+ * $GLOBALS['language'] and does not require a bootstrapped `Horde_Registry`.
+ *
+ * `Horde_Registry` is a *consumer* of this service:
+ * It asks this class to resolve/persist the language, then applies side effects
+ * - setlocale()/putenv()
+ * - gettext domain reload
+ * - `$GLOBALS['language']` mirroring
+ * - per-app `changeLanguage()` callbacks
+ *
+ * When using this service directly without going through registry, side effects are not triggered.
+ *
+ * TODO: Optionally wire a PSR-14 event for language changes.
+ * TODO: Upgrade to a PrefsService rather than the legacy Horde_Prefs.
  *
  * @category  Horde
  * @copyright 2026 The Horde Project
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
  */
-final class Nlsconfig implements LanguageContext
+final class Nlsconfig implements LanguageContext, LanguageContextSelector
 {
     /** Merged `nls.php` config (`horde_nls_config` variable). */
     private array $config;
@@ -53,8 +56,9 @@ final class Nlsconfig implements LanguageContext
     private ?string $language = null;
 
     public function __construct(
-        private SessionAccess $session,
         BackendConfigLoader $configLoader,
+        private ?string $serverEnvironment = null,
+        private ?SessionAccess $session = null,
         private ?Horde_Prefs $prefs = null,
     ) {
         $this->config = $configLoader
@@ -83,10 +87,10 @@ final class Nlsconfig implements LanguageContext
             return basename($lang);
         }
 
-        if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+        if (!empty($serverEnvironment)) {
             $partialLang = null;
 
-            foreach (explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']) as $browserLang) {
+            foreach (explode(',', $serverEnvironment) as $browserLang) {
                 if (($pos = strpos($browserLang, ';')) !== false) {
                     $browserLang = substr($browserLang, 0, $pos);
                 }
@@ -99,8 +103,8 @@ final class Nlsconfig implements LanguageContext
                 /* In case there's no full match, save our best guess. Try
                  * ll_LL, followed by just ll. */
                 if ($partialLang === null) {
-                    $llLL = Horde_String::lower(substr($mapped, 0, 2))
-                        . '_' . Horde_String::upper(substr($mapped, 0, 2));
+                    $llLL = mb_strtolower(substr($mapped, 0, 2))
+                        . '_' . mb_strtoupper(substr($mapped, 0, 2));
                     if ($this->validLang($llLL)) {
                         $partialLang = $llLL;
                     } else {
@@ -158,9 +162,9 @@ final class Nlsconfig implements LanguageContext
         // (e.g. de-DE should match de_DE)
         $transLang = str_replace('-', '_', $language);
         $langParts = explode('_', $transLang);
-        $transLang = Horde_String::lower($langParts[0]);
+        $transLang = mb_strtolower($langParts[0]);
         if (isset($langParts[1])) {
-            $transLang .= '_' . Horde_String::upper($langParts[1]);
+            $transLang .= '_' . mb_strtoupper($langParts[1]);
         }
 
         return $this->config['aliases'][$transLang] ?? $transLang;

@@ -18,6 +18,9 @@ namespace Horde\Core;
 
 use Horde\Core\ActiveSync\Ops\SnapshotService;
 use Horde\Core\Api\ApiRegistry;
+use Horde\Core\LanguageContext;
+use Horde\Core\LanguageContextSelector;
+use Horde\Core\Factory\NlsconfigFactory;
 use Horde\Core\Auth\AuthService;
 use Horde\Core\Config\ConfigLoader;
 use Horde\Core\Config\ConfigMetadataProvider;
@@ -185,6 +188,8 @@ class DefaultInjectorBindings implements InjectorBindings
             'Horde_Core_Auth_Signup' => 'Horde_Core_Factory_AuthSignup',
             'Horde_Auth_Base' => AuthBaseFactory::class,
             ApiRegistry::class => ApiRegistryFactory::class,
+            LanguageContext::class => NlsconfigFactory::class,
+            LanguageContextSelector::class => NlsconfigFactory::class,
             'Horde_Core_CssCache' => 'Horde_Core_Factory_CssCache',
             'Horde_Core_JavascriptCache' => 'Horde_Core_Factory_JavascriptCache',
             'Horde_Core_Perms' => 'Horde_Core_Factory_PermsCore',
