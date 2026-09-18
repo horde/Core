@@ -56,14 +56,14 @@ class Horde_Script_File_ThemeDir extends Horde_Script_File
     {
         switch ($name) {
             case 'path':
-                return $GLOBALS['registry']->get('themesfs', $this->_app) .
-                    '/' . $this->_theme . '/';
+                return $GLOBALS['registry']->get('themesfs', $this->_app)
+                    . '/' . $this->_theme . '/';
 
             case 'url':
             case 'url_full':
                 return $this->_url(
-                    $GLOBALS['registry']->get('themesuri', $this->_app) .
-                        '/' . $this->_theme . '/' . $this->_file,
+                    $GLOBALS['registry']->get('themesuri', $this->_app)
+                        . '/' . $this->_theme . '/' . $this->_file,
                     ($name == 'url_full')
                 );
         }

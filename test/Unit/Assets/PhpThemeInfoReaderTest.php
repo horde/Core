@@ -91,7 +91,7 @@ class PhpThemeInfoReaderTest extends TestCase
     {
         // Theme dir exists but no info.php.
         $dir = $this->root . '/horde/silver';
-        mkdir($dir, 0777, true);
+        mkdir($dir, 0o777, true);
 
         $reader = new PhpThemeInfoReader($this->pathBuilder, $this->filesystem);
 
@@ -125,7 +125,7 @@ class PhpThemeInfoReaderTest extends TestCase
     private function writeTheme(string $app, string $theme, string $info, array $scriptFiles): void
     {
         $dir = $this->root . '/' . $app . '/' . $theme;
-        mkdir($dir, 0777, true);
+        mkdir($dir, 0o777, true);
         file_put_contents($dir . '/info.php', $info);
         foreach ($scriptFiles as $file) {
             file_put_contents($dir . '/' . $file, '// js');

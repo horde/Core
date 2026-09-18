@@ -328,16 +328,16 @@ class Horde_Themes_Cache implements Serializable
     {
         if (!isset($this->_scripts)) {
             $info = $this->_themeInfo();
-            $base = $GLOBALS['registry']->get('themesfs', 'horde') .
-                '/' . $this->_theme . '/';
+            $base = $GLOBALS['registry']->get('themesfs', 'horde')
+                . '/' . $this->_theme . '/';
             $this->_scripts = [];
 
             foreach ((array) ($info['theme_scripts'] ?? []) as $script) {
                 /* Plain file names only: no directory separators, no '..'.
                  * The theme directory is the only place a script may come
                  * from. */
-                if (!preg_match('/^[A-Za-z0-9_.-]+\.js$/', (string) $script) ||
-                    strpos($script, '..') !== false) {
+                if (!preg_match('/^[A-Za-z0-9_.-]+\.js$/', (string) $script)
+                    || strpos($script, '..') !== false) {
                     continue;
                 }
                 if (is_readable($base . $script)) {

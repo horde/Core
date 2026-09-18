@@ -101,4 +101,3 @@ class AjaxApplicationFactory
         return null;
     }
 }
-

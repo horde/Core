@@ -29,7 +29,7 @@ class ThemeJsDiscovererTest extends TestCase
     protected function setUp(): void
     {
         $this->root = sys_get_temp_dir() . '/horde-theme-js-' . uniqid('', true);
-        mkdir($this->root, 0777, true);
+        mkdir($this->root, 0o777, true);
         $this->pathBuilder = $this->createPathMock($this->root);
         $this->uriBuilder = $this->createUriMock();
         $this->filesystem = new LocalAssetFilesystem();
@@ -164,7 +164,7 @@ class ThemeJsDiscovererTest extends TestCase
         $full = $this->root . '/' . $relative;
         $dir = dirname($full);
         if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
+            mkdir($dir, 0o777, true);
         }
         file_put_contents($full, '// js');
     }
