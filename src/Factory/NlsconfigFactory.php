@@ -44,8 +44,10 @@ class NlsconfigFactory
         }
 
         return new Nlsconfig(
-            $injector->getInstance(SessionAccess::class),
             $injector->getInstance(BackendConfigLoader::class),
+            // TODO: Delegate this to an appropriate place.
+            $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? null,
+            $injector->getInstance(SessionAccess::class),
             $prefs,
         );
     }

@@ -19,28 +19,8 @@ namespace Horde\Core;
 /**
  * Owner of the request's display language / locale.
  *
- * Replaces reads of $GLOBALS['language'] with an injectable service.
- * This is the source of truth: {@see \Horde_Registry} delegates its
- * legacy preferredLang()/setLanguage() to an instance of this
- * interface and mirrors the result into $GLOBALS['language'] for
- * backward compatibility, rather than the other way around.
+ * Replaces reads of $GLOBALS['language'] with an injectable service for READING.
  *
- * Implementations resolve the language cascade:
- *   1. Session ('horde' / 'language' scope)
- *   2. Preference ('language')
- *   3. Explicit $lang argument (e.g. login-screen selection), if valid
- *   4. Browser Accept-Language header
- *   5. Site-wide default / 'en_US' fallback
- *
- * Known MVP gap: code that calls setLanguage() directly on this
- * service (bypassing Horde_Registry) resolves and persists the
- * session value, but does not trigger Horde_Registry's side effects
- * (setlocale()/putenv(), gettext domain reload, per-app
- * changeLanguage() callbacks) or refresh $GLOBALS['language']. This is
- * accepted for now; a future PSR-14 LanguageChanged event dispatched
- * from setLanguage() is the intended remediation, letting
- * Horde_Registry (and other interested listeners) react without this
- * service depending back on the legacy registry.
  *
  * @category  Horde
  * @copyright 2026 The Horde Project
