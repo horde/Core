@@ -254,7 +254,7 @@ class Horde_Session implements Horde_Shutdown_Task
         try {
             $access = $GLOBALS['injector']->get(SessionAccess::class);
             return $access instanceof SessionAccess ? $access : null;
-        } catch (\Throwable) {
+        } catch (Throwable) {
             return null;
         }
     }

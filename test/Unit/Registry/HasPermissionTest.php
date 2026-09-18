@@ -31,6 +31,7 @@ use PHPUnit\Framework\TestCase;
  *
  * Guards against regressions where SHOW (menu-appearance) checks trigger
  * per-app transparent authentication (e.g. futile IMAP logins for IMP).
+ * @coversNothing
  */
 class HasPermissionTest extends TestCase
 {

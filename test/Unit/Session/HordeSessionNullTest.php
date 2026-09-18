@@ -21,6 +21,7 @@ use Horde_Session_Null;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 /**
  * Regression coverage for horde/Core#207.
@@ -102,7 +103,7 @@ class HordeSessionNullTest extends TestCase
         // _start(), which is what setup() eventually calls; invoke it
         // directly to isolate the publish step from PHP's session
         // machinery.
-        (new \ReflectionMethod($null, '_start'))->invoke($null);
+        (new ReflectionMethod($null, '_start'))->invoke($null);
 
         self::assertTrue(
             $accessor->hasCurrent(),
@@ -124,7 +125,7 @@ class HordeSessionNullTest extends TestCase
         $GLOBALS['injector'] = $injector;
 
         $null = new Horde_Session_Null();
-        (new \ReflectionMethod($null, '_start'))->invoke($null);
+        (new ReflectionMethod($null, '_start'))->invoke($null);
 
         // Consumers that resolve HordeSession directly (not through the
         // accessor) must reach the same instance the accessor points at,
@@ -154,7 +155,7 @@ class HordeSessionNullTest extends TestCase
         $GLOBALS['injector'] = $injector;
 
         $null = new Horde_Session_Null();
-        (new \ReflectionMethod($null, '_start'))->invoke($null);
+        (new ReflectionMethod($null, '_start'))->invoke($null);
 
         $accessor->setScoped('horde', 'nls/curr_default', 'de_DE');
         self::assertTrue($accessor->hasScoped('horde', 'nls/curr_default'));
@@ -189,7 +190,7 @@ class HordeSessionNullTest extends TestCase
         }
 
         $null = new Horde_Session_Null();
-        (new \ReflectionMethod($null, '_start'))->invoke($null);
+        (new ReflectionMethod($null, '_start'))->invoke($null);
 
         self::assertNotSame(
             PHP_SESSION_ACTIVE,
