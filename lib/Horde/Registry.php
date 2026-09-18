@@ -22,6 +22,7 @@ use Horde\Core\Factory\DbAdapterFactory;
 use Horde\Core\Factory\DriverRepositoryFactory;
 use Horde\Core\Factory\EventDispatcherFactory;
 use Horde\Core\Factory\HttpClientFactory;
+use Horde\Core\LanguageContext;
 use Horde\Core\Factory\LoggerFactory;
 use Horde\Core\Factory\AuthLinkRepositoryFactory;
 use Horde\Core\Factory\IdentityHistoryRepositoryFactory;
@@ -3088,64 +3089,11 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     public function preferredLang($lang = null)
     {
-        $session = $GLOBALS['injector']->getInstance(HordeSession::class);
-
-        /* Check if we have a language set in the session */
-        if ($session->hasScoped('horde', 'language')) {
-            return basename($session->getScoped('horde', 'language'));
-        }
-
-        /* If language pref exists, we should use that. */
-        if (isset($GLOBALS['prefs'])
-            && ($language = $GLOBALS['prefs']->getValue('language'))) {
-            return basename($language);
-        }
-
-        /* Check if the user selected a language from the login screen */
-        if (!empty($lang) && $this->nlsconfig->validLang($lang)) {
-            return basename($lang);
-        }
-
-        /* Try browser-accepted languages. */
-        if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            /* The browser supplies a list, so return the first valid one. */
-            $browser_langs = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
-            foreach ($browser_langs as $lang) {
-                /* Strip quality value for language */
-                if (($pos = strpos($lang, ';')) !== false) {
-                    $lang = substr($lang, 0, $pos);
-                }
-
-                $lang = $this->_mapLang(trim($lang));
-                if ($this->nlsconfig->validLang($lang)) {
-                    return basename($lang);
-                }
-
-                /* In case there's no full match, save our best guess. Try
-                 * ll_LL, followed by just ll. */
-                if (!isset($partial_lang)) {
-                    $ll_LL = Horde_String::lower(substr($lang, 0, 2)) . '_' . Horde_String::upper(substr($lang, 0, 2));
-                    if ($this->nlsconfig->validLang($ll_LL)) {
-                        $partial_lang = $ll_LL;
-                    } else {
-                        $ll = $this->_mapLang(substr($lang, 0, 2));
-                        if ($this->nlsconfig->validLang($ll)) {
-                            $partial_lang = $ll;
-                        }
-                    }
-                }
-            }
-
-            if (isset($partial_lang)) {
-                return basename($partial_lang);
-            }
-        }
-
-        /* Use site-wide default, if one is defined */
-        return $this->nlsconfig->curr_default
-            ? basename($this->nlsconfig->curr_default)
-            /* No dice auto-detecting, default to US English. */
-            : 'en_US';
+        /* This used to be handled internally but is now owned by the
+         * LanguageContext/Nlsconfig service.
+         * See Horde\Core\Registry\Nlsconfig. */
+        return $GLOBALS['injector']->getInstance(LanguageContext::class)
+            ->preferredLang($lang);
     }
 
     /**
@@ -3159,12 +3107,20 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     public function setLanguage($lang = null)
     {
-        if (empty($lang) || !$this->nlsconfig->validLang($lang)) {
-            $lang = $this->preferredLang();
-        }
 
-        $GLOBALS['injector']->getInstance(HordeSession::class)
-            ->setScoped('horde', 'language', $lang);
+
+
+        /**
+         * Resolution and session persistence used to be handled internally but is now owned by the
+         * LanguageContext/Nlsconfig service.
+         * See Horde\Core\Registry\Nlsconfig.
+         *
+         * Horde_Registry::setLanguage only applies its own side effects
+         * (locale/gettext/app callbacks) and mirrors the result into
+         * $GLOBALS['language'] for backward compatibility.
+         **/
+        $lang = $GLOBALS['injector']->getInstance(LanguageContext::class)
+            ->setLanguage($lang);
 
         $changed = false;
         if (isset($GLOBALS['language'])) {

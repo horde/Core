@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Factory;
 
+use Horde\Core\LanguageContext;
 use Horde\Core\Prefs\DateFormatPrefs;
 use Horde_Injector;
 use Horde\Injector\Injector;
@@ -44,7 +45,7 @@ class DateFormatPrefsFactory
 
         return new DateFormatPrefs(
             prefs: $injector->getInstance('Horde_Prefs'),
-            locale: $GLOBALS['language'] ?? 'en_US',
+            locale: $injector->getInstance(LanguageContext::class)->getLocale(),
             logger: $logger,
         );
     }
