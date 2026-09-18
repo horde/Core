@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Horde\Core\Session;
 
 use DateTimeImmutable;
+use LogicException;
 
 /**
  * Access to the request's current {@see HordeSession} value.
@@ -65,7 +66,7 @@ interface SessionAccess
      * `SessionLifecycle::clean()`, or `SessionLifecycle::destroy()` —
      * ask again by calling this method afresh.
      *
-     * @throws \LogicException When no session has been established
+     * @throws LogicException When no session has been established
      *                         yet. Guard with {@see hasCurrent()} at
      *                         call sites that legitimately run before
      *                         session setup.

@@ -24,6 +24,8 @@ use Horde\SessionHandler\SessionId;
 use Horde_Exception;
 use Horde_Shutdown;
 use Horde_Shutdown_Task;
+use RuntimeException;
+use Throwable;
 
 /**
  * Orchestrates the lifecycle of the current PHP session under Horde control.
@@ -464,7 +466,7 @@ class SessionLifecycle implements Horde_Shutdown_Task
         // HordeSessionFactory whose restore() actually returns a
         // HordeSession, but assert the type for the type checker.
         if (!$successor instanceof HordeSession) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'HordeSessionFactory::restore() returned '
                 . get_debug_type($successor)
                 . '; expected HordeSession.',
@@ -592,7 +594,7 @@ class SessionLifecycle implements Horde_Shutdown_Task
             $resolved = null;
             try {
                 $resolved = $this->injector->getInstance(SessionAccess::class);
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 // No SessionAccess binding — legacy test contexts and
                 // partial DI setups build a SessionLifecycle without
                 // wiring the accessor. Fall through to the private
