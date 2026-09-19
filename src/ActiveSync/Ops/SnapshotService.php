@@ -24,9 +24,9 @@ use Horde\ActiveSync\Ops\FleetSummary;
 use Horde\ActiveSync\Ops\HealthEvaluator;
 use Horde\ActiveSync\Ops\HealthOptions;
 use Horde\ActiveSync\Ops\HealthStatus;
+use Horde\Exception\NotFound;
 use Horde_ActiveSync_State_Base;
 use Horde_Exception;
-use Horde_Exception_NotFound;
 use Horde_Log_Logger;
 
 final class SnapshotService
@@ -120,7 +120,7 @@ final class SnapshotService
                 ->withLogPath($this->logPaths->resolve($deviceId));
         }
 
-        throw new Horde_Exception_NotFound(
+        throw new NotFound(
             sprintf('ActiveSync device %s was not found for %s.', $deviceId, $user)
         );
     }
