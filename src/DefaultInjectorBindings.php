@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Horde\Core;
 
+use Horde\Core\ActiveSync\Ops\SnapshotService;
 use Horde\Core\Api\ApiRegistry;
 use Horde\Core\Auth\AuthService;
 use Horde\Core\Config\ConfigLoader;
@@ -26,6 +27,7 @@ use Horde\Core\Config\RegistryConfigLoader;
 use Horde\Core\Config\State;
 use Horde\Core\Config\StateFactory;
 use Horde\Core\Editor\TinymcePageBinder;
+use Horde\Core\Factory\ActiveSyncOpsSnapshotFactory;
 use Horde\Core\Factory\ApiRegistryFactory;
 use Horde\Core\Factory\ApplicationServiceFactory;
 use Horde\Core\Factory\AuthBaseFactory;
@@ -171,6 +173,7 @@ class DefaultInjectorBindings implements InjectorBindings
             'Horde_ActiveSyncBackend' => 'Horde_Core_Factory_ActiveSyncBackend',
             'Horde_ActiveSyncServer' => 'Horde_Core_Factory_ActiveSyncServer',
             'Horde_ActiveSyncState' => 'Horde_Core_Factory_ActiveSyncState',
+            SnapshotService::class => ActiveSyncOpsSnapshotFactory::class,
             'Horde_Alarm' => 'Horde_Core_Factory_Alarm',
             'Horde_Browser' => 'Horde_Core_Factory_Browser',
             'Horde_Cache' => 'Horde_Core_Factory_Cache',
