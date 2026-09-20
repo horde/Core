@@ -61,7 +61,7 @@ class Horde_Core_Ajax_Imple_Geocoder_Geonames extends Horde_Core_Ajax_Imple
             'username' => $vars->key,
         ]);
 
-        $response = $GLOBALS['injector']->getInstance('Horde_Core_Factory_HttpClient')->create()->get($url);
+        $response = $GLOBALS['injector']->get(Horde_Core_Factory_HttpClient::class)->create()->get($url);
 
         return new Horde_Core_Ajax_Response_Prototypejs([
             'results' => $response->getBody(),

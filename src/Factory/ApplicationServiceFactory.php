@@ -32,7 +32,7 @@ class ApplicationServiceFactory
 {
     public function create(Injector $injector): ApplicationService
     {
-        $registryLoader = $injector->getInstance(RegistryConfigLoader::class);
+        $registryLoader = $injector->get(RegistryConfigLoader::class);
         return new ApplicationService($registryLoader);
     }
 }

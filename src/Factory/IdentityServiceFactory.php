@@ -40,7 +40,7 @@ class IdentityServiceFactory
      */
     public function create(Injector $injector): IdentityService
     {
-        $prefsService = $injector->getInstance(PrefsService::class);
+        $prefsService = $injector->get(PrefsService::class);
         return new IdentityService($prefsService);
     }
 }

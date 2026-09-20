@@ -32,7 +32,7 @@ class PageComposerFactory
     public function create(Horde_Injector|Injector $injector): PageComposer
     {
         return new PageComposer(
-            $injector->getInstance(AssetCollector::class),
+            $injector->get(AssetCollector::class),
         );
     }
 }

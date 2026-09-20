@@ -53,7 +53,7 @@ class VersionServiceFactory
      */
     public function create(Injector $injector): VersionService
     {
-        $appService = $injector->getInstance(ApplicationService::class);
+        $appService = $injector->get(ApplicationService::class);
         $installed = new HordeYmlInstalledSource($appService);
 
         $available = $this->createAvailableSource($injector);
@@ -74,11 +74,11 @@ class VersionServiceFactory
      */
     private function createAvailableSource(Injector $injector): AvailableVersionSource
     {
-        $httpClient = $injector->getInstance(ClientInterface::class);
-        $requestFactory = $injector->getInstance(RequestFactoryInterface::class);
+        $httpClient = $injector->get(ClientInterface::class);
+        $requestFactory = $injector->get(RequestFactoryInterface::class);
 
         try {
-            $cache = $injector->getInstance(CacheInterface::class);
+            $cache = $injector->get(CacheInterface::class);
         } catch (Throwable $e) {
             $logger = $this->getLogger($injector);
             $logger->warning(
@@ -94,7 +94,7 @@ class VersionServiceFactory
     private function getLogger(Injector $injector): LoggerInterface
     {
         try {
-            return $injector->getInstance(LoggerInterface::class);
+            return $injector->get(LoggerInterface::class);
         } catch (Throwable) {
             return new NullLogger();
         }

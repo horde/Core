@@ -51,7 +51,7 @@ class CssDiscovererFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorResolvesCssDiscoverer(): void
     {
-        $discoverer = $this->injector->getInstance(CssDiscoverer::class);
+        $discoverer = $this->injector->get(CssDiscoverer::class);
 
         self::assertInstanceOf(CssDiscoverer::class, $discoverer);
         self::assertInstanceOf(CascadeCssDiscoverer::class, $discoverer);
@@ -60,8 +60,8 @@ class CssDiscovererFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorReturnsSameInstance(): void
     {
-        $first = $this->injector->getInstance(CssDiscoverer::class);
-        $second = $this->injector->getInstance(CssDiscoverer::class);
+        $first = $this->injector->get(CssDiscoverer::class);
+        $second = $this->injector->get(CssDiscoverer::class);
 
         self::assertSame($first, $second);
     }

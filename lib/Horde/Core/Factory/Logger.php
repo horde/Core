@@ -1,6 +1,7 @@
 <?php
 
 use Horde\Injector\Injector;
+use Horde\Core\Config\LoggerConfig;
 
 /**
  * @category Horde
@@ -35,7 +36,7 @@ class Horde_Core_Factory_Logger extends Horde_Core_Factory_Injector
     {
         // Get LoggerConfig service (autowired by injector)
         if ($this->config === null) {
-            $this->config = $injector->getInstance('Horde\\Core\\Config\\LoggerConfig');
+            $this->config = $injector->get(LoggerConfig::class);
         }
 
         $this->error = null;
@@ -153,7 +154,7 @@ class Horde_Core_Factory_Logger extends Horde_Core_Factory_Injector
             }
 
             if (is_null($logger)) {
-                $logger = $GLOBALS['injector']->getInstance('Horde_Log_Logger');
+                $logger = $GLOBALS['injector']->get('Horde_Log_Logger');
             }
 
             foreach (self::$_queue as $val) {

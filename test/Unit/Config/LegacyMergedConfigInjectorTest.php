@@ -57,7 +57,7 @@ class LegacyMergedConfigInjectorTest extends TestCase
 
         $this->injector->setInstance(LegacyMergedConfig::class, $config);
 
-        $retrieved = $this->injector->getInstance(LegacyMergedConfig::class);
+        $retrieved = $this->injector->get(LegacyMergedConfig::class);
 
         $this->assertSame($config, $retrieved);
         $this->assertEquals('value', $retrieved->get('test'));
@@ -74,7 +74,7 @@ class LegacyMergedConfigInjectorTest extends TestCase
         $hordeConfig = new LegacyMergedConfig(['app' => 'horde', 'cache' => ['driver' => 'file']]);
         $this->injector->setInstance(LegacyMergedConfig::class, $hordeConfig);
 
-        $retrieved1 = $this->injector->getInstance(LegacyMergedConfig::class);
+        $retrieved1 = $this->injector->get(LegacyMergedConfig::class);
         $this->assertEquals('horde', $retrieved1->get('app'));
         $this->assertEquals('file', $retrieved1->get('cache.driver'));
 
@@ -82,7 +82,7 @@ class LegacyMergedConfigInjectorTest extends TestCase
         $impConfig = new LegacyMergedConfig(['app' => 'imp', 'cache' => ['driver' => 'memcache']]);
         $this->injector->setInstance(LegacyMergedConfig::class, $impConfig);
 
-        $retrieved2 = $this->injector->getInstance(LegacyMergedConfig::class);
+        $retrieved2 = $this->injector->get(LegacyMergedConfig::class);
         $this->assertEquals('imp', $retrieved2->get('app'));
         $this->assertEquals('memcache', $retrieved2->get('cache.driver'));
 
@@ -107,7 +107,7 @@ class LegacyMergedConfigInjectorTest extends TestCase
         ]);
         $this->injector->setInstance(LegacyMergedConfig::class, $hordeConfig);
 
-        $config1 = $this->injector->getInstance(LegacyMergedConfig::class);
+        $config1 = $this->injector->get(LegacyMergedConfig::class);
         $this->assertEquals('horde', $config1->get('app'));
         $this->assertEquals('horde-db', $config1->get('database.host'));
 
@@ -120,7 +120,7 @@ class LegacyMergedConfigInjectorTest extends TestCase
         ]);
         $this->injector->setInstance(LegacyMergedConfig::class, $impConfig);
 
-        $config2 = $this->injector->getInstance(LegacyMergedConfig::class);
+        $config2 = $this->injector->get(LegacyMergedConfig::class);
         $this->assertEquals('imp', $config2->get('app'));
         $this->assertEquals('horde-db', $config2->get('database.host'));
         $this->assertEquals('imap.example.com', $config2->get('mail.server'));
@@ -129,7 +129,7 @@ class LegacyMergedConfigInjectorTest extends TestCase
         // (restore horde config)
         $this->injector->setInstance(LegacyMergedConfig::class, $hordeConfig);
 
-        $config3 = $this->injector->getInstance(LegacyMergedConfig::class);
+        $config3 = $this->injector->get(LegacyMergedConfig::class);
         $this->assertEquals('horde', $config3->get('app'));
         $this->assertEquals('horde-db', $config3->get('database.host'));
         $this->assertNull($config3->get('mail.server'));  // imp-specific gone
@@ -147,8 +147,8 @@ class LegacyMergedConfigInjectorTest extends TestCase
         $this->injector->setInstance(LegacyMergedConfig::class, $config);
 
         // Simulate two factories requesting config
-        $instance1 = $this->injector->getInstance(LegacyMergedConfig::class);
-        $instance2 = $this->injector->getInstance(LegacyMergedConfig::class);
+        $instance1 = $this->injector->get(LegacyMergedConfig::class);
+        $instance2 = $this->injector->get(LegacyMergedConfig::class);
 
         // Should be same instance (singleton per binding)
         $this->assertSame($instance1, $instance2);
@@ -163,12 +163,12 @@ class LegacyMergedConfigInjectorTest extends TestCase
         $this->injector->setInstance(LegacyMergedConfig::class, $legacyConfig);
 
         // Verify LegacyMergedConfig is bound
-        $retrieved = $this->injector->getInstance(LegacyMergedConfig::class);
+        $retrieved = $this->injector->get(LegacyMergedConfig::class);
         $this->assertSame($legacyConfig, $retrieved);
 
         // Verify State is NOT bound (would throw exception)
         try {
-            $this->injector->getInstance(State::class);
+            $this->injector->get(State::class);
             $this->fail('State should not be bound to injector');
         } catch (Exception $e) {
             // Expected - State is not bound, throws from State constructor or injector
@@ -184,7 +184,7 @@ class LegacyMergedConfigInjectorTest extends TestCase
         $config = new LegacyMergedConfig(['value' => 'original']);
         $this->injector->setInstance(LegacyMergedConfig::class, $config);
 
-        $retrieved = $this->injector->getInstance(LegacyMergedConfig::class);
+        $retrieved = $this->injector->get(LegacyMergedConfig::class);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('ConfigState is immutable');

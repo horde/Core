@@ -67,7 +67,7 @@ class Horde_Registry_Logout
 
         foreach ($this->_getTasks() as $val) {
             try {
-                $ob = $injector->getInstance($val);
+                $ob = $injector->get($val);
                 if ($ob instanceof Horde_Registry_Logout_Task) {
                     $ob->logoutTask();
                 }
@@ -105,6 +105,6 @@ class Horde_Registry_Logout
      */
     private function _session(): SessionAccess
     {
-        return $GLOBALS['injector']->getInstance(SessionAccess::class);
+        return $GLOBALS['injector']->get(SessionAccess::class);
     }
 }

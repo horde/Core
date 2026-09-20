@@ -40,13 +40,13 @@ class LdapGroupServiceFactory
      */
     public function create(Injector $injector): LdapGroupService
     {
-        $loader = $injector->getInstance(ConfigLoader::class);
+        $loader = $injector->get(ConfigLoader::class);
         $config = $loader->load('horde');
 
         // Resolve the LDAP connection for the 'groups' service specifically:
         // falls back to the default 'ldap' config if 'ldap.service.groups'
         // isn't set (see HordeLdapServiceFactory::resolveConfig()).
-        $ldapFactory = $injector->getInstance(HordeLdapServiceFactory::class);
+        $ldapFactory = $injector->get(HordeLdapServiceFactory::class);
         $ldapService = $ldapFactory->create($injector, 'horde:groups');
 
         // Get group configuration (legacy conf.php key is singular: 'group', not 'groups')

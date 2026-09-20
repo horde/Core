@@ -55,7 +55,7 @@ class Horde
          * before we can start logging. Otherwise, queue entries. */
         if (isset($GLOBALS['injector'])
             && Horde_Core_Factory_Logger::available()) {
-            $GLOBALS['injector']->getInstance('Horde_Log_Logger')->logObject($log_ob);
+            $GLOBALS['injector']->get('Horde_Log_Logger')->logObject($log_ob);
         } else {
             Horde_Core_Factory_Logger::queue($log_ob);
         }

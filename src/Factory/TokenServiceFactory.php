@@ -88,7 +88,7 @@ class TokenServiceFactory
     public function create(Injector $injector): Token
     {
         return $this->createForSession(
-            $this->injector->getInstance(HordeSession::class)
+            $this->injector->get(HordeSession::class)
         );
     }
 
@@ -169,7 +169,7 @@ class TokenServiceFactory
 
     private function loadState(): State
     {
-        $loader = $this->injector->getInstance(ConfigLoader::class);
+        $loader = $this->injector->get(ConfigLoader::class);
 
         return $loader->load('horde');
     }
@@ -244,7 +244,7 @@ class TokenServiceFactory
      */
     private function buildSqlStorage(array $params): SqlStorage
     {
-        $dbService = $this->injector->getInstance(HordeDbService::class);
+        $dbService = $this->injector->get(HordeDbService::class);
         $table = isset($params['table']) && is_string($params['table'])
             ? $params['table']
             : 'horde_tokens';

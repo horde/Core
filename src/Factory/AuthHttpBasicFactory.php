@@ -8,6 +8,7 @@ use Horde\Core\Middleware\AuthHttpBasic;
 use Horde_Core_Factory_Injector as InjectorFactory;
 use Horde\Injector\Injector as Injector;
 use Horde_Registry;
+use Horde_Core_Factory_Auth;
 
 class AuthHttpBasicFactory extends InjectorFactory
 {
@@ -21,7 +22,7 @@ class AuthHttpBasicFactory extends InjectorFactory
      */
     public function create(Injector $injector): AuthHttpBasic
     {
-        $driver = $injector->getInstance('Horde_Core_Factory_Auth')->create();
+        $driver = $injector->get(Horde_Core_Factory_Auth::class)->create();
         $registry = $injector->get(Horde_Registry::class);
         return new AuthHttpBasic($driver, $registry);
     }

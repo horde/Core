@@ -25,8 +25,8 @@ class TopbarRendererFactory
     public function create(Injector $injector): TopbarRenderer
     {
         return new TopbarRenderer(
-            $injector->getInstance(AssetCollector::class),
-            $injector->getInstance(JsDiscoverer::class),
+            $injector->get(AssetCollector::class),
+            $injector->get(JsDiscoverer::class),
         );
     }
 }

@@ -19,7 +19,7 @@ class Horde_Core_Factory_Token extends Horde_Core_Factory_Injector
             ? []
             : Horde::getDriverConfig('token', $conf['token']['driver']);
 
-        $params['logger'] = $injector->getInstance('Horde_Log_Logger');
+        $params['logger'] = $injector->get('Horde_Log_Logger');
 
         if (!$session->exists('horde', 'token_secret_key')) {
             $session->set('horde', 'token_secret_key', strval(new Horde_Support_Randomid()));
@@ -32,7 +32,7 @@ class Horde_Core_Factory_Token extends Horde_Core_Factory_Injector
                 break;
 
             case 'nosql':
-                $nosql = $injector->getInstance('Horde_Core_Factory_Nosql')->create('horde', 'token');
+                $nosql = $injector->get(Horde_Core_Factory_Nosql::class)->create('horde', 'token');
                 if ($nosql instanceof Horde_Mongo_Client) {
                     $params['mongo_db'] = $nosql;
                     $driver = 'Horde_Token_Mongo';
@@ -40,7 +40,7 @@ class Horde_Core_Factory_Token extends Horde_Core_Factory_Injector
                 break;
 
             case 'sql':
-                $params['db'] = $injector->getInstance('Horde_Core_Factory_Db')->create('horde', 'token');
+                $params['db'] = $injector->get(Horde_Core_Factory_Db::class)->create('horde', 'token');
                 break;
         }
 

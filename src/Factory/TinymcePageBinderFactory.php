@@ -31,7 +31,7 @@ class TinymcePageBinderFactory
     public function create(Injector $injector): TinymcePageBinder
     {
         return new TinymcePageBinder(
-            $injector->getInstance(Tinymce::class),
+            $injector->get(Tinymce::class),
         );
     }
 }

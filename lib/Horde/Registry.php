@@ -555,12 +555,8 @@ class Horde_Registry implements Horde_Shutdown_Task
         /* Optional injector profiling — activated by env var. */
         if (getenv('HORDE_INJECTOR_PROFILE')) {
             try {
-                $dispatcher = $injector->getInstance(
-                    EventDispatcherInterface::class
-                );
-                $provider = $injector->getInstance(
-                    ListenerProviderInterface::class
-                );
+                $dispatcher = $injector->get(EventDispatcherInterface::class);
+                $provider = $injector->get(ListenerProviderInterface::class);
                 $collector = new \Horde\Injector\BindingMapCollector();
                 $provider->addListener($collector);
                 $injector->setEventDispatcher($dispatcher);
@@ -584,7 +580,7 @@ class Horde_Registry implements Horde_Shutdown_Task
         /* Initial Horde-wide settings. */
 
         /* Initialize browser object. */
-        $GLOBALS['browser'] = $injector->getInstance('Horde_Browser');
+        $GLOBALS['browser'] = $injector->get('Horde_Browser');
 
         /* Get modified time of registry files. */
         $regfiles = [
@@ -635,13 +631,13 @@ class Horde_Registry implements Horde_Shutdown_Task
              * instance; two divergent instances for the same PHP
              * session id decrypt each other's ciphertext with
              * different keys. See horde/Core#182. */
-            $hordeSession = $injector->getInstance(HordeSession::class);
+            $hordeSession = $injector->get(HordeSession::class);
             $injector->setInstance(HordeSession::class, $hordeSession);
 
             /* Ensure the per-session CSRF secret exists before closing a
              * read-only session, so view/download scripts can validate
              * tokens generated on full page views. */
-            $injector->getInstance(TokenServiceFactory::class)
+            $injector->get(TokenServiceFactory::class)
                 ->createForSession($hordeSession);
 
             if ($session_flags & self::SESSION_READONLY) {
@@ -667,7 +663,7 @@ class Horde_Registry implements Horde_Shutdown_Task
         $this->setLanguageEnvironment(null, 'horde');
 
         /* Initialize global page output object. */
-        $GLOBALS['page_output'] = $injector->getInstance('Horde_PageOutput');
+        $GLOBALS['page_output'] = $injector->get(Horde_PageOutput::class);
 
         /* Initialize notification object. Always attach status listener by
          * default. */
@@ -681,7 +677,7 @@ class Horde_Registry implements Horde_Shutdown_Task
                 $nclass = 'Horde_Core_Notification_Listener_SmartmobileStatus';
                 break;
         }
-        $GLOBALS['notification'] = $injector->getInstance('Horde_Notification');
+        $GLOBALS['notification'] = $injector->get('Horde_Notification');
         if (empty($args['nonotificationinit'])) {
             $GLOBALS['notification']->attachAllAppHandlers();
         }
@@ -760,7 +756,7 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     public function rebuild()
     {
-        $session = $GLOBALS['injector']->getInstance(HordeSession::class);
+        $session = $GLOBALS['injector']->get(HordeSession::class);
 
         $app = $this->getApp();
 
@@ -803,7 +799,7 @@ class Horde_Registry implements Horde_Shutdown_Task
                 ]),
                 [
                     'lifetime' => 0,
-                    'logger' => $injector->getInstance('Horde_Log_Logger'),
+                    'logger' => $injector->get('Horde_Log_Logger'),
                 ]
             );
 
@@ -811,7 +807,7 @@ class Horde_Registry implements Horde_Shutdown_Task
                 && ($cdata = $cache->get($cid, 0))) {
                 try {
                     [$this->applications, $this->_interfaces]
-                        = $injector->getInstance('Horde_Pack')->unpack($cdata);
+                        = $injector->get('Horde_Pack')->unpack($cdata);
                     return;
                 } catch (Horde_Pack_Exception $e) {
                 }
@@ -829,7 +825,7 @@ class Horde_Registry implements Horde_Shutdown_Task
         /* Need to determine hash of generated data, since it is possible that
          * there is dynamic data in the config files. This only needs to
          * be done once per session. */
-        $packed_data = $injector->getInstance('Horde_Pack')->pack([
+        $packed_data = $injector->get('Horde_Pack')->pack([
             $this->applications,
             $this->_interfaces,
         ]);
@@ -848,7 +844,7 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     protected function _cacheId($hash = null)
     {
-        $session = $GLOBALS['injector']->getInstance(HordeSession::class);
+        $session = $GLOBALS['injector']->get(HordeSession::class);
 
         if (!is_null($hash)) {
             $hash = hash('md5', $hash);
@@ -919,7 +915,7 @@ class Horde_Registry implements Horde_Shutdown_Task
          * be done here because it is possible to try to load app-specific
          * libraries from other applications. */
         if (!isset($this->_cache['ob'][$app])) {
-            $autoloader = $GLOBALS['injector']->getInstance('Horde_Autoloader');
+            $autoloader = $GLOBALS['injector']->get('Horde_Autoloader');
 
             $app_mappers = [
                 'Controller' =>  'controllers',
@@ -1559,7 +1555,7 @@ class Horde_Registry implements Horde_Shutdown_Task
                            ->add(
                                'token',
                                (string) $GLOBALS['injector']
-                                   ->getInstance(Token::class)
+                                   ->get(Token::class)
                                    ->generate(HordeSession::CSRF_SEED)
                            );
 
@@ -1751,7 +1747,7 @@ class Horde_Registry implements Horde_Shutdown_Task
         }
 
         /* Run authenticated hooks, if necessary. */
-        $hooks = $injector->getInstance('Horde_Core_Hooks');
+        $hooks = $injector->get(Horde_Core_Hooks::class);
         if ($session->get('horde', 'auth_app_init/' . $app)) {
             try {
                 $error = self::INITCALLBACK_FATAL;
@@ -1787,7 +1783,7 @@ class Horde_Registry implements Horde_Shutdown_Task
         /* Do login tasks. */
         if ($checkPerms
             && !empty($options['logintasks'])
-            && ($tasks = $injector->getInstance('Horde_Core_Factory_LoginTasks')->create($app))) {
+            && ($tasks = $injector->get(Horde_Core_Factory_LoginTasks::class)->create($app))) {
             $tasks->runTasks();
         }
 
@@ -1885,7 +1881,7 @@ class Horde_Registry implements Horde_Shutdown_Task
          * authentication against the app's auth backend, i.e. IMAP for IMP.
          */
         if (($perms != Horde_Perms::SHOW)
-            && $GLOBALS['injector']->getInstance('Horde_Core_Factory_Auth')->create($app)->requireAuth()
+            && $GLOBALS['injector']->get(Horde_Core_Factory_Auth::class)->create($app)->requireAuth()
             && !$this->isAuthenticated(['app' => $app, 'notransparent' => !empty($params['notransparent'])])) {
             return false;
         }
@@ -1893,8 +1889,8 @@ class Horde_Registry implements Horde_Shutdown_Task
         /* Otherwise, allow access for admins, for apps that do not have any
          * explicit permissions, or for apps that allow the given permission. */
         return $this->isAdmin()
-            || ($GLOBALS['injector']->getInstance('Horde_Perms')->exists($app)
-             ? $GLOBALS['injector']->getInstance('Horde_Perms')->hasPermission($app, $this->getAuth(), $perms)
+            || ($GLOBALS['injector']->get('Horde_Perms')->exists($app)
+             ? $GLOBALS['injector']->get('Horde_Perms')->hasPermission($app, $this->getAuth(), $perms)
              : (bool) $this->getAuth());
     }
 
@@ -1964,7 +1960,7 @@ class Horde_Registry implements Horde_Shutdown_Task
             ];
         }
 
-        $prefs = $injector->getInstance('Horde_Core_Factory_Prefs')->create($app, $opts);
+        $prefs = $injector->get(Horde_Core_Factory_Prefs::class)->create($app, $opts);
     }
 
     /**
@@ -2137,7 +2133,7 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     public function setView($view = self::VIEW_BASIC)
     {
-        $GLOBALS['injector']->getInstance(HordeSession::class)
+        $GLOBALS['injector']->get(HordeSession::class)
             ->setScoped('horde', 'view', $view);
     }
 
@@ -2148,7 +2144,7 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     public function getView()
     {
-        $session = $GLOBALS['injector']->getInstance(HordeSession::class);
+        $session = $GLOBALS['injector']->get(HordeSession::class);
 
         return $session->hasScoped('horde', 'view')
             ? $session->getScoped('horde', 'view')
@@ -2261,7 +2257,7 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     public function clearAuth($destroy = true)
     {
-        $session = $GLOBALS['injector']->getInstance(HordeSession::class);
+        $session = $GLOBALS['injector']->get(HordeSession::class);
 
         /* Do application logout tasks. */
         /* @todo: Replace with exclusively registered logout tasks. */
@@ -2318,7 +2314,7 @@ class Horde_Registry implements Horde_Shutdown_Task
             // shim's `$GLOBALS['session']->destroy()` wrapped exactly this
             // call; reaching for SessionLifecycle directly removes the
             // last shim hop inside Registry::clearAuth.
-            $lifecycle = $GLOBALS['injector']->getInstance(SessionLifecycle::class);
+            $lifecycle = $GLOBALS['injector']->get(SessionLifecycle::class);
             $lifecycle->destroy();
 
             // Mark the modern HordeSession destroyed so
@@ -2329,7 +2325,7 @@ class Horde_Registry implements Horde_Shutdown_Task
             // rebuilt instance, not the one we resolved at the top of
             // this method.
             $GLOBALS['injector']
-                ->getInstance(HordeSession::class)
+                ->get(HordeSession::class)
                 ->markDestroyed();
         }
     }
@@ -2343,7 +2339,7 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     public function clearAuthApp($app)
     {
-        $session = $GLOBALS['injector']->getInstance(HordeSession::class);
+        $session = $GLOBALS['injector']->get(HordeSession::class);
 
         if ($session->getScoped('horde', 'auth/credentials') == $app) {
             return false;
@@ -2390,7 +2386,7 @@ class Horde_Registry implements Horde_Shutdown_Task
         }
 
         return isset($options['permission'])
-            ? $GLOBALS['injector']->getInstance('Horde_Perms')->hasPermission($options['permission'], $user, $options['permlevel'] ?? Horde_Perms::EDIT)
+            ? $GLOBALS['injector']->get('Horde_Perms')->hasPermission($options['permission'], $user, $options['permlevel'] ?? Horde_Perms::EDIT)
             : false;
     }
 
@@ -2428,7 +2424,7 @@ class Horde_Registry implements Horde_Shutdown_Task
             $res = true;
         } elseif ($transparent) {
             try {
-                $res = $injector->getInstance('Horde_Core_Factory_Auth')->create($app)->transparent();
+                $res = $injector->get(Horde_Core_Factory_Auth::class)->create($app)->transparent();
             } catch (Horde_Exception $e) {
                 Horde::log($e);
                 $res = false;
@@ -2480,7 +2476,7 @@ class Horde_Registry implements Horde_Shutdown_Task
         if (!isset($options['reason'])) {
             // TODO: This only returns the error for Horde-wide
             // authentication, not for application auth.
-            $options['reason'] = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Auth')->create()->getError();
+            $options['reason'] = $GLOBALS['injector']->get(Horde_Core_Factory_Auth::class)->create()->getError();
         }
 
         $params = [];
@@ -2492,7 +2488,7 @@ class Horde_Registry implements Horde_Shutdown_Task
             || ($options['app'] == 'horde')
             || ($options['reason'] == Horde_Auth::REASON_LOGOUT)) {
             $params['horde_logout_token'] = (string) $GLOBALS['injector']
-                ->getInstance(Token::class)
+                ->get(Token::class)
                 ->generate(HordeSession::CSRF_SEED);
         }
 
@@ -2504,7 +2500,7 @@ class Horde_Registry implements Horde_Shutdown_Task
             $params['logout_reason'] = $options['reason'];
             if ($options['reason'] == Horde_Auth::REASON_MESSAGE) {
                 $params['logout_msg'] = empty($options['msg'])
-                    ? $GLOBALS['injector']->getInstance('Horde_Core_Factory_Auth')->create()->getError(true)
+                    ? $GLOBALS['injector']->get(Horde_Core_Factory_Auth::class)->create()->getError(true)
                     : $options['msg'];
             }
         }
@@ -2551,7 +2547,7 @@ class Horde_Registry implements Horde_Shutdown_Task
     public function convertUsername($userId, $toHorde)
     {
         try {
-            return $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
+            return $GLOBALS['injector']->get(Horde_Core_Hooks::class)
                 ->callHook('authusername', 'horde', [$userId, $toHorde]);
         } catch (Horde_Exception_HookNotSet $e) {
             return $userId;
@@ -2577,7 +2573,7 @@ class Horde_Registry implements Horde_Shutdown_Task
             return $this->_cache['auth'];
         }
 
-        $session = $GLOBALS['injector']->getInstance(HordeSession::class);
+        $session = $GLOBALS['injector']->get(HordeSession::class);
 
         if ($format == 'original') {
             return $session->hasScoped('horde', 'auth/authId')
@@ -2616,7 +2612,7 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     public function passwordChangeRequested()
     {
-        return (bool) $GLOBALS['injector']->getInstance(HordeSession::class)
+        return (bool) $GLOBALS['injector']->get(HordeSession::class)
             ->getScoped('horde', 'auth/change');
     }
 
@@ -2705,7 +2701,7 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     private function _credentialStore(): AuthCredentialStore
     {
-        return $GLOBALS['injector']->getInstance(AuthCredentialStore::class);
+        return $GLOBALS['injector']->get(AuthCredentialStore::class);
     }
 
     /**
@@ -2715,7 +2711,7 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     private function _credentialBaseApp(): ?string
     {
-        $value = $GLOBALS['injector']->getInstance(HordeSession::class)
+        $value = $GLOBALS['injector']->get(HordeSession::class)
             ->getScoped('horde', 'auth/credentials');
 
         return is_string($value) ? $value : null;
@@ -2769,7 +2765,7 @@ class Horde_Registry implements Horde_Shutdown_Task
         }
 
         // Legacy mode: Perform DNS resolution
-        $dns = $injector->getInstance('Net_DNS2_Resolver');
+        $dns = $injector->get('Net_DNS2_Resolver');
 
         if ($dns && !isset($out->host)) {
             $out->host = $out->addr;
@@ -2881,21 +2877,21 @@ class Horde_Registry implements Horde_Shutdown_Task
                 && ($remoteaddr = $session->get('horde', 'auth/remoteAddr'))
                 && ($remoteob = $this->remoteHost())
                 && ($remoteaddr != $remoteob->addr)) {
-                $injector->getInstance('Horde_Core_Factory_Auth')->create()
+                $injector->get(Horde_Core_Factory_Auth::class)->create()
                     ->setError(Horde_Core_Auth_Application::REASON_SESSIONIP);
                 return false;
             }
 
             if (!empty($conf['auth']['checkbrowser'])
                 && ($session->get('horde', 'auth/browser') != $browser->getAgentString())) {
-                $injector->getInstance('Horde_Core_Factory_Auth')->create()
+                $injector->get(Horde_Core_Factory_Auth::class)->create()
                     ->setError(Horde_Core_Auth_Application::REASON_BROWSER);
                 return false;
             }
 
             if (!empty($conf['session']['max_time'])
                 && (($conf['session']['max_time'] + $session->begin) < time())) {
-                $injector->getInstance('Horde_Core_Factory_Auth')->create()
+                $injector->get(Horde_Core_Factory_Auth::class)->create()
                     ->setError(Horde_Core_Auth_Application::REASON_SESSIONMAXTIME);
                 return false;
             }
@@ -2903,7 +2899,7 @@ class Horde_Registry implements Horde_Shutdown_Task
 
         foreach (array_unique(['horde', $app]) as $val) {
             if (!isset($this->_cache['existing'][$val])) {
-                $auth = $injector->getInstance('Horde_Core_Factory_Auth')->create($val);
+                $auth = $injector->get(Horde_Core_Factory_Auth::class)->create($val);
                 if (!$auth->validateAuth()) {
                     if (!$auth->getError()) {
                         $auth->setError(Horde_Auth::REASON_SESSION);
@@ -2928,7 +2924,7 @@ class Horde_Registry implements Horde_Shutdown_Task
     public function removeUser($userId)
     {
         $GLOBALS['injector']
-            ->getInstance('Horde_Core_Factory_Auth')
+            ->get(Horde_Core_Factory_Auth::class)
             ->create()
             ->removeUser($userId);
         $this->removeUserData($userId);
@@ -2957,7 +2953,7 @@ class Horde_Registry implements Horde_Shutdown_Task
         $errApps = [];
         if (!empty($applist)) {
             $prefs_ob = $GLOBALS['injector']
-                ->getInstance('Horde_Core_Factory_Prefs')
+                ->get(Horde_Core_Factory_Prefs::class)
                 ->create('horde', ['user' => $user]);
 
             // Remove all preference at once, if possible.
@@ -3014,7 +3010,7 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     public function getAuthInfo()
     {
-        $session = $GLOBALS['injector']->getInstance(HordeSession::class);
+        $session = $GLOBALS['injector']->get(HordeSession::class);
 
         // Reproduce the legacy "prefix get" semantics: read all keys
         // starting with "auth/" under the horde scope, return them as a
@@ -3038,7 +3034,7 @@ class Horde_Registry implements Horde_Shutdown_Task
     public function getAuthApps()
     {
         $apps = [];
-        foreach ($GLOBALS['injector']->getInstance(HordeSession::class)->keysForApp('horde') as $key) {
+        foreach ($GLOBALS['injector']->get(HordeSession::class)->keysForApp('horde') as $key) {
             if (str_starts_with($key, 'auth_app/')) {
                 $apps[] = substr($key, 9);
             }
@@ -3088,7 +3084,7 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     public function preferredLang($lang = null)
     {
-        $session = $GLOBALS['injector']->getInstance(HordeSession::class);
+        $session = $GLOBALS['injector']->get(HordeSession::class);
 
         /* Check if we have a language set in the session */
         if ($session->hasScoped('horde', 'language')) {
@@ -3163,7 +3159,7 @@ class Horde_Registry implements Horde_Shutdown_Task
             $lang = $this->preferredLang();
         }
 
-        $GLOBALS['injector']->getInstance(HordeSession::class)
+        $GLOBALS['injector']->get(HordeSession::class)
             ->setScoped('horde', 'language', $lang);
 
         $changed = false;
@@ -3228,7 +3224,7 @@ class Horde_Registry implements Horde_Shutdown_Task
             return;
         }
 
-        $session = $GLOBALS['injector']->getInstance(HordeSession::class);
+        $session = $GLOBALS['injector']->get(HordeSession::class);
         $session->clearScopeWithPrefixes('horde', ['nls/']);
     }
 

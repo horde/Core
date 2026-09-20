@@ -75,7 +75,7 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
                 $driver = $conf['prefs']['driver'];
                 switch (Horde_String::lower($driver)) {
                     case 'nosql':
-                        $nosql = $this->_injector->getInstance('Horde_Core_Factory_Nosql')->create('horde', 'prefs');
+                        $nosql = $this->_injector->get(Horde_Core_Factory_Nosql::class)->create('horde', 'prefs');
                         if ($nosql instanceof Horde_Mongo_Client) {
                             $driver = 'mongo';
                         }
@@ -96,7 +96,7 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
 
         $opts = array_merge([
             'cache' => true,
-            'logger' => $this->_injector->getInstance('Horde_Log_Logger'),
+            'logger' => $this->_injector->get('Horde_Log_Logger'),
             'password' => '',
             'sizecallback' => ((isset($conf['prefs']['maxsize'])) ? [$this, 'sizeCallback'] : null),
             'user' => '',
@@ -127,7 +127,7 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
             switch ($driver) {
                 case 'Horde_Prefs_Storage_Ldap':
                     $params['ldap'] = $this->_injector
-                        ->getInstance('Horde_Core_Factory_Ldap')
+                        ->get(Horde_Core_Factory_Ldap::class)
                         ->create('horde', 'prefs');
                     break;
 
@@ -140,7 +140,7 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
                     break;
 
                 case 'Horde_Prefs_Storage_Sql':
-                    $params['db'] = $this->_injector->getInstance('Horde_Core_Factory_Db')->create('horde', 'prefs');
+                    $params['db'] = $this->_injector->get(Horde_Core_Factory_Db::class)->create('horde', 'prefs');
                     break;
 
                 case 'Horde_Prefs_Storage_Imsp':
@@ -148,7 +148,7 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
                     $imspParams['username'] = $registry->getAuth('bare');
                     $imspParams['password'] = $registry->getAuthCredential('password');
                     $params['imsp'] = $this->_injector
-                        ->getInstance('Horde_Core_Factory_Imsp')->create('Options', $imspParams);
+                        ->get(Horde_Core_Factory_Imsp::class)->create('Options', $imspParams);
             }
             $this->storage = new $driver($opts['user'], $params);
         } catch (Horde_Exception $e) {
@@ -198,7 +198,7 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
      */
     protected function _notifyError($e)
     {
-        $session = $GLOBALS['injector']->getInstance(HordeSession::class);
+        $session = $GLOBALS['injector']->get(HordeSession::class);
         if (!$session->getScoped('horde', 'no_prefs')) {
             $session->setScoped('horde', 'no_prefs', true);
             if (isset($GLOBALS['notification'])) {
@@ -229,7 +229,7 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
             $params['cache'] = new Horde_Cache_Storage_Null();
             $params['maxsize'] = 0;
         } else {
-            $params['cache'] = $injector->getInstance('Horde_Cache');
+            $params['cache'] = $injector->get('Horde_Cache');
         }
 
         return new Horde_Prefs_Cache_HordeCache(
@@ -243,7 +243,7 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
                          * oversized) or is compressed within the session
                          * (if stored in session cache). */
                         'compress' => false,
-                        'logger' => $injector->getInstance('Horde_Core_Log_Wrapper'),
+                        'logger' => $injector->get(Horde_Core_Log_Wrapper::class),
                     ]
                 ),
             ]

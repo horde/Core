@@ -55,7 +55,7 @@ class GroupServiceFactory
      */
     public function create(Injector $injector): GroupService
     {
-        $loader = $injector->getInstance(ConfigLoader::class);
+        $loader = $injector->get(ConfigLoader::class);
         $state = $loader->load('horde');
 
         $driver = strtolower($state->get('group.driver', 'sql'));
@@ -63,7 +63,7 @@ class GroupServiceFactory
 
         return match ($driver) {
             'sql' => $this->createSqlBackend($injector, $params),
-            'ldap' => $injector->getInstance(LdapGroupServiceFactory::class)->create($injector),
+            'ldap' => $injector->get(LdapGroupServiceFactory::class)->create($injector),
             default => throw new RuntimeException(
                 "Unsupported group driver: {$driver}. "
                 . "Modern GroupService currently supports 'sql' and 'ldap'. "
@@ -95,7 +95,7 @@ class GroupServiceFactory
         Injector $injector,
         array $params,
     ): SqlGroupService {
-        $dbFactory = $injector->getInstance(DbServiceFactory::class);
+        $dbFactory = $injector->get(DbServiceFactory::class);
         $dbService = $dbFactory->create($injector, 'horde:group');
 
         $backend = new Horde_Group_Sql([

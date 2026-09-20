@@ -62,7 +62,7 @@ class HordeCore implements MiddlewareInterface
             $injector->setInstance(ResponseFactoryInterface::class, new ResponseFactory());
         }
 
-        $registry = $injector->getInstance('Horde_Registry');
+        $registry = $injector->get(Horde_Registry::class);
         $request = $request->withAttribute('registry', $registry);
 
         // Bridge RuntimeRoutesProvider into legacy injector so controllers can use RoutesProvider
@@ -99,7 +99,7 @@ class HordeCore implements MiddlewareInterface
         // Resolve controller
         if ($controllerName) {
             try {
-                $controller = $injector->getInstance($controllerName);
+                $controller = $injector->get($controllerName);
             } catch (Exception $e) {
                 throw new HordeException(
                     'Defined controller but could not create: ' . $controllerName . ' — ' . $e->getMessage(),

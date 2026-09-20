@@ -117,7 +117,7 @@ class Horde_Core_Factory_Mail extends Horde_Core_Factory_Base
                 && strlen((string) ($auth = $registry->getAuth()))) {
                 /* Try to get SMTP credentials via hook (e.g. for XOAUTH2 support). */
                 try {
-                    $hooks = $this->_injector->getInstance('Horde_Core_Hooks');
+                    $hooks = $this->_injector->get(Horde_Core_Hooks::class);
                     $smtp_creds = $hooks->callHook('smtp_credentials', 'horde', [$auth]);
 
                     // Hook returned XOAUTH2 credentials

@@ -50,7 +50,7 @@ class SidebarRendererFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorResolvesSidebarRenderer(): void
     {
-        $renderer = $this->injector->getInstance(SidebarRenderer::class);
+        $renderer = $this->injector->get(SidebarRenderer::class);
 
         self::assertInstanceOf(SidebarRenderer::class, $renderer);
     }
@@ -58,8 +58,8 @@ class SidebarRendererFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorReturnsSameInstance(): void
     {
-        $first = $this->injector->getInstance(SidebarRenderer::class);
-        $second = $this->injector->getInstance(SidebarRenderer::class);
+        $first = $this->injector->get(SidebarRenderer::class);
+        $second = $this->injector->get(SidebarRenderer::class);
 
         self::assertSame($first, $second);
     }

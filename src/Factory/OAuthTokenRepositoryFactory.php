@@ -36,7 +36,7 @@ class OAuthTokenRepositoryFactory
 {
     public function create(Injector $injector): OAuthTokenRepository
     {
-        $loader = $injector->getInstance(ConfigLoader::class);
+        $loader = $injector->get(ConfigLoader::class);
         $state = $loader->load('horde');
 
         $driver = $state->get('oauth.token_driver', 'null');

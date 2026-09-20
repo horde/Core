@@ -53,7 +53,7 @@ class Horde_Core_HashTable_Vfs extends Horde_HashTable_Vfs
         global $injector;
 
         try {
-            $vfs = $injector->getInstance('Horde_Core_Factory_Vfs')->create();
+            $vfs = $injector->get(Horde_Core_Factory_Vfs::class)->create();
         } catch (Horde_Vfs_Exception $e) {
         }
 
@@ -62,7 +62,7 @@ class Horde_Core_HashTable_Vfs extends Horde_HashTable_Vfs
         }
 
         parent::__construct(array_merge($params, [
-            'logger' => $injector->getInstance('Horde_Core_Log_Wrapper'),
+            'logger' => $injector->get(Horde_Core_Log_Wrapper::class),
             'vfs' => $vfs,
         ]));
     }

@@ -43,7 +43,7 @@ class Horde_Core_HashTable_Wrapper
     public function __call($name, $arguments)
     {
         return call_user_func_array(
-            [$GLOBALS['injector']->getInstance('Horde_HashTable'), $name],
+            [$GLOBALS['injector']->get('Horde_HashTable'), $name],
             $arguments
         );
     }
@@ -53,7 +53,7 @@ class Horde_Core_HashTable_Wrapper
      */
     public function __get($name)
     {
-        return $GLOBALS['injector']->getInstance('Horde_HashTable')->$name;
+        return $GLOBALS['injector']->get('Horde_HashTable')->$name;
     }
 
     /**
@@ -61,7 +61,7 @@ class Horde_Core_HashTable_Wrapper
      */
     public function __set($name, $value)
     {
-        $GLOBALS['injector']->getInstance('Horde_HashTable')->$name = $value;
+        $GLOBALS['injector']->get('Horde_HashTable')->$name = $value;
     }
 
 }

@@ -36,10 +36,10 @@ class TopbarBuilderFactory
     public function create(Horde_Injector|Injector $injector): TopbarBuilder
     {
         return new TopbarBuilder(
-            $injector->getInstance(Horde_Registry::class),
-            $injector->getInstance(PrefsService::class),
-            $injector->getInstance(PermissionService::class),
-            $injector->getInstance(SessionAccess::class),
+            $injector->get(Horde_Registry::class),
+            $injector->get(PrefsService::class),
+            $injector->get(PermissionService::class),
+            $injector->get(SessionAccess::class),
         );
     }
 }

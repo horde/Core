@@ -25,7 +25,7 @@ class PathBuilderFactory
 {
     public function create(Injector $injector): PathBuilderInterface
     {
-        $registryLoader = $injector->getInstance(RegistryConfigLoader::class);
+        $registryLoader = $injector->get(RegistryConfigLoader::class);
         $registryState = $registryLoader->load();
 
         return new PathBuilder($registryState);

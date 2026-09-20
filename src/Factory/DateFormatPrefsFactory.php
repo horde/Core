@@ -37,13 +37,13 @@ class DateFormatPrefsFactory
     {
         $logger = null;
         try {
-            $logger = $injector->getInstance(LoggerInterface::class);
+            $logger = $injector->get(LoggerInterface::class);
         } catch (Throwable) {
             // Logger unavailable — proceed without
         }
 
         return new DateFormatPrefs(
-            prefs: $injector->getInstance('Horde_Prefs'),
+            prefs: $injector->get('Horde_Prefs'),
             locale: $GLOBALS['language'] ?? 'en_US',
             logger: $logger,
         );

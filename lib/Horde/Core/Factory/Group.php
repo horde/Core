@@ -20,7 +20,7 @@ class Horde_Core_Factory_Group extends Horde_Core_Factory_Injector
             }
         }
         if (!empty($GLOBALS['conf']['group']['cache'])) {
-            $params['cache'] = $injector->getInstance('Horde_Cache');
+            $params['cache'] = $injector->get('Horde_Cache');
         }
 
         switch ($driver) {
@@ -32,14 +32,14 @@ class Horde_Core_Factory_Group extends Horde_Core_Factory_Injector
             case 'Ldap':
                 $class = 'Horde_Core_Group_Ldap';
                 $params['ldap'] = $injector
-                    ->getInstance('Horde_Core_Factory_Ldap')
+                    ->get(Horde_Core_Factory_Ldap::class)
                     ->create('horde', 'group');
                 break;
 
             case 'Sql':
                 $class = 'Horde_Group_Sql';
                 $params['db'] = $injector
-                    ->getInstance('Horde_Core_Factory_Db')
+                    ->get(Horde_Core_Factory_Db::class)
                     ->create('horde', 'group');
                 break;
 

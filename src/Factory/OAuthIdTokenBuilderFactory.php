@@ -33,10 +33,10 @@ class OAuthIdTokenBuilderFactory
         $ttl = (int) ($oauthConf['access_token_ttl'] ?? 3600);
 
         return new IdTokenBuilder(
-            $injector->getInstance(TokenEncoder::class),
-            $injector->getInstance(Rs256Signer::class),
-            $injector->getInstance(ClaimsMapper::class),
-            $injector->getInstance(ScopeClaimsMapping::class),
+            $injector->get(TokenEncoder::class),
+            $injector->get(Rs256Signer::class),
+            $injector->get(ClaimsMapper::class),
+            $injector->get(ScopeClaimsMapping::class),
             $issuer,
             $ttl,
         );

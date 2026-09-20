@@ -33,7 +33,7 @@ class Horde_Core_Dav_Auth extends Horde_Dav_Auth
     {
         $user = $this->_auth->getCredential('userId');
         try {
-            $user = $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
+            $user = $GLOBALS['injector']->get(Horde_Core_Hooks::class)
                 ->callHook('davusername', 'horde', [$user, false]);
         } catch (Horde_Exception_HookNotSet $e) {
         }

@@ -118,7 +118,7 @@ class Horde_Core_Alarm_Handler_Mail extends Horde_Alarm_Handler
         }
 
         if ($this->_mail === null) {
-            $this->_mail = $this->_injector->getInstance('Horde_Mail');
+            $this->_mail = $this->_injector->get('Horde_Mail');
         }
 
         try {

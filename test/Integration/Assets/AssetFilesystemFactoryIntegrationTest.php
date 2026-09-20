@@ -26,7 +26,7 @@ class AssetFilesystemFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorResolvesAssetFilesystem(): void
     {
-        $fs = $this->injector->getInstance(AssetFilesystem::class);
+        $fs = $this->injector->get(AssetFilesystem::class);
 
         self::assertInstanceOf(AssetFilesystem::class, $fs);
         self::assertInstanceOf(LocalAssetFilesystem::class, $fs);
@@ -35,7 +35,7 @@ class AssetFilesystemFactoryIntegrationTest extends TestCase
     #[Test]
     public function factoryProducedFilesystemChecksFiles(): void
     {
-        $fs = $this->injector->getInstance(AssetFilesystem::class);
+        $fs = $this->injector->get(AssetFilesystem::class);
 
         self::assertTrue($fs->fileExists(__FILE__));
         self::assertFalse($fs->fileExists('/tmp/nonexistent-integration-' . uniqid() . '.php'));
@@ -44,7 +44,7 @@ class AssetFilesystemFactoryIntegrationTest extends TestCase
     #[Test]
     public function localAssetFilesystemAlsoServesAsResponsiveAssetsFilesystem(): void
     {
-        $fs = $this->injector->getInstance(AssetFilesystem::class);
+        $fs = $this->injector->get(AssetFilesystem::class);
 
         self::assertInstanceOf(ResponsiveAssetsFilesystem::class, $fs);
     }
@@ -52,8 +52,8 @@ class AssetFilesystemFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorReturnsSameInstance(): void
     {
-        $first = $this->injector->getInstance(AssetFilesystem::class);
-        $second = $this->injector->getInstance(AssetFilesystem::class);
+        $first = $this->injector->get(AssetFilesystem::class);
+        $second = $this->injector->get(AssetFilesystem::class);
 
         self::assertSame($first, $second);
     }

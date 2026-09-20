@@ -75,7 +75,7 @@ class Horde_Core_Ui_FlagImage
         $resolver = new Horde\Nls\Dns\NativeResolver();
 
         try {
-            $netDnsResolver = $injector->getInstance('Net_DNS2_Resolver');
+            $netDnsResolver = $injector->get('Net_DNS2_Resolver');
             $resolver = new Horde\Nls\Dns\NetDns2Resolver($netDnsResolver);
         } catch (Exception $e) {
         }

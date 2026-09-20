@@ -13,6 +13,6 @@ class Horde_Core_Factory_Memcache extends Horde_Core_Factory_Injector
     {
         return empty($GLOBALS['conf']['memcache']['enabled'])
             ? null
-            : new Horde_Memcache(array_merge($GLOBALS['conf']['memcache'], ['logger' => $injector->getInstance('Horde_Core_Log_Wrapper')]));
+            : new Horde_Memcache(array_merge($GLOBALS['conf']['memcache'], ['logger' => $injector->get(Horde_Core_Log_Wrapper::class)]));
     }
 }

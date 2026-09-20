@@ -38,6 +38,6 @@ class Horde_Core_Factory_ElasticSearch extends Horde_Core_Factory_Injector
      */
     public function create(Horde_Injector|Injector $injector)
     {
-        return new Horde_ElasticSearch_Client('http://localhost:9200/', $injector->getInstance('Horde_Http_Client'));
+        return new Horde_ElasticSearch_Client('http://localhost:9200/', $injector->get('Horde_Http_Client'));
     }
 }

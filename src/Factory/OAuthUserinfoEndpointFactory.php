@@ -28,10 +28,10 @@ class OAuthUserinfoEndpointFactory
     public function create(Injector $injector): UserinfoEndpoint
     {
         return new UserinfoEndpoint(
-            $injector->getInstance(ClaimsMapper::class),
-            $injector->getInstance(ScopeClaimsMapping::class),
-            $injector->getInstance(ResponseFactoryInterface::class),
-            $injector->getInstance(StreamFactoryInterface::class),
+            $injector->get(ClaimsMapper::class),
+            $injector->get(ScopeClaimsMapping::class),
+            $injector->get(ResponseFactoryInterface::class),
+            $injector->get(StreamFactoryInterface::class),
         );
     }
 }

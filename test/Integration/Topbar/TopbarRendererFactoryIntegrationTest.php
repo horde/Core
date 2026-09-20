@@ -50,7 +50,7 @@ class TopbarRendererFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorResolvesTopbarRenderer(): void
     {
-        $renderer = $this->injector->getInstance(TopbarRenderer::class);
+        $renderer = $this->injector->get(TopbarRenderer::class);
 
         self::assertInstanceOf(TopbarRenderer::class, $renderer);
     }
@@ -58,8 +58,8 @@ class TopbarRendererFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorReturnsSameInstance(): void
     {
-        $first = $this->injector->getInstance(TopbarRenderer::class);
-        $second = $this->injector->getInstance(TopbarRenderer::class);
+        $first = $this->injector->get(TopbarRenderer::class);
+        $second = $this->injector->get(TopbarRenderer::class);
 
         self::assertSame($first, $second);
     }

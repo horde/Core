@@ -89,7 +89,7 @@ class Horde_Core_Factory_Imsp extends Horde_Core_Factory_Base
             $params['auth_method'] = $GLOBALS['conf']['imsp']['auth_method'];
         }
 
-        $params['authObj'] = $this->_injector->getInstance('Horde_Core_Factory_ImspAuth')->create($params['auth_method'], $params);
+        $params['authObj'] = $this->_injector->get(Horde_Core_Factory_ImspAuth::class)->create($params['auth_method'], $params);
         // @TODO: Separate class for the imtest client?
         unset($params['auth_method']);
         try {

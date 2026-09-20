@@ -23,7 +23,7 @@ class ApiRegistryFactory
     public function create(Injector $injector): ApiRegistry
     {
         $registry = new ApiRegistry();
-        $registryLoader = $injector->getInstance(RegistryConfigLoader::class);
+        $registryLoader = $injector->get(RegistryConfigLoader::class);
         $state = $registryLoader->load();
 
         foreach ($state->listApplications() as $appName) {
@@ -38,7 +38,7 @@ class ApiRegistryFactory
             }
 
             try {
-                $appInstance = $injector->getInstance($className);
+                $appInstance = $injector->get($className);
                 $interfaces = $appInstance->getApiInterfaceList();
             } catch (Throwable) {
                 continue;
@@ -46,7 +46,7 @@ class ApiRegistryFactory
 
             foreach ($interfaces as $interface => $providerClass) {
                 try {
-                    $provider = $injector->getInstance($providerClass);
+                    $provider = $injector->get($providerClass);
                 } catch (Throwable) {
                     continue;
                 }

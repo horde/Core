@@ -57,7 +57,7 @@ trait PublishesModernSessionToAccessorTrait
         $GLOBALS['injector']->setInstance(HordeSession::class, $fresh);
 
         try {
-            $access = $GLOBALS['injector']->getInstance(SessionAccess::class);
+            $access = $GLOBALS['injector']->get(SessionAccess::class);
             if ($access instanceof SessionAccessor) {
                 $access->replaceWith($fresh);
             }

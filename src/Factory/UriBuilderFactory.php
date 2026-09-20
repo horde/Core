@@ -29,20 +29,20 @@ class UriBuilderFactory
 {
     public function create(Injector $injector): UriBuilderInterface
     {
-        $registryLoader = $injector->getInstance(RegistryConfigLoader::class);
+        $registryLoader = $injector->get(RegistryConfigLoader::class);
         $registryState = $registryLoader->load();
 
-        $routeProvider = $injector->getInstance(RouteMapperProvider::class);
+        $routeProvider = $injector->get(RouteMapperProvider::class);
 
         $request = null;
         try {
-            $request = $injector->getInstance(ServerRequestInterface::class);
+            $request = $injector->get(ServerRequestInterface::class);
         } catch (Throwable) {
         }
 
         $configState = null;
         try {
-            $configState = $injector->getInstance(ConfigLoader::class)->load('horde');
+            $configState = $injector->get(ConfigLoader::class)->load('horde');
         } catch (Throwable) {
         }
 

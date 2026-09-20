@@ -30,9 +30,9 @@ class OAuthJwksEndpointFactory
         $oauthConf = $conf['oauth_server'] ?? [];
 
         return new JwksEndpoint(
-            $injector->getInstance(PublicKey::class),
-            $injector->getInstance(ResponseFactoryInterface::class),
-            $injector->getInstance(StreamFactoryInterface::class),
+            $injector->get(PublicKey::class),
+            $injector->get(ResponseFactoryInterface::class),
+            $injector->get(StreamFactoryInterface::class),
             $oauthConf['key_id'] ?? 'horde-1',
             'RS256',
         );

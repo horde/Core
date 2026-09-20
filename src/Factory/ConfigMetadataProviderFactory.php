@@ -43,7 +43,7 @@ class ConfigMetadataProviderFactory
      */
     public function create(): ConfigMetadataProvider
     {
-        $repository = $this->injector->getInstance(DriverRepository::class);
+        $repository = $this->injector->get(DriverRepository::class);
         return new ConfigMetadataProvider($repository);
     }
 }

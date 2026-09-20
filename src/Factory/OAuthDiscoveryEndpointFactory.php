@@ -27,9 +27,9 @@ class OAuthDiscoveryEndpointFactory
     public function create(Injector $injector): DiscoveryEndpoint
     {
         return new DiscoveryEndpoint(
-            $injector->getInstance(ServerMetadata::class),
-            $injector->getInstance(ResponseFactoryInterface::class),
-            $injector->getInstance(StreamFactoryInterface::class),
+            $injector->get(ServerMetadata::class),
+            $injector->get(ResponseFactoryInterface::class),
+            $injector->get(StreamFactoryInterface::class),
         );
     }
 }

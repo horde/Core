@@ -30,19 +30,19 @@ class CssDiscovererFactory
 {
     public function create(Injector $injector): CssDiscoverer
     {
-        $pathBuilder = $injector->getInstance(PathBuilderInterface::class);
-        $uriBuilder = $injector->getInstance(UriBuilderInterface::class);
-        $filesystem = $injector->getInstance(AssetFilesystem::class);
+        $pathBuilder = $injector->get(PathBuilderInterface::class);
+        $uriBuilder = $injector->get(UriBuilderInterface::class);
+        $filesystem = $injector->get(AssetFilesystem::class);
 
         $textDirection = null;
         try {
-            $textDirection = $injector->getInstance(TextDirectionProvider::class);
+            $textDirection = $injector->get(TextDirectionProvider::class);
         } catch (Throwable) {
         }
 
         $hookProvider = null;
         try {
-            $hookProvider = $injector->getInstance(CssHookProvider::class);
+            $hookProvider = $injector->get(CssHookProvider::class);
         } catch (Throwable) {
         }
 

@@ -56,7 +56,7 @@ class Horde_Core_Factory_Alarm extends Horde_Core_Factory_Base
             case 'sql':
                 try {
                     $params['db'] = $this->_injector
-                        ->getInstance('Horde_Core_Factory_Db')
+                        ->get(Horde_Core_Factory_Db::class)
                         ->create('horde', 'alarms');
                 } catch (Horde_Exception $e) {
                     $driver = 'null';
@@ -65,7 +65,7 @@ class Horde_Core_Factory_Alarm extends Horde_Core_Factory_Base
                 break;
         }
 
-        $params['logger'] = $this->_injector->getInstance('Horde_Log_Logger');
+        $params['logger'] = $this->_injector->get('Horde_Log_Logger');
         $params['loader'] = [$this, 'load'];
 
         $this->_ttl = $params['ttl']
@@ -88,7 +88,7 @@ class Horde_Core_Factory_Alarm extends Horde_Core_Factory_Base
             new Horde_Core_Alarm_Handler_Desktop([
                 'icon' => new Horde_Core_Alarm_Handler_Desktop_Icon('alerts/alarm.png'),
                 'js_notify' => [
-                    $this->_injector->getInstance('Horde_PageOutput'),
+                    $this->_injector->get(Horde_PageOutput::class),
                     'addInlineScript',
                 ],
             ])
@@ -98,7 +98,7 @@ class Horde_Core_Factory_Alarm extends Horde_Core_Factory_Base
             'mail',
             new Horde_Core_Alarm_Handler_Mail([
                 'injector' => $this->_injector,
-                'identity' => $this->_injector->getInstance('Horde_Core_Factory_Identity'),
+                'identity' => $this->_injector->get(Horde_Core_Factory_Identity::class),
             ])
         );
 
@@ -121,7 +121,7 @@ class Horde_Core_Factory_Alarm extends Horde_Core_Factory_Base
     {
         global $registry;
 
-        $session = $this->_injector->getInstance(HordeSession::class);
+        $session = $this->_injector->get(HordeSession::class);
 
         if ($this->_ttl
             && $session->hasScoped('horde', 'alarm_loaded')

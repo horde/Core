@@ -145,7 +145,7 @@ class Horde_Config
     public function checkVersions()
     {
         $response = $GLOBALS['injector']
-            ->getInstance('Horde_Core_Factory_HttpClient')
+            ->get(Horde_Core_Factory_HttpClient::class)
             ->create([
                 'request.timeout' => 60,
                 'request.userAgent' => 'Horde ' . $GLOBALS['registry']->getVersion('horde', true),
@@ -352,7 +352,7 @@ class Horde_Config
         }
 
         /* Cannot write. Save to session. */
-        $GLOBALS['injector']->getInstance(HordeSession::class)
+        $GLOBALS['injector']->get(HordeSession::class)
             ->setScoped('horde', 'config/' . $this->_app, $php);
 
         return false;
@@ -540,7 +540,7 @@ class Horde_Config
             $name = $node->getAttribute('name');
             // Don't pass Null or Integer to a Text Filter
             $desc = (string) $node->getAttribute('desc');
-            $desc = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($desc, 'linkurls');
+            $desc = $GLOBALS['injector']->get(Horde_Core_Factory_TextFilter::class)->filter($desc, 'linkurls');
             $required = !($node->getAttribute('required') == 'false');
             $quote = !($node->getAttribute('quote') == 'false');
 
@@ -556,7 +556,7 @@ class Horde_Config
 
                     $conf[$name] = [
                         '_type' => 'description',
-                        'desc' => $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($this->_default($curctx, $this->_getNodeOnlyText($node)), 'linkurls'),
+                        'desc' => $GLOBALS['injector']->get(Horde_Core_Factory_TextFilter::class)->filter($this->_default($curctx, $this->_getNodeOnlyText($node)), 'linkurls'),
                     ];
                     break;
 
@@ -1198,9 +1198,7 @@ class Horde_Config
 
         if ($useMetadata && $injector) {
             try {
-                $provider = $injector->getInstance(
-                    ConfigMetadataProvider::class
-                );
+                $provider = $injector->get(ConfigMetadataProvider::class);
                 $adapter = new LegacyConfigAdapter($provider);
 
                 // Get driver metadata converted to legacy format

@@ -239,7 +239,7 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
                     || !$this->rowExists($row)
                     || !$this->colExists($col)) {
                     // Check permissions.
-                    $max_blocks = $GLOBALS['injector']->getInstance('Horde_Core_Perms')->hasAppPermission('max_blocks');
+                    $max_blocks = $GLOBALS['injector']->get(Horde_Core_Perms::class)->hasAppPermission('max_blocks');
                     if (($max_blocks !== true)
                         && ($max_blocks <= count($this))) {
                         Horde::permissionDeniedError(
@@ -335,7 +335,7 @@ class Horde_Core_Block_Layout_Manager extends Horde_Core_Block_Layout implements
         if (!isset($this->_blocks[$row][$col])) {
             $field = $this->_layout[$row][$col];
             $this->_blocks[$row][$col] = $GLOBALS['injector']
-                ->getInstance('Horde_Core_Factory_BlockCollection')
+                ->get(Horde_Core_Factory_BlockCollection::class)
                 ->create()
                 ->getBlock(
                     $field['app'],
