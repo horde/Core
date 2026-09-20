@@ -26,8 +26,8 @@ class OAuthClientCredentialsGrantFactory
     public function create(Injector $injector): ClientCredentialsGrant
     {
         return new ClientCredentialsGrant(
-            $injector->getInstance(AccessTokenIssuer::class),
-            $injector->getInstance(ScopeRepository::class),
+            $injector->get(AccessTokenIssuer::class),
+            $injector->get(ScopeRepository::class),
         );
     }
 }

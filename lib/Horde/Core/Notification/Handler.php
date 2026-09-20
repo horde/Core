@@ -66,7 +66,7 @@ class Horde_Core_Notification_Handler extends Horde_Notification_Handler
     ) {
         parent::__construct($storage);
         $this->_session = $session
-            ?? $GLOBALS['injector']->getInstance(SessionAccess::class);
+            ?? $GLOBALS['injector']->get(SessionAccess::class);
     }
 
     /**

@@ -38,7 +38,7 @@ class Horde_Themes_Css_Cache_HordeCache extends Horde_Themes_Css_Cache
             }
         }
 
-        $cache = $injector->getInstance('Horde_Cache');
+        $cache = $injector->get('Horde_Cache');
         $sig = hash(
             /* Use 64-bit FNV algo (instead of 32-bit) since this is a
              * publicly accessible key and we want to guarantee filename

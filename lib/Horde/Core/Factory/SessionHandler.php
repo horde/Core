@@ -51,12 +51,12 @@ class Horde_Core_Factory_SessionHandler extends Horde_Core_Factory_Injector
             case 'hashtable':
                 // DEPRECATED
             case 'memcache':
-                $params['hashtable'] = $injector->getInstance('Horde_HashTable');
+                $params['hashtable'] = $injector->get('Horde_HashTable');
                 $driver = 'hashtable';
                 break;
 
             case 'nosql':
-                $nosql = $injector->getInstance('Horde_Core_Factory_Nosql')->create('horde', 'sessionhandler');
+                $nosql = $injector->get(Horde_Core_Factory_Nosql::class)->create('horde', 'sessionhandler');
                 if ($nosql instanceof Horde_Mongo_Client) {
                     $params['mongo_db'] = $nosql;
                     $driver = 'Horde_SessionHandler_Storage_Mongo';
@@ -64,7 +64,7 @@ class Horde_Core_Factory_SessionHandler extends Horde_Core_Factory_Injector
                 break;
 
             case 'sql':
-                $factory = $injector->getInstance('Horde_Core_Factory_Db');
+                $factory = $injector->get(Horde_Core_Factory_Db::class);
                 $config = $factory->getConfig('sessionhandler');
                 unset($config['umask'], $config['driverconfig']);
                 $params['db'] = $factory->createDb($config);
@@ -80,7 +80,7 @@ class Horde_Core_Factory_SessionHandler extends Horde_Core_Factory_Injector
             $storage = new Horde_SessionHandler_Storage_Stack([
                 'stack' => [
                     new Horde_SessionHandler_Storage_Hashtable([
-                        'hashtable' => $injector->getInstance('Horde_HashTable'),
+                        'hashtable' => $injector->get('Horde_HashTable'),
                     ]),
                     $this->storage,
                 ],
@@ -98,7 +98,7 @@ class Horde_Core_Factory_SessionHandler extends Horde_Core_Factory_Injector
         return new Horde_SessionHandler(
             $storage,
             [
-                'logger' => $injector->getInstance('Horde_Log_Logger'),
+                'logger' => $injector->get('Horde_Log_Logger'),
                 'no_md5' => true,
                 'noset' => true,
                 'parse' => [$this, 'readSessionData'],

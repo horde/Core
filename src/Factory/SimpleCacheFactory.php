@@ -66,7 +66,7 @@ class SimpleCacheFactory
 
     private function loadConfig(Injector $injector): State
     {
-        $loader = $injector->getInstance(ConfigLoader::class);
+        $loader = $injector->get(ConfigLoader::class);
 
         return $loader->load('horde');
     }
@@ -85,7 +85,7 @@ class SimpleCacheFactory
     private function getLogger(Injector $injector): LoggerInterface
     {
         try {
-            return $injector->getInstance(LoggerInterface::class);
+            return $injector->get(LoggerInterface::class);
         } catch (Throwable) {
             return new NullLogger();
         }
@@ -126,7 +126,7 @@ class SimpleCacheFactory
 
     private function createSqlStorage(Injector $injector, LoggerInterface $logger): SqlStorage
     {
-        $db = $injector->getInstance(Horde_Db_Adapter::class);
+        $db = $injector->get(Horde_Db_Adapter::class);
 
         return new SqlStorage(db: $db, logger: $logger);
     }

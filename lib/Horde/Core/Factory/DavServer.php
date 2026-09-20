@@ -36,16 +36,16 @@ class Horde_Core_Factory_DavServer extends Horde_Core_Factory_Injector
             new Horde_Core_Auth_UsernameHook(
                 [
                     'base' => $injector
-                        ->getInstance('Horde_Core_Factory_Auth')
+                        ->get(Horde_Core_Factory_Auth::class)
                         ->create(),
                 ]
             ),
-            $injector->getInstance('Horde_Core_Factory_Identity_DavUsernameHook')
+            $injector->get(Horde_Core_Factory_Identity_DavUsernameHook::class)
         );
         $principals = new DAVACL\PrincipalCollection($principalBackend);
         $principals->disableListing = $conf['auth']['list_users'] == 'input';
 
-        $calendarBackend = new Horde_Dav_Calendar_Backend($registry, $injector->getInstance('Horde_Dav_Storage'));
+        $calendarBackend = new Horde_Dav_Calendar_Backend($registry, $injector->get('Horde_Dav_Storage'));
         $caldav = new CalDAV\CalendarRoot($principalBackend, $calendarBackend);
         $contactsBackend = new Horde_Dav_Contacts_Backend($registry);
         $carddav = new CardDAV\AddressBookRoot($principalBackend, $contactsBackend);
@@ -79,7 +79,7 @@ class Horde_Core_Factory_DavServer extends Horde_Core_Factory_Injector
         $server->addPlugin(
             new DAV\Auth\Plugin(
                 new Horde_Core_Dav_Auth(
-                    $injector->getInstance('Horde_Core_Factory_Auth')->create()
+                    $injector->get(Horde_Core_Factory_Auth::class)->create()
                 ),
                 'Horde DAV Server'
             )
@@ -92,7 +92,7 @@ class Horde_Core_Factory_DavServer extends Horde_Core_Factory_Injector
         );
         $server->addPlugin(
             new DAV\Locks\Plugin(
-                new Horde_Dav_Locks($registry, $injector->getInstance('Horde_Lock'))
+                new Horde_Dav_Locks($registry, $injector->get('Horde_Lock'))
             )
         );
         /**

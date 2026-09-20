@@ -23,7 +23,7 @@ class AuthIsGlobalAdminFactory
 {
     public function create(Injector $injector): AuthIsGlobalAdmin
     {
-        $loader = $injector->getInstance(ConfigLoader::class);
+        $loader = $injector->get(ConfigLoader::class);
         $state = $loader->load('horde');
 
         $admins = $state->get('auth.admins', []);

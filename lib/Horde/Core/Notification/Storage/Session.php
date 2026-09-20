@@ -61,7 +61,7 @@ class Horde_Core_Notification_Storage_Session implements Horde_Notification_Stor
     public function __construct(?SessionAccess $session = null)
     {
         $this->_session = $session
-            ?? $GLOBALS['injector']->getInstance(SessionAccess::class);
+            ?? $GLOBALS['injector']->get(SessionAccess::class);
     }
 
     /**

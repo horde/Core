@@ -29,7 +29,7 @@ class OAuthClientRepositoryFactory
     {
         if (class_exists(SqlOAuthClientRepository::class)) {
             try {
-                $db = $injector->getInstance(Adapter::class);
+                $db = $injector->get(Adapter::class);
                 return new SqlOAuthClientRepository($db);
             } catch (Throwable) {
                 return new InMemoryClientRepository();

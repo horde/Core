@@ -30,7 +30,7 @@ class ThemeResolverFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorResolvesThemeResolver(): void
     {
-        $resolver = $this->injector->getInstance(ThemeResolver::class);
+        $resolver = $this->injector->get(ThemeResolver::class);
 
         self::assertInstanceOf(ThemeResolver::class, $resolver);
         self::assertInstanceOf(PrefsThemeResolver::class, $resolver);
@@ -39,7 +39,7 @@ class ThemeResolverFactoryIntegrationTest extends TestCase
     #[Test]
     public function factoryProducedResolverReturnsDefault(): void
     {
-        $resolver = $this->injector->getInstance(ThemeResolver::class);
+        $resolver = $this->injector->get(ThemeResolver::class);
 
         self::assertSame('default', $resolver->resolve('unknown-user'));
     }
@@ -47,8 +47,8 @@ class ThemeResolverFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorReturnsSameInstance(): void
     {
-        $first = $this->injector->getInstance(ThemeResolver::class);
-        $second = $this->injector->getInstance(ThemeResolver::class);
+        $first = $this->injector->get(ThemeResolver::class);
+        $second = $this->injector->get(ThemeResolver::class);
 
         self::assertSame($first, $second);
     }

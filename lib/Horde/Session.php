@@ -252,7 +252,7 @@ class Horde_Session implements Horde_Shutdown_Task
             return null;
         }
         try {
-            $access = $GLOBALS['injector']->getInstance(SessionAccess::class);
+            $access = $GLOBALS['injector']->get(SessionAccess::class);
             return $access instanceof SessionAccess ? $access : null;
         } catch (\Throwable) {
             return null;
@@ -270,7 +270,7 @@ class Horde_Session implements Horde_Shutdown_Task
     private function _resolveModernFallback(): HordeSession
     {
         if (isset($GLOBALS['injector'])) {
-            return $GLOBALS['injector']->getInstance(HordeSession::class);
+            return $GLOBALS['injector']->get(HordeSession::class);
         }
 
         $sid = (string) (session_id() ?: 'none');
@@ -291,7 +291,7 @@ class Horde_Session implements Horde_Shutdown_Task
     private function _resolveLifecycle(): ?SessionLifecycle
     {
         if (isset($GLOBALS['injector'])) {
-            return $GLOBALS['injector']->getInstance(SessionLifecycle::class);
+            return $GLOBALS['injector']->get(SessionLifecycle::class);
         }
         return null;
     }
@@ -436,7 +436,7 @@ class Horde_Session implements Horde_Shutdown_Task
          * land in HordeSession before this mirror copies them back to
          * $_SESSION. addFinal() is single-slot last-writer-wins. */
         if (isset($GLOBALS['injector'])) {
-            $GLOBALS['injector']->getInstance('Horde_Shutdown')->addFinal($this);
+            $GLOBALS['injector']->get(Horde_Shutdown::class)->addFinal($this);
         }
 
         if ($start) {
@@ -869,9 +869,7 @@ class Horde_Session implements Horde_Shutdown_Task
         }
 
         if (isset($GLOBALS['injector'])) {
-            $factory = $GLOBALS['injector']->getInstance(
-                TokenServiceFactory::class
-            );
+            $factory = $GLOBALS['injector']->get(TokenServiceFactory::class);
             $this->tokenService = $factory->createForSession($this->modern());
             return $this->tokenService;
         }
@@ -948,7 +946,7 @@ class Horde_Session implements Horde_Shutdown_Task
         }
 
         $ob = new Horde_Core_Cache_SessionObjects();
-        $ob->set($id, $injector->getInstance('Horde_Pack')->pack($data));
+        $ob->set($id, $injector->get('Horde_Pack')->pack($data));
 
         return $id;
     }
@@ -962,7 +960,7 @@ class Horde_Session implements Horde_Shutdown_Task
 
         $ob = new Horde_Core_Cache_SessionObjects();
         try {
-            return $injector->getInstance('Horde_Pack')->unpack($ob->get($id));
+            return $injector->get('Horde_Pack')->unpack($ob->get($id));
         } catch (Horde_Pack_Exception $e) {
         }
 

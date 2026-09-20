@@ -39,7 +39,7 @@ class Horde_Core_Imsp_Utils
     {
         $foundDefault = false;
         $results = [];
-        $imsp = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Imsp')->create('Book', $serverInfo['params']);
+        $imsp = $GLOBALS['injector']->get(Horde_Core_Factory_Imsp::class)->create('Book', $serverInfo['params']);
         $books = $imsp->getAddressBookList();
         $bCount = count($books);
         for ($i = 0; $i < $bCount; $i++) {
@@ -78,7 +78,7 @@ class Horde_Core_Imsp_Utils
      */
     public static function createBook(array $source, $newName)
     {
-        $imsp = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Imsp')->create('Book', $source['params']);
+        $imsp = $GLOBALS['injector']->get(Horde_Core_Factory_Imsp::class)->create('Book', $source['params']);
 
         // We now check if the username is already prepended to
         // the address book name or not.
@@ -106,7 +106,7 @@ class Horde_Core_Imsp_Utils
         $return = ['added' => [], 'removed' => []];
         $params = [];
 
-        $imsp = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Imsp')->create('Book', $serverInfo['params']);
+        $imsp = $GLOBALS['injector']->get(Horde_Core_Factory_Imsp::class)->create('Book', $serverInfo['params']);
         $abooks = $imsp->getAddressBookList();
 
         // Do we have a default address book? If not, create one.
@@ -280,7 +280,7 @@ class Horde_Core_Imsp_Utils
      */
     public static function setACL($params, $book, $name, $acl)
     {
-        $imsp = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Imsp')->create('Book', $params);
+        $imsp = $GLOBALS['injector']->get(Horde_Core_Factory_Imsp::class)->create('Book', $params);
         return $imsp->setACL($book, $name, $acl);
     }
 

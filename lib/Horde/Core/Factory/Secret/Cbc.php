@@ -22,7 +22,7 @@ class Horde_Core_Factory_Secret_Cbc extends Horde_Core_Factory_Injector
 {
     public function create(Horde_Injector|Injector $injector)
     {
-        $state = $injector->getInstance(ConfigLoader::class)->load('horde');
+        $state = $injector->get(ConfigLoader::class)->load('horde');
 
         // Configuration values are stable for the object's lifetime
         // and ride in via $params on construction. The per-request

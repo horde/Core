@@ -37,11 +37,11 @@ class ViewModeConfiguratorFactory
     public function create(Horde_Injector|Injector $injector): ViewModeConfigurator
     {
         return new ViewModeConfigurator(
-            $injector->getInstance(Horde_Registry::class),
-            $injector->getInstance(PrefsService::class),
-            $injector->getInstance(SessionAccess::class),
-            $injector->getInstance(JsDiscoverer::class),
-            $injector->getInstance(Token::class),
+            $injector->get(Horde_Registry::class),
+            $injector->get(PrefsService::class),
+            $injector->get(SessionAccess::class),
+            $injector->get(JsDiscoverer::class),
+            $injector->get(Token::class),
         );
     }
 }

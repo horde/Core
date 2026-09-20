@@ -32,7 +32,7 @@ class Horde_Core_Ui_Language
         $html = '';
 
         if (!$prefs->isLocked('language')) {
-            $session = $GLOBALS['injector']->getInstance(HordeSession::class);
+            $session = $GLOBALS['injector']->get(HordeSession::class);
             $session->setScoped('horde', 'language', $registry->preferredLang());
             $html = sprintf(
                 '<form name="language" action="%s">',

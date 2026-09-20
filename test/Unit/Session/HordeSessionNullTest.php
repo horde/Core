@@ -132,7 +132,7 @@ class HordeSessionNullTest extends TestCase
         // through the other during the request.
         self::assertSame(
             $accessor->current(),
-            $injector->getInstance(HordeSession::class),
+            $injector->get(HordeSession::class),
             'HordeSession singleton and SessionAccessor current() diverged',
         );
     }

@@ -41,11 +41,11 @@ class LdapPrefsServiceFactory
      */
     public function create(Injector $injector): LdapPrefsService
     {
-        $loader = $injector->getInstance(ConfigLoader::class);
+        $loader = $injector->get(ConfigLoader::class);
         $config = $loader->load('horde');
 
         // Get LDAP service (may use service-specific connection)
-        $ldapService = $injector->getInstance(HordeLdapService::class);
+        $ldapService = $injector->get(HordeLdapService::class);
 
         // Get prefs configuration
         $params = $config->get('prefs.params', []);

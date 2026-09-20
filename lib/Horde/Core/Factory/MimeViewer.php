@@ -79,9 +79,9 @@ class Horde_Core_Factory_MimeViewer extends Horde_Core_Factory_Base
         $params = array_merge($config, [
             'charset' => 'UTF-8',
             // TODO: Logging
-            // 'logger' => $this->_injector->getInstance('Horde_Log_Logger'),
+            // 'logger' => $this->_injector->get('Horde_Log_Logger'),
             'temp_file' => ['Horde', 'getTempFile'],
-            'text_filter' => [$this->_injector->getInstance('Horde_Core_Factory_TextFilter'), 'filter'],
+            'text_filter' => [$this->_injector->get(Horde_Core_Factory_TextFilter::class), 'filter'],
         ]);
 
         switch ($config['driver']) {
@@ -92,7 +92,7 @@ class Horde_Core_Factory_MimeViewer extends Horde_Core_Factory_Base
 
             case 'Html':
                 $params['browser'] = $GLOBALS['browser'];
-                $params['dns'] = $this->_injector->getInstance('Net_DNS2_Resolver');
+                $params['dns'] = $this->_injector->get('Net_DNS2_Resolver');
                 $params['external_callback'] = ['Horde', 'externalUrl'];
                 break;
 

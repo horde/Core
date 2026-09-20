@@ -25,7 +25,7 @@ class Horde_Core_Ajax_Imple_WeatherLocationAutoCompleter_Weather extends Horde_C
      */
     protected function _handleAutoCompleter($input)
     {
-        return $GLOBALS['injector']->getInstance('Horde_Weather')->autocompleteLocation($input);
+        return $GLOBALS['injector']->get('Horde_Weather')->autocompleteLocation($input);
     }
 
 }

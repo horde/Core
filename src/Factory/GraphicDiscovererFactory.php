@@ -27,9 +27,9 @@ class GraphicDiscovererFactory
 {
     public function create(Injector $injector): GraphicDiscoverer
     {
-        $pathBuilder = $injector->getInstance(PathBuilderInterface::class);
-        $uriBuilder = $injector->getInstance(UriBuilderInterface::class);
-        $filesystem = $injector->getInstance(AssetFilesystem::class);
+        $pathBuilder = $injector->get(PathBuilderInterface::class);
+        $uriBuilder = $injector->get(UriBuilderInterface::class);
+        $filesystem = $injector->get(AssetFilesystem::class);
 
         return new CascadeGraphicDiscoverer($pathBuilder, $uriBuilder, $filesystem);
     }

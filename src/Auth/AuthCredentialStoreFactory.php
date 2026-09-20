@@ -32,7 +32,7 @@ class AuthCredentialStoreFactory
     public function create(Injector $injector): AuthCredentialStore
     {
         return new AuthCredentialStore(
-            $injector->getInstance(SessionAccess::class),
+            $injector->get(SessionAccess::class),
         );
     }
 }

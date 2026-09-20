@@ -33,7 +33,7 @@ class Horde_Core_Factory_DavStorage extends Horde_Core_Factory_Injector
             case 'Sql':
                 $class = 'Horde_Dav_Storage_Sql';
                 $params['db'] = $injector
-                    ->getInstance('Horde_Core_Factory_Db')
+                    ->get(Horde_Core_Factory_Db::class)
                     ->create('horde', 'davstorage');
                 break;
 

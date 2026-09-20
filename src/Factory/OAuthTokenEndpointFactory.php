@@ -30,12 +30,12 @@ class OAuthTokenEndpointFactory
     public function create(Injector $injector): TokenEndpoint
     {
         return new TokenEndpoint(
-            $injector->getInstance(ClientAuthenticatorChain::class),
-            $injector->getInstance(ResponseFactoryInterface::class),
-            $injector->getInstance(StreamFactoryInterface::class),
-            $injector->getInstance(AuthorizationCodeGrant::class),
-            $injector->getInstance(ClientCredentialsGrant::class),
-            $injector->getInstance(RefreshTokenGrant::class),
+            $injector->get(ClientAuthenticatorChain::class),
+            $injector->get(ResponseFactoryInterface::class),
+            $injector->get(StreamFactoryInterface::class),
+            $injector->get(AuthorizationCodeGrant::class),
+            $injector->get(ClientCredentialsGrant::class),
+            $injector->get(RefreshTokenGrant::class),
         );
     }
 }

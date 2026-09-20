@@ -27,7 +27,7 @@ class OAuthClientAuthenticatorFactory
     public function create(Injector $injector): ClientAuthenticatorChain
     {
         return new ClientAuthenticatorChain(
-            $injector->getInstance(ClientRepository::class),
+            $injector->get(ClientRepository::class),
             new ClientSecretBasic(),
             new ClientSecretPost(),
         );

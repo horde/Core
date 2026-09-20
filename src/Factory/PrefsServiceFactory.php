@@ -93,7 +93,7 @@ class PrefsServiceFactory
      */
     public function create(Injector $injector): PrefsService
     {
-        $loader = $injector->getInstance(ConfigLoader::class);
+        $loader = $injector->get(ConfigLoader::class);
         $state = $loader->load('horde');
 
         $driver = $state->get('prefs.driver', 'sql');
@@ -116,7 +116,7 @@ class PrefsServiceFactory
     private function createSqlBackend(Injector $injector, array $params): SqlPrefsService
     {
         // Get DB service (supports 'horde:prefs' pattern in future)
-        $dbService = $injector->getInstance(HordeDbService::class);
+        $dbService = $injector->get(HordeDbService::class);
 
         $table = $params['table'] ?? 'horde_prefs';
 

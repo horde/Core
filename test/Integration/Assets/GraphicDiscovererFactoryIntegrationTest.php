@@ -51,7 +51,7 @@ class GraphicDiscovererFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorResolvesGraphicDiscoverer(): void
     {
-        $discoverer = $this->injector->getInstance(GraphicDiscoverer::class);
+        $discoverer = $this->injector->get(GraphicDiscoverer::class);
 
         self::assertInstanceOf(GraphicDiscoverer::class, $discoverer);
         self::assertInstanceOf(CascadeGraphicDiscoverer::class, $discoverer);
@@ -60,8 +60,8 @@ class GraphicDiscovererFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorReturnsSameInstance(): void
     {
-        $first = $this->injector->getInstance(GraphicDiscoverer::class);
-        $second = $this->injector->getInstance(GraphicDiscoverer::class);
+        $first = $this->injector->get(GraphicDiscoverer::class);
+        $second = $this->injector->get(GraphicDiscoverer::class);
 
         self::assertSame($first, $second);
     }

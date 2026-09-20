@@ -35,7 +35,7 @@ class SecretManagerFactory
 {
     public function create(Injector $injector): SecretManager
     {
-        $loader = $injector->getInstance(ConfigLoader::class);
+        $loader = $injector->get(ConfigLoader::class);
         $state = $loader->load('horde');
 
         $key = $state->get('secret_key', '');

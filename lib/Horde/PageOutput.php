@@ -210,7 +210,7 @@ class Horde_PageOutput
             $this->smartmobileInit = [];
         }
 
-        $out = $injector->getInstance('Horde_Core_JavascriptCache')->process($this->hsl, $full);
+        $out = $injector->get('Horde_Core_JavascriptCache')->process($this->hsl, $full);
 
         $this->hsl->clear();
 
@@ -449,12 +449,8 @@ class Horde_PageOutput
             return;
         }
         try {
-            $renderer = $GLOBALS['injector']->getInstance(
-                Horde\Core\PageOutput\SessionApiMetaRenderer::class
-            );
-            $session = $GLOBALS['injector']->getInstance(
-                Horde\Core\Session\HordeSession::class
-            );
+            $renderer = $GLOBALS['injector']->get(Horde\Core\PageOutput\SessionApiMetaRenderer::class);
+            $session = $GLOBALS['injector']->get(Horde\Core\Session\HordeSession::class);
         } catch (Throwable $e) {
             return;
         }
@@ -621,7 +617,7 @@ class Horde_PageOutput
     {
         global $injector, $language, $registry, $session;
 
-        $tokenService = $injector->getInstance(Horde\Token\Token::class);
+        $tokenService = $injector->get(Horde\Token\Token::class);
 
         $view = new Horde_View([
             'templatePath' => $registry->get('templates', 'horde') . '/common',
@@ -823,7 +819,7 @@ class Horde_PageOutput
 
         echo $view->render('header');
         if ($this->topbar) {
-            echo $injector->getInstance('Horde_View_Topbar')->render();
+            echo $injector->get('Horde_View_Topbar')->render();
         }
 
         // Send what we have currently output so the browser can start
@@ -858,7 +854,7 @@ class Horde_PageOutput
 
         /* The cache instance may come back unserialized; themeScripts() is
          * derived on demand (not serialized), like the covered-apps list. */
-        $cache = $injector->getInstance('Horde_Core_Factory_ThemesCache')
+        $cache = $injector->get(Horde_Core_Factory_ThemesCache::class)
             ->create($registry->getApp(), $theme);
 
         foreach ($cache->themeScripts() as $script) {

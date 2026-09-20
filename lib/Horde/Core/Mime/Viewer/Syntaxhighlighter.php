@@ -31,7 +31,7 @@ class Horde_Core_Mime_Viewer_Syntaxhighlighter extends Horde_Mime_Viewer_Syntaxh
         $language = $this->_mimeTypeToLanguage($mimeType);
         $brush = $this->_languageToBrush($language);
 
-        $page_output = $GLOBALS['injector']->getInstance('Horde_PageOutput');
+        $page_output = $GLOBALS['injector']->get(Horde_PageOutput::class);
 
         if (!self::$_shLoaded) {
             $page_output->addScriptFile('syntaxhighlighter/scripts/syntaxhighlighter.js', 'horde');

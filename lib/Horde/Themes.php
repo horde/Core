@@ -124,7 +124,7 @@ class Horde_Themes
             $theme = $GLOBALS['prefs']->getValue('theme');
         }
 
-        $cache = $GLOBALS['injector']->getInstance('Horde_Core_Factory_ThemesCache')->create($app, $theme);
+        $cache = $GLOBALS['injector']->get(Horde_Core_Factory_ThemesCache::class)->create($app, $theme);
 
         $sounds = [];
         foreach ($cache->build() as $val) {

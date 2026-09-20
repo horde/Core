@@ -53,7 +53,7 @@ class PermissionServiceFactory
      */
     public function create(Injector $injector): PermissionService
     {
-        $loader = $injector->getInstance(ConfigLoader::class);
+        $loader = $injector->get(ConfigLoader::class);
         $state = $loader->load('horde');
 
         $driver = strtolower($state->get('perms.driver', 'null'));
@@ -82,10 +82,10 @@ class PermissionServiceFactory
         array $params
     ): SqlPermissionService {
         // Get database connection via DbServiceFactory with pooling
-        $dbFactory = $injector->getInstance(DbServiceFactory::class);
+        $dbFactory = $injector->get(DbServiceFactory::class);
         $dbService = $dbFactory->create($injector, 'horde:perms');
 
-        $groupService = $injector->getInstance(GroupService::class);
+        $groupService = $injector->get(GroupService::class);
 
         // Create legacy Horde_Perms_Sql backend. Horde_Perms_Sql calls
         // $this->_cache->get() unconditionally in getPermission() and

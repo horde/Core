@@ -59,7 +59,7 @@ class Horde_Core_HashTable_PersistentSession extends Horde_Core_HashTable_Vfs im
     public function __construct(array $params = [])
     {
         $this->_session = $params['session']
-            ?? $GLOBALS['injector']->getInstance(SessionAccess::class);
+            ?? $GLOBALS['injector']->get(SessionAccess::class);
 
         /* Stable per-session VFS prefix. Derived from session_id() rather
          * than a CSRF token because such tokens are not stable across calls.

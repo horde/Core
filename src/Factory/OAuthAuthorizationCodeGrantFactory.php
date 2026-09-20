@@ -28,10 +28,10 @@ class OAuthAuthorizationCodeGrantFactory
     public function create(Injector $injector): AuthorizationCodeGrant
     {
         return new AuthorizationCodeGrant(
-            $injector->getInstance(AuthorizationCodeRepository::class),
-            $injector->getInstance(AccessTokenIssuer::class),
-            $injector->getInstance(RefreshTokenIssuer::class),
-            $injector->getInstance(ScopeRepository::class),
+            $injector->get(AuthorizationCodeRepository::class),
+            $injector->get(AccessTokenIssuer::class),
+            $injector->get(RefreshTokenIssuer::class),
+            $injector->get(ScopeRepository::class),
         );
     }
 }

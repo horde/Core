@@ -143,7 +143,7 @@ class Horde_Core_Db_Migration
     public function getMigrator($app, ?Horde_Log_Logger $logger = null)
     {
         $app = Horde_String::lower($app);
-        $db = $GLOBALS['injector']->getInstance('Horde_Db_Adapter');
+        $db = $GLOBALS['injector']->get('Horde_Db_Adapter');
         return new Horde_Db_Migration_Migrator(
             $db,
             $logger,

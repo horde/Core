@@ -49,28 +49,28 @@ class Horde_Core_Nosql
         if ($app == 'horde') {
             $backends = [
                 'Horde_ActiveSync_State_Mongo' => function () use ($injector) {
-                    return $injector->getInstance('Horde_ActiveSyncState');
+                    return $injector->get('Horde_ActiveSyncState');
                 },
                 'Horde_Cache_Storage_Mongo' => function () use ($injector) {
-                    return $injector->getInstance('Horde_Core_Factory_Cache')->storage;
+                    return $injector->get(Horde_Core_Factory_Cache::class)->storage;
                 },
                 'Horde_History_Mongo' => function () use ($injector) {
-                    return $injector->getInstance('Horde_History');
+                    return $injector->get('Horde_History');
                 },
                 'Horde_Lock_Mongo' => function () use ($injector) {
-                    return $injector->getInstance('Horde_Lock');
+                    return $injector->get('Horde_Lock');
                 },
                 'Horde_Prefs_Storage_Mongo' => function () use ($injector) {
-                    return $injector->getInstance('Horde_Core_Factory_Prefs')->storage;
+                    return $injector->get(Horde_Core_Factory_Prefs::class)->storage;
                 },
                 'Horde_SessionHandler_Storage_Mongo' => function () use ($injector) {
-                    return $injector->getInstance('Horde_Core_Factory_SessionHandler')->storage;
+                    return $injector->get(Horde_Core_Factory_SessionHandler::class)->storage;
                 },
                 'Horde_Token_Mongo' => function () use ($injector) {
-                    return $injector->getInstance('Horde_Token');
+                    return $injector->get('Horde_Token');
                 },
                 'Horde_Vfs_Mongo' => function () use ($injector) {
-                    return $injector->getInstance('Horde_Core_Factory_Vfs')->create();
+                    return $injector->get(Horde_Core_Factory_Vfs::class)->create();
                 },
             ];
 

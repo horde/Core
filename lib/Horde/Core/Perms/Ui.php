@@ -88,7 +88,7 @@ class Horde_Core_Perms_Ui
         $blank_img = Horde_Themes_Image::tag('blank.gif', ['attr' => ['width' => 16, 'height' => 16]]);
 
         /* Set up the tree. */
-        $tree = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Tree')->create('perms_ui', 'Javascript', [
+        $tree = $GLOBALS['injector']->get(Horde_Core_Factory_Tree::class)->create('perms_ui', 'Javascript', [
             'alternate' => true,
             'hideHeaders' => true,
         ]);
@@ -316,7 +316,7 @@ class Horde_Core_Perms_Ui
         /* Users permissions. */
         $perm_val = $permission->getUserPermissions();
         $this->_form->setSection('users', Horde_Core_Translation::t('Individual Users'), Horde_Themes_Image::tag('user.png'), false);
-        $auth = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Auth')->create();
+        $auth = $GLOBALS['injector']->get(Horde_Core_Factory_Auth::class)->create();
         $user_list = [];
         if ($auth->hasCapability('list')) {
             /* The auth driver has list capabilities so set up an array which
@@ -379,7 +379,7 @@ class Horde_Core_Perms_Ui
         $this->_form->setSection('groups', Horde_Core_Translation::t('Groups'), Horde_Themes_Image::tag('group.png'), false);
         try {
             $group_list = $GLOBALS['injector']
-                ->getInstance('Horde_Group')
+                ->get('Horde_Group')
                 ->listAll();
         } catch (Horde_Group_Exception $e) {
             $GLOBALS['notification']->push($e);

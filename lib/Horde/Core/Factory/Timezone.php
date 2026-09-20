@@ -27,7 +27,7 @@ class Horde_Core_Factory_Timezone extends Horde_Core_Factory_Injector
         }
 
         return new Horde_Timezone([
-            'cache' => $injector->getInstance('Horde_Cache'),
+            'cache' => $injector->get('Horde_Cache'),
             'location' => $GLOBALS['conf']['timezone']['location'],
             'temp' => Horde::getTempDir(),
         ]);

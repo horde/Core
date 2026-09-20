@@ -190,7 +190,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
         $image = $var->getImage($vars);
         $varname = $this->_genID($var->getVarName(), false);
 
-        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addScriptFile('image.js', 'horde');
+        $GLOBALS['injector']->get(Horde_PageOutput::class)->addScriptFile('image.js', 'horde');
 
         /* Check if there is existing img information stored. */
         if (isset($image['img'])) {
@@ -333,7 +333,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
         );
 
         if ($var->hasHelper('rte')) {
-            $GLOBALS['injector']->getInstance('Horde_Editor')->initialize(
+            $GLOBALS['injector']->get('Horde_Editor')->initialize(
                 ['id' => $this->_genID($var->getVarName(), false),
                     'relativelinks' => $var->hasHelper('relativelinks'),
                     'config' => ['extraPlugins' => 'syntaxhighlight']]
@@ -344,11 +344,11 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
             $html .= '<br /><table cellspacing="0"><tr><td>';
             $imgId = $this->_genID($var->getVarName(), false) . 'ehelper';
 
-            $page_output = $GLOBALS['injector']->getInstance('Horde_PageOutput');
+            $page_output = $GLOBALS['injector']->get(Horde_PageOutput::class);
             $page_output->addScriptFile('open_html_helper.js', 'horde');
 
             if ($var->hasHelper('emoticons')) {
-                $filter = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->create('emoticons');
+                $filter = $GLOBALS['injector']->get(Horde_Core_Factory_TextFilter::class)->create('emoticons');
                 $icon_list = [];
 
                 foreach (array_flip($filter->getIcons() ?? []) as $icon => $string) {
@@ -541,7 +541,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
             return $this->_renderVarInput_basic($form, $var, $vars);
         }
 
-        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineScript(
+        $GLOBALS['injector']->get(Horde_PageOutput::class)->addInlineScript(
             "document.observe('Horde_Calendar:select', "
               . 'function(e) {'
                 . 'var elt = e.element();'
@@ -645,7 +645,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
             . ' value="' . htmlspecialchars((string) $color)
             . '" />';
         if ($browser->hasFeature('javascript')) {
-            $GLOBALS['injector']->getInstance('Horde_PageOutput')->addScriptFile('colorpicker.js', 'horde');
+            $GLOBALS['injector']->get(Horde_PageOutput::class)->addScriptFile('colorpicker.js', 'horde');
             $html .= ' '
                 . Horde::link(
                     '#',
@@ -663,7 +663,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
     {
         $instance = $var->getProperty('instance');
 
-        $page = $GLOBALS['injector']->getInstance('Horde_PageOutput');
+        $page = $GLOBALS['injector']->get(Horde_PageOutput::class);
         $page->addScriptFile('sorter.js', 'horde');
         $page->addInlineScript(
             sprintf(
@@ -687,7 +687,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
 
     protected function _renderVarInput_assign($form, &$var, &$vars)
     {
-        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addScriptFile('form_assign.js', 'horde');
+        $GLOBALS['injector']->get(Horde_PageOutput::class)->addScriptFile('form_assign.js', 'horde');
 
         $name = htmlspecialchars((string) $var->getVarName());
         $size = $var->getSize();
@@ -853,7 +853,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
             $disable = Horde_Core_Translation::t('Select none');
             $invert = Horde_Core_Translation::t('Invert selection');
             $GLOBALS['injector']
-                ->getInstance('Horde_PageOutput')
+                ->get(Horde_PageOutput::class)
                 ->addInlineScript(sprintf(
                     '
 function %s()
@@ -1057,7 +1057,7 @@ function %s()
         $varvalue = $vars->get($varname);
         $fieldId = $this->_genID(uniqid(mt_rand()), false) . 'id';
         $GLOBALS['injector']
-            ->getInstance('Horde_PageOutput')
+            ->get(Horde_PageOutput::class)
             ->addInlineScript(sprintf(
                 '
 var obrowserWindowName;
@@ -1139,7 +1139,7 @@ function obrowserCallback(name, oid)
         $email_val = $var->getValue($vars);
 
         if ($var->getProperty('link_compose')) {
-            $addrs = $GLOBALS['injector']->getInstance('Horde_Mail_Rfc822')->parseAddressList($email_val, [
+            $addrs = $GLOBALS['injector']->get('Horde_Mail_Rfc822')->parseAddressList($email_val, [
                 'limit' => $var->getProperty('allow_multi') ? 0 : 1,
             ]);
 
@@ -1167,7 +1167,7 @@ function obrowserCallback(name, oid)
 
             return $link;
         } else {
-            $addrs = $GLOBALS['injector']->getInstance('Horde_Mail_Rfc822')->parseAddressList($email_val, [
+            $addrs = $GLOBALS['injector']->get('Horde_Mail_Rfc822')->parseAddressList($email_val, [
                 'limit' => $var->getProperty('allow_multi') ? 0 : 1,
             ]);
 
@@ -1461,7 +1461,7 @@ function obrowserCallback(name, oid)
             return '';
         }
         return '<pre>'
-            . $GLOBALS['injector']->getInstance('Horde_Core_Factory_Crypt')->create('Pgp', $var->getPGPParams())->pgpPrettyKey($key)
+            . $GLOBALS['injector']->get(Horde_Core_Factory_Crypt::class)->create('Pgp', $var->getPGPParams())->pgpPrettyKey($key)
             . '</pre>';
     }
 
@@ -1473,7 +1473,7 @@ function obrowserCallback(name, oid)
         }
         try {
             return $GLOBALS['injector']
-                ->getInstance('Horde_Core_Factory_Crypt')
+                ->get(Horde_Core_Factory_Crypt::class)
                 ->create('Smime', $var->getSMIMEParams())
                 ->certToHTML($cert);
         } catch (Horde_Crypt_Exception $e) {
@@ -1626,7 +1626,7 @@ function obrowserCallback(name, oid)
         }
 
         $cid = hash('md5', $var->getText());
-        $cache = $GLOBALS['injector']->getInstance('Horde_Cache');
+        $cache = $GLOBALS['injector']->get('Horde_Cache');
 
         $cache->set($cid, serialize(['data' => $captcha->getCAPTCHAAsJPEG(),
             'ctype' => 'image/jpeg']));
@@ -1693,7 +1693,7 @@ function obrowserCallback(name, oid)
 
     protected function _renderVarInput_category($form, &$var, &$vars)
     {
-        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addScriptFile('form_helpers.js', 'horde');
+        $GLOBALS['injector']->get(Horde_PageOutput::class)->addScriptFile('form_helpers.js', 'horde');
         $this->_addOnLoadJavascript('addEvent(document.getElementById(\'' . $form->getName() . '\'), \'submit\', checkCategory);');
         return '<input type="hidden" name="new_category" />'
             . Horde_Prefs_CategoryManager::getJavaScript($form->getName(), $var->getVarName())

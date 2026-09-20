@@ -23,8 +23,8 @@ class ChromeRendererDispatcherFactory
     public function create(Injector $injector): ChromeRendererDispatcher
     {
         return new ChromeRendererDispatcher(
-            $injector->getInstance(DesktopChromeRenderer::class),
-            $injector->getInstance(ResponsiveChromeRenderer::class),
+            $injector->get(DesktopChromeRenderer::class),
+            $injector->get(ResponsiveChromeRenderer::class),
         );
     }
 }

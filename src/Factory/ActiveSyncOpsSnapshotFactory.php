@@ -40,7 +40,7 @@ final class ActiveSyncOpsSnapshotFactory
         $logging = $conf['activesync']['logging'] ?? [];
 
         return new SnapshotService(
-            state: $injector->getInstance('Horde_ActiveSyncState'),
+            state: $injector->get('Horde_ActiveSyncState'),
             logPaths: new DeviceLogPathResolver(
                 is_string($logging['type'] ?? null)
                     ? $logging['type']
@@ -49,7 +49,7 @@ final class ActiveSyncOpsSnapshotFactory
                     ? $logging['path']
                     : null
             ),
-            logger: $injector->getInstance('Horde_Log_Logger')
+            logger: $injector->get('Horde_Log_Logger')
         );
     }
 }

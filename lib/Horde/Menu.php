@@ -126,7 +126,7 @@ class Horde_Menu
      */
     protected function _render()
     {
-        $sidebar = $GLOBALS['injector']->getInstance('Horde_View_Sidebar');
+        $sidebar = $GLOBALS['injector']->get('Horde_View_Sidebar');
 
         foreach ($this->_menu as $m) {
             /* Check for separators. */

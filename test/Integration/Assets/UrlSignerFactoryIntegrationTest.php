@@ -24,7 +24,7 @@ class UrlSignerFactoryIntegrationTest extends TestCase
 
         try {
             $injector = new Injector(new TopLevel());
-            $signer = $injector->getInstance(UrlSigner::class);
+            $signer = $injector->get(UrlSigner::class);
 
             self::assertInstanceOf(UrlSigner::class, $signer);
             self::assertInstanceOf(HmacUrlSigner::class, $signer);
@@ -39,7 +39,7 @@ class UrlSignerFactoryIntegrationTest extends TestCase
         unset($GLOBALS['conf']);
 
         $injector = new Injector(new TopLevel());
-        $signer = $injector->getInstance(UrlSigner::class);
+        $signer = $injector->get(UrlSigner::class);
 
         self::assertInstanceOf(NullUrlSigner::class, $signer);
     }
@@ -51,8 +51,8 @@ class UrlSignerFactoryIntegrationTest extends TestCase
 
         try {
             $injector = new Injector(new TopLevel());
-            $first = $injector->getInstance(UrlSigner::class);
-            $second = $injector->getInstance(UrlSigner::class);
+            $first = $injector->get(UrlSigner::class);
+            $second = $injector->get(UrlSigner::class);
 
             self::assertSame($first, $second);
         } finally {
@@ -68,7 +68,7 @@ class UrlSignerFactoryIntegrationTest extends TestCase
 
         try {
             $injector = new Injector(new TopLevel());
-            $signer = $injector->getInstance(UrlSigner::class);
+            $signer = $injector->get(UrlSigner::class);
 
             $now = 1700000000;
             $signed = $signer->signUrl('/test/page', $now);

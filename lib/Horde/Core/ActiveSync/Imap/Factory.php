@@ -143,7 +143,7 @@ class Horde_Core_ActiveSync_Imap_Factory implements Horde_ActiveSync_Interface_I
             }
         }
         try {
-            $this->_mailboxlist = $injector->getInstance('Horde_Core_Hooks')->callHook(
+            $this->_mailboxlist = $injector->get(Horde_Core_Hooks::class)->callHook(
                 'activesync_mailboxlist',
                 'horde',
                 [$this->_mailboxlist]
@@ -178,7 +178,7 @@ class Horde_Core_ActiveSync_Imap_Factory implements Horde_ActiveSync_Interface_I
             // Sentmail is dependent on Identity.
             if (count($this->_specialMailboxlist['sent']) > 1) {
                 $this->_specialMailboxlist['sent'] = $injector
-                    ->getInstance('Horde_Core_Factory_Identity')
+                    ->get(Horde_Core_Factory_Identity::class)
                     ->create($registry->getAuth(), $registry->hasInterface('mail'))
                     ->getValue('sent_mail_folder', $prefs->getValue('activesync_identity'));
             } else {

@@ -51,7 +51,7 @@ class UriBuilderFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorResolvesUriBuilderInterface(): void
     {
-        $builder = $this->injector->getInstance(UriBuilderInterface::class);
+        $builder = $this->injector->get(UriBuilderInterface::class);
 
         self::assertInstanceOf(UriBuilderInterface::class, $builder);
         self::assertInstanceOf(UriBuilder::class, $builder);
@@ -60,7 +60,7 @@ class UriBuilderFactoryIntegrationTest extends TestCase
     #[Test]
     public function factoryProducedBuilderResolvesRegistry(): void
     {
-        $builder = $this->injector->getInstance(UriBuilderInterface::class);
+        $builder = $this->injector->get(UriBuilderInterface::class);
         $result = $builder->withAppWebroot('kronolith');
 
         self::assertSame('/horde/kronolith', $result->getPath());
@@ -69,7 +69,7 @@ class UriBuilderFactoryIntegrationTest extends TestCase
     #[Test]
     public function factoryProducedBuilderSupportsPsr7Chain(): void
     {
-        $builder = $this->injector->getInstance(UriBuilderInterface::class);
+        $builder = $this->injector->get(UriBuilderInterface::class);
         $result = $builder
             ->withScheme('https')
             ->withHost('example.com')
@@ -87,8 +87,8 @@ class UriBuilderFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorReturnsSameInstance(): void
     {
-        $first = $this->injector->getInstance(UriBuilderInterface::class);
-        $second = $this->injector->getInstance(UriBuilderInterface::class);
+        $first = $this->injector->get(UriBuilderInterface::class);
+        $second = $this->injector->get(UriBuilderInterface::class);
 
         self::assertSame($first, $second);
     }

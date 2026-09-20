@@ -38,13 +38,13 @@ class Horde_Core_Factory_Data extends Horde_Core_Factory_Base
     public function create($driver, array $params = [])
     {
         $class = $this->_getDriverName($driver, 'Horde_Data');
-        $params['browser'] = $this->_injector->getInstance('Horde_Browser');
-        $params['vars'] = $this->_injector->getInstance('Horde_Variables');
+        $params['browser'] = $this->_injector->get('Horde_Browser');
+        $params['vars'] = $this->_injector->get('Horde_Variables');
         $params['http'] = $this->_injector
-            ->getInstance('Horde_Core_Factory_HttpClient')
+            ->get(Horde_Core_Factory_HttpClient::class)
             ->create(['request.verifyPeer' => false]);
 
-        return new $class($this->_injector->getInstance('Horde_Core_Data_Storage'), $params);
+        return new $class($this->_injector->get(Horde_Core_Data_Storage::class), $params);
     }
 
 }

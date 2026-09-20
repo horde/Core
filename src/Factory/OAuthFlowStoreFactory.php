@@ -28,7 +28,7 @@ class OAuthFlowStoreFactory
 {
     public function create(Injector $injector): OAuthFlowStore
     {
-        $loader = $injector->getInstance(ConfigLoader::class);
+        $loader = $injector->get(ConfigLoader::class);
         $state = $loader->load('horde');
 
         $driver = strtolower((string) $state->get('oauth_login.flow_store_driver', 'File'));
@@ -50,7 +50,7 @@ class OAuthFlowStoreFactory
 
     private function createSqlStore(Injector $injector, array $params): SqlOAuthFlowStore
     {
-        $dbService = $injector->getInstance(HordeDbService::class);
+        $dbService = $injector->get(HordeDbService::class);
         $table = !empty($params['table']) ? $params['table'] : 'horde_oauth_flows';
 
         return new SqlOAuthFlowStore($dbService->getAdapter(), $table);

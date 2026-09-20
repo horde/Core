@@ -57,7 +57,7 @@ class HordeLdapServiceFactory
      */
     public function create(Injector $injector, string $serviceId = 'horde'): StandardHordeLdapService
     {
-        $loader = $injector->getInstance(ConfigLoader::class);
+        $loader = $injector->get(ConfigLoader::class);
 
         // Parse service ID: 'horde' or 'horde:groups'
         [$app, $service] = $this->parseServiceId($serviceId);
@@ -110,7 +110,7 @@ class HordeLdapServiceFactory
     {
         // Add optional cache if available
         try {
-            $cache = $injector->getInstance('Horde_Cache');
+            $cache = $injector->get('Horde_Cache');
             if ($cache instanceof Horde_Cache) {
                 $ldapConfig['cache'] = $cache;
                 $ldapConfig['cache_root_dse'] = true;

@@ -108,6 +108,6 @@ class Horde_Core_Factory_Tree extends Horde_Core_Factory_Base
      */
     private static function session(): SessionAccess
     {
-        return $GLOBALS['injector']->getInstance(SessionAccess::class);
+        return $GLOBALS['injector']->get(SessionAccess::class);
     }
 }

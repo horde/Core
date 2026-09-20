@@ -31,7 +31,7 @@ class PageOutputAssetManagerFactory
 {
     public function create(Horde_Injector|Injector $injector): PageOutputAssetManager
     {
-        $assetCollector = $injector->getInstance(AssetCollector::class);
+        $assetCollector = $injector->get(AssetCollector::class);
 
         return new PageOutputAssetManager($assetCollector);
     }

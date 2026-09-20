@@ -50,7 +50,7 @@ class Horde_Core_Factory_Cache extends Horde_Core_Factory_Injector
 
         $params = [
             'compress' => true,
-            'logger' => $injector->getInstance('Horde_Core_Log_Wrapper'),
+            'logger' => $injector->get(Horde_Core_Log_Wrapper::class),
         ];
         if (isset($conf['cache']['default_lifetime'])) {
             $params['lifetime'] = $conf['cache']['default_lifetime'];
@@ -76,7 +76,7 @@ class Horde_Core_Factory_Cache extends Horde_Core_Factory_Injector
                 break;
 
             case 'nosql':
-                $nosql = $injector->getInstance('Horde_Core_Factory_Nosql')->create('horde', 'cache');
+                $nosql = $injector->get(Horde_Core_Factory_Nosql::class)->create('horde', 'cache');
                 if ($nosql instanceof Horde_Mongo_Client) {
                     $sparams['mongo_db'] = $nosql;
                     $driver = 'Horde_Cache_Storage_Mongo';
@@ -87,7 +87,7 @@ class Horde_Core_Factory_Cache extends Horde_Core_Factory_Injector
                 break;
 
             case 'sql':
-                $sparams['db'] = $injector->getInstance('Horde_Core_Factory_Db')->create('horde', 'cache');
+                $sparams['db'] = $injector->get(Horde_Core_Factory_Db::class)->create('horde', 'cache');
                 unset($sparams['driverconfig'], $sparams['umask']);
                 break;
         }
@@ -188,7 +188,7 @@ class Horde_Core_Factory_Cache extends Horde_Core_Factory_Injector
     protected function _resolveHashTable($injector): HashTable
     {
         try {
-            return $injector->getInstance(HashTable::class);
+            return $injector->get(HashTable::class);
         } catch (Throwable $e) {
             $hashtableDriver = $this->_describeConfiguredHashTableDriver();
             /* Horde_Cache_Exception extends Horde_Exception_Wrapped, whose

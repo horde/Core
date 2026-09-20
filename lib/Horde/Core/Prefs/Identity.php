@@ -82,7 +82,7 @@ class Horde_Core_Prefs_Identity extends Horde_Prefs_Identity
         $body->send(
             $new_addr,
             $msg_headers,
-            $injector->getInstance('Horde_Mail')
+            $injector->get('Horde_Mail')
         );
 
         $notification->push(

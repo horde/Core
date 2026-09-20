@@ -64,12 +64,12 @@ class DbAdapterFactory
         $ob = new $class($config);
 
         try {
-            $ob->setCache($injector->getInstance('Horde_Cache'));
+            $ob->setCache($injector->get('Horde_Cache'));
         } catch (Throwable) {
         }
 
         try {
-            $ob->setLogger($injector->getInstance('Horde_Log_Logger'));
+            $ob->setLogger($injector->get('Horde_Log_Logger'));
         } catch (Throwable) {
         }
 

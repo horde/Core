@@ -29,7 +29,7 @@ class OAuthRefreshTokenIssuerFactory
         $ttl = (int) ($oauthConf['refresh_token_ttl'] ?? 2592000);
 
         return new RefreshTokenIssuer(
-            $injector->getInstance(RefreshTokenRepository::class),
+            $injector->get(RefreshTokenRepository::class),
             $ttl,
         );
     }

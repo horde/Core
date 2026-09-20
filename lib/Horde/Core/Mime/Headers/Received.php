@@ -57,7 +57,7 @@ class Horde_Core_Mime_Headers_Received extends Horde_Mime_Headers_Received
             $server_name = 'unknown';
         }
 
-        $is_ssl = $injector->getInstance('Horde_Browser')->usingSSLConnection();
+        $is_ssl = $injector->get('Horde_Browser')->usingSSLConnection();
 
         return new self(
             null,

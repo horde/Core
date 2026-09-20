@@ -40,6 +40,7 @@ use Horde_Variables;
 use InvalidArgumentException;
 use stdClass;
 use Throwable;
+use Horde_Core_Hooks;
 
 abstract class Application
 {
@@ -122,7 +123,7 @@ abstract class Application
             if (!$auth) {
                 throw new Horde_Exception('Accessing AJAX action without being authenticated.');
             }
-            $tokenService = $injector->getInstance(Token::class);
+            $tokenService = $injector->get(Token::class);
             try {
                 $valid = $tokenService->isValid((string) $token, HordeSession::CSRF_SEED);
             } catch (TokenException) {
@@ -203,7 +204,7 @@ abstract class Application
             return;
         }
 
-        $hooks = $injector->getInstance('Horde_Core_Hooks');
+        $hooks = $injector->get(Horde_Core_Hooks::class);
 
         /* Look for action in helpers. */
         if ($ob = $this->_getHandler()) {
@@ -288,7 +289,7 @@ abstract class Application
 
         if (!headers_sent()) {
             try {
-                $fresh = $injector->getInstance(Token::class)
+                $fresh = $injector->get(Token::class)
                     ->generate(HordeSession::CSRF_SEED);
                 header('X-Csrf-Token: ' . (string) $fresh);
             } catch (TokenException) {
@@ -364,7 +365,7 @@ abstract class Application
     protected function _tryApiRegistry($injector)
     {
         try {
-            $apiRegistry = $injector->getInstance(ApiRegistry::class);
+            $apiRegistry = $injector->get(ApiRegistry::class);
         } catch (Throwable $e) {
             return null;
         }
@@ -375,7 +376,7 @@ abstract class Application
         }
 
         try {
-            $api = $injector->getInstance($apiClass);
+            $api = $injector->get($apiClass);
         } catch (Throwable $e) {
             return null;
         }

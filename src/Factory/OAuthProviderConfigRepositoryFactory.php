@@ -42,13 +42,13 @@ class OAuthProviderConfigRepositoryFactory
     {
         if (class_exists(SqlOAuthProviderConfigRepository::class)) {
             try {
-                $db = $injector->getInstance(Adapter::class);
+                $db = $injector->get(Adapter::class);
             } catch (Throwable) {
                 return new NullOAuthProviderConfigRepository();
             }
 
             try {
-                $secret = $injector->getInstance(SecretManager::class);
+                $secret = $injector->get(SecretManager::class);
             } catch (Throwable) {
                 $secret = null;
             }

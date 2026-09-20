@@ -48,7 +48,7 @@ class Horde_Core_Factory_ThemesCache extends Horde_Core_Factory_Base implements 
         if (!isset($this->_instances[$sig])) {
             $cache = empty($GLOBALS['conf']['cachethemes'])
                 ? null
-                : $this->_injector->getInstance('Horde_Cache');
+                : $this->_injector->get('Horde_Cache');
 
             if (!$cache || ($cache instanceof Horde_Cache_Null)) {
                 $instance = new Horde_Themes_Cache($app, $theme);
@@ -86,7 +86,7 @@ class Horde_Core_Factory_ThemesCache extends Horde_Core_Factory_Base implements 
     {
         $sig = implode('|', [$app, $theme]);
 
-        $cache = $this->_injector->getInstance('Horde_Cache');
+        $cache = $this->_injector->get('Horde_Cache');
 
         if ($cache->exists($sig, $GLOBALS['conf']['cachethemesparams']['lifetime'])) {
             if (!$cache->expire($sig)) {
@@ -105,7 +105,7 @@ class Horde_Core_Factory_ThemesCache extends Horde_Core_Factory_Base implements 
      */
     public function shutdown()
     {
-        $cache = $this->_injector->getInstance('Horde_Cache');
+        $cache = $this->_injector->get('Horde_Cache');
 
         foreach ($this->_instances as $key => $val) {
             if ($val->changed) {

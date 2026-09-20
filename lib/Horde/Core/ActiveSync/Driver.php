@@ -267,7 +267,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         // backend is configured or when explicitly turned off.
         $throttleKey = $this->_authThrottleKey($username);
         if ($this->_authThrottleExceeded($throttleKey)) {
-            $injector->getInstance('Horde_Log_Logger')->warn(sprintf(
+            $injector->get('Horde_Log_Logger')->warn(sprintf(
                 'ActiveSync: too many failed authentication attempts for user %s; temporarily refusing further attempts.',
                 $username
             ));
@@ -277,12 +277,12 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         // First try transparent/X509. Happens for authtype == 'cert' || 'basic_cert'
         if ($conf['activesync']['auth']['type'] != 'basic') {
             if (!$this->_auth->transparent()) {
-                $injector->getInstance('Horde_Log_Logger')->notice(sprintf('Login failed ActiveSync client certificate for user %s.', $username));
+                $injector->get('Horde_Log_Logger')->notice(sprintf('Login failed ActiveSync client certificate for user %s.', $username));
                 $this->_recordAuthFailure($throttleKey);
                 return false;
             }
             if ($username != $GLOBALS['registry']->getAuth()) {
-                $injector->getInstance('Horde_Log_Logger')->notice(sprintf(
+                $injector->get('Horde_Log_Logger')->notice(sprintf(
                     'Access granted based on transparent authentication of user %s, but ActiveSync client is requesting access for %s.',
                     $GLOBALS['registry']->getAuth(),
                     $username
@@ -321,7 +321,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             }
 
             if (!$authResult) {
-                $injector->getInstance('Horde_Log_Logger')->notice(sprintf('Login failed from ActiveSync client for user %s.', $username));
+                $injector->get('Horde_Log_Logger')->notice(sprintf('Login failed from ActiveSync client for user %s.', $username));
                 $this->_recordAuthFailure($throttleKey);
                 return false;
             }
@@ -344,7 +344,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 (string) $username
             ));
         }
-        $perms = $injector->getInstance('Horde_Perms');
+        $perms = $injector->get('Horde_Perms');
         if ($perms->exists('horde:activesync')) {
             // Check permissions to ActiveSync
             if (!$this->_getPolicyValue('activesync', $perms->getPermissions('horde:activesync', $username))) {
@@ -3166,7 +3166,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     {
         if (!empty($device)) {
             try {
-                $hooks = $GLOBALS['injector']->getInstance('Horde_Core_Hooks');
+                $hooks = $GLOBALS['injector']->get(Horde_Core_Hooks::class);
                 $result = $hooks->callHook('activesync_provisioning_check', 'horde', [$device, $this->_user]);
                 if ($result !== -1) {
                     return $result;
@@ -3176,7 +3176,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         }
 
         $provisioning = $GLOBALS['injector']
-            ->getInstance('Horde_Perms')
+            ->get('Horde_Perms')
             ->getPermissions(
                 'horde:activesync:provisioning',
                 $this->_user
@@ -3251,7 +3251,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     break;
                 case 'userinformation':
                     $identities = $injector
-                        ->getInstance('Horde_Core_Factory_Identity')
+                        ->get(Horde_Core_Factory_Identity::class)
                         ->create($registry->getAuth());
                     $as_ident = $prefs->getValue('activesync_identity');
                     if ($as_ident != 'horde') {
@@ -3333,7 +3333,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      */
     public function autoDiscover($params = [], $version = 1)
     {
-        $hooks = $GLOBALS['injector']->getInstance('Horde_Core_Hooks');
+        $hooks = $GLOBALS['injector']->get(Horde_Core_Hooks::class);
         $url = parse_url((string) Horde::url(null, true));
 
         if ($version == 2) {
@@ -3347,7 +3347,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
 
         // Attempt to get a username from the email address.
         $ident = $GLOBALS['injector']
-            ->getInstance('Horde_Core_Factory_Identity')
+            ->get(Horde_Core_Factory_Identity::class)
             ->create($GLOBALS['registry']->getAuth());
         $params['display_name'] = $ident->getValue('fullname');
         $params['email'] = $ident->getValue('from_addr');
@@ -3411,7 +3411,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 // no break
             case 'hook':
                 try {
-                    return $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
+                    return $GLOBALS['injector']->get(Horde_Core_Hooks::class)
                         ->callHook('activesync_get_autodiscover_username', 'horde', [$email]);
                 } catch (Horde_Exception_HookNotSet $e) {
                     return $email;
@@ -3756,7 +3756,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         }
 
         // Update the vCal so the response will be reflected when imported.
-        $ident = $injector->getInstance('Horde_Core_Factory_Identity')->create($this->_user);
+        $ident = $injector->get(Horde_Core_Factory_Identity::class)->create($this->_user);
         //$cn = $ident->getValue('fullname');
         $email = $ident->getValue('from_addr');
         switch ($response['response']) {
@@ -3845,7 +3845,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             }
             $itip = Horde_Itip::factory($vEvent, $resource);
             $itipOptions = new Horde_Core_Itip_Response_Options_Horde('UTF-8', []);
-            $mail = $injector->getInstance('Horde_Mail');
+            $mail = $injector->get('Horde_Mail');
 
             if (!empty($response['sendresponse'])) {
                 try {
@@ -3935,7 +3935,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         if ($mode === 'device') {
             $allowed = $this->_getDeviceScopedVersionPermission($server, $username);
         } else {
-            $perms = $GLOBALS['injector']->getInstance('Horde_Perms');
+            $perms = $GLOBALS['injector']->get('Horde_Perms');
             if (!$perms->exists('horde:activesync:version')) {
                 return;
             }
@@ -3991,7 +3991,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         }
 
         try {
-            return $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
+            return $GLOBALS['injector']->get(Horde_Core_Hooks::class)
                 ->callHook('activesync_device_version', 'horde', [$deviceId, $username]);
         } catch (Horde_Exception_HookNotSet $e) {
         }
@@ -4048,12 +4048,12 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     {
         global $injector, $registry;
 
-        $perms = $injector->getInstance('Horde_Perms');
+        $perms = $injector->get('Horde_Perms');
 
         // Check max_device
         if ($perms->exists('horde:activesync:max_devices')) {
             $max_devices = $this->_getPolicyValue('max_devices', $perms->getPermissions('horde:activesync:max_devices', $registry->getAuth()));
-            $state = $injector->getInstance('Horde_ActiveSyncState');
+            $state = $injector->get('Horde_ActiveSyncState');
             $devices = $state->listDevices($registry->getAuth());
             if (count($devices) >= $max_devices) {
                 $this->_logger->meta(sprintf(
@@ -4065,7 +4065,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
             }
         }
         try {
-            return $injector->getInstance('Horde_Core_Hooks')
+            return $injector->get(Horde_Core_Hooks::class)
                 ->callHook('activesync_create_device', 'horde', [$device]);
         } catch (Horde_Exception_HookNotSet $e) {
         }
@@ -4086,7 +4086,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     public function deviceCallback(Horde_ActiveSync_Device $device)
     {
         try {
-            return $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
+            return $GLOBALS['injector']->get(Horde_Core_Hooks::class)
                 ->callHook('activesync_device_check', 'horde', [$device]);
         } catch (Horde_Exception_HookNotSet $e) {
         }
@@ -4105,7 +4105,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     public function modifyDeviceCallback(Horde_ActiveSync_Device $device)
     {
         try {
-            $device = $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
+            $device = $GLOBALS['injector']->get(Horde_Core_Hooks::class)
                 ->callHook('activesync_device_modify', 'horde', [$device]);
             if (!($device instanceof Horde_ActiveSync_Device)) {
                 $this->_logger->err('activesync_device_modify hook must return device object.');
@@ -4539,7 +4539,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     protected function _searchGal(array $query, array $options, bool $deepTraversal): ?array
     {
         // If no perms to the GAL, return zero results.
-        $perms = $GLOBALS['injector']->getInstance('Horde_Perms');
+        $perms = $GLOBALS['injector']->get('Horde_Perms');
         if ($perms->exists('horde:activesync:no_gal')
             && $perms->getPermissions('horde:activesync:no_gal', $this->_user)) {
             return null;
@@ -4689,7 +4689,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
     {
         $prefix = 'horde:activesync:provisioning:';
         $policy = [];
-        $perms = $GLOBALS['injector']->getInstance('Horde_Perms');
+        $perms = $GLOBALS['injector']->get('Horde_Perms');
         if (!$perms->exists('horde:activesync:provisioning')) {
             return $policy;
         }
@@ -4761,7 +4761,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         global $prefs;
 
         $ident = $GLOBALS['injector']
-            ->getInstance('Horde_Core_Factory_Identity')
+            ->get(Horde_Core_Factory_Identity::class)
             ->create($this->_user);
 
         $as_ident = $prefs->getValue('activesync_identity');

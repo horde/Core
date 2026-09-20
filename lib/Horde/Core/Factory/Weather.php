@@ -21,7 +21,7 @@ class Horde_Core_Factory_Weather extends Horde_Core_Factory_Injector
 
         // Parameters for all driver types
         $params = [
-            'cache' => $injector->getInstance('Horde_Cache'),
+            'cache' => $injector->get('Horde_Cache'),
             'cache_lifetime' => $conf['weather']['params']['lifetime'],
             'http_client' => $injector->createInstance('Horde_Core_Factory_HttpClient')->create(),
         ];
@@ -38,7 +38,7 @@ class Horde_Core_Factory_Weather extends Horde_Core_Factory_Injector
                 }
                 break;
             case 'Metar':
-                $params['db'] = $injector->getInstance('Horde_Db_Adapter');
+                $params['db'] = $injector->get('Horde_Db_Adapter');
                 break;
         }
         $class = $this->_getDriverName($driver, 'Horde_Service_Weather');

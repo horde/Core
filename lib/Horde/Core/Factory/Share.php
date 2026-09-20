@@ -35,7 +35,7 @@ class Horde_Core_Factory_Share extends Horde_Core_Factory_Base
      */
     public function create($app = null, $driver = null)
     {
-        return new Horde_Core_Share_Driver($this->_injector->getInstance('Horde_Core_Factory_ShareBase')->create($app, $driver));
+        return new Horde_Core_Share_Driver($this->_injector->get(Horde_Core_Factory_ShareBase::class)->create($app, $driver));
     }
 
 }

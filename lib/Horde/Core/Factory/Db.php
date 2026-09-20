@@ -198,14 +198,14 @@ class Horde_Core_Factory_Db extends Horde_Core_Factory_Base
         if ($cache && !isset($config['cache'])) {
             /* Need to add cache ob here, after it is stored as an instance,
              * or else we enter infinite bootstrapping loop. Bug #13439 */
-            $ob->setCache($this->_injector->getInstance('Horde_Cache'));
+            $ob->setCache($this->_injector->get('Horde_Cache'));
         }
 
         /* Bug #13463: setting logger before cache causes intermittent issues
          * with DB object during session shutdown. */
         if (!isset($config['logger'])) {
             $ob->setLogger(
-                $this->_injector->getInstance('Horde_Log_Logger'),
+                $this->_injector->get('Horde_Log_Logger'),
                 $logqueries
             );
         }

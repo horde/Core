@@ -28,20 +28,20 @@ class DesktopChromeRendererFactory
 {
     public function create(Injector $injector): DesktopChromeRenderer
     {
-        $session = $injector->getInstance(SessionAccess::class);
+        $session = $injector->get(SessionAccess::class);
         $themeResolver = $injector->get(ThemeResolver::class);
 
         $authUid = $session->getAuthId();
         $theme = $authUid !== null ? $themeResolver->resolve($authUid) : 'default';
 
         return new DesktopChromeRenderer(
-            $injector->getInstance(AssetCollector::class),
-            $injector->getInstance(PageComposer::class),
-            $injector->getInstance(ViewModeConfigurator::class),
-            $injector->getInstance(TopbarBuilder::class),
-            $injector->getInstance(TopbarRenderer::class),
-            $injector->getInstance(SidebarRenderer::class),
-            $injector->getInstance(JsDiscoverer::class),
+            $injector->get(AssetCollector::class),
+            $injector->get(PageComposer::class),
+            $injector->get(ViewModeConfigurator::class),
+            $injector->get(TopbarBuilder::class),
+            $injector->get(TopbarRenderer::class),
+            $injector->get(SidebarRenderer::class),
+            $injector->get(JsDiscoverer::class),
             $theme,
         );
     }

@@ -33,14 +33,14 @@ class AuthLinkRepositoryFactory
     public function create(Injector $injector): AuthLinkRepository
     {
         try {
-            $db = $injector->getInstance(Adapter::class);
+            $db = $injector->get(Adapter::class);
             return new SqlAuthLinkRepository($db);
         } catch (Throwable) {
             // SQL not available, try file-based
         }
 
         try {
-            $loader = $injector->getInstance(ConfigLoader::class);
+            $loader = $injector->get(ConfigLoader::class);
             $state = $loader->load('horde');
             $filePath = $state->get('auth.authlink_file', '');
 
