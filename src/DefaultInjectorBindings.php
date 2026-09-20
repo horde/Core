@@ -218,6 +218,7 @@ class DefaultInjectorBindings implements InjectorBindings
             Secret\SessionSecret::class => Factory\SessionSecretFactory::class,
             Session\SessionEncryptionCoordinator::class => Factory\SessionEncryptionCoordinatorFactory::class,
             Session\HordeSessionFactory::class => [SessionHandlerFactory::class, 'createSessionFactory'],
+            Session\SessionLifecycle::class => Session\SessionLifecycleFactory::class,
             SecretManager::class => SecretManagerFactory::class,
             DbAdapter::class => DbAdapterFactory::class,
             OAuthProviderConfigRepository::class => OAuthProviderConfigRepositoryFactory::class,
