@@ -48,7 +48,13 @@ class RampageBootstrap
         $injector = new Injector(new TopLevel());
         $injector->setInstance(Injector::class, $injector);
         $injector->setInstance(Horde_Injector::class, $injector);
-        $GLOBALS['injector'] = $injector;
+        /**
+         * The RampageBootstrap must NOT store the injector in the global scope.
+         * Support for legacy scope must be handled by DefaultStack, specifically in HordeCore middleware.
+         * DO NOT: $GLOBALS['injector'] = $injector;
+         *
+         * @See discussion https://github.com/horde/Core/pull/227/changes#r4041232116
+         */
 
         if (class_exists('Horde\Bundle\PrecompiledBindings')) {
             (new \Horde\Bundle\PrecompiledBindings())->register($injector);
