@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Horde\Core\Service\Exception;
 
+use Horde\Core\Service\TokenGrant;
 use RuntimeException;
 
 /**
@@ -23,4 +24,31 @@ use RuntimeException;
  *
  * Callers should prompt the user to re-authorize.
  */
-class OAuthTokenRefreshException extends RuntimeException {}
+class OAuthTokenRefreshException extends RuntimeException
+{
+    public function __construct(
+        string $message,
+        private readonly string $userId,
+        private readonly string $providerId,
+        private readonly ?TokenGrant $grant = null,
+        int $code = 0,
+        ?\Throwable $previous = null
+    ) {
+        parent::__construct($message, $code, $previous);
+    }
+
+    public function userId(): string
+    {
+        return $this->userId;
+    }
+
+    public function providerId(): string
+    {
+        return $this->providerId;
+    }
+
+    public function grant(): ?TokenGrant
+    {
+        return $this->grant;
+    }
+}

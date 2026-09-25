@@ -23,7 +23,7 @@ use Horde\Injector\Attribute\Factory;
  * Storage contract for OAuth provider configurations.
  *
  * Providers are keyed by a unique slug (provider_id).
- * Data is returned as plain arrays with snake_case keys matching DB columns,
+ * Data is returned as plain arrays with snake_case keys matching DB columns
  * because the three provider types (oauth2, oidc, service_app) have
  * different shapes.
  *
