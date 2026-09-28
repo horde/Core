@@ -78,6 +78,10 @@ use Horde\Core\Factory\OAuthConsentMiddlewareFactory;
 use Horde\Core\Factory\OAuthFlowStoreFactory;
 use Horde\Core\Factory\PermissionServiceFactory;
 use Horde\Core\Factory\PrefsServiceFactory;
+use Horde\Core\Service\Factory\CredentialStoreFactory;
+use Horde\Core\Service\Factory\CredentialProvisioningStrategyFactory;
+use Horde\Core\Service\Factory\PasswordServiceAuthorizationServiceFactory;
+use Horde\Core\Service\Factory\ServiceCredentialManagerFactory;
 use Horde\Core\Factory\RegistryConfigLoaderFactory;
 use Horde\Core\Factory\RouteUrlWriterFactory;
 use Horde\Core\Factory\RuntimeRoutesProviderFactory;
@@ -94,6 +98,8 @@ use Horde\Core\Middleware\AuthIsGlobalAdmin;
 use Horde\Core\Middleware\ErrorFilter;
 use Horde\Core\Middleware\OAuthConsentMiddleware;
 use Horde\Core\Service\ApplicationService;
+use Horde\Core\Service\CredentialStore;
+use Horde\Core\Service\CredentialProvisioningStrategy;
 use Horde\Core\Service\GroupService;
 use Horde\Core\Service\HordeDbService;
 use Horde\Core\Service\HordeLdapService;
@@ -101,8 +107,10 @@ use Horde\Core\Service\IdentityService;
 use Horde\Core\Service\OAuthHttpClientService;
 use Horde\Core\Service\OAuthProviderConfigRepository;
 use Horde\Core\Service\OAuthTokenService;
+use Horde\Core\Service\PasswordServiceAuthorizationService;
 use Horde\Core\Service\PermissionService;
 use Horde\Core\Service\PrefsService;
+use Horde\Core\Service\ServiceCredentialManager;
 use Horde\Core\Service\VersionCheck\VersionService;
 use Horde\Core\Uri\RegistryRouteMapperProvider;
 use Horde\Core\Uri\RouteMapperProvider;
@@ -288,6 +296,10 @@ class DefaultInjectorBindings implements InjectorBindings
             HordeLdapService::class => HordeLdapServiceFactory::class,
             PermissionService::class => PermissionServiceFactory::class,
             VersionService::class => VersionServiceFactory::class,
+            CredentialStore::class => CredentialStoreFactory::class,
+            CredentialProvisioningStrategy::class => CredentialProvisioningStrategyFactory::class,
+            PasswordServiceAuthorizationService::class => PasswordServiceAuthorizationServiceFactory::class,
+            ServiceCredentialManager::class => ServiceCredentialManagerFactory::class,
             Tinymce::class => TinymceFactory::class,
             TinymcePageBinder::class => TinymcePageBinderFactory::class,
             EventDispatcherInterface::class => [EventDispatcherFactory::class, 'create'],
