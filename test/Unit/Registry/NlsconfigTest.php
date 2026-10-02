@@ -81,7 +81,7 @@ class NlsconfigTest extends TestCase
 
     private function makeNlsconfig(): Nlsconfig
     {
-        return new Nlsconfig($this->sessionAccessor, $this->configLoader);
+        return new Nlsconfig($this->configLoader, null, $this->sessionAccessor);
     }
 
     public function testImplementsLanguageContext(): void

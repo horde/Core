@@ -18,6 +18,7 @@ namespace Horde\Core\Registry;
 
 use Horde\Core\Config\BackendConfigLoader;
 use Horde\Core\LanguageContext;
+use Horde\Core\LanguageContextSelector;
 use Horde\Core\Session\SessionAccess;
 use Horde_Prefs;
 
@@ -87,10 +88,10 @@ final class Nlsconfig implements LanguageContext, LanguageContextSelector
             return basename($lang);
         }
 
-        if (!empty($serverEnvironment)) {
+        if (!empty($this->serverEnvironment)) {
             $partialLang = null;
 
-            foreach (explode(',', $serverEnvironment) as $browserLang) {
+            foreach (explode(',', $this->serverEnvironment) as $browserLang) {
                 if (($pos = strpos($browserLang, ';')) !== false) {
                     $browserLang = substr($browserLang, 0, $pos);
                 }
