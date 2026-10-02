@@ -26,7 +26,7 @@ class Horde_Core_Factory_Logger extends Horde_Core_Factory_Injector
     /**
      * Logger configuration service
      *
-     * @var Horde\Core\Config\LoggerConfig
+     * @var LoggerConfig
      */
     private $config;
 

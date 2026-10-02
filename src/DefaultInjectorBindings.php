@@ -25,6 +25,7 @@ use Horde\Core\Auth\AuthService;
 use Horde\Core\Config\ConfigLoader;
 use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\BackendConfigLoader;
+use Horde\Core\Config\MotdLoader;
 use Horde\Core\Config\Driver\DriverRepository;
 use Horde\Core\Config\RegistryConfigLoader;
 use Horde\Core\Config\State;
@@ -289,6 +290,7 @@ class DefaultInjectorBindings implements InjectorBindings
             AuthenticationService::class => AuthenticationServiceFactory::class,
             ConfigLoader::class => ConfigLoaderFactory::class,
             BackendConfigLoader::class => Factory\BackendConfigLoaderFactory::class,
+            MotdLoader::class => Factory\MotdLoaderFactory::class,
             State::class => StateFactory::class,
             DriverRepository::class => DriverRepositoryFactory::class,
             ConfigMetadataProvider::class => ConfigMetadataProviderFactory::class,

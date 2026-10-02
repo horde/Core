@@ -24,8 +24,7 @@ final class DeviceLogPathResolver
     public function __construct(
         private readonly ?string $loggingType,
         private readonly ?string $loggingPath
-    ) {
-    }
+    ) {}
 
     public function resolve(string $deviceId): ?string
     {

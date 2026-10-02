@@ -43,8 +43,8 @@ final class SnapshotService
     ) {
         $this->factoryBuilder = Closure::fromCallable(
             $factoryBuilder
-                ?? static fn (HealthOptions $options): DeviceHealthFactory =>
-                    new DeviceHealthFactory(new HealthEvaluator($options))
+                ?? static fn(HealthOptions $options): DeviceHealthFactory
+                    => new DeviceHealthFactory(new HealthEvaluator($options))
         );
         $this->clock = Closure::fromCallable($clock ?? time(...));
     }
@@ -146,21 +146,21 @@ final class SnapshotService
         usort(
             $devices,
             match ($sort) {
-                SnapshotCriteria::SORT_USER =>
-                    static fn (DeviceHealth $a, DeviceHealth $b): int =>
-                        strnatcasecmp($a->user, $b->user)
+                SnapshotCriteria::SORT_USER
+                    => static fn(DeviceHealth $a, DeviceHealth $b): int
+                        => strnatcasecmp($a->user, $b->user)
                             ?: strnatcasecmp($a->deviceId, $b->deviceId),
-                SnapshotCriteria::SORT_HEALTH =>
-                    static fn (DeviceHealth $a, DeviceHealth $b): int =>
-                        HealthStatus::rank($b->status)
+                SnapshotCriteria::SORT_HEALTH
+                    => static fn(DeviceHealth $a, DeviceHealth $b): int
+                        => HealthStatus::rank($b->status)
                             <=> HealthStatus::rank($a->status)
                             ?: self::compareAge($a, $b),
-                SnapshotCriteria::SORT_DEVICE =>
-                    static fn (DeviceHealth $a, DeviceHealth $b): int =>
-                        strnatcasecmp($a->deviceId, $b->deviceId),
-                default =>
-                    static fn (DeviceHealth $a, DeviceHealth $b): int =>
-                        self::compareAge($a, $b),
+                SnapshotCriteria::SORT_DEVICE
+                    => static fn(DeviceHealth $a, DeviceHealth $b): int
+                        => strnatcasecmp($a->deviceId, $b->deviceId),
+                default
+                => static fn(DeviceHealth $a, DeviceHealth $b): int
+                    => self::compareAge($a, $b),
             }
         );
     }

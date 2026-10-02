@@ -171,7 +171,7 @@ final class SnapshotServiceTest extends TestCase
         self::assertSame(
             ['DEVICE1', 'DEVICE3'],
             array_map(
-                static fn ($device): string => $device->deviceId,
+                static fn($device): string => $device->deviceId,
                 $snapshot->devices
             )
         );
@@ -186,7 +186,7 @@ final class SnapshotServiceTest extends TestCase
                 'perdevice',
                 '/var/log/activesync/'
             ),
-            clock: static fn (): int => self::NOW
+            clock: static fn(): int => self::NOW
         );
     }
 
