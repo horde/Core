@@ -17,65 +17,38 @@ declare(strict_types=1);
 namespace Horde\Core\Factory;
 
 use Horde\Core\Config\ConfigLoader;
+use Horde\Core\Config\PrefsConfigLoader;
+use Horde\Core\Service\HordeDbService;
+use Horde\Core\Service\HordeLdapService;
+use Horde\Core\Service\LdapPrefsService;
+use Horde\Core\Service\NullPrefsService;
 use Horde\Core\Service\PrefsService;
 use Horde\Core\Service\SqlPrefsService;
-use Horde\Core\Service\NullPrefsService;
-use Horde\Core\Service\HordeDbService;
 use Horde\Injector\Injector;
 use RuntimeException;
 
 /**
  * Factory for PrefsService from configuration
  *
- * Creates prefs storage backend based on conf.php settings.
- * Supports SQL initially, designed for expansion.
+ * Reads $conf['prefs']['driver'] from horde's conf.php and constructs the
+ * appropriate PrefsService backend.
  *
- * Currently implemented:
- * - 'sql': SQL storage (Horde_Prefs_Storage_Sql)
- * - 'null', 'session': Null storage (in-memory only)
+ * Supported drivers:
+ * - 'sql'          SQL storage via Horde_Prefs_Storage_Sql (default)
+ * - 'ldap'         LDAP attribute storage via LdapPrefsService
+ * - 'null'         In-memory only, no persistence
+ * - 'session'      Alias for 'null'
  *
- * TODO: Implement additional backends as needed:
+ * Driver-specific conf.php keys (all under $conf['prefs']['params']):
  *
- * LDAP Backend:
- * - Driver: 'ldap'
- * - Requires: LdapService (similar to DbServiceFactory pattern)
- * - Config: $conf['prefs']['params'] with:
- *   - hostspec: LDAP server hostname
- *   - port: LDAP port (default 389)
- *   - basedn: Base DN for prefs (e.g., 'ou=prefs,dc=example,dc=com')
- *   - uid: Attribute for username (default 'uid')
- *   - binddn: Bind DN for authentication
- *   - bindpw: Bind password
- * - Notes: LDAP has limited attribute storage, less common for prefs
- * - Implementation: Create LdapServiceFactory, then Horde_Prefs_Storage_Ldap wrapper
+ * sql:
+ *   table   - table name (default: 'horde_prefs')
  *
- * NoSQL Backend (MongoDB):
- * - Driver: 'nosql' or 'mongo'
- * - Requires: NoSQL service factory
- * - Config: $conf['nosql'] with connection params
- * - Notes: Check $conf['prefs']['driver'] == 'nosql', detect backend type (mongo/redis)
- * - Implementation: Create NoSqlServiceFactory, wrap Horde_Prefs_Storage_Mongo
- *
- * File Backend:
- * - Driver: 'file'
- * - Requires: File path configuration only
- * - Config: $conf['prefs']['params']['directory'] - Path to store prefs files
- * - Notes: Simple, no service dependencies, but slow at scale
- * - Implementation: Wrap Horde_Prefs_Storage_File with directory param
- *
- * Kolab IMAP Backend:
- * - Driver: 'kolab_imap'
- * - Requires: Kolab session/storage service
- * - Config: Uses authenticated user's IMAP connection
- * - Notes: Unavailable for admin users, stores prefs in IMAP folders
- * - Implementation: Create KolabServiceFactory, wrap Horde_Prefs_Storage_KolabImap
- *
- * App:Service Pattern:
- * - Factory supports 'app:service' notation for DB connections
- * - Example: $conf['prefs']['params']['driverconfig'] = 'horde:prefs'
- * - Gets DB connection specific to that service: DbServiceFactory->create('horde', 'prefs')
- * - For now, we use default 'horde' SQL connection
- * - Future: Extend DbServiceFactory to accept optional service parameter
+ * ldap:
+ *   basedn  - Base DN for user searches; required
+ *             e.g. 'ou=people,dc=example,dc=com'
+ *   The LDAP connection itself is sourced from HordeLdapService (configured
+ *   separately under $conf['ldap'] or $conf['auth']['params']).
  *
  * @category Horde
  * @package  Core
@@ -100,9 +73,10 @@ class PrefsServiceFactory
         $params = $state->get('prefs.params', []);
 
         return match (strtolower($driver)) {
-            'sql' => $this->createSqlBackend($injector, $params),
+            'sql'           => $this->createSqlBackend($injector, $params),
+            'ldap'          => $this->createLdapBackend($injector, $params),
             'null', 'session' => $this->createNullBackend(),
-            default => throw new RuntimeException("Unsupported prefs driver: $driver (TODO: implement)"),
+            default         => throw new RuntimeException("Unsupported prefs driver: $driver"),
         };
     }
 
@@ -120,7 +94,39 @@ class PrefsServiceFactory
 
         $table = $params['table'] ?? 'horde_prefs';
 
-        return new SqlPrefsService($dbService->getAdapter(), $table);
+        return new SqlPrefsService(
+            $dbService->getAdapter(),
+            $injector->get(PrefsConfigLoader::class),
+            $table
+        );
+    }
+
+    /**
+     * Create LDAP prefs backend
+     *
+     * Requires $conf['prefs']['params']['basedn'] in conf.php.
+     * The LDAP connection is resolved from the container via HordeLdapService,
+     * configured under $conf['ldap'] (or $conf['auth']['params'] for auth-bound
+     * connections). See doc/PREFERENCES.md for details.
+     *
+     * @param Injector $injector Dependency injector
+     * @param array    $params   Prefs configuration parameters
+     * @return LdapPrefsService LDAP prefs service
+     * @throws RuntimeException If basedn is missing from configuration
+     */
+    private function createLdapBackend(Injector $injector, array $params): LdapPrefsService
+    {
+        if (empty($params['basedn'])) {
+            throw new RuntimeException(
+                "LDAP prefs require \$conf['prefs']['params']['basedn'] in conf.php"
+            );
+        }
+
+        return new LdapPrefsService(
+            ldapService: $injector->get(HordeLdapService::class),
+            prefsConfigLoader: $injector->get(PrefsConfigLoader::class),
+            basedn: $params['basedn']
+        );
     }
 
     /**

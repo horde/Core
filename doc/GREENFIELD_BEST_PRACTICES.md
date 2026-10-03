@@ -241,6 +241,16 @@ global state.
 
 ## Modern replacements
 
+### Config access
+
+Use the Horde\Core\Config\ConfigLoader instead of the legacy $conf global.
+By default apps come with a Horde\$app\$AppConfig object wired up in the DI container which wraps this app's config object.
+
+## Preferences access
+
+Prefer type hinting against the Horde\Core\Service\PrefsService class over using the legacy Horde_Prefs DI hint or the $prefs global.
+See also PREFERENCES.md
+
 ### Horde\Db over Horde_Db
 
 Use `Horde\Db` (the namespaced package) for all new database work:
