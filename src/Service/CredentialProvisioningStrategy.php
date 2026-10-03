@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Strategy interface for credential provisioning.
  *

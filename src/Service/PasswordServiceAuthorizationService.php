@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Service interface for password-based authorization.
  *

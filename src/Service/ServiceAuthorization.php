@@ -1,7 +1,9 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Horde\Core\Service;
+
 /**
  * Revocation is performed through `ServiceAuthorizationService` rather than through this object.
  * This avoids the object holding a self-reference to its repository.

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Credential types supported by unified manager.
  *

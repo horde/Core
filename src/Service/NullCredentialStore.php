@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Null implementation of CredentialStore.
  *
@@ -11,6 +12,8 @@
 declare(strict_types=1);
 
 namespace Horde\Core\Service;
+
+use RuntimeException;
 
 final class NullCredentialStore implements CredentialStore
 {
@@ -40,14 +43,14 @@ final class NullCredentialStore implements CredentialStore
         ServicePurpose $purpose,
         array|string $credential
     ): PasswordCredential {
-        throw new \RuntimeException('Password credential storage not available');
+        throw new RuntimeException('Password credential storage not available');
     }
 
     public function update(
         string $credentialId,
         array|string $credential
     ): PasswordCredential {
-        throw new \RuntimeException('Password credential storage not available');
+        throw new RuntimeException('Password credential storage not available');
     }
 
     public function delete(string $credentialId): void

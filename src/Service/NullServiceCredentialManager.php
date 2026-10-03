@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Null implementation of ServiceCredentialManager.
  *
@@ -12,6 +13,8 @@ declare(strict_types=1);
 
 namespace Horde\Core\Service;
 
+use RuntimeException;
+
 final class NullServiceCredentialManager implements ServiceCredentialManager
 {
     public function get(
@@ -19,7 +22,7 @@ final class NullServiceCredentialManager implements ServiceCredentialManager
         string $providerId,
         ServicePurpose $purpose
     ): ServiceCredentialResult {
-        throw new \RuntimeException('Service credential manager not available');
+        throw new RuntimeException('Service credential manager not available');
     }
 
     public function initiate(

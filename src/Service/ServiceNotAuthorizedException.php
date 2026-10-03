@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Horde\Core\Service;
 
 use Horde\OAuth\Client\ScopeSet;
+use RuntimeException;
+use Throwable;
 
-final class ServiceNotAuthorizedException extends \RuntimeException
+final class ServiceNotAuthorizedException extends RuntimeException
 {
     public function __construct(
         private readonly string $userId,
@@ -15,7 +17,7 @@ final class ServiceNotAuthorizedException extends \RuntimeException
         private readonly ScopeSet $missingScopes,
         string $message = '',
         int $code = 0,
-        ?\Throwable $previous = null
+        ?Throwable $previous = null
     ) {
         if ($message === '') {
             $message = sprintf(
