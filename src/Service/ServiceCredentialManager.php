@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Unified credential manager (Entry Point B).
  *

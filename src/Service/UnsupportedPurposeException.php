@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Horde\Core\Service;
 
-final class UnsupportedPurposeException extends \RuntimeException
+use RuntimeException;
+use Throwable;
+
+final class UnsupportedPurposeException extends RuntimeException
 {
     public function __construct(
         private readonly string $providerId,
         private readonly ServicePurpose $purpose,
         string $message = '',
         int $code = 0,
-        ?\Throwable $previous = null
+        ?Throwable $previous = null
     ) {
         if ($message === '') {
             $message = sprintf(

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Repository interface for password credential storage.
  *

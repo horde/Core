@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Null implementation of CredentialProvisioningStrategy.
  *

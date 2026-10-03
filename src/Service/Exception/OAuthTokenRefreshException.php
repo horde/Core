@@ -18,6 +18,7 @@ namespace Horde\Core\Service\Exception;
 
 use Horde\Core\Service\TokenGrant;
 use RuntimeException;
+use Throwable;
 
 /**
  * Thrown when an OAuth token refresh fails (e.g. refresh token revoked).
@@ -32,7 +33,7 @@ class OAuthTokenRefreshException extends RuntimeException
         private readonly string $providerId,
         private readonly ?TokenGrant $grant = null,
         int $code = 0,
-        ?\Throwable $previous = null
+        ?Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);
     }

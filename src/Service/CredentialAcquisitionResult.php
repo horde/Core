@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Result of credential acquisition attempt.
  *

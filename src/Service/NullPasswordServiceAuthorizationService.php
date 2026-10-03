@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Null implementation of PasswordServiceAuthorizationService.
  *
@@ -11,6 +12,8 @@
 declare(strict_types=1);
 
 namespace Horde\Core\Service;
+
+use RuntimeException;
 
 final class NullPasswordServiceAuthorizationService implements PasswordServiceAuthorizationService
 {
@@ -36,14 +39,14 @@ final class NullPasswordServiceAuthorizationService implements PasswordServiceAu
         ServicePurpose $purpose,
         array|string $credential
     ): PasswordCredential {
-        throw new \RuntimeException('Password credential service not available');
+        throw new RuntimeException('Password credential service not available');
     }
 
     public function update(
         string $credentialId,
         array|string $credential
     ): PasswordCredential {
-        throw new \RuntimeException('Password credential service not available');
+        throw new RuntimeException('Password credential service not available');
     }
 
     public function revoke(
