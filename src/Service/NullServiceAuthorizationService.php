@@ -7,6 +7,7 @@ namespace Horde\Core\Service;
 use Horde\OAuth\Client\OAuthFlowData;
 use Horde\OAuth\Client\ScopeSet;
 use Psr\Http\Message\UriInterface;
+use RuntimeException;
 
 /** Null ServiceAuthorizationService - safe default when service authorization is not configured. */
 class NullServiceAuthorizationService implements ServiceAuthorizationService
@@ -36,7 +37,7 @@ class NullServiceAuthorizationService implements ServiceAuthorizationService
 
     public function handleCallback(string $code, OAuthFlowData $flowData): ServiceAuthorization
     {
-        throw new \RuntimeException('Service authorization not configured');
+        throw new RuntimeException('Service authorization not configured');
     }
 
     public function revoke(

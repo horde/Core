@@ -100,4 +100,19 @@ class NullPrefsService implements PrefsService
     {
         return isset($this->storage[$uid][$scope][$key]);
     }
+    /**
+     * Check if preference is locked
+     *
+     * A locked preference cannot be changed by the user.
+     * This implementation always returns false.
+     *
+     * @param string $uid   User ID
+     * @param string $scope App name
+     * @param string $key   Preference key
+     * @return bool True if the preference is locked
+     */
+    public function isLocked(string $uid, string $scope, string $key): bool
+    {
+        return false;
+    }
 }

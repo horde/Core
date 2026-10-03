@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Password-based credential value object.
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Actions that can result from credential acquisition attempt.
  *
