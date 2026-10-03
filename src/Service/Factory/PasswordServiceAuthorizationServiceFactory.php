@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory for PasswordServiceAuthorizationService.
  *
@@ -11,11 +12,12 @@ namespace Horde\Core\Service\Factory;
 
 use Horde\Core\Service\NullPasswordServiceAuthorizationService;
 use Horde\Core\Service\PasswordServiceAuthorizationService;
+use Horde\Injector\Injector;
 use Horde_Injector;
 
 class PasswordServiceAuthorizationServiceFactory
 {
-    public function create(Horde_Injector $injector): PasswordServiceAuthorizationService
+    public function create(Horde_Injector|Injector $injector): PasswordServiceAuthorizationService
     {
         return new NullPasswordServiceAuthorizationService();
     }
