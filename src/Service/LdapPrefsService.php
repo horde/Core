@@ -103,7 +103,7 @@ class LdapPrefsService implements PrefsService
             ]);
 
             if ($search->count() === 0) {
-                // No hordePerson entry — check user entry directly
+                // No hordePerson entry. Check user entry directly
                 try {
                     $entry = $ldap->getEntry($userDN, ['attributes' => [$attrName]]);
                     $value = $entry->getValue($attrName, 'single');
@@ -130,7 +130,7 @@ class LdapPrefsService implements PrefsService
      * Set preference value
      *
      * Refuses to write a preference that is locked in the config cascade.
-     * Throws RuntimeException — same contract as SqlPrefsService — so callers
+     * Throws RuntimeException so callers
      * can rely on a consistent lock-enforcement contract regardless of backend.
      *
      * @param string $uid   User ID
@@ -160,7 +160,7 @@ class LdapPrefsService implements PrefsService
             $attrName = $this->buildAttributeName($scope, $key);
 
             if ($search->count() === 0) {
-                // No hordePerson entry — modify user entry directly
+                // No hordePerson entry. Modify user entry directly
                 $entry = $ldap->getEntry($userDN);
 
                 // Add hordePerson objectClass if not present.
@@ -292,14 +292,14 @@ class LdapPrefsService implements PrefsService
                 if (strpos($attrName, $prefix) === 0) {
                     $key = lcfirst(substr($attrName, $prefixLen));
                     if (isset($locked[$key])) {
-                        // Config lock wins — skip this LDAP attribute
+                        // Config lock wins. Skip this LDAP attribute
                         continue;
                     }
                     $result[$key] = is_array($values) ? $values[0] : $values;
                 }
             }
         } catch (Horde_Ldap_Exception $e) {
-            // LDAP unavailable — return config defaults only (no rethrow)
+            // LDAP unavailable. Return config defaults only (no rethrow)
         }
 
         return $result;
