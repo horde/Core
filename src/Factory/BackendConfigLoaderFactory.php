@@ -19,6 +19,7 @@ namespace Horde\Core\Factory;
 use Horde\Core\Config\BackendConfigLoader;
 use Horde\Core\Config\Vhost;
 use Horde\Injector\Injector;
+use ReflectionClass;
 
 /**
  * Factory for BackendConfigLoader
@@ -39,13 +40,21 @@ class BackendConfigLoaderFactory
     {
         $configBase = defined('HORDE_CONFIG_BASE') ? HORDE_CONFIG_BASE : '/etc/horde';
 
+        $vendorBase = '';
+
+        if (class_exists('Composer\Autoload\ClassLoader')) {
+            $reflection = new ReflectionClass(\Composer\Autoload\ClassLoader::class);
+            $vendorBase = dirname($reflection->getFileName(), 2) . '/horde'; // vendor/horde/
+        }
         // BackendConfigLoader builds "$vendorBase/$app/config/", so vendorBase
         // must be the directory CONTAINING each app package (vendor/horde/),
         // not the horde package itself. HORDE_BASE points at vendor/horde/horde,
         // so its parent is the correct base.
-        $vendorBase = defined('HORDE_BASE')
-            ? dirname(HORDE_BASE)
-            : __DIR__ . '/../../../..';
+        else {
+            $vendorBase = defined('HORDE_BASE')
+                ? dirname(HORDE_BASE)
+                : __DIR__ . '/../../../..';
+        }
 
         return new BackendConfigLoader($configBase, $vendorBase, new Vhost());
     }
