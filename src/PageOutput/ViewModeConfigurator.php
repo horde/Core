@@ -16,7 +16,11 @@ declare(strict_types=1);
 
 namespace Horde\Core\PageOutput;
 
+use Horde\Core\Assets\CssDiscoverer;
+use Horde\Core\Assets\CssDiscoveryRequest;
 use Horde\Core\Assets\JsDiscoverer;
+use Horde\Core\Assets\JsDiscoveryRequest;
+use Horde\Core\Assets\ThemeResolver;
 use Horde\Core\Service\PrefsService;
 use Horde\Core\Session\HordeSession;
 use Horde\Core\Session\SessionAccess;
@@ -45,7 +49,72 @@ class ViewModeConfigurator
         private readonly SessionAccess $session,
         private readonly JsDiscoverer $jsDiscoverer,
         private readonly Token $tokenService,
+        private readonly ?CssDiscoverer $cssDiscoverer = null,
+        private readonly ?ThemeResolver $themeResolver = null,
     ) {}
+
+    /**
+     * Adds themed stylesheets to the output.
+     *
+     * Resolves the user's theme and walks the asset cascade, so a theme that
+     * does not ship $files still gets the default theme's version, and one
+     * that does gets it layered on top.
+     *
+     * Controllers outside the Horde_PageOutput path used to hardcode
+     * '/default/' in the stylesheet URI, which pinned those pages to the
+     * default theme whatever the user had selected.
+     *
+     * @param list<string> $files Stylesheet names, e.g. ['screen.css'].
+     */
+    public function addThemeStylesheets(
+        AssetCollector $collector,
+        array $files,
+        string $app = 'horde',
+    ): void {
+        if ($this->cssDiscoverer === null || $this->themeResolver === null) {
+            return;
+        }
+
+        $theme = $this->resolveTheme($app);
+
+        $result = $this->cssDiscoverer->discover(
+            new CssDiscoveryRequest(files: $files, app: $app, theme: $theme)
+        );
+
+        foreach ($result as $entry) {
+            $collector->addStylesheet($entry->uri);
+        }
+    }
+
+    /**
+     * Adds the scripts the active theme ships for itself (info.php
+     * $theme_scripts), as DesktopChromeRenderer does.
+     *
+     * Call it AFTER configure(): theme scripts may rely on the core
+     * scripts (prototype.js, horde.js) it adds.
+     */
+    public function addThemeScripts(AssetCollector $collector, string $app = 'horde'): void
+    {
+        if ($this->themeResolver === null) {
+            return;
+        }
+
+        $scripts = $this->jsDiscoverer->discoverTheme(
+            new JsDiscoveryRequest(app: $app, theme: $this->resolveTheme($app))
+        );
+        foreach ($scripts as $entry) {
+            $collector->addScript($entry->uri);
+        }
+    }
+
+    private function resolveTheme(string $app): string
+    {
+        $uid = $this->session->getAuthId() ?? '';
+
+        return $uid === ''
+            ? 'default'
+            : $this->themeResolver->resolve($uid, null, $app);
+    }
 
     public function configure(AssetCollector $collector, ViewMode $mode): void
     {
