@@ -296,7 +296,7 @@ class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
             );
 
             /* Apply fixed ratio resize. */
-            $html .= Horde::link('#', Horde_Core_Translation::t('Fix ratio'), '', '', 'src=getResizeSrc(\'' . $img->copy()->add('a', 'resize') . '\', \'' . $varname . '\', \'1\');showImage(src, \'_p_' . $varname . '\', true);') . Horde_Themes_Image::tag('ratio.png', ['alt' => Horde_Core_Translation::t('Fix ratio')]) . '</a>';
+            $html .= Horde::link('#', Horde_Core_Translation::t('Fix ratio'), '', '', 'src=getResizeSrc(\'' . $img->copy()->add('a', 'resize') . '\', \'' . $varname . '\', \'1\');showImage(src, \'_p_' . $varname . '\', true);') . Horde_Themes_Image::tag('image/ratio.png', ['alt' => Horde_Core_Translation::t('Fix ratio')]) . '</a>';
 
             /* Keep also original if it has been requested. */
             if ($var->getProperty('show_keeporig')) {
