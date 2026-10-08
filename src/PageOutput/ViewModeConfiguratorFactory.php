@@ -16,7 +16,9 @@ declare(strict_types=1);
 
 namespace Horde\Core\PageOutput;
 
+use Horde\Core\Assets\CssDiscoverer;
 use Horde\Core\Assets\JsDiscoverer;
+use Horde\Core\Assets\ThemeResolver;
 use Horde\Core\Service\PrefsService;
 use Horde\Core\Session\SessionAccess;
 use Horde_Injector;
@@ -42,6 +44,8 @@ class ViewModeConfiguratorFactory
             $injector->get(SessionAccess::class),
             $injector->get(JsDiscoverer::class),
             $injector->get(Token::class),
+            $injector->get(CssDiscoverer::class),
+            $injector->get(ThemeResolver::class),
         );
     }
 }
