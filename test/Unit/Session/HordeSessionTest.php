@@ -18,6 +18,7 @@ use Horde\SessionHandler\Exception\SessionException;
 use Horde\SessionHandler\Session;
 use Horde\SessionHandler\SessionId;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Horde_Pack;
@@ -219,6 +220,47 @@ class HordeSessionTest extends TestCase
             'horde' => ['auth/remoteAddr' => '192.168.1.1'],
         ]);
         self::assertSame('192.168.1.1', $session->getRemoteAddress());
+    }
+
+    /**
+     * Strings written through setScoped() carry the NOT_SERIALIZED marker
+     * on the wire. The meta getters must return them without it, both on
+     * the writing session and after a round trip through toPayload().
+     * The tests above seed $data with unprefixed strings, so they did not
+     * catch the marker leaking out.
+     *
+     * @return array<string, array{string, string, string}>
+     */
+    public static function metaGetterProvider(): array
+    {
+        return [
+            'authenticated user' => ['auth/userId', 'getAuthenticatedUser', 'alice'],
+            'auth id' => ['auth/authId', 'getAuthId', 'alice@example.com'],
+            'browser fingerprint' => ['auth/browser', 'getBrowserFingerprint', 'Mozilla/5.0'],
+            'remote address' => ['auth/remoteAddr', 'getRemoteAddress', '192.168.1.1'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('metaGetterProvider')]
+    public function testMetaGetterStripsStorageMarker(string $key, string $getter, string $value): void
+    {
+        $session = $this->createSession();
+        $session->setScoped('horde', $key, $value);
+
+        self::assertSame($value, $session->{$getter}());
+    }
+
+    #[Test]
+    #[DataProvider('metaGetterProvider')]
+    public function testMetaGetterStripsStorageMarkerAfterPayloadRoundTrip(string $key, string $getter, string $value): void
+    {
+        $writer = $this->createSession();
+        $writer->setScoped('horde', $key, $value);
+
+        $reader = $this->createSession($writer->toPayload());
+
+        self::assertSame($value, $reader->{$getter}());
     }
 
     #[Test]
