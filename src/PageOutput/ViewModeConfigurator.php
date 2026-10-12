@@ -75,7 +75,7 @@ class ViewModeConfigurator
             return;
         }
 
-        $theme = $this->resolveTheme($app);
+        $theme = $this->resolveTheme();
 
         $result = $this->cssDiscoverer->discover(
             new CssDiscoveryRequest(files: $files, app: $app, theme: $theme)
@@ -100,20 +100,25 @@ class ViewModeConfigurator
         }
 
         $scripts = $this->jsDiscoverer->discoverTheme(
-            new JsDiscoveryRequest(app: $app, theme: $this->resolveTheme($app))
+            new JsDiscoveryRequest(app: $app, theme: $this->resolveTheme())
         );
         foreach ($scripts as $entry) {
             $collector->addScript($entry->uri);
         }
     }
 
-    private function resolveTheme(string $app): string
+    /**
+     * The theme is a Horde-wide preference: resolve it in the horde scope,
+     * as DesktopChromeRendererFactory does, whatever app the assets belong
+     * to. $app only selects which app's files are discovered.
+     */
+    private function resolveTheme(): string
     {
         $uid = $this->session->getAuthId() ?? '';
 
         return $uid === ''
             ? 'default'
-            : $this->themeResolver->resolve($uid, null, $app);
+            : $this->themeResolver->resolve($uid);
     }
 
     public function configure(AssetCollector $collector, ViewMode $mode): void
