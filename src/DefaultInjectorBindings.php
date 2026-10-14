@@ -226,6 +226,7 @@ class DefaultInjectorBindings implements InjectorBindings
             'Horde_Perms' => 'Horde_Core_Factory_Perms',
             'Horde_Perms_Base' => 'Horde_Core_Factory_Perms',
             'Horde_Queue_Storage' => 'Horde_Core_Factory_QueueStorage',
+            'Horde_Registry' => [Factory\HordeRegistryFactory::class, 'create'],
             'Horde_Routes_Mapper' => 'Horde_Core_Factory_Mapper',
             HordeRoutesMapper::class => 'Horde_Core_Factory_Mapper',
             'Horde_Routes_Matcher' => 'Horde_Core_Factory_Matcher',
