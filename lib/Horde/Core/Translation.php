@@ -24,7 +24,7 @@ class Horde_Core_Translation extends Horde_Translation_Autodetect
      *
      * @var string
      */
-    protected static $_domain = 'Horde_Core';
+    protected static $_domain = 'Core';
 
     /**
      * The absolute PEAR path to the translations for the default gettext handler.
