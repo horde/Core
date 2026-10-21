@@ -57,7 +57,8 @@ abstract class Horde_Themes_Css_Cache
     /**
      * Split off the stylesheets that are not local files (e.g. a CDN URL
      * added by the cssfiles hook). These cannot be compressed, so they are
-     * linked as is, before the cached file.
+     * linked as is, before the cached file. An absolute URL backed by a
+     * readable local file is kept in the cached file.
      *
      * @param array $css  See Horde_Themes_Css#getStylesheets().
      *
@@ -70,7 +71,8 @@ abstract class Horde_Themes_Css_Cache
 
         foreach ($css as $val) {
             if (isset($val['uri'])
-                && preg_match('#^https?://#i', (string) $val['uri'])) {
+                && preg_match('#^https?://#i', (string) $val['uri'])
+                && !(isset($val['fs']) && is_readable($val['fs']))) {
                 $external[] = Horde::url($val['uri'], true, -1);
             } else {
                 $local[] = $val;
