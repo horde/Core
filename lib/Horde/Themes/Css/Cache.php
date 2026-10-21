@@ -55,6 +55,34 @@ abstract class Horde_Themes_Css_Cache
     abstract public function process($css, $cacheid);
 
     /**
+     * Split off the stylesheets that are not local files (e.g. a CDN URL
+     * added by the cssfiles hook). These cannot be compressed, so they are
+     * linked as is, before the cached file. An absolute URL backed by a
+     * readable local file is kept in the cached file.
+     *
+     * @param array $css  See Horde_Themes_Css#getStylesheets().
+     *
+     * @return array  Two elements: the list of external URLs (Horde_Url
+     *                objects) and the list of local stylesheets.
+     */
+    protected function _splitExternal($css)
+    {
+        $external = $local = [];
+
+        foreach ($css as $val) {
+            if (isset($val['uri'])
+                && preg_match('#^https?://#i', (string) $val['uri'])
+                && !(isset($val['fs']) && is_readable($val['fs']))) {
+                $external[] = Horde::url($val['uri'], true, -1);
+            } else {
+                $local[] = $val;
+            }
+        }
+
+        return [$external, $local];
+    }
+
+    /**
      * Perform garbage collection.
      */
     public function gc() {}
