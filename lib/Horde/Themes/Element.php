@@ -162,6 +162,12 @@ class Horde_Themes_Element
     /**
      * Convert a URI into a Horde_Themes_Element object.
      *
+     * The URI is first matched against the themes, javascript and static
+     * locations of the registered applications, since these may be served
+     * outside of the Horde webroot (e.g. /themes/horde in a composer
+     * installation). Otherwise, the URI is resolved against the Horde
+     * fileroot.
+     *
      * @param string $uri  The URI to convert.
      *
      * @return Horde_Themes_Element  A theme element object.
@@ -170,12 +176,35 @@ class Horde_Themes_Element
     {
         global $registry;
 
-        $fileroot = $registry->get('fileroot', 'horde');
-        $webroot = $registry->get('webroot', 'horde');
+        $uri = (string) $uri;
+        $fs = null;
+        $match = 0;
+
+        foreach ($registry->listAllApps() as $app) {
+            foreach (['themes', 'js', 'static'] as $type) {
+                $base_uri = rtrim((string) $registry->get($type . 'uri', $app), '/');
+                $base_fs = $registry->get($type . 'fs', $app);
+                if (!strlen($base_uri)
+                    || !strlen((string) $base_fs)
+                    || (strlen($base_uri) <= $match)
+                    || !str_starts_with($uri, $base_uri . '/')) {
+                    continue;
+                }
+                $fs = rtrim($base_fs, '/') . substr($uri, strlen($base_uri));
+                $match = strlen($base_uri);
+            }
+        }
+
+        if (is_null($fs)) {
+            $fileroot = $registry->get('fileroot', 'horde');
+            $webroot = rtrim((string) $registry->get('webroot', 'horde'), '/');
+            $fs = realpath($fileroot ?? '') . '/'
+                . ltrim(preg_replace('/^' . preg_quote($webroot, '/') . '(?=\/)/', '', $uri), '/');
+        }
 
         return new self('', [
             'data' => [
-                'fs' => realpath($fileroot ?? '') . preg_replace('/^' . preg_quote($webroot ?? '', '/') . '/', '', $uri),
+                'fs' => $fs,
                 'uri' => $uri,
             ],
         ]);
