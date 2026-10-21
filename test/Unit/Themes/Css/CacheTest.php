@@ -55,6 +55,21 @@ class CacheTest extends TestCase
         $this->assertSame([$local], $rest);
     }
 
+    public function testSplitExternalKeepsAbsoluteUrlWithLocalFile(): void
+    {
+        $fs = tempnam(sys_get_temp_dir(), 'css');
+        $local = ['app' => 'horde', 'fs' => $fs, 'uri' => 'https://static.example.org/themes/x/screen.css'];
+
+        try {
+            [$external, $rest] = $this->getCache()->process([$local], '');
+        } finally {
+            unlink($fs);
+        }
+
+        $this->assertSame([], $external);
+        $this->assertSame([$local], $rest);
+    }
+
     public function testSplitExternalWithoutExternal(): void
     {
         $local = ['app' => 'horde', 'fs' => '/srv/themes/x/screen.css', 'uri' => '/themes/x/screen.css'];
