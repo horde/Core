@@ -31,6 +31,7 @@ class CompressTest extends TestCase
         $GLOBALS['browser']->method('hasFeature')->willReturn(false);
 
         $GLOBALS['registry'] = $this->createStub(Horde_Registry::class);
+        $GLOBALS['registry']->method('listAllApps')->willReturn([]);
 
         // Use stubs for logger and injector
         $logger = $this->createStub(LoggerInterface::class);
