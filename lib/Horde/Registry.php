@@ -522,10 +522,15 @@ class Horde_Registry implements Horde_Shutdown_Task
         /* Save arguments. */
         $this->_args = $args;
 
-        /* Setup injector. */
+        /* Setup injector. Only register the default bindings on an injector we
+         * created ourselves: registering them again on one handed over by a
+         * bootstrap shadows instances it already resolved (e.g. SessionLifecycle). */
+        $injectorProvided = isset($GLOBALS['injector']);
         $injector = $GLOBALS['injector'] ??= new Horde_Injector(new Horde_Injector_TopLevel());
 
-        (new \Horde\Core\DefaultInjectorBindings())->register($injector);
+        if (!$injectorProvided) {
+            (new \Horde\Core\DefaultInjectorBindings())->register($injector);
+        }
 
         $GLOBALS['registry'] = $this;
         $injector->setInstance(__CLASS__, $this);
