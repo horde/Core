@@ -1,5 +1,6 @@
 <?php
 
+use Horde\Exception\InvalidDataThrowable;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -2478,6 +2479,11 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
      *         if adding Draft email message. @since 2.28.0
      *  - conversationindex: (integer) The conversation index value if adding
      *         Draft email message @since 2.28.0
+     *
+     *   On failure: false for a server-side error the client may retry, or
+     *   an array with only an 'error' key holding the
+     *   Horde_ActiveSync_Request_Sync::STATUS_* code to report for the item
+     *   (STATUS_INVALID when the backend rejected the client data).
      */
     public function changeMessage($folderid, $id, Horde_ActiveSync_Message_Base $message, $device)
     {
@@ -2513,9 +2519,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     try {
                         $results = $this->_connector->calendar_import($message, $server_id);
                     } catch (Horde_Exception $e) {
-                        $this->_logger->err($e->getMessage());
-                        $this->_endBuffer();
-                        return false;
+                        return $this->_importFailure($e, $folderid, $id);
                     }
                     $stat = [
                         'mod' => $this->getSyncStamp($folderid),
@@ -2530,9 +2534,7 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     try {
                         $results = $this->_connector->calendar_replace($id, $message, $server_id);
                     } catch (Horde_Exception $e) {
-                        $this->_logger->err($e->getMessage());
-                        $this->_endBuffer();
-                        return false;
+                        return $this->_importFailure($e, $folderid, $id);
                     }
                     $stat = $this->_smartStatMessage($folderid, $id, false);
                     // @todo Remove this check in H6, when the API always returns.
@@ -2549,18 +2551,14 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     try {
                         $id = $this->_connector->contacts_import($message, $server_id);
                     } catch (Horde_Exception $e) {
-                        $this->_logger->err($e->getMessage());
-                        $this->_endBuffer();
-                        return false;
+                        return $this->_importFailure($e, $folderid, $id);
                     }
                     $stat = ['mod' => $this->getSyncStamp($folderid), 'id' => $id, 'flags' => 1];
                 } else {
                     try {
                         $this->_connector->contacts_replace($id, $message);
                     } catch (Horde_Exception $e) {
-                        $this->_logger->err($e->getMessage());
-                        $this->_endBuffer();
-                        return false;
+                        return $this->_importFailure($e, $folderid, $id);
                     }
                     $stat = $this->_smartStatMessage($folderid, $id, false);
                 }
@@ -2571,18 +2569,14 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     try {
                         $id = $this->_connector->tasks_import($message, $server_id);
                     } catch (Horde_Exception $e) {
-                        $this->_logger->err($e->getMessage());
-                        $this->_endBuffer();
-                        return false;
+                        return $this->_importFailure($e, $folderid, $id);
                     }
                     $stat = ['mod' => $this->getSyncStamp($folderid), 'id' => $id, 'flags' => 1];
                 } else {
                     try {
                         $this->_connector->tasks_replace($id, $message);
                     } catch (Horde_Exception $e) {
-                        $this->_logger->err($e->getMessage());
-                        $this->_endBuffer();
-                        return false;
+                        return $this->_importFailure($e, $folderid, $id);
                     }
                     $stat = $this->_smartStatMessage($folderid, $id, false);
                 }
@@ -2593,18 +2587,14 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                     try {
                         $id = $this->_connector->notes_import($message, $server_id);
                     } catch (Horde_Exception $e) {
-                        $this->_logger->err($e->getMessage());
-                        $this->_endBuffer();
-                        return false;
+                        return $this->_importFailure($e, $folderid, $id);
                     }
                     $stat = ['mod' => $this->getSyncStamp($folderid), 'id' => $id, 'flags' => 1];
                 } else {
                     try {
                         $this->_connector->notes_replace($id, $message);
                     } catch (Horde_Exception $e) {
-                        $this->_logger->err($e->getMessage());
-                        $this->_endBuffer();
-                        return false;
+                        return $this->_importFailure($e, $folderid, $id);
                     }
                     $stat = $this->_smartStatMessage($folderid, $id, false);
                 }
@@ -4659,6 +4649,39 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
         if ($output = ob_get_clean()) {
             $this->_logger->err('Unexpected output: ' . $output);
         }
+    }
+
+    /**
+     * Turn an exception raised by a PIM backend while importing a client
+     * change into the changeMessage() failure result.
+     *
+     * A backend that rejected the client's data (InvalidDataThrowable, e.g.
+     * an attribute over its configured length) is reported as STATUS_INVALID:
+     * the item itself is unacceptable and the client must not resend it on
+     * every Sync. Any other failure stays a generic server error (false),
+     * which the client may retry.
+     *
+     * @param Horde_Exception $e  The backend exception.
+     * @param string $folderid    The folder the change was addressed to.
+     * @param string|null $id     The server id of the changed item, null for
+     *                            an addition.
+     *
+     * @return array|boolean  @see self::changeMessage()
+     */
+    protected function _importFailure(Horde_Exception $e, $folderid, $id)
+    {
+        $this->_endBuffer();
+        if ($e instanceof InvalidDataThrowable) {
+            $this->_logger->warn(sprintf(
+                'Rejected client change for %s in folder %s: %s',
+                $id ?: 'new item',
+                $folderid,
+                $e->getMessage()
+            ));
+            return ['error' => Horde_ActiveSync_Request_Sync::STATUS_INVALID];
+        }
+        $this->_logger->err($e->getMessage());
+        return false;
     }
 
     /**
