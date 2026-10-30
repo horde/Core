@@ -2092,8 +2092,12 @@ class Horde_Core_ActiveSync_Driver extends Horde_ActiveSync_Driver_Base
                 case 'IPM.Schedule.Meeting.Resp.Tent':
                     $addr = new Horde_Mail_Rfc822_Address($msg->from);
                     $rq = $msg->meetingrequest;
+                    $vEvent = $rq ? $rq->getvEvent() : null;
+                    if ($vEvent === null) {
+                        break;
+                    }
                     $this->_connector->calendar_import_attendee(
-                        $rq->getvEvent(),
+                        $vEvent,
                         $addr->bare_address
                     );
             }
