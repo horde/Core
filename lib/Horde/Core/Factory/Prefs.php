@@ -225,7 +225,11 @@ class Horde_Core_Factory_Prefs extends Horde_Core_Factory_Base
             'storage_key' => 'horde_prefs_cache',
         ];
 
-        if ($fallback) {
+        /* A non-persistent session gets a new session_id() on every request.
+         * A per-session cache entry would never be reused and only expire
+         * after the cache lifetime. Keep it in memory only. */
+        if ($fallback
+            || (($GLOBALS['session'] ?? null) instanceof Horde_Session_Null)) {
             $params['cache'] = new Horde_Cache_Storage_Null();
             $params['maxsize'] = 0;
         } else {
