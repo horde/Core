@@ -1,7 +1,9 @@
 <?php
 
+use Horde\Core\Config\State as ConfigState;
 use Horde\Util\Util;
 use Horde\Util\Variables;
+use Horde\Injector\Injector;
 
 /**
  * The Horde_Core_Perms_Ui class provides UI methods for the Horde permissions
@@ -53,18 +55,28 @@ class Horde_Core_Perms_Ui
      */
     protected $_type = 'matrix';
 
+    protected Injector $_injector;
+    protected ConfigState $_configState;
+
     /**
      * Constructor.
      *
      * @param Horde_Perms_Base $perms  The object to display UI stuff for.
      * @param Horde_Core_Perms_Base $corePerms
+     * @param ConfigState|null $configState  The configuration state object.
+     * @param Injector|null $injector  The injector object.
      */
     public function __construct(
         Horde_Perms_Base $perms,
-        Horde_Core_Perms $corePerms
+        Horde_Core_Perms $corePerms,
+        ConfigState|null $configState = null,
+        Injector|null $injector = null
     ) {
         $this->_perms = $perms;
         $this->_corePerms = $corePerms;
+        $this->_injector = $injector ?? $GLOBALS['injector'];
+        $this->_configState = $configState
+            ?? $this->_injector->get(ConfigState::class);
     }
 
     /**
@@ -88,7 +100,7 @@ class Horde_Core_Perms_Ui
         $blank_img = Horde_Themes_Image::tag('blank.gif', ['attr' => ['width' => 16, 'height' => 16]]);
 
         /* Set up the tree. */
-        $tree = $GLOBALS['injector']->get(Horde_Core_Factory_Tree::class)->create('perms_ui', 'Javascript', [
+        $tree = $this->_injector->get(Horde_Core_Factory_Tree::class)->create('perms_ui', 'Javascript', [
             'alternate' => true,
             'hideHeaders' => true,
         ]);
@@ -316,9 +328,14 @@ class Horde_Core_Perms_Ui
         /* Users permissions. */
         $perm_val = $permission->getUserPermissions();
         $this->_form->setSection('users', Horde_Core_Translation::t('Individual Users'), Horde_Themes_Image::tag('user.png'), false);
-        $auth = $GLOBALS['injector']->get(Horde_Core_Factory_Auth::class)->create();
+        $auth = $this->_injector->get(Horde_Core_Factory_Auth::class)->create();
         $user_list = [];
-        if ($auth->hasCapability('list')) {
+        if ($auth->hasCapability('list')
+            && in_array(
+                $this->_configState->get('auth.list_users', 'list'),
+                ['list', 'both'],
+                true
+            )) {
             /* The auth driver has list capabilities so set up an array which
              * the matrix field type will recognise to set up an enum box for
              * adding new users to the permissions matrix. */
@@ -378,7 +395,7 @@ class Horde_Core_Perms_Ui
         $perm_val = $permission->getGroupPermissions();
         $this->_form->setSection('groups', Horde_Core_Translation::t('Groups'), Horde_Themes_Image::tag('group.png'), false);
         try {
-            $group_list = $GLOBALS['injector']
+            $group_list = $this->_injector
                 ->get('Horde_Group')
                 ->listAll();
         } catch (Horde_Group_Exception $e) {
