@@ -10,8 +10,11 @@
  * @copyright 1999-2017 Horde LLC
  * @license   http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package   Core
+ * @todo Framework 6.1 migrate to Horde\Browser\Browser or Horde\Browser\HttpUtils
  */
 
+use Horde\Browser\Browser;
+use Horde\Browser\BrowserFamily;
 use Horde\Core\Auth\AuthCredentialStore;
 use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\Driver\DriverRepository;
@@ -392,10 +395,8 @@ class Horde_Registry implements Horde_Shutdown_Task
         switch ($args['session_control']) {
             case 'netscape':
                 // Chicken/egg: Browser object doesn't exist yet.
-                // Can't use Horde_Core_Browser since it depends on registry to be
-                // configured.
-                $browser = new Horde_Browser();
-                if ($browser->isBrowser('mozilla')) {
+                $browser = new Browser();
+                if ($browser->isBrowser(BrowserFamily::Firefox)) {
                     $args['session_cache_limiter'] = 'private, must-revalidate';
                 }
                 break;
@@ -2817,7 +2818,7 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     public function setAuth($authId, $credentials, array $options = [])
     {
-        global $browser, $injector, $session;
+        global $injector, $session;
 
         $app = empty($options['app'])
             ? 'horde'
@@ -2831,7 +2832,7 @@ class Horde_Registry implements Horde_Shutdown_Task
 
         /* Initial authentication to Horde. */
         $session->set('horde', 'auth/authId', $authId);
-        $session->set('horde', 'auth/browser', $browser->getAgentString());
+        $session->set('horde', 'auth/browser', $injector->get(Browser::class)->getUserAgent());
         if (!empty($options['change'])) {
             $session->set('horde', 'auth/change', 1);
         }
@@ -2871,7 +2872,7 @@ class Horde_Registry implements Horde_Shutdown_Task
      */
     public function checkExistingAuth($app = 'horde')
     {
-        global $browser, $conf, $injector, $session;
+        global $conf, $injector, $session;
 
         if (!empty($this->_cache['existing'][$app])) {
             return true;
@@ -2888,11 +2889,17 @@ class Horde_Registry implements Horde_Shutdown_Task
                 return false;
             }
 
-            if (!empty($conf['auth']['checkbrowser'])
-                && ($session->get('horde', 'auth/browser') != $browser->getAgentString())) {
-                $injector->get(Horde_Core_Factory_Auth::class)->create()
-                    ->setError(Horde_Core_Auth_Application::REASON_BROWSER);
-                return false;
+            if (!empty($conf['auth']['checkbrowser'])) {
+                $browser = $injector->get(Browser::class);
+                $originalAgent = $session->get('horde', 'auth/browser');
+                if ($originalAgent !== $browser->getUserAgent()
+                    && !(in_array($_SERVER['REQUEST_METHOD'] ?? '', ['GET', 'HEAD'], true)
+                        && is_string($originalAgent)
+                        && $browser->isCompanionOf($originalAgent))) {
+                    $injector->get(Horde_Core_Factory_Auth::class)->create()
+                        ->setError(Horde_Core_Auth_Application::REASON_BROWSER);
+                    return false;
+                }
             }
 
             if (!empty($conf['session']['max_time'])

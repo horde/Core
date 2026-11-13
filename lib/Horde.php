@@ -13,6 +13,7 @@ use Horde\Util\Util;
  * @category Horde
  * @license  http://www.horde.org/licenses/lgpl21 LGPL
  * @package  Core
+ * @todo Framework 6.1 migrate to Horde\Browser\Browser or Horde\Browser\HttpUtils
  */
 
 /**

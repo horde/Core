@@ -15,6 +15,7 @@ use Horde\Util\Variables;
  * @category Horde
  * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @package  Core
+ * @todo Framework 6.1 migrate to Horde\Browser\Browser or Horde\Browser\HttpUtils
  */
 class Horde_Core_Ui_VarRenderer_Html extends Horde_Core_Ui_VarRenderer
 {

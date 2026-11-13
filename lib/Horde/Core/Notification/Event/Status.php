@@ -12,6 +12,7 @@
  * @category Horde
  * @license  http://www.horde.org/licenses/lgpl21 LGPL
  * @package  Core
+ * @todo Framework 6.1 migrate to Horde\Browser\Browser or Horde\Browser\HttpUtils
  */
 class Horde_Core_Notification_Event_Status extends Horde_Notification_Event_Status
 {

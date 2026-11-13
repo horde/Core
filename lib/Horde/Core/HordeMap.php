@@ -10,6 +10,7 @@
  * @copyright 2009-2017 Horde LLC (http://www.horde.org/)
  * @license   http://www.horde.org/licenses/lgpl21 LGPL
  * @package   Core
+ * @todo Framework 6.1 migrate to Horde\Browser\Browser or Horde\Browser\HttpUtils
  */
 
 /**
