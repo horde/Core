@@ -7,6 +7,8 @@
  * @package   Core
  */
 
+use Horde\Util\HordeString;
+
 /**
  * Horde_Core_ActiveSync_Imap_Factory implements a factory/builder for
  * providing a Horde_ActiveSync_Imap_Adapter object as well as building a tree
@@ -22,6 +24,16 @@ class Horde_Core_ActiveSync_Imap_Factory implements Horde_ActiveSync_Interface_I
     protected $_adapter;
     protected $_mailboxlist;
     protected $_specialMailboxlist;
+
+    /**
+     * User keyword map from mail/msgflags, cached for this factory.
+     *
+     * Null until the first lookup. An empty array means the mail application
+     * has no user flags or does not expose the capability.
+     *
+     * @var array<string, string>|null
+     */
+    protected $_msgFlags = null;
 
     /**
      * Logger.
@@ -190,37 +202,62 @@ class Horde_Core_ActiveSync_Imap_Factory implements Horde_ActiveSync_Interface_I
     }
 
     /**
-     * Return a list of user-defined flags.
+     * Return user-defined IMAP keywords for the current user.
      *
-     * @return array  An array of flag arrays keyed by the RFC 3501 flag name.
+     * Keys are lowercase flag keywords. Values are the display labels used
+     * as ActiveSync categories. The mail application owns the preference
+     * format and exposes the map as mail/msgflags.
+     *
+     * @return array<string, string>
+     *
+     * @author Torben Dannhauer <torben@dannhauer.de>
      */
-    public function getMsgFlags()
+    public function getMsgFlags(): array
     {
-        global $registry;
+        if ($this->_msgFlags !== null) {
+            return $this->_msgFlags;
+        }
+
+        if (!$GLOBALS['registry']->hasMethod('mail/msgflags')) {
+            $this->_msgFlags = [];
+            return $this->_msgFlags;
+        }
+
+        try {
+            $flags = $GLOBALS['registry']->call('mail/msgflags');
+        } catch (Horde_Exception $e) {
+            $this->_logger->log(sprintf(
+                'Error retrieving user message flags: %s',
+                $e->getMessage()
+            ), Horde_Log::ERR);
+            $this->_msgFlags = [];
+            return $this->_msgFlags;
+        }
+
+        if (!is_array($flags)) {
+            $this->_logger->log(
+                'Mail API mail/msgflags did not return an array.',
+                Horde_Log::WARN
+            );
+            $this->_msgFlags = [];
+            return $this->_msgFlags;
+        }
 
         $msgFlags = [];
-        $flags = unserialize($registry->horde->getPreference($registry->hasInterface('mail'), 'msgflags'), ['allowed_classes' => false]);
-
-        // Remove any system flags, as these should never be user (un)set.
-        $system_flags = [
-            Horde_Imap_Client::FLAG_ANSWERED,
-            Horde_Imap_Client::FLAG_DELETED,
-            Horde_Imap_Client::FLAG_DRAFT,
-            Horde_Imap_Client::FLAG_FLAGGED,
-            Horde_Imap_Client::FLAG_RECENT,
-            Horde_Imap_Client::FLAG_SEEN,
-        ];
-        foreach ($system_flags as $flag) {
-            unset($flags[$flag]);
-        }
-
-        foreach ($flags as $flag) {
-            if ($flag->imapflag) {
-                $msgFlags[Horde_String::lower($flag->imapflag)] = $flag->label;
+        foreach ($flags as $keyword => $label) {
+            if (!is_scalar($keyword) || !is_scalar($label)) {
+                continue;
             }
+            $keyword = (string) $keyword;
+            if ($keyword === '') {
+                continue;
+            }
+            $msgFlags[HordeString::lower($keyword)] = (string) $label;
         }
 
-        return $msgFlags;
+        $this->_msgFlags = $msgFlags;
+
+        return $this->_msgFlags;
     }
 
     /**
