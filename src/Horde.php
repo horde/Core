@@ -7,6 +7,8 @@ declare(strict_types=1);
  *
  * See the enclosed file LICENSE for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
+ *
+ * @todo Framework 6.1 migrate to Horde\Browser\Browser or Horde\Browser\HttpUtils
  */
 
 namespace Horde\Core;

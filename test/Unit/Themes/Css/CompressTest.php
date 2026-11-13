@@ -7,6 +7,7 @@ declare(strict_types=1);
  *
  * @category Horde
  * @package  Core
+ * @todo Framework 6.1 migrate to Horde\Browser\Browser or Horde\Browser\HttpUtils
  */
 
 namespace Horde\Core\Test\Unit\Themes\Css;

@@ -11,6 +11,7 @@
  * @category Horde
  * @license  http://opensource.org/licenses/lgpl-2.1.php LGPL
  * @package  Core
+ * @todo Framework 6.1 migrate to Horde\Browser\Browser or Horde\Browser\HttpUtils
  */
 
 use Horde\Core\Session\HordeSession;
