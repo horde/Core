@@ -60,14 +60,14 @@ abstract class Horde_Core_Tagger
     {
         global $injector;
 
-        $cache = $injector->getInstance('Horde_Cache');
+        $cache = $injector->get('Horde_Cache');
         $key = $this->_app . '.tagger.type_ids';
         $ids = $cache->get($key, 360);
 
         if ($ids) {
             $this->_type_ids = unserialize($ids, ['allowed_classes' => false]);
         } else {
-            $types = $injector->getInstance('Content_Types_Manager')
+            $types = $injector->get('Content_Types_Manager')
                 ->ensureTypes($this->_types);
             foreach ($this->_types as $k => $v) {
                 $this->_type_ids[$v] = intval($types[$k]);
@@ -75,7 +75,7 @@ abstract class Horde_Core_Tagger
             $cache->set($key, serialize($this->_type_ids));
         }
 
-        $this->_tagger = $injector->getInstance('Content_Tagger');
+        $this->_tagger = $injector->get('Content_Tagger');
     }
 
     /**

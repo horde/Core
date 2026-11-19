@@ -160,11 +160,11 @@ class Horde_Core_Controller_RequestMapper
      */
     public function getRequestConfiguration(Horde_Injector|Injector $injector)
     {
-        $request = $injector->getInstance('Horde_Controller_Request');
+        $request = $injector->get('Horde_Controller_Request');
         $requestServer = $_SERVER['SERVER_NAME'];
         $uriScheme = $_SERVER['REQUEST_SCHEME'];
-        $registry = $injector->getInstance('Horde_Registry');
-        $settingsFinder = $injector->getInstance('Horde_Core_Controller_SettingsFinder');
+        $registry = $injector->get(Horde_Registry::class);
+        $settingsFinder = $injector->get(Horde_Core_Controller_SettingsFinder::class);
 
         $config = $injector->createInstance('Horde_Core_Controller_RequestConfiguration');
         $found = $this->_identifyApp($uriScheme, $request, $requestServer, $GLOBALS['registry']);
@@ -222,7 +222,7 @@ class Horde_Core_Controller_RequestMapper
         }
         // TODO: Move to some ControllerAuthHelper and check perms and admin
         if (!$registry->isAuthenticated()) {
-            $auth = $injector->getInstance('Horde_Core_Factory_Auth')->create();
+            $auth = $injector->get(Horde_Core_Factory_Auth::class)->create();
 
             // Default behaviour should be to authenticate if none given.
             // Older controllers expect this.

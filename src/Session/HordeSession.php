@@ -306,28 +306,28 @@ class HordeSession extends DefaultSession implements SessionMetaInterface, Encry
 
     public function getAuthenticatedUser(): ?string
     {
-        $value = $this->data['horde']['auth/userId'] ?? null;
+        $value = $this->getScoped('horde', 'auth/userId');
 
         return is_string($value) ? $value : null;
     }
 
     public function getAuthId(): ?string
     {
-        $value = $this->data['horde']['auth/authId'] ?? null;
+        $value = $this->getScoped('horde', 'auth/authId');
 
         return is_string($value) ? $value : null;
     }
 
     public function getBrowserFingerprint(): ?string
     {
-        $value = $this->data['horde']['auth/browser'] ?? null;
+        $value = $this->getScoped('horde', 'auth/browser');
 
         return is_string($value) ? $value : null;
     }
 
     public function getRemoteAddress(): ?string
     {
-        $value = $this->data['horde']['auth/remoteAddr'] ?? null;
+        $value = $this->getScoped('horde', 'auth/remoteAddr');
 
         return is_string($value) ? $value : null;
     }

@@ -32,7 +32,7 @@ class Horde_Core_Factory_ActiveSyncBackend extends Horde_Core_Factory_Injector
         // Backend driver and dependencies
         $params = ['registry' => $registry];
         $adapter_params = ['factory' => new Horde_Core_ActiveSync_Imap_Factory([
-            'logger' => $injector->getInstance('Horde_Log_Logger'),
+            'logger' => $injector->get('Horde_Log_Logger'),
         ])];
 
         // Determine emailsync setting - force to off if we don't have a mail API.
@@ -66,13 +66,13 @@ class Horde_Core_Factory_ActiveSyncBackend extends Horde_Core_Factory_Injector
         global $conf, $injector;
 
         $params = [
-            'base_driver' => $injector->getInstance('Horde_Core_Factory_Auth')->create(),
+            'base_driver' => $injector->get(Horde_Core_Factory_Auth::class)->create(),
         ];
 
         if ($conf['activesync']['auth']['type'] != 'basic') {
             $x_params = $conf['activesync']['auth']['params'];
             $x_params['default_user'] = $GLOBALS['registry']->getAuth();
-            $x_params['logger'] = $this->_injector->getInstance('Horde_Log_Logger');
+            $x_params['logger'] = $this->_injector->get('Horde_Log_Logger');
             $params['transparent_driver'] = Horde_Auth::factory('Horde_Core_Auth_X509', $x_params);
         }
 

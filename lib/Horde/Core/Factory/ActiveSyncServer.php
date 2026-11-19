@@ -19,11 +19,11 @@ class Horde_Core_Factory_ActiveSyncServer extends Horde_Core_Factory_Injector
         }
 
         $server = new Horde_ActiveSync(
-            $injector->getInstance('Horde_ActiveSyncBackend'),
+            $injector->get('Horde_ActiveSyncBackend'),
             new Horde_ActiveSync_Wbxml_Decoder(fopen('php://input', 'r'), $level),
             new Horde_ActiveSync_Wbxml_Encoder(fopen('php://output', 'w+'), $level),
-            $injector->getInstance('Horde_ActiveSyncState'),
-            $injector->getInstance('Horde_Controller_Request')
+            $injector->get('Horde_ActiveSyncState'),
+            $injector->get('Horde_Controller_Request')
         );
         $server->setSupportedVersion($conf['activesync']['version']);
 

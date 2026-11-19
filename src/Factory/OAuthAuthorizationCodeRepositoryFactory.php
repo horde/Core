@@ -29,7 +29,7 @@ class OAuthAuthorizationCodeRepositoryFactory
     {
         if (class_exists(SqlOAuthAuthorizationCodeRepository::class)) {
             try {
-                $db = $injector->getInstance(Adapter::class);
+                $db = $injector->get(Adapter::class);
                 return new SqlOAuthAuthorizationCodeRepository($db);
             } catch (Throwable) {
                 return new InMemoryAuthorizationCodeRepository();

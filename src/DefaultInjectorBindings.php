@@ -18,10 +18,15 @@ namespace Horde\Core;
 
 use Horde\Core\ActiveSync\Ops\SnapshotService;
 use Horde\Core\Api\ApiRegistry;
+use Horde\Core\LanguageContext;
+use Horde\Core\LanguageContextSelector;
+use Horde\Core\Factory\NlsconfigFactory;
 use Horde\Core\Auth\AuthService;
 use Horde\Core\Config\ConfigLoader;
 use Horde\Core\Config\ConfigMetadataProvider;
 use Horde\Core\Config\BackendConfigLoader;
+use Horde\Core\Config\MotdLoader;
+use Horde\Core\Config\PrefsConfigLoader;
 use Horde\Core\Config\Driver\DriverRepository;
 use Horde\Core\Config\RegistryConfigLoader;
 use Horde\Core\Config\State;
@@ -77,7 +82,12 @@ use Horde\Core\Factory\OAuthIdTokenBuilderFactory;
 use Horde\Core\Factory\OAuthConsentMiddlewareFactory;
 use Horde\Core\Factory\OAuthFlowStoreFactory;
 use Horde\Core\Factory\PermissionServiceFactory;
+use Horde\Core\Factory\PrefsConfigLoaderFactory;
 use Horde\Core\Factory\PrefsServiceFactory;
+use Horde\Core\Service\Factory\CredentialStoreFactory;
+use Horde\Core\Service\Factory\CredentialProvisioningStrategyFactory;
+use Horde\Core\Service\Factory\PasswordServiceAuthorizationServiceFactory;
+use Horde\Core\Service\Factory\ServiceCredentialManagerFactory;
 use Horde\Core\Factory\RegistryConfigLoaderFactory;
 use Horde\Core\Factory\RouteUrlWriterFactory;
 use Horde\Core\Factory\RuntimeRoutesProviderFactory;
@@ -94,6 +104,8 @@ use Horde\Core\Middleware\AuthIsGlobalAdmin;
 use Horde\Core\Middleware\ErrorFilter;
 use Horde\Core\Middleware\OAuthConsentMiddleware;
 use Horde\Core\Service\ApplicationService;
+use Horde\Core\Service\CredentialStore;
+use Horde\Core\Service\CredentialProvisioningStrategy;
 use Horde\Core\Service\GroupService;
 use Horde\Core\Service\HordeDbService;
 use Horde\Core\Service\HordeLdapService;
@@ -102,9 +114,12 @@ use Horde\Core\Service\OAuthHttpClientService;
 use Horde\Core\Service\OAuthProviderConfigRepository;
 use Horde\Core\Service\OAuthTokenService;
 use Horde\Core\Service\OidcPreLogoutHandler;
+use Horde\Core\Service\PasswordServiceAuthorizationService;
 use Horde\Core\Service\PermissionService;
 use Horde\Core\Service\PrefsService;
 use Horde\Core\Service\PreLogoutHandlerInterface;
+use Horde\Core\Service\PermissionService;
+use Horde\Core\Service\ServiceCredentialManager;
 use Horde\Core\Service\VersionCheck\VersionService;
 use Horde\Core\Uri\RegistryRouteMapperProvider;
 use Horde\Core\Uri\RouteMapperProvider;
@@ -188,6 +203,8 @@ class DefaultInjectorBindings implements InjectorBindings
             'Horde_Core_Auth_Signup' => 'Horde_Core_Factory_AuthSignup',
             'Horde_Auth_Base' => AuthBaseFactory::class,
             ApiRegistry::class => ApiRegistryFactory::class,
+            LanguageContext::class => NlsconfigFactory::class,
+            LanguageContextSelector::class => NlsconfigFactory::class,
             'Horde_Core_CssCache' => 'Horde_Core_Factory_CssCache',
             'Horde_Core_JavascriptCache' => 'Horde_Core_Factory_JavascriptCache',
             'Horde_Core_Perms' => 'Horde_Core_Factory_PermsCore',
@@ -213,6 +230,7 @@ class DefaultInjectorBindings implements InjectorBindings
             'Horde_Perms' => 'Horde_Core_Factory_Perms',
             'Horde_Perms_Base' => 'Horde_Core_Factory_Perms',
             'Horde_Queue_Storage' => 'Horde_Core_Factory_QueueStorage',
+            'Horde_Registry' => [Factory\HordeRegistryFactory::class, 'create'],
             'Horde_Routes_Mapper' => 'Horde_Core_Factory_Mapper',
             HordeRoutesMapper::class => 'Horde_Core_Factory_Mapper',
             'Horde_Routes_Matcher' => 'Horde_Core_Factory_Matcher',
@@ -221,6 +239,7 @@ class DefaultInjectorBindings implements InjectorBindings
             Secret\SessionSecret::class => Factory\SessionSecretFactory::class,
             Session\SessionEncryptionCoordinator::class => Factory\SessionEncryptionCoordinatorFactory::class,
             Session\HordeSessionFactory::class => [SessionHandlerFactory::class, 'createSessionFactory'],
+            Session\SessionLifecycle::class => Session\SessionLifecycleFactory::class,
             SecretManager::class => SecretManagerFactory::class,
             DbAdapter::class => DbAdapterFactory::class,
             OAuthProviderConfigRepository::class => OAuthProviderConfigRepositoryFactory::class,
@@ -279,6 +298,8 @@ class DefaultInjectorBindings implements InjectorBindings
             AuthenticationService::class => AuthenticationServiceFactory::class,
             ConfigLoader::class => ConfigLoaderFactory::class,
             BackendConfigLoader::class => Factory\BackendConfigLoaderFactory::class,
+            PrefsConfigLoader::class => PrefsConfigLoaderFactory::class,
+            MotdLoader::class => Factory\MotdLoaderFactory::class,
             State::class => StateFactory::class,
             DriverRepository::class => DriverRepositoryFactory::class,
             ConfigMetadataProvider::class => ConfigMetadataProviderFactory::class,
@@ -292,6 +313,10 @@ class DefaultInjectorBindings implements InjectorBindings
             HordeLdapService::class => HordeLdapServiceFactory::class,
             PermissionService::class => PermissionServiceFactory::class,
             VersionService::class => VersionServiceFactory::class,
+            CredentialStore::class => CredentialStoreFactory::class,
+            CredentialProvisioningStrategy::class => CredentialProvisioningStrategyFactory::class,
+            PasswordServiceAuthorizationService::class => PasswordServiceAuthorizationServiceFactory::class,
+            ServiceCredentialManager::class => ServiceCredentialManagerFactory::class,
             Tinymce::class => TinymceFactory::class,
             TinymcePageBinder::class => TinymcePageBinderFactory::class,
             EventDispatcherInterface::class => [EventDispatcherFactory::class, 'create'],

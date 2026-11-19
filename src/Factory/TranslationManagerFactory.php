@@ -45,7 +45,7 @@ class TranslationManagerFactory
     public function create(Injector $injector): TranslationManager
     {
         $manager = new TranslationManager();
-        $registry = $injector->getInstance(Horde_Registry::class);
+        $registry = $injector->get(Horde_Registry::class);
 
         foreach ($registry->listAllApps() as $app) {
             try {

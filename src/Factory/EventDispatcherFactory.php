@@ -58,7 +58,7 @@ class EventDispatcherFactory
         $provider = $this->createListenerProvider($injector);
 
         try {
-            $logger = $injector->getInstance(LoggerInterface::class);
+            $logger = $injector->get(LoggerInterface::class);
         } catch (Throwable) {
             $logger = new NullLogger();
         }

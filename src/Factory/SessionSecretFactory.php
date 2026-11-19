@@ -37,7 +37,7 @@ class SessionSecretFactory
 {
     public function create(Injector $injector): SessionSecret
     {
-        $resolved = $injector->getInstance('Horde_Secret_Cbc');
+        $resolved = $injector->get('Horde_Secret_Cbc');
 
         if (!$resolved instanceof SessionSecret) {
             throw new LogicException(

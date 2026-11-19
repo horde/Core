@@ -29,15 +29,14 @@ final class FleetSnapshot
         public readonly FleetSummary $summary,
         public readonly array $devices,
         public readonly int $asOf
-    ) {
-    }
+    ) {}
 
     public function toArray(): array
     {
         return [
             'summary' => $this->summary->toArray(),
             'devices' => array_map(
-                static fn (DeviceHealth $device): array => $device->toArray(),
+                static fn(DeviceHealth $device): array => $device->toArray(),
                 $this->devices
             ),
             'asOf' => $this->asOf,

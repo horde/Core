@@ -32,10 +32,10 @@ class RuntimeRoutesProviderFactory
 {
     public function create(Injector $injector): RuntimeRoutesProvider
     {
-        $registryState = $injector->getInstance(RegistryConfigLoader::class)->load();
+        $registryState = $injector->get(RegistryConfigLoader::class)->load();
 
         if ($injector->has(ServerRequestInterface::class)) {
-            $request = $injector->getInstance(ServerRequestInterface::class);
+            $request = $injector->get(ServerRequestInterface::class);
         } else {
             $factory = new RequestFactory();
             $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';

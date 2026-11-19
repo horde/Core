@@ -29,7 +29,7 @@ class OAuthConsentRepositoryFactory
     {
         if (class_exists(SqlOAuthConsentRepository::class)) {
             try {
-                $db = $injector->getInstance(Adapter::class);
+                $db = $injector->get(Adapter::class);
                 return new SqlOAuthConsentRepository($db);
             } catch (Throwable) {
                 return new InMemoryConsentRepository();

@@ -31,13 +31,13 @@ class OAuthConsentMiddlewareFactory
     public function create(Injector $injector): OAuthConsentMiddleware
     {
         return new OAuthConsentMiddleware(
-            $injector->getInstance(AuthorizationEndpoint::class),
-            $injector->getInstance(ConsentRepository::class),
-            $injector->getInstance(SessionAccess::class),
-            $injector->getInstance(Horde_PageOutput::class),
-            $injector->getInstance(Horde_Notification_Handler::class),
-            $injector->getInstance(ResponseFactoryInterface::class),
-            $injector->getInstance(StreamFactoryInterface::class),
+            $injector->get(AuthorizationEndpoint::class),
+            $injector->get(ConsentRepository::class),
+            $injector->get(SessionAccess::class),
+            $injector->get(Horde_PageOutput::class),
+            $injector->get(Horde_Notification_Handler::class),
+            $injector->get(ResponseFactoryInterface::class),
+            $injector->get(StreamFactoryInterface::class),
         );
     }
 }

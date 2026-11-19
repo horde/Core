@@ -29,11 +29,11 @@ class OAuthIntrospectionEndpointFactory
     public function create(Injector $injector): IntrospectionEndpoint
     {
         return new IntrospectionEndpoint(
-            $injector->getInstance(ClientAuthenticatorChain::class),
-            $injector->getInstance(AccessTokenRepository::class),
-            $injector->getInstance(RefreshTokenRepository::class),
-            $injector->getInstance(ResponseFactoryInterface::class),
-            $injector->getInstance(StreamFactoryInterface::class),
+            $injector->get(ClientAuthenticatorChain::class),
+            $injector->get(AccessTokenRepository::class),
+            $injector->get(RefreshTokenRepository::class),
+            $injector->get(ResponseFactoryInterface::class),
+            $injector->get(StreamFactoryInterface::class),
         );
     }
 }

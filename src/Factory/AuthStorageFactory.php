@@ -28,14 +28,14 @@ class AuthStorageFactory
 {
     public function createLockManager(Injector $injector): LockManager
     {
-        $lock = $injector->getInstance(Horde_Lock::class);
+        $lock = $injector->get(Horde_Lock::class);
 
         return new HordeLockAdapter($lock);
     }
 
     public function createAttemptTracker(Injector $injector): LoginAttemptTracker
     {
-        $history = $injector->getInstance(Horde_History::class);
+        $history = $injector->get(Horde_History::class);
 
         return new HistoryAttemptTracker($history);
     }

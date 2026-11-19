@@ -21,7 +21,7 @@ class CheckCredentialsFactory
 {
     public function create(Injector $injector): CheckCredentials
     {
-        $authService = $injector->getInstance(AuthService::class);
+        $authService = $injector->get(AuthService::class);
 
         return new CheckCredentials($authService);
     }

@@ -38,7 +38,7 @@ class SessionConfigFactory
      */
     public function create(Injector $injector): SessionConfig
     {
-        $loader = $injector->getInstance(ConfigLoader::class);
+        $loader = $injector->get(ConfigLoader::class);
         $state = $loader->load('horde');
 
         return $this->fromState($state);

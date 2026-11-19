@@ -407,7 +407,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
     public function listNames()
     {
         $factory = $GLOBALS['injector']
-            ->getInstance('Horde_Core_Factory_Identity');
+            ->get(Horde_Core_Factory_Identity::class);
         $names = [];
         foreach ($this->listUsers() as $user) {
             $names[$user] = $factory->create($user)->getName();
@@ -667,7 +667,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
         }
 
         try {
-            $result = $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
+            $result = $GLOBALS['injector']->get(Horde_Core_Hooks::class)
                 ->callHook($type, $this->_app, [$userId, $credentials]);
         } catch (Horde_Exception_HookNotSet $e) {
             return $ret_array;
@@ -739,7 +739,7 @@ class Horde_Core_Auth_Application extends Horde_Auth_Base
         ]);
 
         /* Only set the view mode on initial authentication */
-        if (!$GLOBALS['injector']->getInstance(HordeSession::class)
+        if (!$GLOBALS['injector']->get(HordeSession::class)
             ->hasScoped('horde', 'view')) {
             $this->_setView();
         }

@@ -94,7 +94,7 @@ class Horde_Core_Block_Collection implements Serializable, JsonSerializable
     public function getLayoutManager(?Horde_Session $session = null)
     {
         if ($session === null && isset($GLOBALS['injector'])) {
-            $session = $GLOBALS['injector']->getInstance('Horde_Session');
+            $session = $GLOBALS['injector']->get(Horde_Session::class);
         }
 
         return new Horde_Core_Block_Layout_Manager($this, $session);

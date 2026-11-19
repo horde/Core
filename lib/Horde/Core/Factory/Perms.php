@@ -33,7 +33,7 @@ class Horde_Core_Factory_Perms extends Horde_Core_Factory_Injector
             case 'sql':
                 try {
                     $params['db'] = $injector
-                        ->getInstance('Horde_Core_Factory_Db')
+                        ->get(Horde_Core_Factory_Db::class)
                         ->create('horde', 'perms');
                 } catch (Horde_Exception $e) {
                     $driver = 'Null';
@@ -45,11 +45,11 @@ class Horde_Core_Factory_Perms extends Horde_Core_Factory_Injector
             new Horde_Cache_Storage_Stack([
                 'stack' => [
                     new Horde_Cache_Storage_Memory(),
-                    $injector->getInstance('Horde_Cache'),
+                    $injector->get('Horde_Cache'),
                 ],
             ])
         );
-        $params['logger'] = $injector->getInstance('Horde_Log_Logger');
+        $params['logger'] = $injector->get('Horde_Log_Logger');
 
         $class = $this->_getDriverName($driver, 'Horde_Perms');
         return new $class($params);

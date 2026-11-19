@@ -50,7 +50,7 @@ class Horde_Core_Data_Storage implements Horde_Data_Storage
         global $injector;
 
         try {
-            return $injector->getInstance('Horde_Pack')->unpack(
+            return $injector->get('Horde_Pack')->unpack(
                 $this->_ht->get($this->_hkey($key))
             );
         } catch (Exception $e) {
@@ -69,7 +69,7 @@ class Horde_Core_Data_Storage implements Horde_Data_Storage
         } else {
             $this->_ht->set(
                 $this->_hkey($key),
-                $injector->getInstance('Horde_Pack')->pack($value)
+                $injector->get('Horde_Pack')->pack($value)
             );
         }
     }

@@ -41,7 +41,7 @@ class AuthServiceFactory
 {
     public function create(Injector $injector): AuthService
     {
-        $loader = $injector->getInstance(ConfigLoader::class);
+        $loader = $injector->get(ConfigLoader::class);
         $state = $loader->load('horde');
 
         $driver = $state->get('auth.driver', 'sql');
@@ -49,7 +49,7 @@ class AuthServiceFactory
 
         $provider = $this->buildProvider($driver, $params, $injector);
         $policy = $this->buildPolicy($params, $injector);
-        $identityBridge = $injector->getInstance(IdentityBridgeService::class);
+        $identityBridge = $injector->get(IdentityBridgeService::class);
 
         return new AuthService($provider, $policy, $identityBridge);
     }
@@ -87,7 +87,7 @@ class AuthServiceFactory
 
     private function createSqlProvider(array $params, Injector $injector): Sql
     {
-        $dbService = $injector->getInstance(HordeDbService::class);
+        $dbService = $injector->get(HordeDbService::class);
 
         return new Sql(
             db: $dbService->getAdapter(),
@@ -101,7 +101,7 @@ class AuthServiceFactory
 
     private function createLdapProvider(array $params, Injector $injector): Ldap
     {
-        $ldap = $injector->getInstance(Horde_Ldap::class);
+        $ldap = $injector->get(Horde_Ldap::class);
 
         return new Ldap(
             ldap: $ldap,
@@ -123,7 +123,7 @@ class AuthServiceFactory
             default => SecureMode::None,
         };
 
-        $clientFactory = $injector->getInstance('Horde_Imap_Client_Factory');
+        $clientFactory = $injector->get('Horde_Imap_Client_Factory');
 
         return new Imap(
             clientFactory: $clientFactory,

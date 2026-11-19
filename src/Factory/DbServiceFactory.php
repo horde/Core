@@ -60,7 +60,7 @@ class DbServiceFactory
      */
     public function create(Injector $injector, string $serviceId = 'horde'): StandardHordeDbService
     {
-        $loader = $injector->getInstance(ConfigLoader::class);
+        $loader = $injector->get(ConfigLoader::class);
         $state = $loader->load('horde');
 
         // Resolve config for this service

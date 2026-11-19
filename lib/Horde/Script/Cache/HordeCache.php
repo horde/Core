@@ -55,7 +55,7 @@ class Horde_Script_Cache_HordeCache extends Horde_Script_Cache
             json_encode($hashes) . $mtime
         );
 
-        $cache = $injector->getInstance('Horde_Cache');
+        $cache = $injector->get('Horde_Cache');
         $cache_lifetime = empty($this->_params['lifetime'])
             ? 0
             : $this->_params['lifetime'];

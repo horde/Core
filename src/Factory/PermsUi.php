@@ -28,6 +28,9 @@ use Horde_Group;
 use Horde_Perms_Base;
 use Horde_Registry;
 use Psr\Http\Message\ServerRequestInterface;
+use Horde_Core_Factory_Auth;
+use Horde_Notification_Handler;
+use Throwable;
 
 /**
  * Factory selecting the administrative permission UI implementation.
@@ -79,10 +82,10 @@ class PermsUi
         $templatePath = $this->resolveTemplatePath($injector);
         $groups = $this->resolveGroups($injector);
         $auth = $this->resolveAuth($injector);
-        $request = $injector->getInstance(ServerRequestInterface::class);
-        $tokens = $injector->getInstance(Token::class);
-        $uriBuilder = $injector->getInstance(UriBuilderInterface::class);
-        $registry = $injector->getInstance(Horde_Registry::class);
+        $request = $injector->get(ServerRequestInterface::class);
+        $tokens = $injector->get(Token::class);
+        $uriBuilder = $injector->get(UriBuilderInterface::class);
+        $registry = $injector->get(Horde_Registry::class);
         $notification = $this->resolveNotification($injector);
 
         return new NegativeUi(
@@ -105,12 +108,12 @@ class PermsUi
      * injector can't supply one so the modern UI degrades to silent
      * rejection rather than failing to construct.
      */
-    private function resolveNotification(Injector $injector): ?\Horde_Notification_Handler
+    private function resolveNotification(Injector $injector): ?Horde_Notification_Handler
     {
         try {
-            $handler = $injector->getInstance('Horde_Notification');
-            return $handler instanceof \Horde_Notification_Handler ? $handler : null;
-        } catch (\Throwable $e) {
+            $handler = $injector->get('Horde_Notification');
+            return $handler instanceof Horde_Notification_Handler ? $handler : null;
+        } catch (Throwable $e) {
             return null;
         }
     }
@@ -122,7 +125,7 @@ class PermsUi
      */
     private function resolveTemplatePath(Injector $injector): string
     {
-        $registry = $injector->getInstance(Horde_Registry::class);
+        $registry = $injector->get(Horde_Registry::class);
         return $registry->get('templates', 'horde') . '/admin/perms';
     }
 
@@ -134,9 +137,9 @@ class PermsUi
     private function resolveGroups(Injector $injector): ?Horde_Group
     {
         try {
-            $groups = $injector->getInstance(Horde_Group::class);
+            $groups = $injector->get(Horde_Group::class);
             return $groups instanceof Horde_Group ? $groups : null;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return null;
         }
     }
@@ -149,10 +152,10 @@ class PermsUi
     private function resolveAuth(Injector $injector): ?Horde_Auth_Base
     {
         try {
-            $factory = $injector->getInstance('Horde_Core_Factory_Auth');
+            $factory = $injector->get(Horde_Core_Factory_Auth::class);
             $auth = $factory->create();
             return $auth instanceof Horde_Auth_Base ? $auth : null;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return null;
         }
     }
@@ -173,13 +176,13 @@ class PermsUi
     private function negativePermissionsEnabled(Injector $injector): bool
     {
         try {
-            $loader = $injector->getInstance(ConfigLoader::class);
+            $loader = $injector->get(ConfigLoader::class);
             $state = $loader->load('horde');
             $modern = $state->get('perms.negative_permissions', null);
             if ($modern !== null) {
                 return (string) $modern === 'on';
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // ConfigLoader unavailable. Fall through to the legacy
             // globals lookup below.
         }

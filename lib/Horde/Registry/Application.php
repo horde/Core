@@ -252,7 +252,7 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
     {
         global $injector;
 
-        $prefs = $injector->getInstance('Horde_Core_Factory_Prefs')
+        $prefs = $injector->get(Horde_Core_Factory_Prefs::class)
             ->create($app, ['user' => $backup->user]);
         $prefs->retrieve();
         $scope = $prefs->getScopeObject($app);
@@ -284,7 +284,7 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
     {
         global $injector;
 
-        $prefs = $injector->getInstance('Horde_Core_Factory_Prefs')
+        $prefs = $injector->get(Horde_Core_Factory_Prefs::class)
             ->create($app, ['user' => $data->getUser()]);
         $prefs->retrieve();
 
@@ -534,7 +534,7 @@ class Horde_Registry_Application implements Horde_Shutdown_Task
      */
     final public function updateSessVars()
     {
-        $session = $GLOBALS['injector']->getInstance(HordeSession::class);
+        $session = $GLOBALS['injector']->get(HordeSession::class);
         foreach ($this->_sessVars as $key => $val) {
             $session->setScoped($this->_app, $key, $val);
         }

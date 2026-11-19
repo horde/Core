@@ -36,7 +36,7 @@ class Horde_Core_Ajax_Imple_UserAutoCompleter extends Horde_Core_Ajax_Imple_Auto
     protected function _handleAutoCompleter($input)
     {
         return $GLOBALS['injector']
-            ->getInstance('Horde_Core_Factory_Auth')
+            ->get(Horde_Core_Factory_Auth::class)
             ->create()
             ->searchUsers($input);
     }

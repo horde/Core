@@ -24,8 +24,8 @@ class AccessKeyTrackerFactory
     {
         $accessKeysEnabled = true;
         try {
-            $prefs = $injector->getInstance(PrefsService::class);
-            $session = $injector->getInstance(HordeSession::class);
+            $prefs = $injector->get(PrefsService::class);
+            $session = $injector->get(HordeSession::class);
             $uid = $session->getAuthId() ?? '';
             if ($uid !== '') {
                 $accessKeysEnabled = (bool) $prefs->getValue($uid, 'horde', 'widget_accesskey');
@@ -35,7 +35,7 @@ class AccessKeyTrackerFactory
 
         $multibyte = false;
         try {
-            $registry = $injector->getInstance(Horde_Registry::class);
+            $registry = $injector->get(Horde_Registry::class);
             $multibyte = !empty($registry->nlsconfig->curr_multibyte);
         } catch (Throwable) {
         }

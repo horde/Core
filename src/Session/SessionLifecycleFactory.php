@@ -49,12 +49,12 @@ class SessionLifecycleFactory
      */
     public function create(Injector $injector): SessionLifecycle
     {
-        $handler = $injector->getInstance(SessionHandler::class);
-        $config = $injector->getInstance(SessionConfig::class);
+        $handler = $injector->get(SessionHandler::class);
+        $config = $injector->get(SessionConfig::class);
 
         $secret = null;
         try {
-            $resolved = $injector->getInstance('Horde_Secret_Cbc');
+            $resolved = $injector->get('Horde_Secret_Cbc');
             if ($resolved instanceof SessionSecret) {
                 $secret = $resolved;
             }
@@ -76,7 +76,7 @@ class SessionLifecycleFactory
             // clean() uses setKey directly because there's no payload
             // to drain.
             try {
-                $coordinator = $injector->getInstance(SessionEncryptionCoordinator::class);
+                $coordinator = $injector->get(SessionEncryptionCoordinator::class);
             } catch (Throwable) {
                 // No coordinator binding configured. Lifecycle falls
                 // back to its inline reEncryptAll path; behaviour is
@@ -98,7 +98,7 @@ class SessionLifecycleFactory
         // (correctness-degraded but non-crashing).
         $accessor = null;
         try {
-            $resolvedAccess = $injector->getInstance(SessionAccess::class);
+            $resolvedAccess = $injector->get(SessionAccess::class);
             if ($resolvedAccess instanceof SessionAccessor) {
                 $accessor = $resolvedAccess;
             }

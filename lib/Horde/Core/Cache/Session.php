@@ -76,7 +76,7 @@ class Horde_Core_Cache_Session extends Horde_Cache_Storage_Base
         }
 
         $this->_session = $params['session']
-            ?? $GLOBALS['injector']->getInstance(SessionAccess::class);
+            ?? $GLOBALS['injector']->get(SessionAccess::class);
         unset($params['session']);
 
         parent::__construct(array_merge(

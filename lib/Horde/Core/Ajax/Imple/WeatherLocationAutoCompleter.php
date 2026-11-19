@@ -21,7 +21,7 @@ class Horde_Core_Ajax_Imple_WeatherLocationAutoCompleter extends Horde_Core_Ajax
     {
         $indicator = $this->_params['id'] . '_loading_img';
 
-        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineScript(
+        $GLOBALS['injector']->get(Horde_PageOutput::class)->addInlineScript(
             [
                 'window.weatherupdate = window.weatherupdate || {}',
                 'window.weatherupdate["' . $this->_params['instance'] . '"] = {
@@ -90,7 +90,7 @@ class Horde_Core_Ajax_Imple_WeatherLocationAutoCompleter extends Horde_Core_Ajax
      */
     protected function _handleAutoCompleter($input)
     {
-        return $GLOBALS['injector']->getInstance('Horde_Weather')->autocompleteLocation($input);
+        return $GLOBALS['injector']->get('Horde_Weather')->autocompleteLocation($input);
     }
 
 }

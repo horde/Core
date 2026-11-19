@@ -16,7 +16,9 @@ declare(strict_types=1);
 
 namespace Horde\Core\PageOutput;
 
+use Horde\Core\Assets\CssDiscoverer;
 use Horde\Core\Assets\JsDiscoverer;
+use Horde\Core\Assets\ThemeResolver;
 use Horde\Core\Service\PrefsService;
 use Horde\Core\Session\SessionAccess;
 use Horde_Injector;
@@ -37,11 +39,13 @@ class ViewModeConfiguratorFactory
     public function create(Horde_Injector|Injector $injector): ViewModeConfigurator
     {
         return new ViewModeConfigurator(
-            $injector->getInstance(Horde_Registry::class),
-            $injector->getInstance(PrefsService::class),
-            $injector->getInstance(SessionAccess::class),
-            $injector->getInstance(JsDiscoverer::class),
-            $injector->getInstance(Token::class),
+            $injector->get(Horde_Registry::class),
+            $injector->get(PrefsService::class),
+            $injector->get(SessionAccess::class),
+            $injector->get(JsDiscoverer::class),
+            $injector->get(Token::class),
+            $injector->get(CssDiscoverer::class),
+            $injector->get(ThemeResolver::class),
         );
     }
 }

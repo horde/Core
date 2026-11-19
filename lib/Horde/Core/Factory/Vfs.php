@@ -90,7 +90,7 @@ class Horde_Core_Factory_Vfs extends Horde_Core_Factory_Base
                 break;
 
             case 'nosql':
-                $nosql = $this->_injector->getInstance('Horde_Core_Factory_Nosql')->create('horde', 'vfs');
+                $nosql = $this->_injector->get(Horde_Core_Factory_Nosql::class)->create('horde', 'vfs');
                 if ($nosql instanceof Horde_Mongo_Client) {
                     $vfs['params']['mongo_db'] = $nosql;
                     $vfs['type'] = 'mongo';
@@ -103,7 +103,7 @@ class Horde_Core_Factory_Vfs extends Horde_Core_Factory_Base
                 $config = Horde::getDriverConfig('vfs', 'sql');
                 unset($config['umask'], $config['vfsroot']);
                 $vfs['params']['db'] = $this->_injector
-                    ->getInstance('Horde_Core_Factory_Db')
+                    ->get(Horde_Core_Factory_Db::class)
                     ->create('horde', $config);
                 break;
         }

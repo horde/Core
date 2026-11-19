@@ -59,7 +59,7 @@ class Horde_Script_Compress
         global $injector;
 
         $this->_params = [
-            'logger' => $injector->getInstance('Horde_Log_Logger'),
+            'logger' => $injector->get('Horde_Log_Logger'),
         ];
 
         switch ($driver) {

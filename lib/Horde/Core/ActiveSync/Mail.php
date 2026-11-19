@@ -267,7 +267,7 @@ class Horde_Core_ActiveSync_Mail
 
     protected function _callPreSendHook()
     {
-        $hooks = $GLOBALS['injector']->getInstance('Horde_Core_Hooks');
+        $hooks = $GLOBALS['injector']->get(Horde_Core_Hooks::class);
         $params = [
             'raw' => $this->_raw,
             'imap_msg' => $this->imapMessage,
@@ -321,7 +321,7 @@ class Horde_Core_ActiveSync_Mail
         }
 
         try {
-            $GLOBALS['injector']->getInstance('Horde_Mail')
+            $GLOBALS['injector']->get('Horde_Mail')
                 ->send($recipients, $h_array, $this->_raw->getMessage()->stream);
         } catch (Horde_Mail_Exception $e) {
             throw new Horde_ActiveSync_Exception($e->getMessage());
@@ -362,7 +362,7 @@ class Horde_Core_ActiveSync_Mail
         $mime = $this->_raw->getMimeObject();
         $this->_raw->replaceMime($mime);
         try {
-            $GLOBALS['injector']->getInstance('Horde_Mail')
+            $GLOBALS['injector']->get('Horde_Mail')
                 ->send($recipients, $headers, $this->_raw->getMessage()->stream);
         } catch (Exception $e) {
             return false;
@@ -392,7 +392,7 @@ class Horde_Core_ActiveSync_Mail
         }
 
         try {
-            $mail->send($GLOBALS['injector']->getInstance('Horde_Mail'));
+            $mail->send($GLOBALS['injector']->get('Horde_Mail'));
             $this->_mailer = $mail;
         } catch (Horde_Mime_Exception $e) {
             throw new Horde_ActiveSync_Exception($e);
@@ -610,7 +610,7 @@ class Horde_Core_ActiveSync_Mail
         global $prefs;
 
         $ident = $GLOBALS['injector']
-            ->getInstance('Horde_Core_Factory_Identity')
+            ->get(Horde_Core_Factory_Identity::class)
             ->create($this->_user);
 
         $as_ident = $prefs->getValue('activesync_identity');
@@ -635,7 +635,7 @@ class Horde_Core_ActiveSync_Mail
         global $prefs;
 
         $ident = $GLOBALS['injector']
-            ->getInstance('Horde_Core_Factory_Identity')
+            ->get(Horde_Core_Factory_Identity::class)
             ->create($this->_user);
 
         $as_ident = $prefs->getValue('activesync_identity');

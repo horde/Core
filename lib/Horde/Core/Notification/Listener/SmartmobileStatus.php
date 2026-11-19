@@ -32,7 +32,7 @@ class Horde_Core_Notification_Listener_SmartmobileStatus extends Horde_Notificat
         // TODO: Need to add delay to allow browser to correctly populate
         // location of original page, or else closing notification reloads
         // previous page (Ticket #11103).
-        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineScript([
+        $GLOBALS['injector']->get(Horde_PageOutput::class)->addInlineScript([
             '$(function() {HordeMobile.showNotifications('
             . Horde_Serialize::serialize($events, Horde_Serialize::JSON)
             . ');});',

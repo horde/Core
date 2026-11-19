@@ -26,7 +26,7 @@
  */
 class Horde_Session_Null extends Horde_Session implements Horde_Shutdown_Task
 {
-    use \Horde\Core\Session\PublishesModernSessionToAccessorTrait;
+    use Horde\Core\Session\PublishesModernSessionToAccessorTrait;
 
     /**
      * Constructor.

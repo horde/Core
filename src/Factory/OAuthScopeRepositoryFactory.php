@@ -29,7 +29,7 @@ class OAuthScopeRepositoryFactory
     {
         if (class_exists(SqlOAuthScopeRepository::class)) {
             try {
-                $db = $injector->getInstance(Adapter::class);
+                $db = $injector->get(Adapter::class);
                 return new SqlOAuthScopeRepository($db);
             } catch (Throwable) {
                 return new InMemoryScopeRepository();

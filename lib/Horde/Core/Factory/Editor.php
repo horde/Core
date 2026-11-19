@@ -36,6 +36,6 @@ class Horde_Core_Factory_Editor extends Horde_Core_Factory_Injector
      */
     public function create(Horde_Injector|Injector $injector)
     {
-        return $injector->getInstance('Horde_Core_Editor_Ckeditor');
+        return $injector->get(Horde_Core_Editor_Ckeditor::class);
     }
 }

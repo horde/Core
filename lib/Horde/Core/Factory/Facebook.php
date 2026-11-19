@@ -24,8 +24,8 @@ class Horde_Core_Factory_Facebook extends Horde_Core_Factory_Injector
             $conf['facebook']['id'],
             $conf['facebook']['secret'],
             [
-                'http_client' => $injector->getInstance('Horde_Core_Factory_HttpClient')->create(),
-                'http_request' => $injector->getInstance('Horde_Controller_Request_Http'),
+                'http_client' => $injector->get(Horde_Core_Factory_HttpClient::class)->create(),
+                'http_request' => $injector->get('Horde_Controller_Request_Http'),
             ]
         );
 

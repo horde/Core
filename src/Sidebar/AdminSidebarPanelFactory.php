@@ -35,9 +35,9 @@ class AdminSidebarPanelFactory
     public function create(Horde_Injector|Injector $injector): AdminSidebarPanel
     {
         return new AdminSidebarPanel(
-            $injector->getInstance(Horde_Registry::class),
-            $injector->getInstance(PermissionService::class),
-            $injector->getInstance(PrefsService::class),
+            $injector->get(Horde_Registry::class),
+            $injector->get(PermissionService::class),
+            $injector->get(PrefsService::class),
         );
     }
 }

@@ -61,7 +61,7 @@ class Horde_Core_Block_Layout_View extends Horde_Core_Block_Layout
 
         $html = '<table id="portal" class="nopadding" cellspacing="8" width="100%">';
 
-        $bc = $GLOBALS['injector']->getInstance('Horde_Core_Factory_BlockCollection')->create();
+        $bc = $GLOBALS['injector']->get(Horde_Core_Factory_BlockCollection::class)->create();
         $covered = [];
         $js = [];
         foreach ($this->_layout as $row_num => $row) {
@@ -154,7 +154,7 @@ class Horde_Core_Block_Layout_View extends Horde_Core_Block_Layout
      */
     public function getStylesheets()
     {
-        $css = $GLOBALS['injector']->getInstance('Horde_PageOutput')->css;
+        $css = $GLOBALS['injector']->get(Horde_PageOutput::class)->css;
         $stylesheets = [];
 
         foreach ($this->getApplications() as $app) {

@@ -24,9 +24,9 @@ use Horde\ActiveSync\Ops\FleetSummary;
 use Horde\ActiveSync\Ops\HealthEvaluator;
 use Horde\ActiveSync\Ops\HealthOptions;
 use Horde\ActiveSync\Ops\HealthStatus;
+use Horde\Exception\NotFound;
 use Horde_ActiveSync_State_Base;
 use Horde_Exception;
-use Horde_Exception_NotFound;
 use Horde_Log_Logger;
 
 final class SnapshotService
@@ -43,8 +43,8 @@ final class SnapshotService
     ) {
         $this->factoryBuilder = Closure::fromCallable(
             $factoryBuilder
-                ?? static fn (HealthOptions $options): DeviceHealthFactory =>
-                    new DeviceHealthFactory(new HealthEvaluator($options))
+                ?? static fn(HealthOptions $options): DeviceHealthFactory
+                    => new DeviceHealthFactory(new HealthEvaluator($options))
         );
         $this->clock = Closure::fromCallable($clock ?? time(...));
     }
@@ -120,7 +120,7 @@ final class SnapshotService
                 ->withLogPath($this->logPaths->resolve($deviceId));
         }
 
-        throw new Horde_Exception_NotFound(
+        throw new NotFound(
             sprintf('ActiveSync device %s was not found for %s.', $deviceId, $user)
         );
     }
@@ -146,21 +146,21 @@ final class SnapshotService
         usort(
             $devices,
             match ($sort) {
-                SnapshotCriteria::SORT_USER =>
-                    static fn (DeviceHealth $a, DeviceHealth $b): int =>
-                        strnatcasecmp($a->user, $b->user)
+                SnapshotCriteria::SORT_USER
+                    => static fn(DeviceHealth $a, DeviceHealth $b): int
+                        => strnatcasecmp($a->user, $b->user)
                             ?: strnatcasecmp($a->deviceId, $b->deviceId),
-                SnapshotCriteria::SORT_HEALTH =>
-                    static fn (DeviceHealth $a, DeviceHealth $b): int =>
-                        HealthStatus::rank($b->status)
+                SnapshotCriteria::SORT_HEALTH
+                    => static fn(DeviceHealth $a, DeviceHealth $b): int
+                        => HealthStatus::rank($b->status)
                             <=> HealthStatus::rank($a->status)
                             ?: self::compareAge($a, $b),
-                SnapshotCriteria::SORT_DEVICE =>
-                    static fn (DeviceHealth $a, DeviceHealth $b): int =>
-                        strnatcasecmp($a->deviceId, $b->deviceId),
-                default =>
-                    static fn (DeviceHealth $a, DeviceHealth $b): int =>
-                        self::compareAge($a, $b),
+                SnapshotCriteria::SORT_DEVICE
+                    => static fn(DeviceHealth $a, DeviceHealth $b): int
+                        => strnatcasecmp($a->deviceId, $b->deviceId),
+                default
+                => static fn(DeviceHealth $a, DeviceHealth $b): int
+                    => self::compareAge($a, $b),
             }
         );
     }

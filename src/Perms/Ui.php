@@ -31,6 +31,8 @@ use Horde_Perms_Permission;
 use Horde_Registry;
 use Horde_View;
 use Psr\Http\Message\ServerRequestInterface;
+use Horde_Array;
+use Throwable;
 
 /**
  * Horde_View based responsive permissions administration UI.
@@ -98,8 +100,7 @@ class Ui implements PermsUiInterface
         private readonly ?Horde_Notification_Handler $notification = null,
         private readonly ?Horde_Group $groups = null,
         private readonly ?Horde_Auth_Base $auth = null
-    ) {
-    }
+    ) {}
 
     public function setVars(mixed $vars): void
     {
@@ -136,7 +137,7 @@ class Ui implements PermsUiInterface
         // externally visible: extraRight and the tree id are the same
         // opaque token, and the action links use the unprefixed id
         // for the URL query params.
-        $nodeId = static fn (int|string $rawId): string => 'p:' . $rawId;
+        $nodeId = static fn(int|string $rawId): string => 'p:' . $rawId;
 
         foreach ($nodes as $perm_id => $node) {
             $params = [];
@@ -178,7 +179,7 @@ class Ui implements PermsUiInterface
 
             $links = [];
             if (isset($app_perms['tree'])
-                && is_array(\Horde_Array::getElement($app_perms['tree'], $parents))) {
+                && is_array(Horde_Array::getElement($app_perms['tree'], $parents))) {
                 $links[] = $this->treeAddLink((string) $perm_id);
             }
             $links[] = $this->treeEditLink((string) $perm_id);
@@ -827,7 +828,7 @@ class Ui implements PermsUiInterface
         }
         try {
             return $this->auth->listNames();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return [];
         }
     }
@@ -839,7 +840,7 @@ class Ui implements PermsUiInterface
         }
         try {
             return $this->groups->listAll();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return [];
         }
     }

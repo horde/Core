@@ -28,15 +28,15 @@ class Horde_Core_Factory_Notification extends Horde_Core_Factory_Injector
 
         $this->_notify = new Horde_Core_Notification_Handler(
             new Horde_Core_Notification_Storage_Session(
-                $injector->getInstance(SessionAccess::class)
+                $injector->get(SessionAccess::class)
             ),
-            $injector->getInstance(SessionAccess::class)
+            $injector->get(SessionAccess::class)
         );
 
         $this->_notify->addType('default', '*', 'Horde_Core_Notification_Event_Status');
         $this->_notify->addType('status', 'horde.*', 'Horde_Core_Notification_Event_Status');
 
-        $this->_notify->addDecorator(new Horde_Notification_Handler_Decorator_Alarm($injector->getInstance('Horde_Core_Factory_Alarm'), $registry->getAuth()));
+        $this->_notify->addDecorator(new Horde_Notification_Handler_Decorator_Alarm($injector->get(Horde_Core_Factory_Alarm::class), $registry->getAuth()));
         $this->_notify->addDecorator(new Horde_Core_Notification_Handler_Decorator_Hordelog());
 
         return $this->_notify;

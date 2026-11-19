@@ -25,7 +25,7 @@ class ThemeResolverFactory
 {
     public function create(Injector $injector): ThemeResolver
     {
-        $prefsService = $injector->getInstance(PrefsService::class);
+        $prefsService = $injector->get(PrefsService::class);
 
         return new PrefsThemeResolver($prefsService);
     }

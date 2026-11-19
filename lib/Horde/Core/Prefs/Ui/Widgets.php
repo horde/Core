@@ -22,7 +22,7 @@ class Horde_Core_Prefs_Ui_Widgets
      */
     public static function sourceInit()
     {
-        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addScriptFile('sourceselect.js', 'horde');
+        $GLOBALS['injector']->get(Horde_PageOutput::class)->addScriptFile('sourceselect.js', 'horde');
     }
 
     /**
@@ -89,7 +89,7 @@ class Horde_Core_Prefs_Ui_Widgets
                     'unselected' => $val[1],
                 ];
             }
-            $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineJsVars([
+            $GLOBALS['injector']->get(Horde_PageOutput::class)->addInlineJsVars([
                 'HordeSourceSelectPrefs.source_list' => $js,
             ]);
         }
@@ -136,7 +136,7 @@ class Horde_Core_Prefs_Ui_Widgets
     public static function addressbooksInit()
     {
         self::sourceInit();
-        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addScriptFile('addressbooksprefs.js', 'horde');
+        $GLOBALS['injector']->get(Horde_PageOutput::class)->addScriptFile('addressbooksprefs.js', 'horde');
     }
 
     /**
@@ -231,7 +231,7 @@ class Horde_Core_Prefs_Ui_Widgets
                 ];
             }
 
-            $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineJsVars([
+            $GLOBALS['injector']->get(Horde_PageOutput::class)->addInlineJsVars([
                 'HordeAddressbooksPrefs.fields' => $js,
                 'HordeAddressbooksPrefs.nonetext' => Horde_Core_Translation::t('No address book selected.'),
             ]);
@@ -272,7 +272,7 @@ class Horde_Core_Prefs_Ui_Widgets
      */
     public static function alarmInit()
     {
-        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addScriptFile('alarmprefs.js', 'horde');
+        $GLOBALS['injector']->get(Horde_PageOutput::class)->addScriptFile('alarmprefs.js', 'horde');
     }
 
     /**
@@ -290,7 +290,7 @@ class Horde_Core_Prefs_Ui_Widgets
     {
         $pref = $data['pref'];
 
-        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineJsVars([
+        $GLOBALS['injector']->get(Horde_PageOutput::class)->addInlineJsVars([
             'HordeAlarmPrefs.pref' => $pref,
         ]);
 
@@ -303,7 +303,7 @@ class Horde_Core_Prefs_Ui_Widgets
 
         $param_list = $select_list = [];
 
-        foreach ($GLOBALS['injector']->getInstance('Horde_Alarm')->handlers() as $method => $handler) {
+        foreach ($GLOBALS['injector']->get('Horde_Alarm')->handlers() as $method => $handler) {
             $select_list[] = [
                 'l' => $handler->getDescription(),
                 's' => in_array($method, $selected),
@@ -386,7 +386,7 @@ class Horde_Core_Prefs_Ui_Widgets
     public static function alarmUpdate($ui, $data)
     {
         $pref = $data['pref'];
-        $methods = $GLOBALS['injector']->getInstance('Horde_Alarm')->handlers();
+        $methods = $GLOBALS['injector']->get('Horde_Alarm')->handlers();
         $val = (isset($ui->vars->$pref) && is_array($ui->vars->$pref))
             ? $ui->vars->$pref
             : [];

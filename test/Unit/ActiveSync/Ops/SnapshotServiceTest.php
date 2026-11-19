@@ -23,9 +23,9 @@ use Horde\ActiveSync\Ops\HealthStatus;
 use Horde\Core\ActiveSync\Ops\DeviceLogPathResolver;
 use Horde\Core\ActiveSync\Ops\SnapshotCriteria;
 use Horde\Core\ActiveSync\Ops\SnapshotService;
+use Horde\Exception\NotFound;
 use Horde_ActiveSync_State_Sql;
 use Horde_Exception;
-use Horde_Exception_NotFound;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -153,7 +153,7 @@ final class SnapshotServiceTest extends TestCase
             $this->row('other@example.com', 'DEVICE1'),
         ]);
 
-        $this->expectException(Horde_Exception_NotFound::class);
+        $this->expectException(NotFound::class);
 
         $this->service($state)->device('alice@example.com', 'DEVICE1');
     }
@@ -171,7 +171,7 @@ final class SnapshotServiceTest extends TestCase
         self::assertSame(
             ['DEVICE1', 'DEVICE3'],
             array_map(
-                static fn ($device): string => $device->deviceId,
+                static fn($device): string => $device->deviceId,
                 $snapshot->devices
             )
         );
@@ -186,7 +186,7 @@ final class SnapshotServiceTest extends TestCase
                 'perdevice',
                 '/var/log/activesync/'
             ),
-            clock: static fn (): int => self::NOW
+            clock: static fn(): int => self::NOW
         );
     }
 

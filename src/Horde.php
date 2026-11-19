@@ -40,6 +40,7 @@ use stdClass;
 use Exception;
 use PEAR_Error;
 use Throwable;
+use Horde_PageOutput;
 
 /**
  * Provides the base functionality shared by all Horde applications.
@@ -121,7 +122,7 @@ class Horde
         if (isset($GLOBALS['injector'])
             && Horde_Core_Factory_Logger::available()) {
             try {
-                $logger = $GLOBALS['injector']->getInstance(Logger::class);
+                $logger = $GLOBALS['injector']->get(Logger::class);
                 self::drainBuffer($logger);
                 $logger->log($resolvedPriority, $message, $context);
                 return;
@@ -130,7 +131,7 @@ class Horde
             }
             // Legacy fallback.
             $log_ob = new Horde_Core_Log_Object($event, $priority, $options);
-            $GLOBALS['injector']->getInstance('Horde_Log_Logger')->logObject($log_ob);
+            $GLOBALS['injector']->get('Horde_Log_Logger')->logObject($log_ob);
         } else {
             // Framework not yet initialized — buffer for later.
             self::bufferLog($resolvedPriority, $message, $context);
@@ -917,7 +918,7 @@ class Horde
                 Horde_Serialize::JSON
             );
             $title = '';
-            $GLOBALS['injector']->getInstance('Horde_PageOutput')
+            $GLOBALS['injector']->get(Horde_PageOutput::class)
                 ->addScriptFile('tooltips.js', 'horde');
         }
 
@@ -1074,7 +1075,7 @@ class Horde
         }
         $tmpfile = Util::getTempFile($prefix, $delete, $dir, $secure);
         if ($session_remove) {
-            $session = $GLOBALS['injector']->getInstance(HordeSession::class);
+            $session = $GLOBALS['injector']->get(HordeSession::class);
             $stored = $session->getScoped('horde', 'gc_tempfiles');
             $gcfiles = is_array($stored) ? $stored : [];
             $gcfiles[] = $tmpfile;
@@ -1398,7 +1399,7 @@ class Horde
         ?string $error = null,
     ): void {
         try {
-            $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
+            $GLOBALS['injector']->get(Horde_Core_Hooks::class)
                 ->callHook('perms_denied', 'horde', [$app, $perm]);
         } catch (Horde_Exception_HookNotSet $e) {
         }

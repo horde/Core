@@ -27,7 +27,7 @@ class Horde_Core_Ajax_Application_Handler_Imple extends Horde_Core_Ajax_Applicat
         global $injector, $registry;
 
         $pushed = $registry->pushApp($this->vars->app);
-        $imple = $injector->getInstance('Horde_Core_Factory_Imple')->create($this->vars->imple, [], true);
+        $imple = $injector->get(Horde_Core_Factory_Imple::class)->create($this->vars->imple, [], true);
 
         $result = $imple->handle($this->vars);
 

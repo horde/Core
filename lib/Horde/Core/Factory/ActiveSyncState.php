@@ -18,14 +18,14 @@ class Horde_Core_Factory_ActiveSyncState extends Horde_Core_Factory_Injector
                 : 'sql';
             switch (Horde_String::lower($driver)) {
                 case 'nosql':
-                    $nosql = $injector->getInstance('Horde_Core_Factory_Nosql')->create('horde', 'activesync');
+                    $nosql = $injector->get(Horde_Core_Factory_Nosql::class)->create('horde', 'activesync');
                     return new Horde_ActiveSync_State_Mongo([
                         'connection' => $nosql,
                     ]);
 
                 case 'sql':
                     return new Horde_ActiveSync_State_Sql([
-                        'db' => $injector->getInstance('Horde_Core_Factory_Db')->create('horde', 'activesync'),
+                        'db' => $injector->get(Horde_Core_Factory_Db::class)->create('horde', 'activesync'),
                     ]);
             }
         }

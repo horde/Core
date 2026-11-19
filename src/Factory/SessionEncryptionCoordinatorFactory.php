@@ -34,7 +34,7 @@ class SessionEncryptionCoordinatorFactory
 {
     public function create(Injector $injector): SessionEncryptionCoordinator
     {
-        $secret = $injector->getInstance(SessionSecret::class);
+        $secret = $injector->get(SessionSecret::class);
 
         return new SessionEncryptionCoordinator($secret);
     }

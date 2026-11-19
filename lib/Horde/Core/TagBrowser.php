@@ -91,7 +91,7 @@ abstract class Horde_Core_TagBrowser
         $owner = null
     ) {
         $this->_tagger = $tagger;
-        $this->_session = $GLOBALS['injector']->getInstance(SessionAccess::class);
+        $this->_session = $GLOBALS['injector']->get(SessionAccess::class);
 
         if (!empty($tags)) {
             $this->_tags = $this->_tagger->getTagIds($tags);

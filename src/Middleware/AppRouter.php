@@ -100,7 +100,7 @@ class AppRouter extends RampageRequestHandler implements MiddlewareInterface, Re
         $controller = null;
         if ($controllerName) {
             try {
-                $controller = $this->injector->getInstance($controllerName);
+                $controller = $this->injector->get($controllerName);
             } catch (Exception $e) {
                 throw new HordeException(
                     'Defined controller but could not create: ' . $controllerName . ' — ' . $e->getMessage(),

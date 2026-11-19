@@ -29,7 +29,7 @@ class ErrorFilterFactory
     {
         $admins = [];
         try {
-            $configLoader = $injector->getInstance(ConfigLoader::class);
+            $configLoader = $injector->get(ConfigLoader::class);
             $conf = $configLoader->load('horde', 'conf.php');
             $admins = $conf->get('auth.admins', []);
             if (!is_array($admins)) {

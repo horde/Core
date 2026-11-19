@@ -34,6 +34,11 @@ class Horde_Themes_Css_Cache_File extends Horde_Themes_Css_Cache
     {
         global $registry, $injector;
 
+        [$external, $css] = $this->_splitExternal($css);
+        if (!count($css)) {
+            return $external;
+        }
+
         if (!empty($this->_params['filemtime'])) {
             foreach ($css as &$val) {
                 $val['mtime'] = @filemtime($val['fs']);
@@ -71,9 +76,9 @@ class Horde_Themes_Css_Cache_File extends Horde_Themes_Css_Cache
             }
         }
 
-        return [
+        return array_merge($external, [
             Horde::url(($registry->get('staticuri', 'horde') ?? '') . '/' . $filename, true, ['append_session' => -1]),
-        ];
+        ]);
     }
 
     /**

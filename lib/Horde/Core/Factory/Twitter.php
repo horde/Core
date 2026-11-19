@@ -41,12 +41,12 @@ class Horde_Core_Factory_Twitter extends Horde_Core_Factory_Injector
 
         /* Create the Consumer */
         $auth = new Horde_Service_Twitter_Auth_Oauth(new Horde_Oauth_Consumer($params));
-        $request = new Horde_Service_Twitter_Request_Oauth($injector->getInstance('Horde_Controller_Request'));
+        $request = new Horde_Service_Twitter_Request_Oauth($injector->get('Horde_Controller_Request'));
         $twitter = new Horde_Service_Twitter($auth, $request);
 
-        //$twitter->setCache($injector->getInstance('Horde_Cache'));
-        $twitter->setLogger($injector->getInstance('Horde_Log_Logger'));
-        $twitter->setHttpClient($injector->getInstance('Horde_Core_Factory_HttpClient')->create());
+        //$twitter->setCache($injector->get('Horde_Cache'));
+        $twitter->setLogger($injector->get('Horde_Log_Logger'));
+        $twitter->setHttpClient($injector->get(Horde_Core_Factory_HttpClient::class)->create());
 
         return $twitter;
     }

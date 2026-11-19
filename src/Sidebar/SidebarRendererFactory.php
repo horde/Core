@@ -25,8 +25,8 @@ class SidebarRendererFactory
     public function create(Injector $injector): SidebarRenderer
     {
         return new SidebarRenderer(
-            $injector->getInstance(AssetCollector::class),
-            $injector->getInstance(JsDiscoverer::class),
+            $injector->get(AssetCollector::class),
+            $injector->get(JsDiscoverer::class),
         );
     }
 }

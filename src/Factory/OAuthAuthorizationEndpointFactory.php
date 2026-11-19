@@ -29,11 +29,11 @@ class OAuthAuthorizationEndpointFactory
     public function create(Injector $injector): AuthorizationEndpoint
     {
         return new AuthorizationEndpoint(
-            $injector->getInstance(ClientRepository::class),
-            $injector->getInstance(ScopeRepository::class),
-            $injector->getInstance(AuthorizationCodeRepository::class),
-            $injector->getInstance(ResponseFactoryInterface::class),
-            $injector->getInstance(StreamFactoryInterface::class),
+            $injector->get(ClientRepository::class),
+            $injector->get(ScopeRepository::class),
+            $injector->get(AuthorizationCodeRepository::class),
+            $injector->get(ResponseFactoryInterface::class),
+            $injector->get(StreamFactoryInterface::class),
         );
     }
 }

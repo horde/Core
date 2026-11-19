@@ -24,6 +24,8 @@ use Horde\SessionHandler\SessionId;
 use Horde_Exception;
 use Horde_Shutdown;
 use Horde_Shutdown_Task;
+use RuntimeException;
+use Throwable;
 
 /**
  * Orchestrates the lifecycle of the current PHP session under Horde control.
@@ -454,7 +456,7 @@ class SessionLifecycle implements Horde_Shutdown_Task
      */
     private function mintSuccessor(HordeSession $old): HordeSession
     {
-        $factory = $this->injector->getInstance(HordeSessionFactory::class);
+        $factory = $this->injector->get(HordeSessionFactory::class);
         $successor = $factory->restore(
             new SessionId((string) (session_id() ?: 'none')),
             $old->toPayload(),
@@ -464,7 +466,7 @@ class SessionLifecycle implements Horde_Shutdown_Task
         // HordeSessionFactory whose restore() actually returns a
         // HordeSession, but assert the type for the type checker.
         if (!$successor instanceof HordeSession) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'HordeSessionFactory::restore() returned '
                 . get_debug_type($successor)
                 . '; expected HordeSession.',
@@ -591,8 +593,8 @@ class SessionLifecycle implements Horde_Shutdown_Task
         if ($this->accessor === null) {
             $resolved = null;
             try {
-                $resolved = $this->injector->getInstance(SessionAccess::class);
-            } catch (\Throwable) {
+                $resolved = $this->injector->get(SessionAccess::class);
+            } catch (Throwable) {
                 // No SessionAccess binding — legacy test contexts and
                 // partial DI setups build a SessionLifecycle without
                 // wiring the accessor. Fall through to the private
@@ -637,7 +639,7 @@ class SessionLifecycle implements Horde_Shutdown_Task
         if ($this->accessor()->hasCurrent()) {
             return $this->accessor()->current();
         }
-        return $this->injector->getInstance(HordeSession::class);
+        return $this->injector->get(HordeSession::class);
     }
 
     /**
@@ -655,7 +657,7 @@ class SessionLifecycle implements Horde_Shutdown_Task
      *    (see horde/Core#190).
      * 2. The `HordeSession::class` injector binding — retained in
      *    parallel because dozens of transient callers still do
-     *    `$injector->getInstance(HordeSession::class)->…` inline and
+     *    `$injector->get(HordeSession::class)->…` inline and
      *    expect the current value there too.
      *
      * The instance is also published on `$GLOBALS['injector']` when that

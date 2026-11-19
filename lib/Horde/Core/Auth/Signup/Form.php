@@ -35,7 +35,7 @@ class Horde_Core_Auth_Signup_Form extends Horde_Form
 
         /* Use hooks get any extra fields required in signing up. */
         try {
-            $extra = $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
+            $extra = $GLOBALS['injector']->get(Horde_Core_Hooks::class)
                 ->callHook('signup_getextra', 'horde');
         } catch (Horde_Exception_HookNotSet $e) {
         }

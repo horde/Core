@@ -47,8 +47,8 @@ class HttpClientFactory
     {
         $state = $this->loadConfig($injector);
         $options = $this->buildOptions($state);
-        $responseFactory = $injector->getInstance(ResponseFactoryInterface::class);
-        $streamFactory = $injector->getInstance(StreamFactoryInterface::class);
+        $responseFactory = $injector->get(ResponseFactoryInterface::class);
+        $streamFactory = $injector->get(StreamFactoryInterface::class);
 
         if (extension_loaded('curl')) {
             return new Curl($responseFactory, $streamFactory, $options);
@@ -59,7 +59,7 @@ class HttpClientFactory
 
     private function loadConfig(Injector $injector): State
     {
-        $loader = $injector->getInstance(ConfigLoader::class);
+        $loader = $injector->get(ConfigLoader::class);
 
         return $loader->load('horde');
     }

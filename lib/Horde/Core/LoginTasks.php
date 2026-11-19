@@ -54,9 +54,9 @@ class Horde_Core_LoginTasks extends Horde_LoginTasks
         }
 
         if (($this->_app != 'horde')
-            && ($GLOBALS['injector']->getInstance(HordeSession::class)
+            && ($GLOBALS['injector']->get(HordeSession::class)
                 ->getScoped('horde', 'logintasks') !== true)) {
-            $GLOBALS['injector']->getInstance('Horde_Core_Factory_LoginTasks')->create('horde')->runTasks($opts);
+            $GLOBALS['injector']->get(Horde_Core_Factory_LoginTasks::class)->create('horde')->runTasks($opts);
         }
 
         parent::runTasks($opts);

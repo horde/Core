@@ -34,7 +34,7 @@ class GroupTest extends TestCase
         $GLOBALS['conf']['group']['driver'] = 'mock';
         $this->assertInstanceOf(
             'Horde_Group_Mock',
-            $injector->getInstance('Horde_Group')
+            $injector->get('Horde_Group')
         );
     }
 }

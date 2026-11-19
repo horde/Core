@@ -23,8 +23,8 @@ class Horde_Core_Factory_PermsCore extends Horde_Core_Factory_Injector
     public function create(Horde_Injector|Injector $injector)
     {
         return new Horde_Core_Perms(
-            $injector->getInstance('Horde_Registry'),
-            $injector->getInstance('Horde_Perms')
+            $injector->get(Horde_Registry::class),
+            $injector->get('Horde_Perms')
         );
     }
 }

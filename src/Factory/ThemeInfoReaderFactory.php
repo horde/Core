@@ -27,8 +27,8 @@ class ThemeInfoReaderFactory
     public function create(Injector $injector): ThemeInfoReader
     {
         return new PhpThemeInfoReader(
-            $injector->getInstance(PathBuilderInterface::class),
-            $injector->getInstance(AssetFilesystem::class),
+            $injector->get(PathBuilderInterface::class),
+            $injector->get(AssetFilesystem::class),
         );
     }
 }

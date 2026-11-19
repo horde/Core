@@ -150,7 +150,7 @@ class Horde_Core_Prefs_Ui
     {
         global $prefs;
 
-        $session = $GLOBALS['injector']->getInstance(HordeSession::class);
+        $session = $GLOBALS['injector']->get(HordeSession::class);
 
         if (is_null($group)) {
             if (!$this->group) {
@@ -255,7 +255,7 @@ class Horde_Core_Prefs_Ui
         /* Toggle Advanced/Basic mode. */
         if (!empty($this->vars->show_advanced)
             || !empty($this->vars->show_basic)) {
-            $GLOBALS['injector']->getInstance(HordeSession::class)
+            $GLOBALS['injector']->get(HordeSession::class)
                 ->setScoped('horde', 'prefs_advanced', !empty($this->vars->show_advanced));
         } elseif (!$this->vars->actionID
                   || !$this->group
@@ -266,7 +266,7 @@ class Horde_Core_Prefs_Ui
             return;
         } else {
             try {
-                $GLOBALS['injector']->getInstance('Horde_Token')->validate($this->vars->horde_prefs_token, 'horde.prefs');
+                $GLOBALS['injector']->get('Horde_Token')->validate($this->vars->horde_prefs_token, 'horde.prefs');
             } catch (Horde_Token_Exception $e) {
                 $GLOBALS['notification']->push($e);
                 return;
@@ -374,7 +374,7 @@ class Horde_Core_Prefs_Ui
                     /* Code for special elements written specifically for each
                      * application. */
                     if (isset($this->prefs[$pref]['handler'])
-                        && ($ob = $injector->getInstance($this->prefs[$pref]['handler']))) {
+                        && ($ob = $injector->get($this->prefs[$pref]['handler']))) {
                         $ob->init($this);
                         $pref_updated = $ob->update($this);
                     }
@@ -433,7 +433,7 @@ class Horde_Core_Prefs_Ui
             $url->add('actionID', 'update_special');
         }
         if (!empty($options['token'])) {
-            $url->add('horde_prefs_token', $GLOBALS['injector']->getInstance('Horde_Token')->get('horde.prefs'));
+            $url->add('horde_prefs_token', $GLOBALS['injector']->get('Horde_Token')->get('horde.prefs'));
         }
         return $url;
     }
@@ -507,7 +507,7 @@ class Horde_Core_Prefs_Ui
 
                 if (($this->prefs[$pref]['type'] == 'special')
                     && isset($this->prefs[$pref]['handler'])
-                    && ($ob = $GLOBALS['injector']->getInstance($this->prefs[$pref]['handler']))) {
+                    && ($ob = $GLOBALS['injector']->get($this->prefs[$pref]['handler']))) {
                     $ob->init($this);
                     echo $ob->display($this);
                     continue;
@@ -700,7 +700,7 @@ class Horde_Core_Prefs_Ui
         $t->set('header', $header);
 
         $t->set('has_advanced', $this->hasAdvancedPrefs());
-        if ($GLOBALS['injector']->getInstance(HordeSession::class)
+        if ($GLOBALS['injector']->get(HordeSession::class)
             ->getScoped('horde', 'prefs_advanced')) {
             $t->set('basic', $this->selfUrl()->add('show_basic', 1));
         } else {
@@ -715,7 +715,7 @@ class Horde_Core_Prefs_Ui
             $t->set('app', htmlspecialchars($this->app));
             $t->set('group', htmlspecialchars($this->group));
             $t->set('label', htmlspecialchars($this->prefGroups[$this->group]['label']));
-            $t->set('token', $GLOBALS['injector']->getInstance('Horde_Token')->get('horde.prefs'));
+            $t->set('token', $GLOBALS['injector']->get('Horde_Token')->get('horde.prefs'));
 
             // Search for previous and next groups.
             if (count($prefgroups) > 1) {
@@ -862,7 +862,7 @@ class Horde_Core_Prefs_Ui
      */
     protected function _identityHeader($members)
     {
-        $identity = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Identity')->create(null, $this->app);
+        $identity = $GLOBALS['injector']->get(Horde_Core_Factory_Identity::class)->create(null, $this->app);
         $default_identity = $identity->getDefault();
 
         $t = $GLOBALS['injector']->createInstance('Horde_Template');
@@ -906,7 +906,7 @@ class Horde_Core_Prefs_Ui
         }
         $t->set('entry', $entry);
 
-        $GLOBALS['injector']->getInstance('Horde_PageOutput')->addInlineScript([
+        $GLOBALS['injector']->get(Horde_PageOutput::class)->addInlineScript([
             'HordeIdentitySelect.identities = ' . Horde_Serialize::serialize($js, Horde_Serialize::JSON),
         ]);
 
@@ -957,7 +957,7 @@ class Horde_Core_Prefs_Ui
     {
         global $conf, $notification, $prefs;
 
-        $identity = $GLOBALS['injector']->getInstance('Horde_Core_Factory_Identity')->create(null, $this->app);
+        $identity = $GLOBALS['injector']->get(Horde_Core_Factory_Identity::class)->create(null, $this->app);
 
         if ($this->vars->delete_identity) {
             $id = intval($this->vars->identity);

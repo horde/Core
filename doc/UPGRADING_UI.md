@@ -601,6 +601,10 @@ Examples:
 
 ## 8. Replacing Horde_Prefs / $prefs with PrefsService
 
+> **Full reference** — config cascade, factory architecture, lock semantics,
+> and a complete migration checklist are in [PREFERENCES.md](PREFERENCES.md).
+> This section summarises the mechanical substitution steps.
+
 ### Old pattern
 
 ```php

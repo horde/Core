@@ -41,7 +41,7 @@ abstract class Horde_Core_Auth_Signup_Base
         // Attempt to add/update any extra data handed in.
         if (!empty($info['extra'])) {
             try {
-                $injector->getInstance('Horde_Core_Hooks')->callHook(
+                $injector->get(Horde_Core_Hooks::class)->callHook(
                     'signup_addextra',
                     'horde',
                     [
@@ -87,7 +87,7 @@ abstract class Horde_Core_Auth_Signup_Base
         $this->_queueSignup($signup);
 
         try {
-            $injector->getInstance('Horde_Core_Hooks')->callHook(
+            $injector->get(Horde_Core_Hooks::class)->callHook(
                 'signup_queued',
                 'horde',
                 [
@@ -114,7 +114,7 @@ abstract class Horde_Core_Auth_Signup_Base
                 'Subject' => sprintf(Horde_Core_Translation::t('Account signup request for "%s"'), $signup->getName()),
                 'To' => $conf['signup']['email'],
                 'From' => $conf['signup']['email']]);
-            $mail->send($injector->getInstance('Horde_Mail'));
+            $mail->send($injector->get('Horde_Mail'));
         }
     }
 
@@ -132,7 +132,7 @@ abstract class Horde_Core_Auth_Signup_Base
         global $auth, $injector;
 
         try {
-            $info = $injector->getInstance('Horde_Core_Hooks')->callHook(
+            $info = $injector->get(Horde_Core_Hooks::class)->callHook(
                 'signup_preprocess',
                 'horde',
                 [$info]

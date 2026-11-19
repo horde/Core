@@ -45,6 +45,6 @@ class StateFactory
         }
 
         // Modern path: ConfigLoader reads conf.php directly from disk.
-        return $injector->getInstance(ConfigLoader::class)->load('horde');
+        return $injector->get(ConfigLoader::class)->load('horde');
     }
 }

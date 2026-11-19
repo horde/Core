@@ -99,7 +99,7 @@ class Horde_Themes_Css
         }
 
         $cache_ob = empty($opts['nocache'])
-            ? $injector->getInstance('Horde_Core_CssCache')
+            ? $injector->get('Horde_Core_CssCache')
             : new Horde_Themes_Css_Cache_Null();
 
         return $cache_ob->process($css, $this->_cacheid);
@@ -155,7 +155,7 @@ class Horde_Themes_Css
             ? null
             : $opts['sub'];
 
-        $cache = $injector->getInstance('Horde_Core_Factory_ThemesCache')->create($curr_app, $theme);
+        $cache = $injector->get(Horde_Core_Factory_ThemesCache::class)->create($curr_app, $theme);
         $this->_cacheid = $cache->getCacheId();
 
         /* Add external stylesheets first, since they are ALWAYS overwritable
@@ -182,7 +182,7 @@ class Horde_Themes_Css
         }
 
         /* Add user-defined additional stylesheets. */
-        $hooks = $injector->getInstance('Horde_Core_Hooks');
+        $hooks = $injector->get(Horde_Core_Hooks::class);
         try {
             $add_css = array_merge($add_css, $hooks->callHook('cssfiles', 'horde', [$theme]));
         } catch (Horde_Exception_HookNotSet $e) {

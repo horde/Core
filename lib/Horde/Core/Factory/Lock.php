@@ -28,7 +28,7 @@ class Horde_Core_Factory_Lock extends Horde_Core_Factory_Injector
             : $conf['lock']['driver'];
 
         $params = Horde::getDriverConfig('lock', $driver);
-        $params['logger'] = $injector->getInstance('Horde_Log_Logger');
+        $params['logger'] = $injector->get('Horde_Log_Logger');
 
         switch (Horde_String::lower($driver)) {
             case 'none':
@@ -36,7 +36,7 @@ class Horde_Core_Factory_Lock extends Horde_Core_Factory_Injector
                 break;
 
             case 'nosql':
-                $nosql = $injector->getInstance('Horde_Core_Factory_Nosql')->create('horde', 'cache');
+                $nosql = $injector->get(Horde_Core_Factory_Nosql::class)->create('horde', 'cache');
                 if ($nosql instanceof Horde_Mongo_Client) {
                     $params['mongo_db'] = $nosql;
                     $driver = 'mongo';
@@ -44,7 +44,7 @@ class Horde_Core_Factory_Lock extends Horde_Core_Factory_Injector
                 break;
 
             case 'sql':
-                $params['db'] = $injector->getInstance('Horde_Core_Factory_Db')->create('horde', 'lock');
+                $params['db'] = $injector->get(Horde_Core_Factory_Db::class)->create('horde', 'lock');
                 break;
         }
 

@@ -32,9 +32,9 @@ class OAuthAccessTokenIssuerFactory
         $ttl = (int) ($oauthConf['access_token_ttl'] ?? 3600);
 
         return new AccessTokenIssuer(
-            $injector->getInstance(TokenEncoder::class),
-            $injector->getInstance(Rs256Signer::class),
-            $injector->getInstance(AccessTokenRepository::class),
+            $injector->get(TokenEncoder::class),
+            $injector->get(Rs256Signer::class),
+            $injector->get(AccessTokenRepository::class),
             $issuer,
             $ttl,
         );

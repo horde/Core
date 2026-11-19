@@ -25,8 +25,8 @@ class RouteUrlWriterFactory
 {
     public function create(Injector $injector): RouteUrlWriter
     {
-        $provider = $injector->getInstance(RuntimeRoutesProvider::class);
-        $registryState = $injector->getInstance(RegistryConfigLoader::class)->load();
+        $provider = $injector->get(RuntimeRoutesProvider::class);
+        $registryState = $injector->get(RegistryConfigLoader::class)->load();
         $hordeConfig = $registryState->getApplication('horde');
         $webroot = $hordeConfig['webroot'] ?? '/horde';
 

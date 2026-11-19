@@ -28,10 +28,10 @@ class JsDiscovererFactory
 {
     public function create(Injector $injector): JsDiscoverer
     {
-        $pathBuilder = $injector->getInstance(PathBuilderInterface::class);
-        $uriBuilder = $injector->getInstance(UriBuilderInterface::class);
-        $filesystem = $injector->getInstance(AssetFilesystem::class);
-        $themeInfo = $injector->getInstance(ThemeInfoReader::class);
+        $pathBuilder = $injector->get(PathBuilderInterface::class);
+        $uriBuilder = $injector->get(UriBuilderInterface::class);
+        $filesystem = $injector->get(AssetFilesystem::class);
+        $themeInfo = $injector->get(ThemeInfoReader::class);
 
         return new ThemeJsDiscoverer($pathBuilder, $uriBuilder, $filesystem, $themeInfo);
     }

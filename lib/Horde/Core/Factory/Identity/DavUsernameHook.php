@@ -36,7 +36,7 @@ class Horde_Core_Factory_Identity_DavUsernameHook extends Horde_Core_Factory_Ide
     public function create($user = null, $driver = null)
     {
         try {
-            $user = $this->_injector->getInstance('Horde_Core_Hooks')
+            $user = $this->_injector->get(Horde_Core_Hooks::class)
                 ->callHook('davusername', 'horde', [$user, true]);
         } catch (Horde_Exception_HookNotSet $e) {
         }

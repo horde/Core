@@ -41,7 +41,7 @@ class PathBuilderFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorResolvesPathBuilderInterface(): void
     {
-        $builder = $this->injector->getInstance(PathBuilderInterface::class);
+        $builder = $this->injector->get(PathBuilderInterface::class);
 
         self::assertInstanceOf(PathBuilderInterface::class, $builder);
         self::assertInstanceOf(PathBuilder::class, $builder);
@@ -50,7 +50,7 @@ class PathBuilderFactoryIntegrationTest extends TestCase
     #[Test]
     public function factoryProducedBuilderResolvesRegistry(): void
     {
-        $builder = $this->injector->getInstance(PathBuilderInterface::class);
+        $builder = $this->injector->get(PathBuilderInterface::class);
         $result = $builder->withAppFileroot('turba');
 
         self::assertSame('/srv/www/horde/turba', (string) $result);
@@ -59,7 +59,7 @@ class PathBuilderFactoryIntegrationTest extends TestCase
     #[Test]
     public function factoryProducedBuilderSupportsChaining(): void
     {
-        $builder = $this->injector->getInstance(PathBuilderInterface::class);
+        $builder = $this->injector->get(PathBuilderInterface::class);
         $result = $builder
             ->withAppFileroot('turba')
             ->withSlug('config')
@@ -72,8 +72,8 @@ class PathBuilderFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorReturnsSameInstance(): void
     {
-        $first = $this->injector->getInstance(PathBuilderInterface::class);
-        $second = $this->injector->getInstance(PathBuilderInterface::class);
+        $first = $this->injector->get(PathBuilderInterface::class);
+        $second = $this->injector->get(PathBuilderInterface::class);
 
         self::assertSame($first, $second);
     }

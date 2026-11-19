@@ -47,7 +47,7 @@ class Horde_Core_Topbar
     {
         /* Set up the tree. */
         $this->_tree = $GLOBALS['injector']
-            ->getInstance('Horde_Core_Factory_Tree')
+            ->get(Horde_Core_Factory_Tree::class)
             ->create('horde_menu', $treeRenderer, $rendererParams);
     }
 
@@ -113,7 +113,7 @@ class Horde_Core_Topbar
 
         /* Add the administration menu if the user is an admin or has any
          * admin permissions. */
-        $perms = $injector->getInstance('Horde_Perms');
+        $perms = $injector->get('Horde_Perms');
         $admin_item_count = 0;
         try {
             foreach ($registry->callByPackage('horde', 'admin_list') as $method => $val) {

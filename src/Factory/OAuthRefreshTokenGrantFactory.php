@@ -29,11 +29,11 @@ class OAuthRefreshTokenGrantFactory
     public function create(Injector $injector): RefreshTokenGrant
     {
         return new RefreshTokenGrant(
-            $injector->getInstance(RefreshTokenRepository::class),
-            $injector->getInstance(AccessTokenRepository::class),
-            $injector->getInstance(AccessTokenIssuer::class),
-            $injector->getInstance(RefreshTokenIssuer::class),
-            $injector->getInstance(ScopeRepository::class),
+            $injector->get(RefreshTokenRepository::class),
+            $injector->get(AccessTokenRepository::class),
+            $injector->get(AccessTokenIssuer::class),
+            $injector->get(RefreshTokenIssuer::class),
+            $injector->get(ScopeRepository::class),
         );
     }
 }

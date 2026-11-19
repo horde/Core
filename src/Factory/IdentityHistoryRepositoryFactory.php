@@ -34,7 +34,7 @@ class IdentityHistoryRepositoryFactory
     {
         if (class_exists(SqlIdentityHistoryRepository::class)) {
             try {
-                $db = $injector->getInstance(Adapter::class);
+                $db = $injector->get(Adapter::class);
                 return new SqlIdentityHistoryRepository($db);
             } catch (Throwable) {
                 return new InMemoryIdentityHistoryRepository();

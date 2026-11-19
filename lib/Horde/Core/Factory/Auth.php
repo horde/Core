@@ -51,7 +51,7 @@ class Horde_Core_Factory_Auth extends Horde_Core_Factory_Base
             $this->_instances[$app] = new Horde_Core_Auth_Application(array_filter([
                 'app' => $app,
                 'base' => ($app === 'horde') ? $this->_create($GLOBALS['conf']['auth']['driver']) : null,
-                'logger' => $this->_injector->getInstance('Horde_Log_Logger'),
+                'logger' => $this->_injector->get('Horde_Log_Logger'),
             ]));
         }
 
@@ -128,12 +128,12 @@ class Horde_Core_Factory_Auth extends Horde_Core_Factory_Base
                 }
 
                 $params['db'] = $this->_injector
-                    ->getInstance('Horde_Core_Factory_Db')
+                    ->get(Horde_Core_Factory_Db::class)
                     ->create('horde', is_null($orig_params) ? 'auth' : $orig_params);
                 break;
 
             case 'horde_auth_http_remote':
-                $params['client'] = $this->_injector->getInstance('Horde_Core_Factory_HttpClient')->create();
+                $params['client'] = $this->_injector->get(Horde_Core_Factory_HttpClient::class)->create();
                 break;
 
             case 'horde_core_auth_application':
@@ -143,13 +143,13 @@ class Horde_Core_Factory_Auth extends Horde_Core_Factory_Base
                 break;
 
             case 'horde_core_auth_imsp':
-                $params['imsp'] = $this->_injector->getInstance('Horde_Core_Factory_Imsp')->create();
+                $params['imsp'] = $this->_injector->get(Horde_Core_Factory_Imsp::class)->create();
                 break;
 
             case 'horde_core_auth_ldap':
             case 'horde_core_auth_msad':
                 $params['ldap'] = $this->_injector
-                    ->getInstance('Horde_Core_Factory_Ldap')
+                    ->get(Horde_Core_Factory_Ldap::class)
                     ->create('horde', is_null($orig_params) ? 'auth' : $orig_params);
                 break;
             case 'horde_core_auth_x509':
@@ -163,18 +163,18 @@ class Horde_Core_Factory_Auth extends Horde_Core_Factory_Base
             case 'horde_auth_customsql':
             case 'horde_auth_sql':
                 $params['db'] = $this->_injector
-                    ->getInstance('Horde_Core_Factory_Db')
+                    ->get(Horde_Core_Factory_Db::class)
                     ->create('horde', is_null($orig_params) ? 'auth' : $orig_params);
                 break;
         }
 
         $params['default_user'] = $GLOBALS['registry']->getAuth();
-        $params['logger'] = $this->_injector->getInstance('Horde_Log_Logger');
+        $params['logger'] = $this->_injector->get('Horde_Log_Logger');
         if (!empty($params['count_bad_logins'])) {
-            $params['history_api'] = $this->_injector->getInstance('Horde_History');
+            $params['history_api'] = $this->_injector->get('Horde_History');
         }
         if (!empty($params['login_block'])) {
-            $params['lock_api'] = $this->_injector->getInstance('Horde_Lock');
+            $params['lock_api'] = $this->_injector->get('Horde_Lock');
         }
 
         $auth_ob = new $driver($params);

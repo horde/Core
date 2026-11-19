@@ -34,8 +34,8 @@ class SidebarBuilderFactory
     public function create(Horde_Injector|Injector $injector): SidebarBuilder
     {
         return new SidebarBuilder(
-            $injector->getInstance(Horde_Registry::class),
-            $injector->getInstance(PrefsService::class),
+            $injector->get(Horde_Registry::class),
+            $injector->get(PrefsService::class),
         );
     }
 }

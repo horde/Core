@@ -23,11 +23,12 @@ namespace Horde\Core\Factory;
 use Horde_Auth_Base;
 use Horde_Core_Factory_Injector;
 use Horde\Injector\Injector;
+use Horde_Core_Factory_Auth;
 
 class AuthBaseFactory extends Horde_Core_Factory_Injector
 {
     public function create(Injector $injector): Horde_Auth_Base
     {
-        return $injector->getInstance('Horde_Core_Factory_Auth')->create();
+        return $injector->get(Horde_Core_Factory_Auth::class)->create();
     }
 }

@@ -25,7 +25,7 @@ abstract class Horde_Core_Ajax_Imple_WeatherLocationAutoCompleter_Base extends H
         global $injector;
 
         $indicator = $this->_params['id'] . '_loading_img';
-        $injector->getInstance('Horde_PageOutput')->addInlineScript(
+        $injector->get(Horde_PageOutput::class)->addInlineScript(
             [
                 'window.weatherupdate = window.weatherupdate || {}',
                 'window.weatherupdate["' . $this->_params['instance'] . '"] = {

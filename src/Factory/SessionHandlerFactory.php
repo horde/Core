@@ -62,7 +62,7 @@ class SessionHandlerFactory
      */
     public function create(Injector $injector): SessionHandler
     {
-        $loader = $injector->getInstance(ConfigLoader::class);
+        $loader = $injector->get(ConfigLoader::class);
         $state = $loader->load('horde');
 
         $driver = strtolower((string) $state->get('sessionhandler.type', 'builtin'));
@@ -91,7 +91,7 @@ class SessionHandlerFactory
         return new SessionHandler(
             backend: $backend,
             serializer: new DefaultSessionSerializer(),
-            sessionFactory: $injector->getInstance(HordeSessionFactory::class),
+            sessionFactory: $injector->get(HordeSessionFactory::class),
             events: $this->getEventDispatcher($injector),
         );
     }
@@ -109,7 +109,7 @@ class SessionHandlerFactory
      */
     private function createSqlBackend(Injector $injector, array $params): SqlBackend
     {
-        $dbService = $injector->getInstance(HordeDbService::class);
+        $dbService = $injector->get(HordeDbService::class);
         $db = $dbService->getAdapter();
         $table = $params['table'] ?? 'horde_sessionhandler';
 
@@ -135,7 +135,7 @@ class SessionHandlerFactory
 
         // Prefer modern LockableHashTable if available.
         try {
-            $modern = $injector->getInstance(LockableHashTable::class);
+            $modern = $injector->get(LockableHashTable::class);
             if ($modern instanceof LockableHashTable) {
                 return new ModernHashtableBackend(
                     hashTable: $modern,
@@ -147,7 +147,7 @@ class SessionHandlerFactory
             // Modern interface not bound; fall through to legacy lookup.
         }
 
-        $ht = $injector->getInstance('Horde_HashTable');
+        $ht = $injector->get('Horde_HashTable');
 
         if (!$ht instanceof Horde_HashTable_Base || !$ht instanceof Horde_HashTable_Lock) {
             throw new RuntimeException(
@@ -198,7 +198,7 @@ class SessionHandlerFactory
         $decryptor = null;
 
         try {
-            $secret = $injector->getInstance('Horde_Secret_Cbc');
+            $secret = $injector->get('Horde_Secret_Cbc');
             if ($secret instanceof SessionSecret) {
                 $encryptor = static fn(string $plaintext): string => $secret->write($secret->getKey(), $plaintext);
                 $decryptor = static fn(string $ciphertext): string => $secret->read($secret->getKey(), $ciphertext);
@@ -216,7 +216,7 @@ class SessionHandlerFactory
     private function getEventDispatcher(Injector $injector): ?EventDispatcherInterface
     {
         try {
-            $dispatcher = $injector->getInstance(EventDispatcherInterface::class);
+            $dispatcher = $injector->get(EventDispatcherInterface::class);
             return $dispatcher instanceof EventDispatcherInterface ? $dispatcher : null;
         } catch (Throwable) {
             return null;

@@ -35,13 +35,13 @@ class Horde_Core_Factory_HashTable extends Horde_Core_Factory_Injector
     {
         global $conf;
 
-        $logger = $injector->getInstance('Horde_Core_Log_Wrapper');
+        $logger = $injector->get(Horde_Core_Log_Wrapper::class);
 
         // DEPRECATED: BC config
         if (!empty($conf['memcache']['enabled'])) {
             return new Horde_HashTable_Memcache([
                 'logger' => $logger,
-                'memcache' => $injector->getInstance('Horde_Memcache'),
+                'memcache' => $injector->get('Horde_Memcache'),
             ]);
         }
 

@@ -195,7 +195,7 @@ class Horde_Core_ActiveSync_Connector
             // iTips, check if we are allowed to autoupdate. If we have no
             // configuration, err on the side of caution and DO NOT auto import.
             $config = $GLOBALS['injector']
-                ->getInstance('Horde_Core_Factory_MimeViewer')
+                ->get(Horde_Core_Factory_MimeViewer::class)
                 ->getViewerConfig('text/calendar', $this->_registry->hasInterface('mail'));
 
             if ($config[1]['driver'] == 'Itip' && !empty($config[1]['auto_update_eventreply'])) {
@@ -429,7 +429,7 @@ class Horde_Core_ActiveSync_Connector
             || !$this->_registry->hasInterface('contacts')) {
             return [];
         }
-        $cache = $GLOBALS['injector']->getInstance('Horde_Cache');
+        $cache = $GLOBALS['injector']->get('Horde_Cache');
         $cache_key = 'HCASC:' . $this->_registry->getAuth() . ':' . $max;
         if (!$cache->exists($cache_key, 3600)) {
             $results = $this->_registry->mail->favouriteRecipients($max);

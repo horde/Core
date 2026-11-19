@@ -46,7 +46,7 @@ class Horde_Core_LoginTasks_Backend_Horde extends Horde_LoginTasks_Backend
      */
     public function getTasklistFromCache()
     {
-        return $GLOBALS['injector']->getInstance(HordeSession::class)
+        return $GLOBALS['injector']->get(HordeSession::class)
             ->getScoped($this->_app, 'logintasks');
     }
 
@@ -58,7 +58,7 @@ class Horde_Core_LoginTasks_Backend_Horde extends Horde_LoginTasks_Backend
      */
     public function storeTasklistInCache($tasklist)
     {
-        $GLOBALS['injector']->getInstance(HordeSession::class)
+        $GLOBALS['injector']->get(HordeSession::class)
             ->setScoped($this->_app, 'logintasks', $tasklist);
     }
 

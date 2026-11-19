@@ -25,7 +25,8 @@ use Horde\Injector\Attribute\Factory;
  * Prefs are scoped by user AND application.
  *
  * For identities/user management, we focus on storage/retrieval only.
- * Schema, defaults, locking, and enforced prefs are out of scope.
+ * Schema and defaults are out of scope. Locking is determined by the
+ * configuration driver (PrefsConfigLoaderStorage, backed by PrefsConfigLoader).
  *
  * @category Horde
  * @package  Core
@@ -84,4 +85,18 @@ interface PrefsService
      * @return bool True if preference exists
      */
     public function exists(string $uid, string $scope, string $key): bool;
+
+    /**
+     * Check if preference is locked
+     *
+     * A locked preference cannot be changed by the user.
+     * Lock state is determined by the configuration driver
+     * (PrefsConfigLoaderStorage / PrefsConfigLoader), not by per-user storage.
+     *
+     * @param string $uid   User ID
+     * @param string $scope App name
+     * @param string $key   Preference key
+     * @return bool True if the preference is locked
+     */
+    public function isLocked(string $uid, string $scope, string $key): bool;
 }

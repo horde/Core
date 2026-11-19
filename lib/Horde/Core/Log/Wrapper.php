@@ -32,7 +32,7 @@ class Horde_Core_Log_Wrapper
     {
         if (isset($GLOBALS['injector'])) {
             return call_user_func_array(
-                [$GLOBALS['injector']->getInstance('Horde_Log_Logger'), $name],
+                [$GLOBALS['injector']->get('Horde_Log_Logger'), $name],
                 $arguments
             );
         }

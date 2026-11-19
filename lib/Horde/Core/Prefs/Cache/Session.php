@@ -95,6 +95,6 @@ class Horde_Core_Prefs_Cache_Session extends Horde_Prefs_Cache_Base
      */
     private function _session(): SessionAccess
     {
-        return $GLOBALS['injector']->getInstance(SessionAccess::class);
+        return $GLOBALS['injector']->get(SessionAccess::class);
     }
 }

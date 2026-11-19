@@ -28,7 +28,7 @@ class Horde_Core_Share_FactoryCallback
 
     public function create()
     {
-        return $GLOBALS['injector']->getInstance('Horde_Core_Factory_ShareBase')->create($this->_app, $this->_driver);
+        return $GLOBALS['injector']->get(Horde_Core_Factory_ShareBase::class)->create($this->_app, $this->_driver);
     }
 
 }

@@ -16,9 +16,10 @@ declare(strict_types=1);
 
 namespace Horde\Core\Factory;
 
-use Horde\Core\Service\LdapPrefsService;
-use Horde\Core\Service\HordeLdapService;
 use Horde\Core\Config\ConfigLoader;
+use Horde\Core\Config\PrefsConfigLoader;
+use Horde\Core\Service\HordeLdapService;
+use Horde\Core\Service\LdapPrefsService;
 use Horde\Injector\Injector;
 use RuntimeException;
 
@@ -41,11 +42,11 @@ class LdapPrefsServiceFactory
      */
     public function create(Injector $injector): LdapPrefsService
     {
-        $loader = $injector->getInstance(ConfigLoader::class);
+        $loader = $injector->get(ConfigLoader::class);
         $config = $loader->load('horde');
 
         // Get LDAP service (may use service-specific connection)
-        $ldapService = $injector->getInstance(HordeLdapService::class);
+        $ldapService = $injector->get(HordeLdapService::class);
 
         // Get prefs configuration
         $params = $config->get('prefs.params', []);
@@ -56,6 +57,7 @@ class LdapPrefsServiceFactory
 
         return new LdapPrefsService(
             ldapService: $ldapService,
+            prefsConfigLoader: $injector->get(PrefsConfigLoader::class),
             basedn: $params['basedn']
         );
     }

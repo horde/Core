@@ -50,7 +50,7 @@ class Horde_Core_Factory_SpellChecker extends Horde_Core_Factory_Base
         if (empty($args['locale'])) {
             if (!is_null($input)) {
                 try {
-                    $args['locale'] = $this->_injector->getInstance('Horde_Core_Factory_LanguageDetect')->getLanguageCode($input);
+                    $args['locale'] = $this->_injector->get(Horde_Core_Factory_LanguageDetect::class)->getLanguageCode($input);
                 } catch (Horde_Exception $e) {
                 }
             }

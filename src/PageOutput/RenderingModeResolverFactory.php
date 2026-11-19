@@ -25,8 +25,8 @@ class RenderingModeResolverFactory
     public function create(Injector $injector): RenderingModeResolver
     {
         return new RenderingModeResolver(
-            $injector->getInstance(SessionAccess::class),
-            $injector->getInstance(Browser::class),
+            $injector->get(SessionAccess::class),
+            $injector->get(Browser::class),
         );
     }
 }

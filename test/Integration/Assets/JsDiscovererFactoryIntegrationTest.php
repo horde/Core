@@ -51,7 +51,7 @@ class JsDiscovererFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorResolvesJsDiscoverer(): void
     {
-        $discoverer = $this->injector->getInstance(JsDiscoverer::class);
+        $discoverer = $this->injector->get(JsDiscoverer::class);
 
         self::assertInstanceOf(JsDiscoverer::class, $discoverer);
         self::assertInstanceOf(PathBasedJsDiscoverer::class, $discoverer);
@@ -60,8 +60,8 @@ class JsDiscovererFactoryIntegrationTest extends TestCase
     #[Test]
     public function injectorReturnsSameInstance(): void
     {
-        $first = $this->injector->getInstance(JsDiscoverer::class);
-        $second = $this->injector->getInstance(JsDiscoverer::class);
+        $first = $this->injector->get(JsDiscoverer::class);
+        $second = $this->injector->get(JsDiscoverer::class);
 
         self::assertSame($first, $second);
     }

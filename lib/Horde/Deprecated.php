@@ -185,7 +185,7 @@ class Horde_Deprecated
      */
     public static function callHook($hook, $args = [], $app = 'horde')
     {
-        return $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
+        return $GLOBALS['injector']->get(Horde_Core_Hooks::class)
             ->callHook($hook, $app, $args);
     }
 
@@ -204,7 +204,7 @@ class Horde_Deprecated
      */
     public static function hookExists($hook, $app = 'horde')
     {
-        return $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
+        return $GLOBALS['injector']->get(Horde_Core_Hooks::class)
             ->hookExists($hook, $app);
     }
 

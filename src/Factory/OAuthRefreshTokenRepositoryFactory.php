@@ -29,7 +29,7 @@ class OAuthRefreshTokenRepositoryFactory
     {
         if (class_exists(SqlOAuthRefreshTokenRepository::class)) {
             try {
-                $db = $injector->getInstance(Adapter::class);
+                $db = $injector->get(Adapter::class);
                 return new SqlOAuthRefreshTokenRepository($db);
             } catch (Throwable) {
                 return new InMemoryRefreshTokenRepository();

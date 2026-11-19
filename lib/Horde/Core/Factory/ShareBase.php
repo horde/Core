@@ -48,7 +48,7 @@ class Horde_Core_Factory_ShareBase extends Horde_Core_Factory_Base implements Ho
     public function create($app = null, $driver = null)
     {
         global $conf;
-        $registry = $this->_injector->getInstance('Horde_Registry');
+        $registry = $this->_injector->get(Horde_Registry::class);
 
         if (empty($driver)) {
             $driver = $conf['share']['driver'];
@@ -63,13 +63,13 @@ class Horde_Core_Factory_ShareBase extends Horde_Core_Factory_Base implements Ho
         }
 
         $class = $this->_getDriverName($driver, 'Horde_Share');
-        $ob = new $class($app, $registry->getAuth(), $this->_injector->getInstance('Horde_Perms'), $this->_injector->getInstance('Horde_Group'));
+        $ob = new $class($app, $registry->getAuth(), $this->_injector->get('Horde_Perms'), $this->_injector->get('Horde_Group'));
         $cb = new Horde_Core_Share_FactoryCallback($app, $driver);
         $ob->setShareCallback([$cb, 'create']);
-        $ob->setLogger($this->_injector->getInstance('Horde_Log_Logger'));
+        $ob->setLogger($this->_injector->get('Horde_Log_Logger'));
 
         if (!empty($conf['share']['cache'])) {
-            $session = $this->_injector->getInstance(HordeSession::class);
+            $session = $this->_injector->get(HordeSession::class);
             $cache_sig = self::STORAGE_KEY . $driver;
             $listCache = $session->getScoped($app, $cache_sig);
             $ob->setListCache($listCache);
@@ -102,7 +102,7 @@ class Horde_Core_Factory_ShareBase extends Horde_Core_Factory_Base implements Ho
      */
     public function shutdown()
     {
-        $session = $this->_injector->getInstance(HordeSession::class);
+        $session = $this->_injector->get(HordeSession::class);
 
         foreach ($this->_toCache as $sig => $val) {
             try {

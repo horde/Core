@@ -45,7 +45,7 @@ class ConfigLoaderFactory
         // Try to get metadata provider if available
         $metadataProvider = null;
         try {
-            $metadataProvider = $injector->getInstance(ConfigMetadataProvider::class);
+            $metadataProvider = $injector->get(ConfigMetadataProvider::class);
         } catch (Exception $e) {
             // Metadata provider not available, continue without it
         }

@@ -28,7 +28,7 @@ class Horde_Core_Factory_Image extends Horde_Core_Factory_Base
 
         $context = [
             'tmpdir' => Horde::getTempdir(),
-            'logger' => $this->_injector->getInstance('Horde_Log_Logger'),
+            'logger' => $this->_injector->get('Horde_Log_Logger'),
         ];
 
         switch ($driver) {

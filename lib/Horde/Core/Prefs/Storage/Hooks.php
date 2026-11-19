@@ -30,7 +30,7 @@ class Horde_Core_Prefs_Storage_Hooks extends Horde_Prefs_Storage_Base
             try {
                 $scope_ob->set(
                     $name,
-                    $GLOBALS['injector']->getInstance('Horde_Core_Hooks')->callHook(
+                    $GLOBALS['injector']->get(Horde_Core_Hooks::class)->callHook(
                         'prefs_init',
                         $scope_ob->scope,
                         [
@@ -60,7 +60,7 @@ class Horde_Core_Prefs_Storage_Hooks extends Horde_Prefs_Storage_Base
     public function onChange($scope, $pref)
     {
         try {
-            $GLOBALS['injector']->getInstance('Horde_Core_Hooks')
+            $GLOBALS['injector']->get(Horde_Core_Hooks::class)
                 ->callHook('prefs_change', $scope, [$pref]);
         } catch (Horde_Exception_HookNotSet $e) {
         }

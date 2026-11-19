@@ -30,6 +30,7 @@ use ReflectionProperty;
  * collapsed to 0 once `_active` was false, max_time + 0 compares less
  * than the current timestamp for any non-zero max_time, incorrectly
  * failing auth for every closed, read-only request. See horde/imp#88.
+ * @coversNothing
  */
 class HordeSessionShimBeginTest extends TestCase
 {
