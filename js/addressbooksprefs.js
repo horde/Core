@@ -12,57 +12,65 @@ var HordeAddressbooksPrefs = {
     updateSearchFields: function()
     {
         var tmp,
-            sv = $F('selected_sources'),
-            sf = $('search_fields_select');
+            sv = Array.from(document.getElementById('selected_sources').selectedOptions).map(option => option.value),
+            sf = document.getElementById('search_fields_select');
 
-        sf.childElements().invoke('remove');
+        // Remove all child elements
+        while (sf.firstChild) {
+            sf.removeChild(sf.firstChild);
+        }
 
-        if (sv.size() == 1) {
-            tmp = this.fields.get(sv.first());
-            tmp.entries.each(function(o) {
-                var opt = new Option(o.label, o.name);
-                if (tmp.selected.include(o.name)) {
+        if (sv.length == 1) {
+            tmp = this.fields.get(sv[0]);
+            tmp.entries.forEach(function(o) {
+                var opt = document.createElement('option');
+                opt.text = o.label;
+                opt.value = o.name;
+                if (tmp.selected.includes(o.name)) {
                     opt.selected = true;
                 }
-                sf.insert(opt);
+                sf.appendChild(opt);
             });
         } else {
-            tmp = new Option(this.nonetext, '');
-            tmp.disabled = true;
-            sf.insert(tmp);
+            var tmpOption = document.createElement('option');
+            tmpOption.text = this.nonetext;
+            tmpOption.disabled = true;
+            sf.appendChild(tmpOption);
         }
     },
 
     changeSearchFields: function()
     {
         var tmp,
-            out = $H(),
-            sv = $F('selected_sources');
+            out = new Map(),
+            sv = Array.from(document.getElementById('selected_sources').selectedOptions).map(option => option.value);
 
-        if (sv.size() == 1) {
-            tmp = this.fields.get(sv.first());
-            tmp.selected = $F('search_fields_select');
-            this.fields.set(sv.first(), tmp);
+        if (sv.length == 1) {
+            tmp = this.fields.get(sv[0]);
+            tmp.selected = Array.from(document.getElementById('search_fields_select').selectedOptions).map(option => option.value);
+            this.fields.set(sv[0], tmp);
 
-            this.fields.each(function(f) {
+            this.fields.forEach(function(f) {
                 out.set(f.key, f.value.selected);
             });
 
-            $('search_fields').setValue(Object.toJSON(out));
+            document.getElementById('search_fields').value = JSON.stringify(Object.fromEntries(out));
         }
     },
 
     onDomLoad: function()
     {
-        this.fields = $H(this.fields);
+        this.fields = new Map(this.fields);
 
         this.updateSearchFields();
 
-        $('search_fields_select').observe('change', this.changeSearchFields.bind(this));
-        $('selected_sources').observe('change', this.updateSearchFields.bind(this));
-        $('selected_sources').observe('HordeSourceSelectPrefs:remove', this.updateSearchFields.bind(this));
+        document.getElementById('search_fields_select').addEventListener('change', this.changeSearchFields.bind(this));
+        document.getElementById('selected_sources').addEventListener('change', this.updateSearchFields.bind(this));
+        document.getElementById('selected_sources').addEventListener('HordeSourceSelectPrefs:remove', this.updateSearchFields.bind(this));
     }
 
 };
 
-document.observe('dom:loaded', HordeAddressbooksPrefs.onDomLoad.bind(HordeAddressbooksPrefs));
+document.addEventListener('DOMContentLoaded', function() {
+    HordeAddressbooksPrefs.onDomLoad.bind(HordeAddressbooksPrefs)();
+});
