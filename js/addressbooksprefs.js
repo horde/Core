@@ -34,6 +34,7 @@ var HordeAddressbooksPrefs = {
         } else {
             var tmpOption = document.createElement('option');
             tmpOption.text = this.nonetext;
+            tmpOption.value = '';
             tmpOption.disabled = true;
             sf.appendChild(tmpOption);
         }
@@ -50,8 +51,8 @@ var HordeAddressbooksPrefs = {
             tmp.selected = Array.from(document.getElementById('search_fields_select').selectedOptions).map(option => option.value);
             this.fields.set(sv[0], tmp);
 
-            this.fields.forEach(function(f) {
-                out.set(f.key, f.value.selected);
+            this.fields.forEach(function(value, key) {
+                out.set(key, value.selected);
             });
 
             document.getElementById('search_fields').value = JSON.stringify(Object.fromEntries(out));
@@ -60,7 +61,7 @@ var HordeAddressbooksPrefs = {
 
     onDomLoad: function()
     {
-        this.fields = new Map(this.fields);
+        this.fields = new Map(Object.entries(this.fields));
 
         this.updateSearchFields();
 
